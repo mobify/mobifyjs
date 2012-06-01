@@ -1,12 +1,12 @@
-(function($, _) { 
-
+(function($) { 
+    
+    var console = Mobify.console;
     var gatherEmpties = function(assignment, ref, value) {
         var  root = this.root
             ,warnings = root.warnings = root.warnings || {}
             ,overwrites = root.overwrites = root.overwrites || {};
 
         var isEmpty = (value === null) || (value === undefined) || (value === '')
-            || ($.isPlainObject(value) && _.isEmpty(value))
             || ((typeof value.length != 'undefined')  && !value.length)
             || (value instanceof Error)
             || (!value && (this.get('laziness') > 0));
@@ -25,14 +25,14 @@
 
     ,logResult = function(value) {
         if (!this.tail) {
-            debug.logGroup('warn', 'Unfilled values', this.warnings);
-            debug.logGroup('warn', 'Missing -> Wrappers', this.forgotten);
-            debug.logGroup('log', 'Overwrites', this.overwrites);
-            debug.logGroup('log', 'Choices', this.choices);
+            console.logGroup('warn', 'Unfilled values', this.warnings);
+            console.logGroup('warn', 'Missing -> Wrappers', this.forgotten);
+            console.logGroup('log', 'Overwrites', this.overwrites);
+            console.logGroup('log', 'Choices', this.choices);
 
-            debug.group('All extracted data');
-            debug.log(value);
-            debug.groupEnd();  
+            console.group('All extracted data');
+            console.log(value);
+            console.groupEnd();  
         }
     }
     ,Async = function(cont, start) {
@@ -64,7 +64,7 @@
         async.finish = function(value) {
             result = value;
             done = true;
-            _.each(listeners, function(f) {
+            $.each(listeners, function(i, f) {
                 f.call(async, value)
             });
         }
@@ -75,25 +75,32 @@
         return done ? result : async;
     }
 
-    // TODO: If we want to Mobify this subb'd jQuery when / how should we do it?
     ,anchor = function($root) {
-        var anchored = $.sub();
+        var rootedQuery = function(selector, context, rootQuery) {
+            $root = $root || (Mobify.conf.data && Mobify.conf.data.$html);
+
+            return ($.fn.init || $.zepto.init).call(this, selector, context || anchored.context(), rootQuery);
+        };
+
+        var anchored = $.sub(rootedQuery); 
 
         anchored.context = function() {
             return $root || (Mobify.conf.data ? Mobify.conf.data.$html : '<div>');
         }
 
-        anchored.fn.init = function(selector, context, rootQuery) {
-            $root = $root || (Mobify.conf.data && Mobify.conf.data.$html);
+        if (!anchored.zepto)  {
+            anchored.fn.init = rootedQuery;
+            anchored.fn.init.prototype = $.fn;
+        }
 
-            //Zepto won't have $.fn.init
-            return ($.fn.init || $).call(this, selector, context || anchored.context(), rootQuery);
-        };
-
-        anchored.fn.init.prototype = $.fn;
-        
         return anchored;
     }
+
+    $.sub = $.sub || function(rootedQuery) {
+        $.extend(rootedQuery, $);
+        rootedQuery.zepto = $.extend({}, $.zepto);
+        return rootedQuery;
+    };
 
     $.fn.anchor = function() {
         return anchor(this);
@@ -102,7 +109,7 @@
     Mobify.data2 = {
         gatherEmpties: gatherEmpties
         ,makeCont: function(opts) {
-            var cont = new Mobify.data2.cont(_.defaults(opts, {laziness: -1 }));
+            var cont = new Mobify.data2.cont($.extend({}, {laziness: -1 }, opts));
             if (Mobify.config.isDebug) {
                 cont
                     .on('assignReference', gatherEmpties)
@@ -111,10 +118,7 @@
             return cont;
         }
         ,Async: Async
-        ,M: {
-             $ : anchor()
-            ,_ : _
-            ,async : Async
-        }
+        ,M: {$ : anchor(), async: Async}
     };
-})(Mobify.$, Mobify._);
+    
+})(Mobify.$);

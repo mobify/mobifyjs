@@ -10,70 +10,6 @@
 (function(window, document, $) {
 
 // ###
-// # Orientation
-// ###
-
-// Android `orientation` support is broken.
-$.support.orientation = 'orientation' in window && 'onorientationchange' in window
-    && !/android/i.test(navigator.userAgent);
-
-var prevWidth
-  , prevOrientation
-    // Returns 'landscape' or 'portrait' based on the current orientation.
-    getOrientation = function() {
-        var docEl = document.documentElement;
-        return ($.support.orientation
-                    // 0 in portrait, 1 in landscape
-                    ? orientation % 180 
-                    // false in portrait, true in landscape
-                    : docEl.clientWidth > docEl.clientHeight)
-                ? 'landscape'
-                : 'portrait';
-    }
-
-    // Some Android browsers (HTC Sensation) don't update widths immediately,
-    // so wait to trigger the event.
-  , orientationHandler = function() {
-        function triggerEvent() {
-            var width = document.documentElement.clientWidth
-              , orientation;
-
-            if (width == prevWidth) {
-                return setTimeout(triggerEvent, 250);
-            }
-
-            prevWidth = width;
-            
-            orientation = getOrientation();
-            if (orientation != prevOrientation) {
-                prevOrientation = orientation;
-                $(window).trigger('orientationchange');
-            }
-        }
-
-        triggerEvent();
-    }
-
-// Polyfill `orientationchange` event.
-$.event.special.orientationchange = {
-    setup: function() {
-        if ($.support.orientation) return false;
-        $(window).bind('resize', orientationHandler);
-    },
-    teardown: function() {
-        if ($.support.orientation) return false;
-        $(window).unbind('resize', orientationHandler);
-    },
-    add: function(handleObj) {
-        var handler = handleObj.handler;
-        handleObj.handler = function(e) {
-            e.orientation = getOrientation();
-            return handler.apply(this, arguments);
-        };
-    }
-}
-
-// ###
 // # Device Properties
 // ###
 
@@ -87,13 +23,16 @@ var $test = $('<div>', {id: 'mc-test'})
   , osMatch = /(ip(od|ad|hone)|android|nokia|blackberry|webos)/gi.exec(navigator.userAgent)
   , os = (osMatch && (osMatch[2] ? 'ios' : osMatch[1].toLowerCase())) || 'desktop'
 
+  , tablet = /ipad|android(?!.*mobile)/i.test(navigator.userAgent)
+
+  , smartphone = ((os != 'desktop') && !tablet)
+
     // Device Pixel Ratio: 1, 1.5, 2.0
   , dpr = 1
   , q = [
         'screen and (-webkit-min-device-pixel-ratio:1.5)', 
-        'screen and (-webkit-min-device-pixel-ratio:2)',
+        'screen and (-webkit-min-device-pixel-ratio:2)'
     ];
-
 // Use `devicePixelRatio` if available, falling back to querying using
 // `matchMedia` or manual media queries.
 if ('devicePixelRatio' in window) {
@@ -121,7 +60,6 @@ if ('devicePixelRatio' in window) {
     }
 }
 
-
 // ###
 // # Mobify.config
 // ###
@@ -129,10 +67,12 @@ if ('devicePixelRatio' in window) {
 // Expose Touch, OS, HD and Orientation properties on `Mobify.config` for
 // use in templating.
 
-var config = Mobify.config;
+var config = Mobify.config || {};
 config.os = os;
+config.tablet = tablet;
+config.smartphone = smartphone;
 config.touch = touch;
-config.orientation = getOrientation();
+config.orientation = Mobify.orientation();
 
 if (dpr > 1) {
     config.HD = '@2x';
@@ -156,8 +96,7 @@ if (dpr > 1) {
 // .dpr1 .dpr15 .dpr2
 Mobify.enhance = function() {
     
-    var prevOrientation = getOrientation()
-      , classes = [os, (!touch ? 'no' : '') + 'touch', prevOrientation];
+    var classes = [os, (!touch ? 'no' : '') + 'touch', Mobify.orientation()];
 
     if (dpr > 1) {
         classes.push('hd' + (dpr + '').replace(/[^\w]/, ''), 'hd');
@@ -167,11 +106,9 @@ Mobify.enhance = function() {
 
     $('html').addClass('x-' + classes.join(' x-'));
 
-    $(window).bind('orientationchange', function() {
-        var orientation = getOrientation();
+    Mobify.orientation(function(orientation, prevOrientation) {
         $('html').removeClass('x-' + prevOrientation).addClass('x-' + orientation);
-        prevOrientation = orientation;
-    })
+    });
 };
 
 })(this, document, Mobify.$);

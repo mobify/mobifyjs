@@ -1,4 +1,4 @@
-(function($, _) {
+(function($, Mobify) {
     var Stack = Mobify.data2.stack = function(head, parent, idx, len) {
         this.tail = parent;
         this.head = head;
@@ -13,9 +13,10 @@
             return new Stack(head, this, idx, len);
         }
         ,crumbs: function() {
-            var crumbs = _(this).chain().pluck('index')
-                .reject(function(idx) { return idx == undefined})
-                .reverse().value();
+            var crumbs = [];
+            for (var walk = this; walk.tail; walk = walk.tail) {
+                if (walk.index !== undefined) crumbs.unshift(walk.index);
+            }
 
             crumbs.toString = function() { return this.join('.') };
             return crumbs;
@@ -43,7 +44,7 @@
                 // If token is numeric and stack.head is an array, we should
                 // disable ascending logic and force local assignment. Otherwise,
                 // we risk ending up with unwanted overwrites in cases of nested arrays
-                && (isNaN(token) || !_.isArray(stack.head))) {
+                && (isNaN(token) || !$.isArray(stack.head))) {
                 while (!(token in stack.head) && stack.tail)
                     stack = stack.tail;
             }
@@ -75,4 +76,4 @@
             }
         }
     };
-})(Mobify.$, Mobify._);
+})(Mobify.$, Mobify);

@@ -1,4 +1,4 @@
-(function($, _, Mobify, undefined) {
+(function($, Mobify, undefined) {
     var decodeAssignmentRe = /^([?!]?)(.*)$/
         ,Location = window.Location
         ,Stack = Mobify.data2.stack
@@ -22,7 +22,7 @@
             }
         };
 
-    _.extend(Cont, {
+    $.extend(Cont, {
         importance : {'!' : 1, '?' : -1, '' : 0}
         ,decodeAssignment : function(selector) {
             parse = selector.toString().match(decodeAssignmentRe);
@@ -33,7 +33,7 @@
         }
     });
 
-    Cont.prototype = _.extend(new Stack(), {
+    Cont.prototype = $.extend(new Stack(), {
          extend: function(head, idx, len, env) {
             return new Cont(head, this, idx, len, env);
         }
@@ -48,13 +48,13 @@
                 : this.get('source');
         }
         ,all: function() {
-            return _(this.env()).find(function(stack) {
-                return !stack.tail.tail;
-            }).head;
+            var env;
+            for (env = this.env(); env.tail.tail; env = env.tail);
+            return env.head;
         }
         ,blankTarget: function() {
             var source = this.source();
-            if (_.isArray(source)) return [];
+            if ($.isArray(source)) return [];
             if ($.isPlainObject(source)) return {};
         }
         ,_eval : function(source) {
@@ -94,7 +94,7 @@
             try {
                 if (!source) return source;
 
-                return (_.isFunction(source) && !source._async)
+                return ($.isFunction(source) && !source._async)
                     ? source.call(this.env().head, this)
                     : source;
             } catch (e) { return e; }
@@ -104,7 +104,7 @@
                 sourceLength = source.length,
                 continuation = this;
  
-            _.each(source, function(sourceFragment, idx) {
+            $.each(source, function(idx, sourceFragment) {
                 if (sourceFragment && (sourceFragment.jquery || sourceFragment.nodeType)
                     && (typeof idx == "string") && idx.indexOf('$')) {
                     var root = continuation.root;
@@ -120,13 +120,13 @@
 
         ,evalReference : function() {
             
-            var  ref, value, cont = this 
-                ,assignment = Cont.decodeAssignment(this.index);
+            var ref, value, cont = this 
+              , assignment = Cont.decodeAssignment(this.index);
             
             if (assignment.importance >= this.get('laziness')) {
                 this.ref = ref = this.env().ref(assignment.selector, true);
                 if (!ref) {
-                    debug.warn(assignment.selector
+                    Mobify.console.warn(assignment.selector
                         , " has a syntax error or points to object that does not exist");
                     return;
                 }
@@ -168,7 +168,7 @@
                 ,forgotten = root.forgotten = root.forgotten || []
                 ,branches = arguments
                 ,choices = root.choices = root.choices || {}
-                ,chosen = _.detect(branches, function(branch, idx) {
+                ,chosen = ([].some.call(branches, function(branch, idx) {
                     var attempt = new Mobify.data2.cont({source: branch, laziness: 1});
                     attempt.root = attempt;
                     attempt.env(cont.env().extend({}));
@@ -177,8 +177,10 @@
                     
                     [].push.apply(root.forgotten, attempt.forgotten || []);
 
-                    return !(attempt.warnings && _.keys(attempt.warnings).length);
-                })
+                    for (var firstWarning in attempt.warnings) break;
+                    if (!firstWarning) chosen = branch;
+                    return !firstWarning;
+                }), chosen)
                 ,chosenCont = cont.extend({source: chosen}, cont.index, cont.of);
             
             if (chosen) {
@@ -190,7 +192,7 @@
                 ,continuation = this
                 ,result;
  
-            result = _.map(source, function(sourceFragment, idx) {
+            result = $.map(source, function(sourceFragment, idx) {
                 var cont = continuation
                     .extend({source: evaluatable}, idx, sourceLength, {
                         $: sourceFragment.tagName && $(sourceFragment).anchor()
@@ -211,7 +213,7 @@
                             cont.env(cont.env().extend({THIS: responseData}));
                             async.finish(cont.eval(evaluatable));
                         } else {
-                            var context = $(Mobify.externals.disable(responseData));
+                            var context = $(Mobify.html.disable(responseData));
                             cont.env(cont.env().extend({THIS: context, $: context.anchor()}));
                             async.finish(cont.eval(evaluatable));
                         }
@@ -222,13 +224,16 @@
         }
         ,tmpl: function(template, data) {
             var args = arguments;
+            if (template instanceof Array) template = template[0];
 
             return Async(this, function(cont, async) {
+                var base = dust.makeBase({ lib_import: Mobify.ark.dustSection });
+
                 if (args.length == 1) data = cont.all();
-                dust.render(template, data, function(err, out) {
+                dust.render(template, base.push(data), function(err, out) {
                     if (err) {
                         async.finish(out);
-                        debug.die(err);
+                        Mobify.console.die(err);
                     } else async.finish(out);
                 });
             });
@@ -255,10 +260,10 @@
                 ,continuation = this
                 ,allHandlers = this.root.handlers;
 
-            _.each(allHandlers[event] || [], function(handler) {
+            $.each(allHandlers[event] || [], function(i, handler) {
                 handler.apply(continuation, args);
             });
         }
     });
 
-})(Mobify.$, Mobify._, Mobify);
+})(Mobify.$, Mobify);

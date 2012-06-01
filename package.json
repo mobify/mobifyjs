@@ -1,0 +1,15 @@
+{
+    "name": "mobify-js",
+    "version": "0.0.0",
+    "description": "The Mobify.js client side adaptation library.",
+    "author": "Mobify <dev@mobify.com>",
+    "devDependencies": {
+        "node-static": "0.5.8"
+    },
+    "engine": "node 0.6.2",
+    "repository" : { 
+        "type" : "git",
+        "url" : "git@github.com:mobify/mobify-js.git"
+    },
+    "private": true
+}

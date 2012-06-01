@@ -1,7 +1,0 @@
-{%rebase}
-
-{>"api/analytics.js"/}
-{>"api/externals.js"/}
-{>"api/enhance.js"/}
-
-{/rebase}
