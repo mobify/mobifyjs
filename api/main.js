@@ -1,30 +1,33 @@
 /*
-
 Processing order description
 
-1. Escaping
+Before this script runs:
 
-The Mobify tags identities whether a browser should recieve the transformation.
-If so, it escapes the document, allowing for markup capture without loading
-external resources.
+0. Escaping
+The Mobify tags identities whether a browser transform the page.
+If so, tag escapes the document contents, allowing markup to be captured 
+without loading external resources.
 
-2. Source DOM Construction
+
+This script does:
+
+1. Source DOM Construction - extractDOM()
 
 The escaped markup is retrieved from the DOM as a string. The escaped markup is 
 transformed into a DOM node after resource loading attributes are escaped.
 
-3. Data select
+2. Data processing - run konf function, which invokes acceptHTML() callback
 
-A data object is created by select nodes from the source DOM using DOM methods.
+A data object is created by selecting elements from source DOM or whatever
+other means necessary. Sometime during this process, output HTML would be build, 
+through dust templating, DOM construction + outerHTML or some other way.
+This HTML string is fed into acceptHTML() callback
 
-4. Markup generation.
+3. Document replacement - writeHTML()
 
-A dust template is rendered with the data as a context, producing the final HTML.
-
-5. Document replacement
-
-The current document is replaced by using document.open/write/close. This makes 
-the browser behave as if the templated HTML was the regular source.
+The current document is abandoned, and retrieved content is inejcted into a new one
+via document.open/write/close. This makes the browser behave almost as if the 
+replacement HTML was originally sent down the pipe.
 
 */
 (function(document, $, Mobify) {
@@ -37,76 +40,37 @@ $.extend(Mobify.transform, {
     prepareConf : function(rawConf) {
         var capturedState = Mobify.html.extractDOM();
         capturedState.config = Mobify.config;
-        
-        // If conf is using data2 evaluation in a {+conf} or {+konf}, this call would provide
-        // an interpretable source data object. 
-        // If conf is using just a function(), the return value is not useful,
-        // as result HTML would be provided as sole argument of a callback.
-        var conf = Mobify.conf = rawConf.call(
-            Mobify.data2 && Mobify.data2.M,
-            capturedState,
-            transform.acceptData // This is escape path for function-based confs
-        );
-
-        // And this is the normal data evaluation
-        if (conf && conf.data) {
-            timing.addPoint('Setup Conf');
-            conf.data = $.extend(capturedState, conf.data);
-            Mobify.evaluatedData = undefined;
-
-            var cont = Mobify.data2.makeCont({source: capturedState})
-                .on('complete', transform.acceptData);
-
-            timing.addPoint('Prepared conf for evaluation');
-            timing.addSelector('Start');
-            cont.eval();
+        try {
+            var base = Mobify.mobject.M(capturedState, transform.acceptHTML);
+            rawConf.call(base, capturedState, transform.acceptHTML);
+        } catch (e) {
+            transform.acceptHTML(e)
         }
     },
 
-    // `acceptData` is exposed on `Mobify` so it can be overridden for server-side adaptation.
+    // `acceptHTML` is exposed on `Mobify` so it can be overridden for server-side adaptation.
     // Called when the `konf` has been evaluated.
-    acceptData: function(data, cont) {     
-        if (!Mobify.evaluatedData) {
-            Mobify.evaluatedData = data;
-            Mobify.evaluatedCont = cont;
-            timing.addPoint('Evaluated Conf');
-        }
+    acceptHTML: function(markup) {
+        if (markup instanceof Error) markup = markup.payload;
+        markup = markup || "";
+
+        if (typeof Mobify.html.acceptedHTML == "string") return;
+        Mobify.html.acceptedHTML = markup;
+        timing.addPoint('Adapted passive document');
         
-        var outputHTML = (typeof data == "string") ? data : data.OUTPUTHTML;
-        var enabled = Mobify.html.enable(outputHTML || '');
-        timing.addPoint('Enabled Markup');
-        transform.emitMarkup(enabled);
-    },
-
-    emitMarkup: function(markup) {
-        timing.addPoint('DOMContentLoaded');
-
-        if (!markup) {
-            Mobify.console.warn('Output HTML is empty, unmobifying.');
-            return Mobify.unmobify();
-        }
-
-        timing.addPoint('Writing Document');
+        markup = Mobify.html.enable(markup);
+        timing.addPoint('Re-enabled external resources');
 
         if (Mobify.config.isDebug) {
             timing.logPoints();
+            Mobify.mobject.log();
         }
-
-        // We'll write markup a tick later, as Firefox logging is async
-        // and gets interrupted if followed by synchronous document.open
-        window.setTimeout(function(){
-            // `document.open` clears events bound to `document`.
-            document.open();
-
-            // In Webkit, `document.write` immediately executes inline scripts 
-            // not preceded by an external resource.
-            document.write(markup);
-            document.close();
-        });
+        Mobify.html.writeHTML(markup);
     },
 
     // Kickstart processing. Guard against beginning before the document is ready.
     run: function(conf) {
+        Mobify.timing.addPoint('Started adaptation');
         var prepareConf = function() {
             Mobify.transform.prepareConf(conf);
         };
@@ -119,5 +83,3 @@ $.extend(Mobify.transform, {
 });
 
 })(document, Mobify.$, Mobify);
-
-Mobify.timing.addPoint('Walked Mobify.js');

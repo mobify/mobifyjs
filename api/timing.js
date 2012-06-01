@@ -24,17 +24,11 @@
     // TODO: Break start out into it's own parameters - bandwidth etc. is unreleated to our load time.
     var timing = Mobify.timing = {
         points: [],
-        selectors: [],
 
         addPoint: function(str, date) {
             var point = date || +new Date;         
             this.points.push([point, str]);
             return point;
-        },
-
-        addSelector: function(str, date) {
-            var point = date || +new Date;         
-            this.selectors.push([point, str]);
         },
 
         logGroup: function(group, name) {
@@ -56,17 +50,16 @@
 
         logPoints: function() {
             this.logGroup(this.points, 'Global timing');
-            this.logGroup(this.selectors, 'Data evaluation timing');
         },
 
         // Allow plugins to reset timing for their own use.
         reset: function() {
             this.points = [];
-            this.selectors = [];
         }
     };
 
-    timing.addPoint('Finished Document', Mobify.points[1]);
-    timing.addPoint('Loaded Mobify.js');
+    timing.addPoint('Wrote Mobify bootstrap tag', Mobify.points[0]);
+    timing.addPoint('Begun executing mobify.js file', Mobify.points[1]);
+    Mobify.points = [];
 
 })(Mobify.$, Mobify);

@@ -2,20 +2,16 @@
 // 2) Set a border or outline on the body
 // 3) get document.body.clientWidth
 // 4) Give me a goddamn prize
-(function(window, $) {
+(function($) {
 
 var absolutify = document.createElement('a')
-
   , hosts = [
         '//ir0.mobify.com'
       , '//ir1.mobify.com'
       , '//ir2.mobify.com'
       , '//ir3.mobify.com'
     ]
-
-    /**
-     * Hash `url` into a well distributed int.
-     */
+    // Hash `url` into a well distributed int.
   , URLHash = Mobify.URLHash = function(url) {
         var hc, len = url.length;
 
@@ -33,25 +29,23 @@ var absolutify = document.createElement('a')
         return hc;
     }
           
-    /**
-     * Returns a URL suitable for use with the 'ir' service.
-     *  :host/:format:quality/:width/:height/:url
-     */ 
-  , getImageURL = Mobify.getImageURL = function(url, options) {
-        options = options || {}
+    // Returns a URL suitable for use with irX.mobify.com.
+    // :host/:format:quality/:width/:height/:url
+  , getImageURL = Mobify.getImageURL = function(url, opts) {
+        opts = opts || {}
 
         var host = hosts[URLHash(url) % hosts.length]
           , bits = [host];
 
-        if (options.format) {
-            bits.push(options.format + (options.quality || ''));
+        if (opts.format) {
+            bits.push(opts.format + (opts.quality || ''));
         }
 
-        if (options.maxWidth) {
-            bits.push(options.maxWidth)
+        if (opts.maxWidth) {
+            bits.push(opts.maxWidth)
 
-            if (options.maxHeight) {
-                bits.push(options.maxHeight);
+            if (opts.maxHeight) {
+                bits.push(opts.maxHeight);
             }
         }
 
@@ -59,20 +53,17 @@ var absolutify = document.createElement('a')
         return bits.join('/');
     }
 
-    /**
-     * Searches the collection for imgs and modifies them to use the `ir` service.
-     * Pass `options` to modify how the images are serviced.
-     */
+    // Alter the `src` of child images to pass through 
+    // irX.mobify.com. Return the set of altered elements.
   , resizeImages = $.fn.resizeImages = function(options) {
-        var opts = $.extend(defaults, typeof options == 'object' && options)
-          , dpr = window.devicePixelRatio
-          , $imgs = this.filter(opts.selector).add(this.find(opts.selector))
-          , attr;
+        var opts = $.extend(resizeImages.defaults, typeof options == 'object' && options)
+          , dpr = window.devicePixelRatio;
 
         if (typeof options == 'number') {
             opts.maxWidth = options;
         }
 
+        // https://github.com/Modernizr/Modernizr/pull/443
         if (dpr) {
             if (opts.maxWidth) {
                 opts.maxWidth = Math.ceil(opts.maxWidth * dpr);
@@ -83,16 +74,22 @@ var absolutify = document.createElement('a')
             }
         }
 
+        var $imgs = this.filter(opts.selector).add(this.find(opts.selector));
         return $imgs.each(function() {
-            if (attr = this.getAttribute(opts.attribute)) {
+            var attr = this.getAttribute(opts.attribute);
+            if (attr) {
                 absolutify.href = attr;
+                // This is slow, but its nice because it preloads the asset.
+                //this.src = getImageURL(absolutify.href, opts);
                 this.setAttribute('x-src', getImageURL(absolutify.href, opts))
+                // this.removeAttribute(opts.attribute);
             }
         });
-    }
-  , defaults = resizeImages.defaults = {
-        selector: 'img[x-src]'
-      , attribute: 'x-src'
-    }
+    };
 
-})(this, Mobify.$);
+resizeImages.defaults = {
+    selector: 'img[x-src]',
+    attribute: 'x-src'
+};
+
+})(Mobify.$);

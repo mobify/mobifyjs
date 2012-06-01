@@ -30,11 +30,6 @@ $.each(disablingMap, function(tagName, targetAttributes) {
         attributesToEnable[value] = true;
     });
 
-    // Special treatment for images - disable existing width/height attributes.
-    if (tagName === 'img') {
-        targetAttributes = targetAttributes.concat('width', 'height')
-    }
-
     // <space><attr>='...'|"..."
     attributeDisablingRes[tagName] = new RegExp(
         '\\s+((?:'

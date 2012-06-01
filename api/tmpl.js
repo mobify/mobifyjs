@@ -1,61 +1,52 @@
 (function($, Mobify) {
 
-var Async = Mobify.data2 && Mobify.data2.Async
-  , Context = dust.makeBase({}).constructor
+var Context = dust.makeBase({}).constructor
   , Chunk = dust.stream('', {}).head.constructor
-  , oldExists = Chunk.prototype.exists
-  , oldNotExists = Chunk.prototype.notexists
   , oldBlock = Chunk.prototype.block;
-    
-Chunk.prototype.exists = function(elem, context, bodies) {
-    if (typeof elem === "function") {
-        elem = elem(this, context, bodies, 'exists');
-        if (elem instanceof Chunk) {
-          return elem;
-        }
-    }
-    return oldExists.call(this, elem, context, bodies);
-};
 
-Chunk.prototype.notexists = function(elem, context, bodies) {
-    if (typeof elem === "function") {
-        elem = elem(this, context, bodies, 'notexists');
-        if (elem instanceof Chunk) {
-          return elem;
-        }
+$.each(["exists", "notexists", "reference", "section"], function(i, name) {
+    var oldFn = Chunk.prototype[name];
+    var needsExecutionWrapper = name.match("exists");
+
+    Chunk.prototype[name] = function(elem, context, bodies, extras) {
+        if (elem && elem._callable) elem = elem._callable;
+
+        if (needsExecutionWrapper && (typeof elem === "function")) {
+            elem = elem(this, context, bodies, 'notexists');
+            if (elem instanceof Chunk) {
+              return elem;
+            }
+        }            
+
+        return oldFn.call(this, elem, context, bodies, extras);
     }
-    return oldNotExists.call(this, elem, context, bodies);
-};
+});
 
 Chunk.prototype.block = function(elem, context, bodies) {
     var topElem = elem ? elem.shift() : undefined;
     if (topElem) {          
         context = new context.constructor(
-                    context.stack, 
-                    $.extend(context.global || {}, {
-                        '_SUPER_': function(_elem, context, _bodies) {
-                            return _elem.block(elem, context, bodies);
-                        }})
-                    , context.blocks);
+            context.stack, 
+            $.extend(context.global || {}, {
+                '_SUPER_': function(_elem, context, _bodies) {
+                    return _elem.block(elem, context, bodies);
+                }})
+            , context.blocks);
     }
     
     return oldBlock.call(this, topElem, context, bodies);
 };
 
 var descend = function(ctx, down, i) {
-        while (ctx && i < down.length) {
-            if (ctx._async) {
-                var unwrap = Async($.noop);
-                ctx.onresult.push(function(result) {
-                    unwrap.result(descend(result, down, i));
-                });
-                return unwrap;
-            }
-            ctx = ctx[down[i]];
-            i++;
-        }        
-        return ctx;
-    }
+    while (ctx && i < down.length) {
+        if (typeof ctx.done === "function" && !ctx.done()) {
+            return ctx._delayInspection();
+        } else {
+            ctx = ctx[down[i++]];
+        }
+    }        
+    return ctx;
+};
 
 Context.prototype.getAscendablePath = function(cur, down) {
     var ctx = this.stack;

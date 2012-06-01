@@ -1,41 +1,7 @@
-{! 
-  Template syntax legend:
-
-  {! Comment !}     - Template comment. Text surrounded by {! will not be rendered.
-  {foo}             - Renders the value of key 'foo'.
-  {foo|bar}         - Renders the value of key 'foo' through the filter bar.
-  {#foo}..{/foo}    - iterate or descend into the key foo. 
-                      Example:  {#header}
-                                    {logo} 
-                                    {nav} 
-                                {/header}
-  {>foo/}           - Include the template 'foo' inside the current template
-                      (also known as a "partial")
-  {+bar}...{/bar}   - Block placeholder. Defined blocks which can be overridden 
-                      in other templates that include this one.
-  {<bar}...{/bar}   - Block override. Overrides the content in the bar block placeholder.
-  {?foo}...{/foo}   - Conditional.
-                      Example:  {?user}
-                                    Welcome {user} 
-                                    Please login. 
-                                {/user}
-  {%script}{/script} - Special script pragma to prevent removal of whitespace when building. 
-
-  $html,$head,$body  - Special keys which are the html, head, and body elements 
-                       from the desktop site.
-  {#lib_imports/}    - The Mobify object gets blown away when we write the rendered template to the document.
-                       This function allows us to reload these libraries after templates have been rendered.
-                       For example, because of this, you can use Mobify.$ to access Zepto, instead of having
-                       to include a script tag for your own selector engine.
-
-Below is your base template file, which is extended by home.tmpl:
-
-!}
-
 {doctype|s}
 {$html|openTag|s}
 {$head|openTag|s}
-    {+baseScriptsBlock}
+    {+base_scripts}
         {#lib_import/}
         {%script}
             Mobify.enhance();
@@ -46,29 +12,23 @@ Below is your base template file, which is extended by home.tmpl:
                 }, 250);
             });
         {/script}
-        {%script}
-            Mobify.$('html, #x-root').last().addClass("{#content.templateName}x-{.}{~s}{/content.templateName}");
-        {/script}    
-    {/baseScriptsBlock}
-    {+headBlock}
+        {%script}{#content}
+            Mobify.$('html, #x-root').last().addClass("{#templateName}x-{.}{~s}{/templateName}");
+        {/content}{/script}    
+    {/base_scripts}
+    {+head}
         {$head|innerHTML|s}
         <link rel="stylesheet" href="{config.configDir}{?config.tablet}tablet{:else}stylesheet{/config.tablet}.css" />
         <meta name="viewport" content="width=device-width; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; user-scalable=no;" />
-    {/headBlock}
+    {/head}
 </head>
 {$body|openTag|s}
-    {+bodyBlock}
-        {+headerBlock}
-            {>_header/}
-        {/headerBlock}
-        {+contentBlock}
-            {$body|innerHTML|s}
-        {/contentBlock}
-        {+footerBlock}
-            {>_footer/}
-        {/footerBlock}
-    {/bodyBlock}
-    {+scriptsBlock}
-    {/scriptsBlock}
+    {+body}
+        {+header}{>_header/}{/header}
+        {+content}{$body|innerHTML|s}{/content}
+        {+footer}{>_footer/}{/footer}
+    {/body}
+    {+scripts}
+    {/scripts}
 </body>
 </html>

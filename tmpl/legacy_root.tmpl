@@ -1,13 +1,5 @@
 {>base_root/}
 
-{<head}
-    {#mobileViewport}<meta name="viewport" content="{.|s}" />{/mobileViewport}
-    {#touchIcon}<link rel="apple-touch-icon" href="{imageDir|s}{.|s}" />{/touchIcon}
-    {#formatDetection}<meta name="format-detection" content="{.|s}" />{/formatDetection}
-    {+style}{#config}<link rel="stylesheet" type="text/css" href="{cssDir}stylesheet.css" />{/config}{/style}
-    {$head|innerHTML|s}
-{/head}
-
 {<body}
     <section id="x-root">
         {+header}{>_header/}{/header}

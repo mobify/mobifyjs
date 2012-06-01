@@ -71,13 +71,13 @@ $.extend(html, {
         // Extract escaped markup out of the DOM
         var captured = guillotine(html.extractHTML());
         
-        Mobify.timing.addPoint('Recovered Markup');
+        Mobify.timing.addPoint('Extracted source HTML');
         
         // Disable attributes that can cause loading of external resources
         var disabledHead = this.disable(captured.headContent)
           , disabledBody = this.disable(captured.bodyContent);
         
-        Mobify.timing.addPoint('Disabled Markup');
+        Mobify.timing.addPoint('Disabled external resources');
 
         // Reinflate HTML strings back into declawed DOM nodes.
         var result = { doctype: captured.doctype };
@@ -85,7 +85,7 @@ $.extend(html, {
         result.$body = makeElement(captured.bodyTag).append(disabledBody);
         result.$html = makeElement(captured.htmlTag).append(result.$head, result.$body);
         
-        Mobify.timing.addPoint('Built Passive DOM');
+        Mobify.timing.addPoint('Created passive document');
         
         return result;
     }

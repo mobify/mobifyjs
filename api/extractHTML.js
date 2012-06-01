@@ -31,8 +31,8 @@ var nodeName = function(node) {
     }
 
     // Return a string for the doctype of the current document.
-  , doctype = function(doc) {
-        var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
+  , doctype = function() {
+        var doctypeEl = document.doctype || [].filter.call(document.childNodes, function(el) {
                 return el.nodeType == Node.DOCUMENT_TYPE_NODE
             })[0];
 
@@ -59,21 +59,17 @@ var nodeName = function(node) {
         }).join('');
     }
 
-    // Memoize result of extract
-  , extractedHTML
-
     // Returns an object containing the state of the original page. Caches the object
     // in `extractedHTML` for later use.
-  , extractHTML = function(doc) {
-        if (extractedHTML) return extractedHTML;
+  , extractHTML = function() {
+        if (this.extractedHTML) return this.extractedHTML;
 
-        var doc = doc || document
-          , headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head')
-          , bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body')
-          , htmlEl = doc.getElementsByTagName('html')[0];
+        var headEl = document.getElementsByTagName('head')[0] || document.createElement('head')
+          , bodyEl = document.getElementsByTagName('body')[0] || document.createElement('body')
+          , htmlEl = document.getElementsByTagName('html')[0];
 
-        extractedHTML = {
-            doctype: doctype(doc),
+        var extractedHTML = this.extractedHTML = {
+            doctype: doctype(document),
             htmlTag: openTag(htmlEl),
             headTag: openTag(headEl),
             bodyTag: openTag(bodyEl),
@@ -90,43 +86,52 @@ var nodeName = function(node) {
 
         return extractedHTML;
     }
+  , writeHTML = function(markup) {
+        if (!markup) {
+            console && console.warn('Output HTML is empty, unmobifying.');
+            markup = html.extractHTML().all();
+        }
+        this.writtenHTML = markup;
 
-  , unmobify = Mobify.unmobify = function(doc) {
-        doc = doc || document
-        if (/complete|loaded/.test(doc.readyState)) {
-            unmobifier(doc);
+        // We'll write markup a tick later, as Firefox logging is async
+        // and gets interrupted if followed by synchronous document.open
+        window.setTimeout(function(){
+            // `document.open` clears events bound to `document`.
+            // The special parameters prevent IE from creating a history entry
+            document.open("text/html", "replace");
+
+            // In Webkit, `document.write` immediately executes inline scripts 
+            // not preceded by an external resource.
+            document.write(markup);
+            document.close();
+        });
+    }
+
+  , unmobify = function() {
+        if (/complete|loaded/.test(document.readyState)) {
+            unmobifier();
         } else {
-            doc.addEventListener('DOMContentLoaded', unmobifier, false);
+            document.addEventListener('DOMContentLoaded', unmobifier, false);
         }
     }
 
     // Gather escaped content from the DOM, unescaped it, and then use 
     // `document.write` to revert to the original page.
-  , unmobifier = function(doc) {
-        //RR: Why all the document-getting plumbing instead of using normal 'document'?
-        doc = (doc && doc.target || doc) || document
-        doc.removeEventListener('DOMContentLoaded', unmobifier, false);
-        var captured = extractHTML(doc);
-
-        // TODO: Confirm this.
-        // Wait up for IE, which isn't ready to do this just yet.
-        setTimeout(function() {
-            doc.open();
-            // RR: Undid extractHTML(doc).all().
-            // It would not have worked, as doc is blanked by document.open()
-            doc.write(captured.all());
-            doc.close();
-        }, 15);
+  , unmobifier = function() {
+        document.removeEventListener('DOMContentLoaded', unmobifier, false);
+        html.writeHTML();
     }
     
   , html = Mobify.html || {}
 
 if (Mobify.$) {
     Mobify.$.extend(html, {
-        extractHTML: extractHTML
-      , extractHTMLFromElement: extractHTMLFromElement
-      , openTag: openTag
-      , closeTag: closeTag
+        'writeHTML': writeHTML
+      , 'unmobify': unmobify
+      , 'extractHTML': extractHTML
+      , 'extractHTMLFromElement': extractHTMLFromElement
+      , 'openTag': openTag
+      , 'closeTag': closeTag
     });
 } else {
     Mobify.api = 1;

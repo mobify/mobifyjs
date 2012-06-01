@@ -46,7 +46,7 @@ Mobify.emitMarkup = function(markup) {
 
 var oldExtractHTML = Mobify.html.extractHTML;
 Mobify.html.extractHTML = function() {
-    var captured = oldExtractHTML(markup);
+    var captured = oldExtractHTML.call(Mobify.html, markup);
     $.each(captured, function(key, value) {
         captured[key] = indexTags(value);
     });

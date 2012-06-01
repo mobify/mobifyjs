@@ -12,7 +12,7 @@
             console.groupEnd();
 
             if (!Mobify.config.isDebug) {
-                Mobify.unmobify();
+                Mobify.html.unmobify();
             }
 
             throw args;
@@ -22,7 +22,7 @@
             $.each(obj, function(key, value) {
                 noneWritten && console.group(title);
                 if (typeof key == "number") {
-                    console[fn].apply(window, value);
+                    console[fn].apply(console, value);
                 } else {
                     console[fn](key, value);
                 }
