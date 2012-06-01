@@ -1,0 +1,37 @@
+/* Default configuration. Override these settings in your site-specific conf */
+{
+    '?unmobify':  false,
+    
+    mobileViewport: 'width=device-width; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; user-scalable=no;',
+    
+    // 'example.png'
+    touchIcon: undefined,
+    
+    formatDetection: ["telephone=no", "address=no"],
+    
+    cssDir: function(cont) { 
+        return cont.data('config.configDir') 
+    },
+
+    imageDir: function(cont) {
+        return cont.data('config.configDir') + 'i/' 
+    },
+
+    '?HD' : function(cont) { 
+        return cont.data('config.HD') 
+    },
+    
+    // Populated from `site.json`.
+    siteConfig: {site_config|s},
+    
+    // Timestamp when this string was made.
+    buildDate: {build_dt},
+    
+    // JB: Update this property to work with new builds.
+    configName: '{conf}',
+    
+    cssName: function(cont) { 
+        return cont.data('configName').split('/').pop().split('.')[0] || 'stylesheet'; 
+    },
+    mobifylib: document.getElementById('x-mobifylib'),
+}

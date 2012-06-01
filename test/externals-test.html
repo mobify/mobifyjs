@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/test/qunit/qunit.css" type="text/css" media="screen">
+    <script type="text/javascript" src="/test/qunit/qunit.js"></script>  
+</head>
+<body>
+    <!-- 
+    Usage:
+    # Run test-server for checkout folder.
+    $ node test/test-server.js
+    # Navigate to this page:
+    $ http://127.0.0.1:8001/test/externals-test.html
+    -->
+    <h1 id="qunit-header">QUnit Test Suite</h1>  
+    <h2 id="qunit-banner"></h2>  
+    <div id="qunit-testrunner-toolbar"></div>  
+    <h2 id="qunit-userAgent"></h2>  
+    <ol id="qunit-tests"></ol>  
+
+
+
+    <script id="test-disable-1" type="text/test">
+        <link href="style.css" />
+        <img src="img.jpg" width="1" height="1" />
+        <iframe src="iframe.html"></iframe>
+        <style></style>
+        <script src="script.js" type="text/javascript"><\/script>
+    </script>
+
+    <script id="test-disable-2" type="text/test">
+        <img src='src.jpg' />
+        <script>
+            "<img src='src.jpg' />";
+        <\/script>
+        <img src='src.jpg' />
+    </script>
+
+    <script id="test-disable-multiline" type="text/test">
+<script 
+    type="text/javascript" 
+    src="https://t.p.mybuys.com/js/mybuys3.js">
+<\/script>
+    </script>
+
+    <script id="test-disable-script-in-comment" type="text/test">
+<!-- <script> -->
+<script 
+    type="text/javascript" 
+    src="https://t.p.mybuys.com/js/mybuys3.js">
+<\/script>
+    </script>
+
+
+    <script id="test-enable-1" type="text/test">
+        <link x-href="style.css" />
+        <img x-src="img.jpg" x-width="1" x-height="1" />
+        <iframe x-src="iframe.html"></iframe>
+        <style media="mobify-media"></style>
+        <script x-src="script.js" type="text/mobify-script" x-type="text/javascript"><\/script>
+    </script>
+
+
+    <iframe id="test-grab-1" src="fixtures-externals/plaintext.html"></iframe>
+
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="/lib/underscore.js"></script>
+    <script>
+        // externals.js dependancies:
+        // - jquery
+        // - underscore
+        // - jquery.mapattributes.js
+        // - externals.js
+        // - unmobify.js
+        // - Mobify.(config.tagVersion|_|$|timing.addPoint)
+        Mobify = {
+            config: {tagVersion: '5.0.0'},
+            _: _,
+            $: $,
+            timing: {addPoint: function(){}}
+        }
+    </script>
+    <script src="/lib/jquery/jquery.mapattributes.js"></script>
+    <script src="/api/externals.js"></script>
+    <script src="/unmobify.js"></script>
+    <script>
+        var externals = Mobify.externals
+
+        test('externals.disable', function() {
+            // Fix <\/script>.
+            var html = $('#test-disable-1').html().replace(/\\/g, '');
+            // <link x-href="style.css" />
+            // <img x-src="img.jpg" x-width="1" x-height="1" />
+            // <iframe x-src="iframe.html"></iframe>
+            // <style media="mobify-media"></style>
+            // <script type="text/mobify-script" x-src="script.js" x-type="text/javascript">
+            //console.log(externals.disable(html));
+            ok(1 == 1);
+        });
+
+        test('externals.disable does not escape scripts', function() {
+            var html = $('#test-disable-2').html().replace(/\\/g, '');
+            // <link x-href="style.css" />
+            // <img x-src="img.jpg" x-width="1" x-height="1" />
+            // <iframe x-src="iframe.html"></iframe>
+            // <style media="mobify-media"></style>
+            // <script type="text/mobify-script" x-src="script.js" x-type="text/javascript">
+            // console.log(externals.disable(html));
+            ok(1 == 1);
+        });
+
+        test('externals.disable handles multiline resources', function() {
+            var html = $('#test-disable-multiline').html().replace(/\\/g, '');
+            var ret = externals.disable(html)
+            var vow = '<script type="text/mobify-script" x-type="text/javascript" x-src="https://t.p.mybuys.com/js/mybuys3.js"><\/script>'
+            ok(ret.replace('\s', ''), vow);
+        });
+
+        test('externals.disable handles &lt;script&gt; in comment', function() {
+            var html = $('#test-disable-script-in-comment').html().replace(/\\/g, '');
+            var ret = externals.disable(html)
+            var vow = '<!-- <script> --><script type="text/mobify-script" x-type="text/javascript" x-src="https://t.p.mybuys.com/js/mybuys3.js"><\/script>'
+            ok(ret.replace('\s', ''), vow);
+        });
+
+        test('externals.enable', function() {
+            var html = $('#test-enable-1').html().replace(/\\/g, '');
+            // <link href="style.css" />
+            // <img src="img.jpg" x-width="1" x-height="1" />
+            // <iframe src="iframe.html"></iframe>
+            // <style></style>
+            // <script src="script.js" type="text/javascript">
+            //console.log(externals.enable(html));
+            ok(1 == 1);
+        });
+
+        test('externals.grabContent', function() {
+            var $iframe = $('#test-grab-1')
+              , doc = $iframe[0].contentWindow.document;
+
+            function onload() {
+                var ret = externals.grabContent(this.document);
+                // <head>
+                // <title>title</title>
+                // </head><body>
+                // <!-- comment -->
+                // <h1>h1</h1>
+                // <script type="text/mobify-script">script<\/script>
+                // <style media="mobify-media">style</style>
+                // </body>
+                // console.log(ret.$html.html());
+                ok(1 == 1)
+            }
+
+            // If the iframe is already loaded, go ahead, otherwise wait.
+            if (doc && /complete/.test(doc.readyState)) {
+                onload.call($iframe[0].contentWindow);
+            } else {
+                $iframe.load(onload);
+            }
+        });
+
+
+    </script>
+<body>
+</html>

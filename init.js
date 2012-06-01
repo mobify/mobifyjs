@@ -1,0 +1,1 @@
+Mobify.init();

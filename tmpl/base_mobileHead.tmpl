@@ -1,0 +1,19 @@
+{#mobileViewport}
+<meta name="viewport" content="{.|s}" />
+{/mobileViewport}
+
+{#touchIcon}
+<link rel="apple-touch-icon" href="{imageDir|s}{.|s}" />
+{/touchIcon}
+
+{#formatDetection}
+    <meta name="format-detection" content="{.|s}" />
+{/formatDetection}
+
+{#latestAnalytics}
+	{>analytics/}
+	{! legacy analytics code is built from base/api/analytics.js and included by api-legacy.js !}
+{/latestAnalytics}
+
+{mobifylib}
+{! Pulling in mobify libs into head if it was extracted in defaultConf !}

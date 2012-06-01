@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{$html|openTag|s}
+{$head|openTag|s}
+    {$head|innerHTML|s}
+    {>base_mobileHead/}
+    {+style}{#config}
+        <link rel="stylesheet" type="text/css" href="{configDir}{cssName}.css" />
+    {/config}{/style}
+    {+head}{/head}
+</head>
+{$body|openTag|s}
+    <section id="x-root" class="x-{bodyType}
+    {#bodySubtype}
+        {~s}x-{.}
+    {/bodySubtype}">
+        {+header}
+            {>_header/}
+        {/header}
+        <section id="x-main">
+            {+body}
+                {#body}
+                    {content}
+                {/body}
+            {/body}
+        </section>
+        {+footer}
+            {>_footer/}
+        {/footer}
+    </section>
+    {+scripts}
+        {%script}
+            // If data misses happen, reveal them in a separate element so that
+            // automated tools like Selenium could pick them up
+            Mobify.$(function(){
+                var warnings = Mobify._
+                    .keys(Mobify.evaluatedCont.root.warnings || {})
+                    .join(' ');
+                if (warnings)
+                    Mobify.$('<div id="x-mobify-warnings" style="display: none">')
+                        .text(warnings)
+                        .appendTo(Mobify.$(document.body));
+            });
+
+            // Scroll the page past URL bar if user did not scroll manually, and
+            // hash is either absent or is a mobify properties override.
+            Mobify.$(window).bind('load', function() {
+                if (location.hash.match(/^(?:#mobify-override|$)/)) {
+                    setTimeout(function() {
+                        if (!window.pageYOffset) {
+                            window.scrollTo(0, 1);
+                        }
+                    }, 250);
+                }
+            });            
+        {/script}
+    {/scripts}
+</body>
+</html>

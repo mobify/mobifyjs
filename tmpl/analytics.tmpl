@@ -1,0 +1,108 @@
+{%script}
+
+/* <script> for syntax highlighting */
+
+(function($) {
+    var _ = Mobify._;
+    // Set up Google Analytics tracking queue if it doesn't exist
+    var _gaq = window._gaq = window._gaq || [];
+    var lGaq = []; // this is a shadow _gaq we use locally so we can inject the prefixes in one swoop
+    var ed =  Mobify.evaluatedData;    
+    var siteConfig = ed.siteConfig;
+    var prefix = siteConfig.ga_prefix || 'MOBIFY';
+
+    // Define the Mobify.ga.queue function used in ecommerce data collection templates
+    // such as most confirmation.tmpl files
+    Mobify.ga = {
+        queue: function() {
+            _.each(arguments, function(ga_array){
+                // Check if the MOBIFY prefix is already there, necessary for 
+                // some legacy sites.  
+                if (! /^MOBIFY/.test(ga_array[0])) 
+                    ga_array[0] = prefix + '.' + ga_array[0];
+                window._gaq.push(ga_array);                
+            });
+        }
+    }
+
+    // Utility variables 
+    var insertAt = document.getElementsByTagName('script')[0] || document.getElementsByTagName('head')[0];
+    var isSSL = location.protocol[4] == 's';
+    var start;
+    try {
+        start = Mobify.timing.points[0][0];    
+    } catch (err) {
+        start = undefined;
+    }
+    
+    var loadTime = Math.round((Mobify.timing.addPoint('Done') - start) / 100) * 100;
+    var template = ed.bodyType || ed.rootPageType || 'miss';
+    //var buildDate = (siteConfig.buildDate || (ed && ed.buildDate)) + '';
+    var buildDate = (
+        (siteConfig && siteConfig.buildDate) ||
+        (ed.buildDate)
+    ) + '';
+    // TBD: we should get rid of the ed.gaId mechanic for google analytics ID and stick to using site.json.
+    var ga_account = ed.ga_account || ((!! (siteConfig && siteConfig.ga_account)) ? siteConfig.ga_account : false) || 'UA-FILLME-IN';
+
+    // Only bother with this if _gat hasn't already loaded
+    if (!window._gat) {            
+        var gaScript = document.createElement('script');
+        gaScript.src = '//' + (isSSL ? 'ssl' : 'www') + '.google-analytics.com/ga.js';
+        gaScript.async = true;
+        insertAt.parentNode.insertBefore(gaScript, insertAt);
+    } 
+
+    // fire quantcast pixel
+    var _qevents = window._qevents = window._qevents || [];
+    var qcScript = document.createElement('script');
+    qcScript.src = '//' + (isSSL ? 'secure' : 'edge') + '.quantserve.com/quant.js';
+    qcScript.async = true;
+    insertAt.parentNode.insertBefore(qcScript, insertAt);
+    _qevents.push({qacct:"p-eb0xvejp1OUw6"});
+
+    // Fire GA tracking call
+    if (!ga_account){
+        debug.error('No google analytics account set! Please set one in site.json.');
+        return;
+    } 
+    lGaq.push(['_setAccount', ga_account]);
+
+    // Need to figure out the ga_domain from the location.hostname
+    var ga_domain = (function(hostname, domain_dict){
+        var domain = 'none';
+        if (! domain_dict) return domain;
+        var hostname_parts = hostname.split('.');
+
+        while (hostname_parts.length > 0) {
+            domain = domain_dict[hostname_parts.join('_')];
+            if (!! domain) return domain;
+            hostname_parts = hostname_parts.slice(1); // cut off the head and continue
+        }
+        // fallback, domain is set to 'none'
+        return domain;
+    })(window.location.hostname, (!! siteConfig) ? siteConfig.ga_domains : false );
+    lGaq.push(['_setDomainName', ((ga_domain === 'none') ? '' : '.') + ga_domain])
+
+    // Get any additional pre-pageview tracking options 
+    var ga_options = (!! (siteConfig && siteConfig.ga_options) ? siteConfig.ga_options : []);
+    // append our populated variables
+    lGaq = lGaq.concat(ga_options, 
+        [
+            ["_addIgnoredRef", ga_domain],
+            ['_setCustomVar', 1, 'loadTime', '' + loadTime],
+            ['_setCustomVar', 2, 't', template],
+            ['_setCustomVar', 3, 'build_dt', buildDate],
+            ['_setCustomVar', 4, 'mobi', 'y', 1],
+            ['_trackPageview'],
+            ['_trackPageLoadTime']
+        ]);
+    // send everything to GA.  
+    _.each(lGaq, function(option) {
+        option[0] = prefix + '.' + option[0];
+        _gaq.push(option);
+    });
+
+})(Mobify.$);
+
+{/script}

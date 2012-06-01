@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/test/qunit/qunit.css">
+    <script src="/test/qunit/qunit.js"></script>  
+    
+</head>
+<body>
+    <!-- 
+    Usage:
+    # Run test-server for checkout folder.
+    $ node test/test-server.js
+    # Navigate to this page:
+    $ http://127.0.0.1:8001/test/util-test.html
+    -->
+    <h1 id="qunit-header">QUnit Test Suite</h1>  
+    <h2 id="qunit-banner"></h2>  
+    <div id="qunit-testrunner-toolbar"></div>  
+    <h2 id="qunit-userAgent"></h2>  
+    <ol id="qunit-tests"></ol>  
+
+
+    <div id="test-resizeImages">
+        <div>
+            <img x-src="http://test/1.jpg" />
+            <img x-src="/2.jpg" />
+        </div>
+        <img x-src="/3.jpg" />
+    </div>
+
+    <div id="test-resizeImages-args-1">
+        <img x-src="/1.jpg" />
+    </div>
+
+    <div id="test-resizeImages-args-2">
+        <img x-src="/2.jpg" />
+    </div>
+
+
+    <div id="test-resizeImages-speed">
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+        <img x-src="/1.jpg" />
+    </div>
+
+
+    <script src="/lib/jquery-latest.js"></script>
+    <script src="/lib/underscore.js"></script>
+    <script>Mobify = {config: {}, $: $, _: _}; debug = console</script>
+    <script src="/api/util.js"></script>
+    <script>
+
+test('Mobify.URLHash', function(t) {
+    Mobify.URLHash('http://test/image.jpg')
+});
+
+test('Mobify.getImageURL', function() {
+    equal(Mobify.getImageURL('http://test/1.jpg'), '//ir3.mobify.com/http://test/1.jpg')
+    equal(Mobify.getImageURL('http://test/1.jpg', {maxWidth: 320}), '//ir3.mobify.com/320/http://test/1.jpg')
+});
+
+test('$.fn.resizeImages', function() {
+    var $resized = Mobify.$('#test-resizeImages').resizeImages()
+    equal($resized.length, 3)
+});
+
+test('$.fn.resizeImages with args', function() {
+    var $resized = Mobify.$('#test-resizeImages-args-1').resizeImages(320)
+    equal($resized.filter('[x-src]').length, 1)
+
+    Mobify.$('#test-resizeImages-args-2').resizeImages({maxWidth: 320})
+});
+
+test('$.fn.resizeImages speed', function() {
+    var start = +new Date
+    Mobify.$('#test-resizeImages-speed').resizeImages()
+    console.log(+new Date - start)
+    
+});
+
+
+
+    </script>
+<body>
+</html>

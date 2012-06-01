@@ -1,0 +1,132 @@
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+ <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+<!--  <link rel="apple-touch-icon" href="../widgets/bubble/icon.png" />
+ <link rel="stylesheet" type="text/css" href="../css/fy.css" />
+ --><!--  <script type="text/javascript">var $fy_dev = true;</script> -->
+<style type="text/css">
+
+#mobify-bubble {
+ display: none;
+ position: absolute;
+ z-index: 9999;
+ bottom: 40px; 
+ left: 0; 
+ right: 0; 
+ -moz-transition-property: -moz-transform, opacity;
+ -moz-transition-duration: .8s, .8s; 
+ -moz-transition-timing-function: ease-in-out; 
+ -moz-transition-delay: 0, 0;
+ -webkit-transition-property: -webkit-transform, opacity; 
+ -webkit-transition-duration: .8s, .8s; 
+ -webkit-transition-timing-function: ease-in-out; 
+ -webkit-transition-delay: 0, 0 
+}
+#mobify-bubble.on { display: block }
+#mobify-bubble.closing{ opacity: 0 }
+
+#mobify-bubble p {
+ position: absolute;
+ top: 15px;
+ right: 5px;
+ width: 130px;
+ margin: 0 !important;
+ padding: 0 !important;
+ font-size: 12px !important; 
+ line-height: 15px !important; 
+ font-family: Verdana !important;
+ color: #1c1c1c !important; 
+}
+#mobify-bubble strong { font-weight: bold !important; }
+
+#mobify-bubble #mobify-bubble-content {
+ position: relative;
+ height: 90px;
+ width: 220px;
+ margin: 0 auto;
+ background: #d5d5d5; 
+ border: 1px solid #fff;
+ -moz-border-radius: 6px;
+ -moz-box-shadow: 2px 2px 14px rgba(0,0,0, .4); 
+ -webkit-border-radius: 6px;
+ -webkit-box-shadow: 2px 2px 14px rgba(0,0,0, .4); 
+}
+
+#mobify-bubble #mobify-bubble-icon {
+ position: absolute;
+ top: 15px;
+ left: 20px;
+ width: 57px;
+ height: 57px;
+ -moz-border-radius: 8px;
+ -moz-box-shadow: 0 1px 2px rgba(0,0,0, .8);
+ -webkit-border-radius: 8px;
+ -webkit-box-shadow: 0 1px 2px rgba(0,0,0, .8); 
+}
+
+#mobify-bubble #mobify-bubble-toggle {
+ position: relative;
+ top: -10px;
+ left: -10px;
+ width: 28px;
+ height: 28px;
+ text-indent: -9999px;
+ background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAEv0lEQVRIx71WSUtjSxTWxERNd2xNnOM8xHloRXGe4zyPOIBzNNJLd25cCvKkJdBwceGq9+JPcC2uXYhLRUEI5gecd756VZebG214i/cKPm5V3Trnq/OdU7duDBHFKHCLZVgZ8QwHI4FhWVhY6F5fXw9sbm5qwM7ODhBYXl7uxnu5ziHtYB9r9BvBYSCCoU0aJjJJ5tLSUnBxcfF1ZWWFFNbW1ojJaWNjg5iUeAOvu7u7QR5nwk7a26S/KGIz2RcYMFmAEWYymp+fj8Lc3JwAr6HV1VXa3t6m/f39sN/vD0jCL5+RxhjIvrIDO0cQZKmE45mZGR2zs7MRT2Mf5CBmQkK08AN/itRMGMdwYlcszy+WUTiampr6I6anp6PmoIiM9peM0ilJY42EkOAr58OPyCYmJmh8fFxgbGxMf6r+Z1DvsdmtrS3a29vzqxQZCwntG0vg4kVvk5OTNDo6KjAyMiKgxh/NqbF5HdLBAYTgF/5l9eqETib7C3kYHBzU4fP5Isb/BkNDQwS14FfKinxaBSHvIpF1f8OigYEB6u/vF0C/p6eHDg4O6OXlhdCurq7Eu66uLgoGg2Lu8fFRRIT1Rnukho/PG/wzWQpyKQg5dB/OVm9vr46+vj5B1traSpWVlXRyckKqYQNY8/z8HDE224MU55Yj9TEZpE0UhFzKRzhP3d3dEUAUijArK0tEh/bw8EDX19eif3FxQe3t7WItYPaBAmLfR0yWDGlVhBrC7+joEMaA6re1tVFDQwMVFRVRTU0NPT096ZHe3d1RU1NThJ0ZqFw+ZhqTJaF4BCHn7zdeIJqWlpaoZ3NzsyDzeDx0fn6uE56dnenrjDDaoi44wt+S0CUIObEayrqxsVFEYwbmISsK4v39XSdEDjFnXmv0g3yyepqU9B9CDvkIB7aurk5HbW2t/qyurhaS3t/fC6Lj42O9f3Nz86Gd6qPwWD3kME0nRBXhDMJxVVWViEY9KyoqqKSkRD8Ct7e35HK5CB8I1U5PTyNs1BMAIVcrqjRbzyHrjasoBAm8Xi+VlpYKoF9YWEiHh4fCMeSEXNnZ2eR0Ouny8lLMh8NhcWUZbQFslis1BP9MlqdXKbd0jvInzg4I8vPzqaCggPLy8oTzlJQUgczMTDGXk5NDqampghTRYoz1CsoeETLZT/hnZOnnkFsRV5OLv/YhVCNIFDIyMig9PZ3S0tIEIeZwJjGPObzD2GgDYGOcwxDLiwNfJA++XRHmYgeclwCixO7cbreIwvxUffPYOI/NgLCsrCwgI8uN+JZyczO8SOzw8LCGMwSZIJkRSUlJUXNmQHqQc9SaLBSv9B9xW+C+wv9ICUtg56rScGiRi4SEBLLb7QLx8fF6X43VHJ4Oh0OA+7h8ceOXSL9R96FNXiEeuaOczs7OAJOGy8vLhUw2m42sVqsOi8UigH5cXJx4coRhJoSMOYwy6e/DG98id5QkF1VDdy5zD3/WgvX19a8oceQFhaKkTU5OVsX0ynkLSttcae+R/uwf/dPEGkidUgZEWiMdxDOhj+X+wRFrfMa04uJijSX/wRXpk/nJleu90t756V/bJ/+lbumknPGdUckolXIplMr573JdrrT783/pZ3/I/xX+d8K/AZffvzoVKy2lAAAAAElFTkSuQmCC); 
+}
+
+#mobify-bubble #mobify-bubble-arrow {
+ width: 44px;
+ height: 37px;
+ margin: -8px auto;
+ background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAlCAYAAAA5iwvJAAACZElEQVRYw7VYO2oDMRBdCKRyldZtWkMO4Mqtb7A38AECbgMB32DBB/ANfICAW8MewN7C4NaVK4PBkYK0TKQZ7cxILp4/u6vV09MbjUZV13Ujgx+D/fF43Ntv/9v/h9clCN+neQeA5TiqzIfFt8EDwnTwCK9JwG0v6OfLcvWErcrnXJIlBx20PTuOPWGLuoSyGkKMPmvPExKuTMNdacW0Avh2jpPlFhM2+DC4Bw2yCdlnpMTd83fHqYoUtiNwo1g/Y/o5pJH760DQyBL2e2xw1ajCVR3OXsLLV8eltwNmCY9lKV+GhLhqOw6RoNAKEK8GB6liBXFwHCIxMbIe8xIJQDmYOcbpT2GCrB/I9pnJg7i3TXEiCTtMwmUud7kaIG37mhA2jQkT9mienTDAs82AgOg6HJJ/M7iUTArEgC6ur1Rc0UEXDGCRG0yM5xdD6lKJA8OLQavdPlL+B/9b10eSLBl0BPGZZg/BVHrGmOVkpqOIbzXTj2U7zjKmskRw7d3gps18yPWbe2fFsQOqcCoI3e+VlFy4VQX3VtzZFRMGGLmSpVjZI7GllOy/cmrIr9yyR+1hIdqMlNwqRIoznZDwVLI6BJhy+xEtawxsFFlvg62vxLZAl+kSLxi7UoZLti97FMGeFXRoOcXIbEtuf+T2UtoIgS1lToxDkhNV9kj8TNV00hfVjPW3hiJo+xxsKPB16tRolxncdKbTkO+QUyNghej0JgfoFGVYpEEINwXE0CnMQFhO9WXP0KZGnZq1ngb4BMG25G7MuUkkKwCIe/7UCD294ZBlZzppmky0m4enNzlLJ2z7Cy9NglmLUiL0AAAAAElFTkSuQmCC) no-repeat; 
+}
+
+
+ </style>
+
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js"></script>
+<script type="text/javascript">
+var Mobify = {$: $};
+</script>
+
+<script type="text/javascript" src="bubble.js"></script>
+<script type="text/javascript">
+$(function() {
+  Mobify.bubble({icon: '/__/menshealth/i/MH-iphone-icon.png'});
+});
+</script>
+
+ <!-- <script type="text/javascript" src="../js/fy.js"></script> -->
+<!--  <script type="text/javascript">$fy.dev = true;</script> -->
+ <!-- <script type="text/javascript" src="../js/fy.bubble.js"></script> -->
+<!--  <script type="text/javascript" src="../js/fy.bubble.min.js"></script> -->
+
+</head>
+<body bgcolor="#eeeeee" style="margin:0;">
+
+
+
+<!-- would be nice to test a random image? -->
+<!-- <div id="mobify-bubble" data-mobify-icon="../widgets/bubble/icon.png"> -->
+<div id="mobify-bubble" >
+    <div id="mobify-bubble-content">
+        <div id="mobify-bubble-icon"></div>
+        <div id="mobify-bubble-toggle">X</div>
+        <p class="ios">Install this web app on your phone: tap <strong>+</strong> and then <strong>Add to Home Screen</strong>.</p>
+        <!-- <p class="android">Install this web app on your phone: tap <strong>≡</strong>, bubbles, ★ Add, OK, long press the clip and then Add shortcut to Home.</p> -->
+    </div>
+    <div id="mobify-bubble-arrow"></div>
+</div>
+
+
+<div id="lipsum"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed est nunc, vestibulum id sagittis ut, bibendum eu tortor. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Quisque volutpat sodales nunc, sit amet egestas augue fringilla quis. Morbi congue adipiscing eros, quis semper odio tincidunt venenatis. Curabitur nisi nibh, ultrices non rhoncus in, facilisis vitae turpis. Cras et molestie nibh. Vivamus mollis molestie erat. Sed in magna nisi. Maecenas ac urna at felis varius consequat. Phasellus quis urna erat, ut adipiscing justo. Sed dapibus varius lectus eu consectetur.</p> 
+<p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer non diam et elit dignissim viverra dapibus ac turpis. Donec eleifend molestie luctus. Donec ut nisi libero, id pharetra magna. Vivamus orci mi, iaculis in venenatis ac, pulvinar eu tortor. Pellentesque pulvinar, est sed ultrices consectetur, quam velit sagittis lorem, eget pulvinar ipsum magna vel eros. Curabitur sit amet diam nisl. Nunc aliquam tempus porttitor. Fusce fringilla nisl metus. Nullam tempus dapibus ante, eget egestas leo fermentum eu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean luctus pretium lectus sed lobortis. Vivamus consectetur, tortor at ultricies rhoncus, massa enim vulputate nisi, ac hendrerit lectus velit vel orci.</p> 
+<p>Mauris eget mauris nec nulla consectetur iaculis. Nulla et malesuada erat. Nullam porta lacus a sapien malesuada aliquam. Suspendisse consectetur iaculis leo eu dapibus. Pellentesque ullamcorper elementum diam sit amet elementum. Suspendisse potenti. Cras eget justo in augue consequat venenatis. Nunc id dapibus nulla. Etiam dapibus felis id eros accumsan id eleifend justo gravida. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec eu euismod sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Pellentesque adipiscing sagittis ligula ac porta. Proin varius facilisis nulla, vel aliquet metus eleifend eget.</p> 
+<p>Curabitur tincidunt tincidunt dictum. Nam fermentum volutpat turpis. Vestibulum ullamcorper dapibus feugiat. Donec sodales, neque at rhoncus porttitor, nibh ligula malesuada mi, nec sodales ipsum orci ac eros. Morbi et orci ac nulla aliquam imperdiet. Phasellus faucibus ultrices nunc, ut pulvinar purus pellentesque eu. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec ac turpis lacus. Pellentesque vel lacus eu tellus congue lobortis. Aliquam vitae lectus leo. Pellentesque eget nibh tortor. Donec id ipsum id eros scelerisque adipiscing eu mattis lacus. Morbi ligula orci, vestibulum eu fermentum vitae, vehicula vitae nunc. Phasellus sit amet libero mauris. Proin lobortis sem eu nunc ultrices eget commodo leo interdum. Nullam lorem nulla, cursus in tincidunt nec, ullamcorper aliquet magna. Aliquam erat volutpat. Maecenas sed elit vitae erat gravida sagittis. Sed condimentum, velit dapibus facilisis gravida, nunc nulla dictum tortor, ac mattis risus tellus sit amet arcu. Integer suscipit, arcu a dignissim viverra, nulla sem pulvinar ligula, fermentum tempor leo ligula vel nunc.</p> 
+<p>Cras eget augue erat. Cras porta consequat dui, ac pretium justo cursus et. Cras in elit sed libero adipiscing consectetur vel eu risus. Aliquam quis augue non est mollis gravida sit amet laoreet nulla. Etiam est velit, venenatis eget rutrum pellentesque, aliquet et lacus. Sed suscipit dignissim pulvinar. Suspendisse posuere arcu et nunc tincidunt vel bibendum nunc euismod. Duis et sapien libero, sit amet varius purus. Integer vitae orci velit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla mollis placerat erat, ut lacinia tellus iaculis et. Praesent orci quam, volutpat nec placerat ac, pharetra at metus. Nullam suscipit pharetra ipsum id tempor. Nam ultrices lorem a orci dignissim euismod.</p></div>
+
+</body>
+</html>

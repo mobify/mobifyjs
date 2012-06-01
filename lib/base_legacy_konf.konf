@@ -1,0 +1,14 @@
+{>"/base/lib/base_konf.konf"/}
+
+{<api}
+    {>"/base/api-legacy.konf"/}
+{/api}
+
+{<main}
+Mobify.conf = function(M) {
+  var $ = M.$, _ = M._, _$= M._$;
+  {+dataUtil}{/dataUtil}
+
+  return ({+data}{}{/data});
+};
+{/main}

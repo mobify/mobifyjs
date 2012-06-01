@@ -1,0 +1,63 @@
+// TODO: Define grids in terms of grid2, grid3, grid4 etc.
+
+@mixin grid {
+    width: 100%;    
+    overflow: hidden;
+    @include box-sizing(border-box);
+
+    > * {
+        position: relative;
+        float: left;
+        overflow: hidden;
+        @include box-sizing(border-box);
+    }
+
+    /* ADD ONS! */
+    img { 
+        width: 100%; 
+        height: auto; 
+    }
+
+    a {
+        width: 100%;
+    }
+}
+
+@mixin grid23($gutter-width: 8px) {
+    @include grid;
+
+    padding-left: $gutter-width;
+    
+    > * { width: 50%; }
+    > :nth-of-type(2n-1) { left: -$gutter-width; }
+    
+    html.x-landscape & { 
+        padding-left: $gutter-width * 2;
+        
+        > * { width: 33.33333333333%; }
+        > :nth-of-type(2n-1) { left: 0; }
+        > :nth-of-type(3n-2) { left: -$gutter-width * 2; }
+        > :nth-of-type(3n-1) { left: -$gutter-width; }
+    }
+}
+
+@mixin grid34($gutter-width: 8px) { 
+    @include grid;
+
+    padding-left: $gutter-width * 2;
+
+    > * { width: 33.33333333333%; }
+    > :nth-of-type(3n-2) { left: -$gutter-width * 2; clear: left; }
+    > :nth-of-type(3n-1) { left: -$gutter-width; }
+
+    html.x-landscape & { 
+        padding-left: $gutter-width * 3;
+
+        > * { width: 25%; }
+        > :nth-of-type(3n-2),
+        > :nth-of-type(3n-1) { left: 0; clear: none; }
+        > :nth-of-type(4n-3) { left: -$gutter-width * 3; clear: left; }
+        > :nth-of-type(4n-2) { left: -$gutter-width * 2; }
+        > :nth-of-type(4n-1) { left: -$gutter-width; }
+    }
+}

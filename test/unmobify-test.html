@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/test/qunit/qunit.css">
+    <script src="/test/qunit/qunit.js"></script>  
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <!-- 
+    Usage:
+    # Run test-server for checkout folder.
+    $ node test/test-server.js
+    # Navigate to this page:
+    $ http://127.0.0.1:8001/test/unmobify-test.html
+    -->
+    <h1 id="qunit-header">QUnit Test Suite</h1>  
+    <h2 id="qunit-banner"></h2>  
+    <div id="qunit-testrunner-toolbar"></div>  
+    <h2 id="qunit-userAgent"></h2>  
+    <ol id="qunit-tests"></ol>  
+
+    <iframe src="/test/fixtures-unmobify/basic.html"></iframe>
+    <a href="/test/fixtures-unmobify/basic.html">BASIC</a>
+
+    <iframe id="escaped" src="/test/fixtures-unmobify/escaped.html"></iframe>
+    <a href="/test/fixtures-unmobify/escaped.html">ESCAPED</a>
+
+    <iframe src="/test/fixtures-unmobify/legacy.html"></iframe>
+    <a href="/test/fixtures-unmobify/legacy.html">LEGACY</a>
+
+    <iframe src="/test/fixtures-unmobify/plaintext.html"></iframe>
+    <a href="/test/fixtures-unmobify/plaintext.html">PLAINTEXT</a>
+
+    <iframe id="plaintext-missing-closing-head" src="/test/fixtures-unmobify/plaintext-missing-closing-head.html"></iframe>
+    <a href="/test/fixtures-unmobify/plaintext-missing-closing-head.html">plaintext-missing-closing-head</a>
+
+    <iframe id="plaintext-missing-body" src="/test/fixtures-unmobify/plaintext-missing-body.html"></iframe>
+    <a href="/test/fixtures-unmobify/plaintext-missing-body.html">plaintext-missing-body</a>
+
+    <iframe id="plaintext-leading-content" src="/test/fixtures-unmobify/plaintext-leading-content.html"></iframe>
+    <a href="/test/fixtures-unmobify/plaintext-leading-content.html">plaintext-leading-content</a>
+
+
+
+    <script>
+        // Have we loaded the tests?
+        var ready = false;
+        // Are we waiting on an iframe?
+        var waiting = $('iframe').size();
+
+        // <iframe> `load` fires best when bound to the iframe.
+        // Bind now because these may load quickly.
+        $('iframe').load(function() {
+            waiting--;
+            if (ready && !waiting) runTests();
+        });
+    </script>
+
+
+    <textarea id="test-singleElementUnescape" class="mobify-grab">
+        <script>&</script>
+    </textarea>
+
+    <textarea id="test-singleElementUnescape-mobify-script" class="mobify-grab">
+        <input value="j<script class="mobify-skip" src="detect.js"><\/script>b" />
+    </textarea>
+
+
+    <script>
+        Mobify = {
+            config: {},
+            // Prevents `unmobify.js` from auto firing.
+            externals: {}
+        }
+    </script>
+    <script src="/unmobify.js"></script>
+    <script>
+        function getIframe(selector) {
+            var o = {}
+            var $root = o.$root = $($(selector)[0].contentDocument)
+            o.$contents = $root.contents()
+            return o
+        }
+
+        function runTests() {
+            test('unmobify basic', function() {
+                var $root = $(window.frames[0].document);
+                var $contents = $root.contents();
+                ok($contents[0].nodeType == Node.DOCUMENT_TYPE_NODE, 'DOCTYPE');
+                ok($contents[1].nodeName == 'HTML', 'HTML');
+                ok($root.find('head').children().size() == 1, 'head');
+                ok($root.find('body').children().size() == 1, 'body');
+
+                // Did attrs work?
+                ok($root.find('html').filter('[attr="<attr>"]').size() == 1, 'html attr');
+                ok($root.find('head').filter('[attr="<attr>"]').size() == 1, 'head attr');
+                ok($root.find('body').filter('[attr="<attr>"]').size() == 1, 'body attr');
+
+            });
+
+            test('unmobify escaped', function() {
+                var f = getIframe('#escaped')
+
+                ok(f.$contents[0].nodeType == Node.DOCUMENT_TYPE_NODE, 'DOCTYPE');
+                ok(f.$contents[1].nodeName == 'HTML', 'HTML');
+                ok(f.$root.find('head').children().size() == 1, 'head');
+                ok(f.$root.find('body').children().size() == 6, 'body');
+
+                // Did attrs work?
+                ok(f.$root.find('html').filter('[attr="<attr>"]').size() == 1, 'html attr');
+                ok(f.$root.find('head').filter('[attr="<attr>"]').size() == 1, 'head attr');
+                ok(f.$root.find('body').filter('[attr="<attr>"]').size() == 1, 'body attr');
+            });
+
+            test('unmobify legacy', function() {
+                var $root = $(window.frames[2].document);
+                var $contents = $root.contents();
+                ok($contents[0].nodeType == Node.DOCUMENT_TYPE_NODE, 'DOCTYPE');
+                ok($contents[1].nodeName == 'HTML', 'HTML');
+
+                ok($root.find('head').children().size() == 1, 'head');
+                ok($root.find('body').children().size() == 6, 'body');
+
+                // Where my comments at?
+                var commentsLength = $root.find('body').contents().filter(function(el) {
+                        return this.nodeName && this.nodeName.toLowerCase() == '#comment';
+                    }).size();
+
+                ok(commentsLength == 2, 'comments');
+            });
+
+            test('unmobify plaintext', function() {
+                var $root = $(window.frames[3].document);
+                var $contents = $root.contents();
+
+                ok($contents[0].nodeType == Node.DOCUMENT_TYPE_NODE, 'DOCTYPE');
+                ok($contents[1].nodeName == 'HTML', 'HTML');
+
+                ok($root.find('head').children().size() == 1, 'head');
+                ok($root.find('body').children().size() == 3, 'body');
+
+                var commentsLength = $root.find('body').contents().filter(function(el) {
+                        return this.nodeName && this.nodeName.toLowerCase() == '#comment';
+                    }).size();
+
+                ok(commentsLength == 1, 'comments');
+            });
+
+            // Tests regression reseting HTML without </head>.
+            test('unmobify plaintext-missing-closing-head', function() {
+                var f = getIframe('#plaintext-missing-closing-head')
+
+                ok(f.$contents[0].nodeType == Node.DOCUMENT_TYPE_NODE, 'DOCTYPE');
+                ok(f.$contents[1].nodeName == 'HTML', 'HTML');
+
+                ok(f.$root.find('head').children().size() == 1, 'head');
+                ok(f.$root.find('body').children().size() == 3, 'body');
+
+                var commentsLength = f.$root.find('body').contents().filter(function(el) {
+                        return this.nodeName && this.nodeName.toLowerCase() == '#comment';
+                    }).size();
+
+                ok(commentsLength == 1, 'comments');
+            });
+
+            test('unmobify plaintext-missing-body', function() {
+                var f = getIframe('#plaintext-missing-body')
+
+                // Everything should be pushed into the body.
+                ok(f.$root.find('head').children().size() == 0, 'head');
+                ok(f.$root.find('body').children().size() == 4, 'body');
+
+                var commentsLength = f.$root.find('body').contents().filter(function(el) {
+                        return this.nodeName && this.nodeName.toLowerCase() == '#comment';
+                    }).size();
+
+                ok(commentsLength == 1, 'comments');
+            });
+
+
+            test('unmobify plaintext-leading-content', function() {
+                var f = getIframe('#plaintext-leading-content')
+
+                ok(f.$contents[0].nodeType == Node.DOCUMENT_TYPE_NODE, 'DOCTYPE');
+                ok(f.$contents[1].nodeName == 'HTML', 'HTML');
+
+                ok(f.$root.find('head').children().size() == 1, 'head');
+                ok(f.$root.find('body').children().size() == 3, 'body');
+
+                var commentsLength = f.$root.find('body').contents().filter(function(el) {
+                        return this.nodeName && this.nodeName.toLowerCase() == '#comment';
+                    }).size();
+
+                ok(commentsLength == 1, 'comments');
+            });
+
+            
+
+        }
+
+        ready = true;
+        if (!waiting) runTests();
+
+
+        test('singleElementUnescape ', function() {
+            var $textarea = $('#test-singleElementUnescape')
+            var ret = $.trim(Mobify.externals.singleElementUnescape($textarea))
+            var exp = '<script>&<\/script>';
+            ok(ret == exp, 'Got: ' + ret)
+        })
+
+        test('singleElementUnescape with stray detect.js', function() {
+
+            // Fix the inline script.
+            var $textarea = $('#test-singleElementUnescape-mobify-script');
+            var text = $textarea.text().replace(/\\/g, '');
+            $textarea.text(text);
+
+            var ret = Mobify.externals.singleElementUnescape($textarea)
+            var vow = '<input value="jb" />'
+            ok($.trim(ret) == vow, 'Scripts sneaking in.')
+        })
+
+    </script>
+<body>
+</html>
