@@ -108,12 +108,13 @@ $.extend(Mobify.transform, {
     // Kickstart processing. Guard against beginning before the document is ready.
     run: function(conf) {
         var prepareConf = function() {
+            // Do NOT proceed unless we're ready.
+            if (!/complete|loaded/.test(document.readyState)) {
+                return setTimeout(prepareConf, 15);
+            }
             Mobify.transform.prepareConf(conf);
         };
 
-        if (!/complete|loaded/.test(document.readyState)) {
-            return setTimeout(prepareConf, 25);
-        }
         prepareConf();
     }
 });
