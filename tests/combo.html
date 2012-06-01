@@ -67,6 +67,9 @@ Mobify.$('iframe').on('load', function() {
     <script>
 function runTests() {
 
+//DEBUG
+console.log("Running tests!")
+
 var getIframeDocument = function(selector) {
         var iframe = $(selector)[0];
         return (iframe.contentDocument || iframe.contentWindow.document);
@@ -77,6 +80,10 @@ var getIframeDocument = function(selector) {
 module('Mobify.combo')
 
 asyncTest('Mobify.combo.comboScriptSync', function() {
+
+    //DEBUG
+    console.log('asyncTest started');
+
     var doc = getIframeDocument('#combo-iframe')
       , $got = $('#test-comboScriptSync', doc).comboScriptSync().removeAttr('type')
       , scriptsHtml = $.map($got, function(el) {
@@ -88,10 +95,8 @@ asyncTest('Mobify.combo.comboScriptSync', function() {
     doc.write(html);
     doc.close();
 
-    $(doc).on('DOMContentLoaded', function() {
-        equal(this.defaultView.combo.length, 3);
-        start();
-    });
+    equal(doc.defaultView.combo.length, 3);
+    start();
 });
 
 } //end runTests

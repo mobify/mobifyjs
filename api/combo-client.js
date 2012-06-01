@@ -18,7 +18,6 @@ var caching = Mobify.httpCaching
      * given array of URLs
      */
   , getComboStoreURL = function(urls) {
-        urls = caching.notCachedUrls(urls);
         return defaults.endpoint + defaults.storeCallback + '/' + JSONURIencode(urls);
     }
     
@@ -30,11 +29,11 @@ var caching = Mobify.httpCaching
      * Prepare to make combo requests by rehydrating the cache, if there is one 
      * and getting rid of stale items.
      */
-    // rehydrate, evict stale items and save back the (potentially smaller) 
-    // cache to localStorage
-    // Note, after this a "live copy" of the cache still exists at 
-    // window.Mobify.combo.resources until "the flood"
   , initializeFromCache = function() {
+        // rehydrate, evict stale items and save back the (potentially smaller) 
+        // cache to localStorage
+        // Note, after this a "live copy" of the cache still exists at 
+        // window.Mobify.combo.resources until "the flood"
         combo.rehydrateCache();
         caching.evictStale();
         combo.dehydrateCache();
@@ -62,8 +61,24 @@ var caching = Mobify.httpCaching
             this.innerHTML = defaults.loadSyncCallback + "('" + url + "');";
         });
 
+        /* Attempt to initialize fromt he localStorage Cache */
+        initializeFromCache();
+
+        var uncachedUrls = caching.notCachedUrls(urls);
+
+
         bootstrap = document.createElement('script');
-        bootstrap.src = getComboStoreURL(urls);
+        // if there are things to load fromt he web service, do that
+        if(uncachedUrls.length > 0) {
+            bootstrap.src = getComboStoreURL(uncachedUrls);
+        } else {
+          // otherwise ensure that the cache ahs been rehydrated
+            bootstrap.innerHTML = 'Mobify.combo.rehydrateCache();';
+            bootstrap.type = 'text/javascript'
+        }
+
+        //DEBUG
+        console.log('comboScriptSync() bootstrap tag: ' + bootstrap.outerHTML);
 
         $scripts = $(bootstrap).add($scripts);
         return $scripts;
@@ -79,6 +94,9 @@ var caching = Mobify.httpCaching
             url = absolutify.href;
             urls.push(url);
         });
+
+        /* Attempt to initialize from the localStorage cache */
+        initializeFromCache();        
 
         /* Build a script tag that gets the uncached scripts, stores them and then 
            loads/executes them asynchronously */
@@ -103,10 +121,9 @@ var caching = Mobify.httpCaching
     }
 
     // Combo defaults.
-  , defaults = combo.defaults = {
+  , defaults = {
         selector: 'script'
       , attribute: 'x-src'
-      //, endpoint: '//jazzcat01.mobify.com/jsonp/'
       , endpoint: '//combo.mobify.com/jsonp/'
       , loadSyncCallback: 'Mobify.combo.loadSync'
       , storeCallback: 'Mobify.combo.store'
