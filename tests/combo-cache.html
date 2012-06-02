@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="qunit/qunit.css">
+    <script src="qunit/qunit.js"></script>  
+    <!-- <script src="qunit/junit.js"></script> -->
+</head>
+<body>
+    <!-- 
+    USAGE
+    1. run the test server: node tests/server.js
+    2. localtunnel 1337 (so combo can see the scripts)
+    3. navigate to the localtunnel url
+    -->
+
+
+    <!-- QUNIT -->
+
+    <h1 id="qunit-header">QUnit Test Suite</h1>  
+    <h2 id="qunit-banner"></h2>  
+    <div id="qunit-testrunner-toolbar"></div>  
+    <h2 id="qunit-userAgent"></h2>  
+    <ol id="qunit-tests"></ol>  
+
+    <!-- FIXTURES -->
+
+    <script src="../vendor/zepto.js"></script>
+    <script>
+        Mobify = window.Mobify || {};
+        Mobify.$ = $
+    </script>
+
+    <script src="../api/combo-caching.js"></script>
+
+    <!-- SETUP -->
+
+    <script>
+        Mobify.combo.clearCache();
+
+        // Sixty Days in seconds
+        var SIXTY_DAYS = 60 * 24 * 60 * 60;
+        // Two weeks in seconds
+        var TWO_WEEKS = 14 * 24 * 60 * 60;
+        //five minutes in seconds
+        var FIVE_MINUTES = 5 * 60;
+
+        // A string, to bury deep in the cache
+        testMessage = "Hello, from the dehydrated cache."
+
+        test_cache_contents = {
+            'key1': {
+                'msg': testMessage
+            },
+            'key2': {
+                'msg': testMessage
+            }
+        }
+
+        localStorage[Mobify.httpCaching.lsKey] = JSON.stringify(test_cache_contents);
+
+
+    </script>
+
+    <!-- TESTS -->
+
+    <script>
+    Mobify.combo.rehydrateCache();
+
+    module('Mobify.combo cache');
+
+    test('Mobify.combo.dehydrateCache', function() {
+        equal(testMessage, Mobify.combo.resources['key1']['msg']);
+        equal(testMessage, Mobify.combo.resources['key2']['msg']);
+    });
+
+    </script>
+
+</body>
+</html>
