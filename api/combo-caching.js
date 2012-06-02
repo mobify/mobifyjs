@@ -377,8 +377,6 @@ var ccPublic = /^\s*public\s*$/
                     return;
                 }
 
-                combo.rehydratedCache = true;
-
                 // Extract keys which are not loaded.
                 for (k in cacheContents) {
                     if (cacheContents.hasOwnProperty(k) && !resources[k]) {
@@ -386,6 +384,7 @@ var ccPublic = /^\s*public\s*$/
                     }
                 }
             }
+            combo.rehydratedCache = true;
         }
 
         /**
@@ -435,7 +434,7 @@ var ccPublic = /^\s*public\s*$/
             if(localStorageAvailable) {
                 localStorage.removeItem(cache.lsKey);
             }
-            resources = {}
+            Mobify.combo.resources = resources = {};
         }  
     };
 
