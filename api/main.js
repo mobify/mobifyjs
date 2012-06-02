@@ -72,12 +72,13 @@ $.extend(Mobify.transform, {
     run: function(conf) {
         Mobify.timing.addPoint('Started adaptation');
         var prepareConf = function() {
+            // Do NOT proceed unless we're ready.
+            if (!/complete|loaded/.test(document.readyState)) {
+                return setTimeout(prepareConf, 15);
+            }
             Mobify.transform.prepareConf(conf);
         };
 
-        if (!/complete|loaded/.test(document.readyState)) {
-            return setTimeout(prepareConf, 25);
-        }
         prepareConf();
     }
 });
