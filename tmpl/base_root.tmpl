@@ -1,7 +1,7 @@
 {! 
   Template syntax legend:
 
-  {! Comment !}     - Template comment. Text surrounded by {! will not be rendered.
+  ! Comment !       - Template comment. Text surrounded by ! will not be rendered.
   {foo}             - Renders the value of key 'foo'.
   {foo|bar}         - Renders the value of key 'foo' through the filter bar.
                         Normally, text variables are escaped by dust, so <p> appears as <p> on user
@@ -56,7 +56,7 @@ Below is your base template file, which is extended by home.tmpl:
     {/baseScripts}
     {+head}
         {$head|innerHTML|s}
-        <link rel="stylesheet" href="{config.configDir}{?config.tablet}tablet{:else}stylesheet{/config.tablet}.css" />
+        <link rel="stylesheet" href="{config.configDir}style.css" />
         <meta name="viewport" content="width=device-width; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; user-scalable=no;" />
     {/head}
 </head>
