@@ -59,7 +59,7 @@ var guillotine = function(captured) {
             el.setAttribute(attr.nodeName, attr.nodeValue);
         });
 
-        return $(el);
+        return el;
     };
 
 // 1. Get the original markup from the document.
@@ -78,21 +78,22 @@ Mobify.html.extractDOM = function() {
     Mobify.timing.addPoint('Disabled external resources');
 
     // Construct passive DOM out of disabled head and body markup
-
     var div = document.createElement('div');
-
-    var $head = makeElement(captured.headTag);
-    for (div.innerHTML = disabledHead; div.firstChild; $head.appendChild(div.firstChild));
-
-    var $body = makeElement(captured.bodyTag);
-    for (div.innerHTML = disabledBody; div.firstChild; $body.appendChild(div.firstChild));
+    var headEl = makeElement(captured.headTag);
+    var bodyEl = makeElement(captured.bodyTag);
+    var htmlEl = makeElement(captured.htmlTag);
 
     var result = {
         'doctype' : captured.doctype
-      , '$head' : $head
-      , '$body' : $body
-      , '$html' : makeElement(captured.htmlTag).append($head, $body)
+      , '$head' : $(headEl)
+      , '$body' : $(bodyEl)
+      , '$html' : $(htmlEl)
     };
+
+    for (div.innerHTML = disabledHead; div.firstChild; headEl.appendChild(div.firstChild));
+    for (div.innerHTML = disabledBody; div.firstChild; bodyEl.appendChild(div.firstChild));
+    htmlEl.appendChild(headEl);
+    htmlEl.appendChild(bodyEl);
 
     Mobify.timing.addPoint('Created passive document');
     
