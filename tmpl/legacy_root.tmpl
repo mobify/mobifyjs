@@ -1,6 +1,10 @@
 {>base_root/}
 
 {<head}
+    {%script}
+        Mobify.$('html').removeClass("{#content.templateName}x-{.}{~s}{/content.templateName}");
+    {/script}    
+
     {#mobileViewport}<meta name="viewport" content="{.|s}" />{/mobileViewport}
     {#touchIcon}<link rel="apple-touch-icon" href="{imageDir|s}{.|s}" />{/touchIcon}
     {#formatDetection}<meta name="format-detection" content="{.|s}" />{/formatDetection}
@@ -9,7 +13,7 @@
 {/head}
 
 {<body}
-    <section id="x-root">
+    <section id="x-root" class="{#content.templateName}x-{.}{~s}{/content.templateName}">
         {+header}{>_header/}{/header}
         <section id="x-main">{+content}{$body|innerHTML|s}{/content}</section>
         {+footer}{>_footer/}{/footer}
