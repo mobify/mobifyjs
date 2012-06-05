@@ -74,25 +74,17 @@ $.extend(html, {
         Mobify.timing.addPoint('Recovered Markup');
         
         // Disable attributes that can cause loading of external resources
-        var disabledHead = this.disable(captured.headContent);
+        var disabledHead = this.disable(captured.headContent)
           , disabledBody = this.disable(captured.bodyContent);
         
         Mobify.timing.addPoint('Disabled Markup');
 
         // Reinflate HTML strings back into declawed DOM nodes.
-        var div = document.createElement('div');
-        var $head = makeElement(captured.headTag);
-        var $body = makeElement(captured.bodyTag);
-        var result = {
-            'doctype' : captured.doctype
-          , '$head' : $head
-          , '$body' : $body
-          , '$html' : makeElement(captured.htmlTag).append($head, $body)
-        };
-
-        for (div.innerHTML = disabledHead; div.firstChild; $head.appendChild(div.firstChild));
-        for (div.innerHTML = disabledBody; div.firstChild; $body.appendChild(div.firstChild));
-                
+        var result = { doctype: captured.doctype };
+        result.$head = makeElement(captured.headTag).append(disabledHead);
+        result.$body = makeElement(captured.bodyTag).append(disabledBody);
+        result.$html = makeElement(captured.htmlTag).append(result.$head, result.$body);
+        
         Mobify.timing.addPoint('Built Passive DOM');
         
         return result;
