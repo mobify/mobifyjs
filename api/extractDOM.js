@@ -1,4 +1,3 @@
-// provides extractDOM
 (function($, Mobify) {
 
 // During capturing, we will usually end up hiding our </head>/<body ... > boundary
@@ -21,6 +20,9 @@ var guillotine = function(captured) {
             if (!match[1]) continue;
 
             if (match[1][1] == '/') {
+                // Disregard subsequent closing </head> tags.
+                if (captured.headContent) continue;
+
                 // Hit </head. Gather <head> innerHTML. Also, take trailing content,
                 // just in case <body ... > is missing or malformed
                 captured.headContent = rawHTML.slice(0, match.index);
@@ -29,17 +31,17 @@ var guillotine = function(captured) {
                 // Hit <body. Gather <body> innerHTML.
 
                 // If we were missing a </head> before, now we can pick up everything before <body
-                captured.headContent = captured.head || rawHTML.slice(0, match.index);
+                captured.headContent = captured.headContent || rawHTML.slice(0, match.index);
                 captured.bodyContent = match[0];
 
                 // Find the end of <body ... >
-                var parseBodyTag = /^((?:[^>'"]*|'[^']*?'|"[^"]*?")*>)([\s\S]*)$/.exec(match[0]);
+                var parseBodyContent = /^((?:[^>'"]*|'[^']*?'|"[^"]*?")*>)([\s\S]*)$/.exec(captured.bodyContent);
                 
                 // Will skip this if <body was malformed (e.g. no closing > )
-                if (parseBodyTag) {
+                if (parseBodyContent) {
                     // Normal termination. Both </head> and <body> were recognized and split out
-                    captured.bodyTag = parseBodyTag[1];
-                    captured.bodyContent = parseBodyTag[2];
+                    captured.bodyTag = parseBodyContent[1];
+                    captured.bodyContent = parseBodyContent[2];
                 }
                 break;
             }
@@ -50,7 +52,7 @@ var guillotine = function(captured) {
     // Transform a primitive <tag attr="value" ...> into corresponding DOM element
     // Unlike $('<tag>'), correctly handles <head>, <body> and <html>
   , makeElement = function(html) {
-        var match = html.match(/^<(\w+)([\s\S]*)/i);
+        var match = html.match(/^<(\w+)([\s\S]*)$/i);
         var el = document.createElement(match[1]);
          
         $.each($('<div' + match[2])[0].attributes, function(i, attr) {
@@ -58,37 +60,32 @@ var guillotine = function(captured) {
         });
 
         return $(el);
-    }
+    };
 
-  , html = Mobify.html || {};
+// 1. Get the original markup from the document.
+// 2. Disable the markup.
+// 3. Construct the source pseudoDOM.    
+Mobify.html.extractDOM = function() {
+    // Extract escaped markup out of the DOM
+    var captured = guillotine(Mobify.html.extractHTML());
+    
+    Mobify.timing.addPoint('Extracted source HTML');
+    
+    // Disable attributes that can cause loading of external resources
+    var disabledHead = Mobify.html.disable(captured.headContent)
+      , disabledBody = Mobify.html.disable(captured.bodyContent);
+    
+    Mobify.timing.addPoint('Disabled external resources');
 
-$.extend(html, {
-
-    // 1. Get the original markup from the document.
-    // 2. Disable the markup.
-    // 3. Construct the source pseudoDOM.    
-    extractDOM: function() {
-        // Extract escaped markup out of the DOM
-        var captured = guillotine(html.extractHTML());
-        
-        Mobify.timing.addPoint('Extracted source HTML');
-        
-        // Disable attributes that can cause loading of external resources
-        var disabledHead = this.disable(captured.headContent)
-          , disabledBody = this.disable(captured.bodyContent);
-        
-        Mobify.timing.addPoint('Disabled external resources');
-
-        // Reinflate HTML strings back into declawed DOM nodes.
-        var result = { doctype: captured.doctype };
-        result.$head = makeElement(captured.headTag).append(disabledHead);
-        result.$body = makeElement(captured.bodyTag).append(disabledBody);
-        result.$html = makeElement(captured.htmlTag).append(result.$head, result.$body);
-        
-        Mobify.timing.addPoint('Created passive document');
-        
-        return result;
-    }
-});
+    // Construct passive DOM out of disabled head and body markup
+    var result = { doctype: captured.doctype };
+    result.$head = makeElement(captured.headTag).append(disabledHead);
+    result.$body = makeElement(captured.bodyTag).append(disabledBody);
+    result.$html = makeElement(captured.htmlTag).append(result.$head, result.$body);
+    
+    Mobify.timing.addPoint('Created passive document');
+    
+    return result;
+};
 
 })(Mobify.$, Mobify);

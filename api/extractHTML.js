@@ -4,28 +4,33 @@ var nodeName = function(node) {
         return node.nodeName.toLowerCase();
     }
 
-  , escapeQuote = function(s) {
-        return s.replace('"', '&quot;');
-    }
+    // Returns first element from jQuery, Zepto, or NodeList collection.
+  , peel = function(element) {
+        // nodeType check is here to ignore things like form elements (which do have length)
+        if (element && !element.nodeType && (typeof element.length == "number")) return element[0];
+        return element;
+  }
 
     // Return a string for the opening tag of DOMElement `element`.
-  , openTag = function(element) {
+    // This function can be reused by templating, so it unwraps jQuery/Zepto objects if given
+  , openTag = function(el) {
+        var element = peel(el);
         if (!element) return '';
-        if (element.length) element = element[0];
 
         var stringBuffer = [];
 
         [].forEach.call(element.attributes, function(attr) {
-            stringBuffer.push(' ', attr.name, '="', escapeQuote(attr.value), '"');
+            stringBuffer.push(' ', attr.name, '="', attr.value.replace('"', '&quot;'), '"');
         })
 
         return '<' + nodeName(element) + stringBuffer.join('') + '>';
     }
 
     // Return a string for the closing tag of DOMElement `element`.
-  , closeTag = function(element) {
+    // This function can be reused by templating, so it unwraps jQuery/Zepto objects if given
+  , closeTag = function(el) {
+        var element = peel(el);
         if (!element) return '';
-        if (element.length) element = element[0];
 
         return '</' + nodeName(element) + '>';
     }
@@ -46,52 +51,54 @@ var nodeName = function(node) {
 
     // Returns a string of the unesacped content from a plaintext escaped `container`.
   , extractHTMLFromElement = function(container) {
-        if (!container) return '';
+        if (!container || !container.childNodes) return '';
 
         return [].map.call(container.childNodes, function(el) {
             var tagName = nodeName(el);
-            if (tagName == '#comment') return '<!--' + el.textContent + '-->'
-            if (tagName == 'plaintext') return el.textContent
+            if (tagName == '#comment') return '<!--' + el.textContent + '-->';
+            if (tagName == 'plaintext') return el.textContent;
             if (tagName == 'script' && ((/mobify\./.test(el.src) || /Mobify/.test(el.textContent)))) {
                 return '';  
             }
             return el.outerHTML || el.nodeValue;
         }).join('');
-    }
+    };  
+
+var html = Mobify.html = {
+    'openTag' : openTag
+  , 'closeTag' : closeTag
+  , 'extractHTMLFromElement' : extractHTMLFromElement
+  , 'memo' : {}
 
     // Returns an object containing the state of the original page. Caches the object
     // in `extractedHTML` for later use.
-  , extractHTML = function() {
-        if (this.extractedHTML) return this.extractedHTML;
+  , 'extractHTML' : function() {
+        if (html.memo.extracted) return html.memo.extracted;
 
         var headEl = document.getElementsByTagName('head')[0] || document.createElement('head')
           , bodyEl = document.getElementsByTagName('body')[0] || document.createElement('body')
           , htmlEl = document.getElementsByTagName('html')[0];
 
-        var extractedHTML = this.extractedHTML = {
-            doctype: doctype(document),
-            htmlTag: openTag(htmlEl),
-            headTag: openTag(headEl),
-            bodyTag: openTag(bodyEl),
-            headContent: extractHTMLFromElement(headEl),
-            bodyContent: extractHTMLFromElement(bodyEl)
+        return html.memo.extracted = {
+            doctype: doctype()
+          , htmlTag: openTag(htmlEl)
+          , headTag: openTag(headEl)
+          , bodyTag: openTag(bodyEl)
+          , headContent: extractHTMLFromElement(headEl)
+          , bodyContent: extractHTMLFromElement(bodyEl)
+          , all : function() {
+                // RR: I assume that Mobify escaping tag is placed in <head>. If so, the <plaintext>
+                // it emits would capture the </head><body> boundary, as well as closing </body></html>
+                return this.doctype + this.htmlTag + this.headTag + this.headContent + this.bodyContent;
+            }
         };
-
-        extractedHTML.all = function() {
-            // RR: I assume that Mobify escaping tag is placed in <head>. If so, the <plaintext>
-            // it emits would capture the </head><body> boundary, as well as closing </body></html>
-            // Therefore, bodyContent will have these tags, and they do not need to be added to .all()
-            return this.doctype + this.htmlTag + this.headTag + this.headContent + this.bodyContent;
-        }
-
-        return extractedHTML;
     }
-  , writeHTML = function(markup) {
-        if (!markup) {
-            console && console.warn('Output HTML is empty, unmobifying.');
-            markup = html.extractHTML().all();
-        }
-        this.writtenHTML = markup;
+
+    // Rewrite document contents with provided markup via document.write() replacement.
+    // If provided string is empty, capture the source markup from escaping tags.   
+  , 'writeHTML' : function(markup) {
+        markup = markup || html.extractHTML().all();
+        if (html.memo) html.memo.written = markup;
 
         // We'll write markup a tick later, as Firefox logging is async
         // and gets interrupted if followed by synchronous document.open
@@ -107,35 +114,23 @@ var nodeName = function(node) {
         });
     }
 
-  , unmobify = function() {
+  , 'unmobify' : function() {
+        var unmobifier = function() {
+            document.removeEventListener('DOMContentLoaded', unmobifier, false);
+            html.writeHTML();
+        }    
+
         if (/complete|loaded/.test(document.readyState)) {
             unmobifier();
         } else {
             document.addEventListener('DOMContentLoaded', unmobifier, false);
         }
     }
+};
 
-    // Gather escaped content from the DOM, unescaped it, and then use 
-    // `document.write` to revert to the original page.
-  , unmobifier = function() {
-        document.removeEventListener('DOMContentLoaded', unmobifier, false);
-        html.writeHTML();
-    }
-    
-  , html = Mobify.html || {}
-
-if (Mobify.$) {
-    Mobify.$.extend(html, {
-        'writeHTML': writeHTML
-      , 'unmobify': unmobify
-      , 'extractHTML': extractHTML
-      , 'extractHTMLFromElement': extractHTMLFromElement
-      , 'openTag': openTag
-      , 'closeTag': closeTag
-    });
-} else {
+if (!Mobify.ark) {
     Mobify.api = 1;
-    unmobify();
+    Mobify.html.unmobify();
 }
 
 })(document, Mobify);

@@ -54,8 +54,8 @@ $.extend(Mobify.transform, {
         if (markup instanceof Error) markup = markup.payload;
         markup = markup || "";
 
-        if (typeof Mobify.html.acceptedHTML == "string") return;
-        Mobify.html.acceptedHTML = markup;
+        if (typeof Mobify.html.memo.accepted == "string") return;
+        Mobify.html.memo.accepted = markup;
         timing.addPoint('Adapted passive document');
         
         markup = Mobify.html.enable(markup);

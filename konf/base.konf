@@ -28,9 +28,10 @@ Mobify.points.push(+new Date);
 {>"/base/api/logging.js"/}
 {>"/base/api/util.js"/}
 {>"/base/api/timing.js"/}
-{>"/base/api/externals.js"/}
+
 {>"/base/api/extractHTML.js"/}
 {>"/base/api/extractDOM.js"/}
+{>"/base/api/externals.js"/}
 
 {+dust}
     {>"/base/vendor/dust-core.js"/}
