@@ -57,7 +57,7 @@ var guillotine = function(captured) {
             el.setAttribute(attr.nodeName, attr.nodeValue);
         });
 
-        return $(el);
+        return el;
     }
 
   , html = Mobify.html || {};
@@ -74,24 +74,28 @@ $.extend(html, {
         Mobify.timing.addPoint('Recovered Markup');
         
         // Disable attributes that can cause loading of external resources
-        var disabledHead = this.disable(captured.headContent);
+        var disabledHead = this.disable(captured.headContent)
           , disabledBody = this.disable(captured.bodyContent);
         
         Mobify.timing.addPoint('Disabled Markup');
 
         // Reinflate HTML strings back into declawed DOM nodes.
         var div = document.createElement('div');
-        var $head = makeElement(captured.headTag);
-        var $body = makeElement(captured.bodyTag);
+        var headEl = makeElement(captured.headTag);
+        var bodyEl = makeElement(captured.bodyTag);
+        var htmlEl = makeElement(captured.htmlTag);
+
         var result = {
             'doctype' : captured.doctype
-          , '$head' : $head
-          , '$body' : $body
-          , '$html' : makeElement(captured.htmlTag).append($head, $body)
+          , '$head' : $(headEl)
+          , '$body' : $(bodyEl)
+          , '$html' : $(htmlEl)
         };
 
-        for (div.innerHTML = disabledHead; div.firstChild; $head.appendChild(div.firstChild));
-        for (div.innerHTML = disabledBody; div.firstChild; $body.appendChild(div.firstChild));
+        for (div.innerHTML = disabledHead; div.firstChild; headEl.appendChild(div.firstChild));
+        for (div.innerHTML = disabledBody; div.firstChild; bodyEl.appendChild(div.firstChild));
+        htmlEl.appendChild(headEl);
+        htmlEl.appendChild(bodyEl);
                 
         Mobify.timing.addPoint('Built Passive DOM');
         
