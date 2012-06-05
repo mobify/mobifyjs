@@ -78,11 +78,22 @@ Mobify.html.extractDOM = function() {
     Mobify.timing.addPoint('Disabled external resources');
 
     // Construct passive DOM out of disabled head and body markup
-    var result = { doctype: captured.doctype };
-    result.$head = makeElement(captured.headTag).append(disabledHead);
-    result.$body = makeElement(captured.bodyTag).append(disabledBody);
-    result.$html = makeElement(captured.htmlTag).append(result.$head, result.$body);
-    
+
+    var div = document.createElement('div');
+
+    var $head = makeElement(captured.headTag);
+    for (div.innerHTML = disabledHead; div.firstChild; $head.appendChild(div.firstChild));
+
+    var $body = makeElement(captured.bodyTag);
+    for (div.innerHTML = disabledBody; div.firstChild; $body.appendChild(div.firstChild));
+
+    var result = {
+        'doctype' : captured.doctype
+      , '$head' : $head
+      , '$body' : $body
+      , '$html' : makeElement(captured.htmlTag).append($head, $body)
+    };
+
     Mobify.timing.addPoint('Created passive document');
     
     return result;
