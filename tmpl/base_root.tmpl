@@ -1,9 +1,13 @@
 {! 
   Template syntax legend:
 
-  {! Comment !}     - Template comment. Text surrounded by {! will not be rendered.
+  ! Comment !       - Template comment. Text surrounded by ! will not be rendered.
   {foo}             - Renders the value of key 'foo'.
   {foo|bar}         - Renders the value of key 'foo' through the filter bar.
+                        Normally, text variables are escaped by dust, so <p> appears as <p> on user
+                        screen instead of creating a paragraph. |s filter overrides that.
+                        openTag, closeTag and innerHTML tags allow showing parts of HTML elements.
+
   {#foo}..{/foo}    - iterate or descend into the key foo. 
                       Example:  {#header}
                                     {logo} 
@@ -35,7 +39,7 @@ Below is your base template file, which is extended by home.tmpl:
 {doctype|s}
 {$html|openTag|s}
 {$head|openTag|s}
-    {+baseScriptsBlock}
+    {+baseScripts}
         {#lib_import/}
         {%script}
             Mobify.enhance();
@@ -49,26 +53,34 @@ Below is your base template file, which is extended by home.tmpl:
         {%script}
             Mobify.$('html, #x-root').last().addClass("{#content.templateName}x-{.}{~s}{/content.templateName}");
         {/script}    
-    {/baseScriptsBlock}
-    {+headBlock}
+    {/baseScripts}
+    {+head}
         {$head|innerHTML|s}
-        <link rel="stylesheet" href="{config.configDir}{?config.tablet}tablet{:else}stylesheet{/config.tablet}.css" />
+        <link rel="stylesheet" href="{config.configDir}style.css" />
         <meta name="viewport" content="width=device-width; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; user-scalable=no;" />
-    {/headBlock}
+    {/head}
 </head>
 {$body|openTag|s}
-    {+bodyBlock}
-        {+headerBlock}
-            {>_header/}
-        {/headerBlock}
-        {+contentBlock}
+    {!  Here, we have set up a few blocks that would help you override content from page-specific
+        templates. For example, if you would like to create a splash page without headers or footers, 
+        you could write {<body}<p>Splash page content</p>{/body} in a page template.
+
+        If you override block contents, you can bring back old content with a {_SUPER_} reference.
+        For instance, if a certain page needs to be wrapped in an extra div, its template could add
+        {<body}<div class="outerWrap">{_SUPER_}</div>{/body}.
+
+        Blocks are independent from names of data objects used within. For example, above in {+head}
+        you can see how content object is being accessed within head block. Reuse of names is merely
+        a matter of convention.
+    !}
+    {+body}
+        {>_header/}
+        {+content}
             {$body|innerHTML|s}
-        {/contentBlock}
-        {+footerBlock}
-            {>_footer/}
-        {/footerBlock}
-    {/bodyBlock}
-    {+scriptsBlock}
-    {/scriptsBlock}
+        {/content}
+        {>_footer/}
+    {/body}
+    {+scripts}
+    {/scripts}
 </body>
 </html>
