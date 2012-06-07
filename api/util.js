@@ -5,7 +5,7 @@
 //
 // `url`: Optional url to redirect to after opting out.
 Mobify.desktop = function(url) {
-    document.cookie = 'mobify-path; path=/;';
+    document.cookie = 'mobify-path=; path=/;';
 
     if (url) {
         location = url;
