@@ -13,7 +13,7 @@
             });
         {/script}
         {%script}
-            Mobify.$('html, #x-root').last().addClass("{#content.templateName}x-{.}{~s}{/content.templateName}");
+            Mobify.$('html').last().addClass("{#content.templateName}x-{.}{~s}{/content.templateName}");
         {/script}    
     {/baseScripts}
     {+head}
@@ -24,7 +24,7 @@
 </head>
 {$body|openTag|s}
     {+body}
-    <section id="x-root">
+    <section id="x-root" class="{#content.templateName}x-{.}{~s}{/content.templateName}">
         {+header}{>_header/}{/header}
         <section id="x-main">{+content}{$body|innerHTML|s}{/content}</section>
         {+footer}{>_footer/}{/footer}
