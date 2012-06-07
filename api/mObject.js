@@ -135,7 +135,7 @@ MObject.prototype = {
   , _attemptCompletion: function() {
         if (this.done()) {
             var completer;
-            while (completer = this._on.complete.shift()) {
+            while (this._on && (completer = this._on.complete.shift())) {
                 completer.call(this);
             }
         }
@@ -149,6 +149,7 @@ MObject.prototype = {
         var done = function(extender) {
             if (extender) mobject.add(extender);
 
+            if (!mobject._outstanding) return;
             var index = mobject._outstanding.indexOf(init);
             mobject._outstanding.splice(index, 1);
             mobject._attemptCompletion();
