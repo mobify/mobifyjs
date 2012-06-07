@@ -54,7 +54,7 @@ var guillotine = function(captured) {
   , makeElement = function(html) {
         var match = html.match(/^<(\w+)([\s\S]*)$/i);
         var el = document.createElement(match[1]);
-         
+
         $.each($('<div' + match[2])[0].attributes, function(i, attr) {
             el.setAttribute(attr.nodeName, attr.nodeValue);
         });
