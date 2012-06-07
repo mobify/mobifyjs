@@ -24,7 +24,6 @@ Mobify.points.push(+new Date);
     {>"/base/vendor/slide.js"/}
 {/lib}{/lib_export}
 
-{>"/base/api/persistHash.js"/}
 {>"/base/api/logging.js"/}
 {>"/base/api/util.js"/}
 {>"/base/api/timing.js"/}
