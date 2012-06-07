@@ -28,6 +28,7 @@ Mobify.points.push(+new Date);
 {>"/base/api/logging.js"/}
 {>"/base/api/util.js"/}
 {>"/base/api/timing.js"/}
+{>"/base/api/config.js"/}
 
 {>"/base/api/extractHTML.js"/}
 {>"/base/api/extractDOM.js"/}
@@ -40,8 +41,6 @@ Mobify.points.push(+new Date);
     {>"/base/api/mObject.logging.js"/}
     {>"/base/api/tmpl.js"/}
 {/dust}
-
-{>"/base/api/config.js"/}
 
 {#lib_export name="enhance"}{+enhance}
     {>"/base/api/orientation.js"/}
