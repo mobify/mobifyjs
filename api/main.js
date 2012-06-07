@@ -57,15 +57,15 @@ $.extend(Mobify.transform, {
         if (typeof Mobify.html.memo.accepted == "string") return;
         Mobify.html.memo.accepted = markup;
         timing.addPoint('Adapted passive document');
-        
+
         markup = Mobify.html.enable(markup);
-        timing.addPoint('Re-enabled external resources');
+        timing.addPoint('Re-enabled external resources');    
+        Mobify.html.writeHTML(markup);
 
         if (Mobify.config.isDebug) {
             timing.logPoints();
             Mobify.mobject.log();
         }
-        Mobify.html.writeHTML(markup);
     },
 
     // Kickstart processing. Guard against beginning before the document is ready.
@@ -76,6 +76,7 @@ $.extend(Mobify.transform, {
             if (!/complete|loaded/.test(document.readyState)) {
                 return setTimeout(prepareConf, 15);
             }
+            Mobify.timing.addPoint('Document ready for extraction');
             Mobify.transform.prepareConf(conf);
         };
 
