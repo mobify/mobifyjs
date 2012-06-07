@@ -18,7 +18,10 @@ var keys = function(obj) { return $.map(obj, function(val, key) { return key }) 
       , link:   ['href']
       , style:  ['media']
     }
-  , affectedTagRe = /<!--[\s\S]*?-->|<(script)([\s\S]*?)>([\s\S]*?<\/script)|<(img|iframe|link|style)([\s\S]*?)>()/gi
+  , affectedTagRe = new RegExp('/<!--[\\s\\S]*?-->'
+      + '|<(script)([\\s\\S]*?)>([\\s\\S]*?<\\/script)'
+      + '|<(img|iframe|link|style)([\\s\\S]*?)>()'
+    , "gi")
   , attributeDisablingRes = {}
   , attributesToEnable = {}
   , attributeEnablingRe;
