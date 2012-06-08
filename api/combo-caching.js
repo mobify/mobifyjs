@@ -395,8 +395,7 @@ var ccPublic = /^\s*public\s*$/
             if (!localStorageAvailable) return;
 
             var MAX_ATTEMPTS = 10
-              , toBeCached = {}
-              , serialized;
+              , toBeCached = {};
     
             // start by shallow copying the global resources dictionary, since 
             // we're going to modify its key list, but not its values
@@ -410,7 +409,7 @@ var ccPublic = /^\s*public\s*$/
             setTimeout( function() {
                 /* serialize the shallow copy */
                 try {
-                    serialzed = JSON.stringify(toBeCached)
+                    var serialized = JSON.stringify(toBeCached)
                 } catch(e) {
                     console.log("Mobify.combo.dehydrateCache error stringifying: " + e.message);
                     return;
@@ -418,7 +417,8 @@ var ccPublic = /^\s*public\s*$/
 
                 try {
                     // The only indicationw e get of a full localstorage is an exception
-                    localStorage.setItem(cache.lsKey, serialzed);
+                    localStorage.setItem(cache.lsKey, serialized);
+                    console.log('dehydrated cache!')
                 // when localStorage is full, try again with one less item, on next tick
                 } catch(e) {
                     setTimeout(function() {
