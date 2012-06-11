@@ -82,5 +82,34 @@
     });
     </script>
 
+    <script>
+    asyncTest('Mobify.combo.dehydrateCache evict least recently used', function() {
+        Mobify.combo.clearCache();
+
+        // This will produce an 8-million+ character string we can take substrings of the build things that should be problematic for localStorage
+        var longString = 'a';
+        while(longString.length < 5000000) {
+            longString = longString.concat(longString);
+        }
+        
+        // Set up some mock resources
+        Mobify.combo.resources['http://foo.bar/baz.js'] = {
+                lastUsed: 2,
+                data: longString
+        }
+        Mobify.combo.resources['http://bar.baz/foo'] = {
+            lastUsed: 1
+        }
+
+        Mobify.combo.dehydrateCache();
+
+        //The big resource is most recently used, so we expect that the empty object's JSON representation should have been stored
+        setTimeout( function(){
+            equal(localStorage[Mobify.httpCaching.lsKey], '{}');
+            start();
+        }, 300);
+    });
+    </script>
+
 </body>
 </html>
