@@ -1,6 +1,8 @@
 (function(Mobify) {
 
-var caching = Mobify.httpCaching
+var $ = Mobify.$
+
+  , caching = Mobify.httpCaching
 
   , combo = Mobify.combo
 
@@ -28,12 +30,12 @@ var caching = Mobify.httpCaching
     /**
      * Prepare to make combo requests by rehydrating the cache, if there is one 
      * and getting rid of stale items.
+     * rehydrate, evict stale items and save back the (potentially smaller) 
+     * cache to localStorage
+     * Note, after this a "live copy" of the cache still exists at 
+     * window.Mobify.combo.resources until "the flood"
      */
   , initializeFromCache = function() {
-        // rehydrate, evict stale items and save back the (potentially smaller) 
-        // cache to localStorage
-        // Note, after this a "live copy" of the cache still exists at 
-        // window.Mobify.combo.resources until "the flood"
         combo.rehydrateCache();
         caching.evictStale();
         combo.dehydrateCache();
@@ -47,7 +49,8 @@ var caching = Mobify.httpCaching
         var $scripts = this.filter(defaults.selector).add(this.find(defaults.selector)).remove()
           , urls = []
           , url
-          , bootstrap;
+          , bootstrap
+          , uncachedUrls;
 
         $scripts.filter('[' + defaults.attribute + ']').each(function() {
             absolutify.href = this.getAttribute(defaults.attribute);
@@ -55,30 +58,24 @@ var caching = Mobify.httpCaching
             urls.push(url);
 
             this.removeAttribute(defaults.attribute);
-
             this.className += ' x-combo';
-
             this.innerHTML = defaults.loadSyncCallback + "('" + url + "');";
         });
 
-        /* Attempt to initialize fromt he localStorage Cache */
         initializeFromCache();
 
-        var uncachedUrls = caching.notCachedUrls(urls);
-
+        uncachedUrls = caching.notCachedUrls(urls);
 
         bootstrap = document.createElement('script');
-        // if there are things to load fromt he web service, do that
-        if(uncachedUrls.length > 0) {
+
+        if (uncachedUrls.length) {
             bootstrap.src = getComboStoreURL(uncachedUrls);
         } else {
-          // otherwise ensure that the cache ahs been rehydrated
             bootstrap.innerHTML = 'Mobify.combo.rehydrateCache();';
-            bootstrap.type = 'text/javascript'
         }
 
         //DEBUG
-        console.log('comboScriptSync() bootstrap tag: ' + bootstrap.outerHTML);
+        console.log('$.fn.comboScriptSync() bootstrap tag: ' + bootstrap.outerHTML);
 
         $scripts = $(bootstrap).add($scripts);
         return $scripts;

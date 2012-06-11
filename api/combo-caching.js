@@ -127,24 +127,23 @@ var ccPublic = /^\s*public\s*$/
      * A function to create a data URI from a mobify combo resource object
      */
   , dataURI = function(resource) {
-        return 'data:' + 
-            resource.headers['content-type'] + 
-            (!resource['text'] ? (';base64,' + resource.body) : 
-                (',' + encodeURIComponent(resource.body)));
+        return 'data:' + resource.headers['content-type'] + (!resource.text
+                ? (';base64,' + resource.body)
+                : (',' + encodeURIComponent(resource.body)));
     }
 
     // Global resource dictionary, to be found later at Mobify.com.resources
   , resources = {}
 
-
   , cache = Mobify.httpCaching = {
 
-      // key used for localStorage caching
-      lsKey: 'Mobify-Combo-Cache-v1.0'
-      /**
-       * Predicate for determining whether or not a comboed resource is "stale" by
-       * HTTP 1.1 caching rules.
-       */
+        // key used for localStorage caching
+        lsKey: 'Mobify-Combo-Cache-v1.0'
+
+        /**
+         * Predicate for determining whether or not a comboed resource is "stale" by
+         * HTTP 1.1 caching rules.
+         */
       , isStale: function(resource) {
           return getAge(resource) > maxAge(resource)
         }
@@ -158,16 +157,15 @@ var ccPublic = /^\s*public\s*$/
          * HTTP 1.1 caching rules.
          */
       , evictStale: function() {
-            for (var i in resources) {
-                if (resources.hasOwnProperty(i) && cache.isStale(resources[i])) {
-                    delete resources[i]
+            for (var key in resources) {
+                if (resources.hasOwnProperty(key) && cache.isStale(resources[key])) {
+                    delete resources[key]
                 }
             }
         }
 
         /**
-         * Takes an array of urls to be comboed, returns a list of those URLs that 
-         * are not already in the resources dictionary.
+         * Given an array of URLs, returns an array of the ones that are not cached.
          */
       , notCachedUrls: function(urls) {        
             var notCachedUrls = [];
@@ -178,15 +176,14 @@ var ccPublic = /^\s*public\s*$/
             }
 
             //DEBUG
-            console.log('urls: ' + JSON.stringify(urls));
-            console.log('notCachedUrls: ' + JSON.stringify(notCachedUrls));
+            // console.log('urls: ' + JSON.stringify(urls));
+            // console.log('notCachedUrls: ' + JSON.stringify(notCachedUrls));
 
             return notCachedUrls;
         }
 
         /**
-         * Takes an array of urls to be comboed, returns those which are already in 
-         * the resources dictionary.
+         * Given an array of URLs, returns an array of the ones that are cached.
          */
       , cachedUrls: function(urls) {
             var cachedUrls = [];
@@ -201,11 +198,13 @@ var ccPublic = /^\s*public\s*$/
     }
 
   , localStorageAvailable = (function() {
-        var k = 'MobifyTestLocalStorage', v = 'Yay!';
+        var key = 'MobifyTestLocalStorage'
+          , val = 'Yay!';
+
         try {
-            localStorage.setItem(k, v);
-            if(v === localStorage.getItem(k)) {
-                localStorage.removeItem(k);
+            localStorage.setItem(key, val);
+            if (val === localStorage.getItem(key)) {
+                localStorage.removeItem(key);
                 return true;
             } else {
                 return false;
@@ -218,7 +217,6 @@ var ccPublic = /^\s*public\s*$/
   , storeResource = function(resource) {
         var url = resource.url;
 
-        /* ensure this response was successfully fetched by the service */
         if (resource.status == 'ready') {
             combo.resources[url] = resource;
         } else {
@@ -227,15 +225,19 @@ var ccPublic = /^\s*public\s*$/
     }
 
 
-    /* asynchronously recursive function that attempts to whittle down a 
-       cache to a storeable size */
+    /**
+     * asynchronously recursive function that attempts to whittle down a 
+     * cache to a storeable size
+     */
   , evictAndStore = function(resources, attempts) {
         var serialzed;
+
         if (attempts == 0) {
             console.log('Mobify.combo.dehydrateCache: evict and store attempts exceeded, aborting');
         // get rid of something.
         } else {
             evictOne(resources);
+
             try {
                 serialzed = JSON.stringify(resources)
             } catch(e) {
@@ -259,29 +261,31 @@ var ccPublic = /^\s*public\s*$/
      * eviction policy.
      */
   , evictOne = function(resources) {
-            /* beginning of the epoch */
+            // beginning of the epoch.
         var START_OF_TIME = 0 
-            /* end of the epoch, 2^53 - 1 milliseconds after the beginning, 
-               285000+ years from now */
+            // end of the epoch, 2^53 - 1 milliseconds after the beginning, 
+            // 285000+ years from now.
           , END_OF_TIME = 9007199254740991 
           , lruKey
           , lruTime = END_OF_TIME
-          , r;
-        for (var k in resources) {
-            if (resources.hasOwnProperty(k)) {
-                r = resources[k];
-                if(r.lastUsed) {
+          , resource;
+
+        for (var key in resources) {
+            if (resources.hasOwnProperty(key)) {
+                resource = resources[k];
+
+                if (resource.lastUsed) {
                     // if this resource has been used less recently than the so 
                     // far least recently used resource, this gets nominated 
-                    if(r.lastUsed <= lruTime) {
-                        lruKey = k;
-                        lruTime = r.lastUsed;
+                    if (resource.lastUsed <= lruTime) {
+                        lruKey = key;
+                        lruTime = resource.lastUsed;
                     }
                 } else {
                     // if lastUsed is not set, we will consider this to never 
                     // have been used, so, this key gets nominated
-                    lruKey = k;
-                    lruTime = BEGINNING;
+                    lruKey = key;
+                    lruTime = START_OF_TIME;
                     break;
                 }
             }
@@ -298,53 +302,44 @@ var ccPublic = /^\s*public\s*$/
          * Store a resoruce or an array of resources from the mobify combo service 
          * in our resource dictionary.
          */
-      , store: function(r) {
-            if (r instanceof Array) {
-                for (var i = 0; i < r.length; i++) {
-                    storeResource(r[i]);
+      , store: function(resource) {
+            if (resource instanceof Array) {
+                for (var i = 0; i < resource.length; i++) {
+                    storeResource(resource[i]);
                 }
             } else {
-                storeResource(r);
+                storeResource(resource);
             }
+
             combo.dehydrateCache();
         }
 
         /**
-         * Retrieve a JS resource from the combo.resources object and write out a 
-         * script tag with it as a dataURI.
-         * Note, document.writing the script tag is probably the only way to 
-         * preserve execution order: 
-         * http://blog.getify.com/ff4-script-loaders-and-order-preservation/
+         * Get the resource `url` from the cache and inject a script to execute it.
          */
       , loadSync: function(url) {
-            var r;
+            var resource;
         
-            /* add it if we have it */
-            if (r = resources[url]) {
-                // do a little accounting for caching purposes
-                r.lastUsed = Date.now();
-                r.useCount = r.useCount++ || 1
-                /* if we have the resource in our dictionary, use data uri rather 
-                   than a network uri */
-                url = dataURI(r)
+            if (resource = resources[url]) {
+                resource.lastUsed = Date.now();
+                resource.useCount = resource.useCount++ || 1
+                url = dataURI(resource)
             }
-            /* write out a script tag which contains either the data uri of the 
-               resource or the original network uri if for some reason it was not in
-               combo's resource dictionary */
+
             document.write('<script src="' + url + '"></script>');
         }
 
-
-        , loadAsync: function(url) {
+      , loadAsync: function(url) {
             var r, s;
-            s = document.createElement('SCRIPT');
-            /* add it if we have it */
-            if(r = resources['url']) {
+            s = document.createElement('script');
+            
+            // add it if we have it
+            if (r = resources['url']) {
                 r.lastUsed = Date.now();
                 r.useCount = r.useCount++ || 1
                 s.src = dataURI(r);
             } else {
-                /* otherwise, make the browser get it itself */
+                // otherwise, make the browser get it itself
                 s.src = url;
             }
             document.body.appendChild(s);
@@ -352,50 +347,51 @@ var ccPublic = /^\s*public\s*$/
 
         , storeAndLoadAsync: function(resources) {
             combo.store(resources);
+
+            // iterate through the resources we've been asked to and load them
             for(var i = 0; i < resources.length; i++) {
-                // iterate through the resources we've been asked to and load them
                 combo.loadAsync(resources[i]['url']);
             }
         }
 
         /* A guard property to ensure that we only rehydrate the cache once */
-
       , rehydratedCache: false  
 
         /**
-         * Get keys out of the localStorage cache and into our in-memory reosurce 
-         * dictionary, if we haven't already.
+         * Deserialize resources from localStorage into `resources`.
+         * A flag remembers if we've already done this.
          */   
       , rehydrateCache: function() {
             if (!localStorageAvailable || combo.rehydratedCache == true) {
                 return;
             }
+            combo.rehydratedCache = true;
 
             //DEBUG
-            console.log("rehydrating cache!")
+            console.log("rehydrateCache()")
 
-            var r, k, cacheContents = localStorage.getItem(cache.lsKey);
-            if (cacheContents !== null) {
-                try {
-                    cacheContents = JSON.parse(cacheContents);
-                } catch(e) {
-                    console.log('Mobify.combo.rehydrateCache: error parsing localStorage[' + 
-                        this.key + ']: ', e.message);
-                    return;
-                }
+            var cacheContents = localStorage.getItem(cache.lsKey)
+              , key;
 
-                // Extract keys which are not loaded.
-                for (k in cacheContents) {
-                    if (cacheContents.hasOwnProperty(k) && !resources[k]) {
-                        resources[k] = cacheContents[k];
-                    }
+            if (cacheContents === null) return;
+                
+            try {
+                cacheContents = JSON.parse(cacheContents);
+            } catch(e) {
+                console.log('Mobify.combo.rehydrateCache: Error parsing localStorage[' + this.lsKey + ']: ', e.message);
+                return;
+            }
+
+            // Extract keys which are not already loaded.
+            for (key in cacheContents) {
+                if (cacheContents.hasOwnProperty(key) && !resources[key]) {
+                    resources[key] = cacheContents[key];
                 }
             }
-            combo.rehydratedCache = true;
         }
 
         /**
-         * Store keys from the local reource dictionary back into the localStorage 
+         * Store keys from the local resource dictionary back into the localStorage 
          * cache.
          */
       , dehydrateCache: function() {
@@ -404,17 +400,16 @@ var ccPublic = /^\s*public\s*$/
             var MAX_ATTEMPTS = 10
               , toBeCached = {};
     
-            // start by shallow copying the global resources dictionary, since 
-            // we're going to modify its key list, but not its values
-            for (var i in resources) {
-                if (resources.hasOwnProperty(i)) {
-                    toBeCached[i] = resources[i];
+            // Shallow copying the global resources dictionary, since we may
+            // evict resources to store things in the cache and change keys.
+            for (var key in resources) {
+                if (resources.hasOwnProperty(key)) {
+                    toBeCached[key] = resources[key];
                 }
             }
             
-            /* These might get expensive, do them on next tick */
-            setTimeout( function() {
-                /* serialize the shallow copy */
+            // This may be expensive, so do it on next tick.
+            setTimeout(function() {
                 try {
                     var serialized = JSON.stringify(toBeCached)
                 } catch(e) {
@@ -422,25 +417,27 @@ var ccPublic = /^\s*public\s*$/
                     return;
                 }
 
+                // An exception is raised when localStorage is ful.
                 try {
-                    // The only indicationw e get of a full localstorage is an exception
                     localStorage.setItem(cache.lsKey, serialized);
-                    console.log('dehydrated cache!')
-                // when localStorage is full, try again with one less item, on next tick
+                    console.log('dehydrateCache()')
                 } catch(e) {
+                    console.log('error');
                     setTimeout(function() {
                         evictAndStore(toBeCached, MAX_ATTEMPTS)
                     }, 0);
                 }
             }, 0);
         }
+
         /**
          * Clear out the cache both in localStorage and in memory
          */
       , clearCache: function() {
-            if(localStorageAvailable) {
+            if (localStorageAvailable) {
                 localStorage.removeItem(cache.lsKey);
             }
+
             Mobify.combo.resources = resources = {};
         }  
     };
