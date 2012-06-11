@@ -32,19 +32,11 @@
 
     <!-- TESTS rehydrateCache-->
     <script>
-    module('Mobify.combo cache');
+    module('Mobify.combo rehydrate');
 
-    test('Mobify.combo.rehydrateCache', function() {
+    test('Mobify.combo.rehydrateCache', 2, function() {
         Mobify.combo.clearCache();
 
-        // Sixty Days in seconds
-        var SIXTY_DAYS = 60 * 24 * 60 * 60;
-        // Two weeks in seconds
-        var TWO_WEEKS = 14 * 24 * 60 * 60;
-        //five minutes in seconds
-        var FIVE_MINUTES = 5 * 60;
-
-        
         // Let's build a dehydrated cache by hand and test rehydration
         testMessage = "Hello, from the dehydrated cache."
 
@@ -67,7 +59,9 @@
     </script>
 
     <script>
-    asyncTest('Mobify.combo.dehydrateCache', function() {
+    module('Mobify.combo dehydrate')
+
+    asyncTest('dehydrates successfully', 1, function() {
         Mobify.combo.clearCache();
 
         Mobify.combo.resources['foo'] = 'bar';
@@ -80,10 +74,8 @@
             start();
         }, 0);
     });
-    </script>
 
-    <script>
-    asyncTest('Mobify.combo.dehydrateCache evict least recently used', function() {
+    asyncTest('evicts all', 1, function() {
         Mobify.combo.clearCache();
 
         // This will produce an 8-million+ character string we can take substrings of the build things that should be problematic for localStorage
@@ -108,6 +100,39 @@
             equal(localStorage[Mobify.httpCaching.lsKey], '{}');
             start();
         }, 300);
+    });
+
+    asyncTest('evicts one', 1, function() {
+        Mobify.combo.clearCache();
+
+        var longString = 'a';
+        while(longString.length < 5000000) {
+            longString = longString.concat(longString);
+        }
+
+        Mobify.combo.resources['http://foo.bar/baz.js'] = {
+                lastUsed: 1,
+                data: longString
+        }
+        Mobify.combo.resources['http://bar.baz/foo'] = {
+            lastUsed: 2
+        }
+
+        var survives = {
+            'http://bar.baz/foo': {
+                lastUsed: 2
+            }
+        }
+
+        var survivesJSON = JSON.stringify(survives);
+
+        Mobify.combo.dehydrateCache();
+
+        setTimeout( function() {
+            equal(localStorage[Mobify.httpCaching.lsKey], survivesJSON);
+            start();
+        }, 300);
+
     });
     </script>
 
