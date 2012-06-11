@@ -77,10 +77,7 @@
         Mobify.combo.clearCache();
 
         // This will produce an 8-million+ character string we can take substrings of the build things that should be problematic for localStorage
-        var longString = 'a';
-        while(longString.length < 5000000) {
-            longString = longString.concat(longString);
-        }
+        var longString = Array(5000000).join('a');
         
         // Set up some mock resources
         Mobify.combo.resources['http://foo.bar/baz.js'] = {
@@ -103,10 +100,7 @@
     asyncTest('evicts one', 1, function() {
         Mobify.combo.clearCache();
 
-        var longString = 'a';
-        while(longString.length < 5000000) {
-            longString = longString.concat(longString);
-        }
+        var longString = Array(5000000).join('a');
 
         Mobify.combo.resources['http://foo.bar/baz.js'] = {
                 lastUsed: 1,
@@ -135,16 +129,35 @@
 
     module('http caching staleness');
 
-    test('evicts stale', function() {
-        // Sixty Days in seconds
-        var SIXTY_DAYS = 60 * 24 * 60 * 60;
+    test('evicts stale', 4, function() {
+        Mobify.combo.clearCache();
         // Two weeks in seconds
         var TWO_WEEKS = 14 * 24 * 60 * 60;
-        //five minutes in seconds
-        var FIVE_MINUTES = 5 * 60;
 
-        var UTC_TWO_WEEKS = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString();
-    })
+        var UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString();
+        var UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString();
+
+        var stale = Mobify.combo.resources['http://foo.bar/stale'] = {
+            'headers': {
+                'expires': UTC_TWO_WEEKS_AGO
+            }
+        }
+        var fresh = Mobify.combo.resources['http://foo.bar/fresh'] = {
+            'headers': {
+                'expires': UTC_TWO_WEEKS_FROM_NOW
+            }
+        }
+
+        //Check that staleness evaluation works
+        equal(true, Mobify.httpCaching.isStale(stale), 'stale resource reads as stale');
+        equal(false, Mobify.httpCaching.isStale(fresh), 'fresh resource reads as not stale');
+        
+        // Now let's make the stale resource get evicted
+        Mobify.httpCaching.evictStale();
+        equal(undefined, Mobify.combo.resources['http://foo.bar/stale'], 'stale resource was evicted');
+        equal(fresh, Mobify.combo.resources['http://foo.bar/fresh'], 'fresh resource was not evicted');
+
+    });
     </script>
 
 </body>
