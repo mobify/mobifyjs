@@ -258,7 +258,7 @@ var ccPublic = /^\s*public\s*$/
                285000+ years from now */
           , END_OF_TIME = 9007199254740991 
           , lruKey
-          , lruTime = END
+          , lruTime = END_OF_TIME
           , r;
         for (var k in resources) {
             if (resources.hasOwnProperty(k)) {
