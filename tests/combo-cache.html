@@ -34,7 +34,7 @@
     <script>
     module('Mobify.combo rehydrate');
 
-    test('Mobify.combo.rehydrateCache', 2, function() {
+    test('rehydrate cache', 2, function() {
         Mobify.combo.clearCache();
 
         // Let's build a dehydrated cache by hand and test rehydration
@@ -53,15 +53,13 @@
 
         Mobify.combo.rehydrateCache();
 
-        equal(testMessage, Mobify.combo.resources['key1']['msg']);
-        equal(testMessage, Mobify.combo.resources['key2']['msg']);
+        equal(testMessage, Mobify.combo.resources['key1']['msg'], "key1 rehydrated");
+        equal(testMessage, Mobify.combo.resources['key2']['msg'], "key2 rehydrated");
     });
-    </script>
 
-    <script>
     module('Mobify.combo dehydrate')
 
-    asyncTest('dehydrates successfully', 1, function() {
+    asyncTest('dehydrates successfully, no evictions', 1, function() {
         Mobify.combo.clearCache();
 
         Mobify.combo.resources['foo'] = 'bar';
@@ -70,7 +68,7 @@
         Mobify.combo.dehydrateCache();
         // Check asynchronosuly, since dehydrate won't store until after the next tick
         setTimeout(function() {
-            equal(localStorage[Mobify.httpCaching.lsKey], resourcesJSON);
+            equal(localStorage[Mobify.httpCaching.lsKey], resourcesJSON, "dehydrated to localStorage");
             start();
         }, 0);
     });
@@ -97,9 +95,9 @@
 
         //The big resource is most recently used, so we expect that the empty object's JSON representation should have been stored
         setTimeout( function(){
-            equal(localStorage[Mobify.httpCaching.lsKey], '{}');
+            equal(localStorage[Mobify.httpCaching.lsKey], '{}', 'nothing survived eviction in dehydration');
             start();
-        }, 300);
+        }, 1500);
     });
 
     asyncTest('evicts one', 1, function() {
@@ -128,12 +126,25 @@
 
         Mobify.combo.dehydrateCache();
 
+        // The big resource is least recently used, so it should be evicted and the smaller resource should be left
         setTimeout( function() {
-            equal(localStorage[Mobify.httpCaching.lsKey], survivesJSON);
+            equal(localStorage[Mobify.httpCaching.lsKey], survivesJSON, 'smaller, more recently used item survived cache dehydration');
             start();
-        }, 300);
-
+        }, 1500);
     });
+
+    module('http caching staleness');
+
+    test('evicts stale', function() {
+        // Sixty Days in seconds
+        var SIXTY_DAYS = 60 * 24 * 60 * 60;
+        // Two weeks in seconds
+        var TWO_WEEKS = 14 * 24 * 60 * 60;
+        //five minutes in seconds
+        var FIVE_MINUTES = 5 * 60;
+
+        var UTC_TWO_WEEKS = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString();
+    })
     </script>
 
 </body>
