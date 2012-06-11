@@ -79,20 +79,27 @@ var ccPublic = /^\s*public\s*$/
      * milliseconds
      */
   , getFreshnessLifetime = function (response) {
-        var cacheControl, maxAge, expires, now;
+        var cacheControl, maxAge, expires, now, date;
         now = Date.now();
 
         // If there's a max-age cache-control directive, return it
-        if (cacheControl = response.headers['cache-control']) {
+        if ( (cacheControl = response.headers['cache-control']) && 
+            (date = response.headers['date']) ) {
+
+            // parse out the cache control header and date
+            date = Date.parse(response.headers.date);
             cacheControl = ccParse(cacheControl);
+
             if ((cacheControl['max-age'] !== null) && 
                 (cacheControl['private'] === null) &&
                 (cacheControl['no-store'] === null) &&
                 (cacheControl['no-cache'] === null)) {
 
-                maxAge = parseInt(cacheControl['max-age']);
-                // max-age is in seconds, these functions deal in milliseconds
-                return maxAge * 1000;
+                // max-age header is in seconds, these functions deal in ms
+                maxAge = parseInt(cacheControl['max-age']) * 1000;
+
+                expires = date + maxAge;                
+                return expires - now;
             }
         }
 
