@@ -129,28 +129,52 @@
 
     module('http caching staleness');
 
-    test('evicts stale', 4, function() {
+    test('evicts stale', 6, function() {
         Mobify.combo.clearCache();
-        // Two weeks in seconds
-        var TWO_WEEKS = 14 * 24 * 60 * 60;
 
-        var UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString();
-        var UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString();
+        // Time offsets in seconds
+        var TWO_WEEKS = 14 * 24 * 60 * 60
+          , TEN_MINUTES = 600
+          // UTC dates
+          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
+          , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
+          , UTC_NOW = (new Date()).toUTCString()
 
+        // stale becuase of past expires header
         var stale = Mobify.combo.resources['http://foo.bar/stale'] = {
             'headers': {
                 'expires': UTC_TWO_WEEKS_AGO
             }
         }
+        // stale because of date and cache-control headers
+        var stale2 = Mobify.combo.resources['http://foo.bar/stale2'] = {
+            'headers': {
+                'date': UTC_TWO_WEEKS_AGO
+                , 'cache-control': 'public,max-age=' + TEN_MINUTES
+            }
+        }
+
+        // fresh because of future expires header
         var fresh = Mobify.combo.resources['http://foo.bar/fresh'] = {
             'headers': {
                 'expires': UTC_TWO_WEEKS_FROM_NOW
             }
         }
+        // fresh because of date and cache-control headers
+        var fresh2 = Mobify.combo.resources['http://foo.bar/fresh2'] = {
+            'headers': {
+                'date': UTC_NOW
+                , 'cache-control': 'public,max-age=' + TEN_MINUTES
+            }
+        }
 
-        //Check that staleness evaluation works
-        equal(true, Mobify.httpCaching.isStale(stale), 'stale resource reads as stale');
-        equal(false, Mobify.httpCaching.isStale(fresh), 'fresh resource reads as not stale');
+        // Check that staleness evaluation works for stale things
+        equal(true, Mobify.httpCaching.isStale(stale), 'stale via expires resource reads as stale');
+        equal(true, Mobify.httpCaching.isStale(stale2), 'stale via date and cahe-control resource reads as stale');
+        // And for fresh things
+        equal(false, Mobify.httpCaching.isStale(fresh), 'fresh via expires resource reads as not stale');
+        equal(false, Mobify.httpCaching.isStale(fresh2), 'fresh via date and cache-control resource reads as not stale');
+
         
         // Now let's make the stale resource get evicted
         Mobify.httpCaching.evictStale();
