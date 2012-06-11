@@ -129,7 +129,7 @@
 
     module('http caching staleness');
 
-    test('evicts stale', 6, function() {
+    test('evicts stale', 8, function() {
         Mobify.combo.clearCache();
 
         // Time offsets in seconds
@@ -179,7 +179,9 @@
         // Now let's make the stale resource get evicted
         Mobify.httpCaching.evictStale();
         equal(undefined, Mobify.combo.resources['http://foo.bar/stale'], 'stale resource was evicted');
+        equal(undefined, Mobify.combo.resources['http://foo.bar/stale2'], 'date/cache control stale resource was evicted');
         equal(fresh, Mobify.combo.resources['http://foo.bar/fresh'], 'fresh resource was not evicted');
+        equal(fresh, Mobify.combo.resources['http://foo.bar/fresh'], 'fresh date/cache-control resource was not evicted');
 
     });
     </script>
