@@ -272,7 +272,7 @@ var ccPublic = /^\s*public\s*$/
 
         for (var key in resources) {
             if (resources.hasOwnProperty(key)) {
-                resource = resources[k];
+                resource = resources[key];
 
                 if (resource.lastUsed) {
                     // if this resource has been used less recently than the so 
