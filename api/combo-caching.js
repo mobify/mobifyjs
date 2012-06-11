@@ -278,7 +278,7 @@ var ccPublic = /^\s*public\s*$/
                     // if lastUsed is not set, we will consider this to never 
                     // have been used, so, this key gets nominated
                     lruKey = key;
-                    lruTime = BEGINNING;
+                    lruTime = START_OF_TIME;
                     break;
                 }
             }
