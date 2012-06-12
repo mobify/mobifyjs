@@ -51,15 +51,14 @@ var guillotine = function(captured) {
 
     // Transform a primitive <tag attr="value" ...> into corresponding DOM element
     // Unlike $('<tag>'), correctly handles <head>, <body> and <html>
-  , makeElement = function(html) {
-        var match = html.match(/^<(\w+)([\s\S]*)$/i);
-        var el = document.createElement(match[1]);
+  , cloneAttrs = function(source, dest) {
+        var match = source.match(/^<(\w+)([\s\S]*)$/i);
 
         $.each($('<div' + match[2])[0].attributes, function(i, attr) {
-            el.setAttribute(attr.nodeName, attr.nodeValue);
+            dest.setAttribute(attr.nodeName, attr.nodeValue);
         });
 
-        return el;
+        return dest;
     };
 
 // 1. Get the original markup from the document.
@@ -73,27 +72,28 @@ Mobify.html.extractDOM = function() {
     
     // Disable attributes that can cause loading of external resources
     var disabledHead = Mobify.html.disable(captured.headContent)
-      , disabledBody = Mobify.html.disable(captured.bodyContent);
+      , disabledBody = Mobify.html.disable(captured.bodyContent)
+      , document = window.document.implementation.createHTMLDocument()
+      , htmlEl = document.documentElement
+      , headEl = htmlEl.firstChild
+      , bodyEl = htmlEl.lastChild
+      , div = document.createElement('div');
     
     Mobify.timing.addPoint('Disabled external resources');
 
-    // Construct passive DOM out of disabled head and body markup
-    var div = document.createElement('div');
-    var headEl = makeElement(captured.headTag);
-    var bodyEl = makeElement(captured.bodyTag);
-    var htmlEl = makeElement(captured.htmlTag);
-
     var result = {
         'doctype' : captured.doctype
-      , '$head' : $(headEl)
-      , '$body' : $(bodyEl)
-      , '$html' : $(htmlEl)
+      , 'document' : document
+      , '$head' : $(cloneAttrs(captured.headTag, headEl))
+      , '$body' : $(cloneAttrs(captured.bodyTag, bodyEl))
+      , '$html' : $(cloneAttrs(captured.htmlTag, htmlEl))
     };
 
+    bodyEl.innerHTML = disabledBody;
+
+    var title = headEl.getElementsByTagName('title')[0];
+    title && headEl.removeChild(title);
     for (div.innerHTML = disabledHead; div.firstChild; headEl.appendChild(div.firstChild));
-    for (div.innerHTML = disabledBody; div.firstChild; bodyEl.appendChild(div.firstChild));
-    htmlEl.appendChild(headEl);
-    htmlEl.appendChild(bodyEl);
 
     Mobify.timing.addPoint('Created passive document');
     
