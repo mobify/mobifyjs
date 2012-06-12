@@ -51,7 +51,7 @@ Below is your base template file, which is extended by home.tmpl:
             });
         {/script}
         {%script}
-            Mobify.$('html, #x-root').last().addClass("{#content.templateName}x-{.}{~s}{/content.templateName}");
+            Mobify.$('html').addClass("{#content.templateName}x-{.}{~s}{/content.templateName}");
         {/script}    
     {/baseScripts}
     {+head}
