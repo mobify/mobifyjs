@@ -49,5 +49,40 @@
             console.logGroup('warn', 'Unfilled values', result.empties);
             console.logGroup('log', 'Choices', result.choices);
         });
+    };
+
+    if (Mobify.config.isDebug) {
+        var timing = Mobify.timing;
+
+        var override = function(name, fn) {
+            fn.superb = MObject.prototype[name];
+            MObject.prototype[name] = fn;
+        };
+
+        override('add', function add() {
+            timing.lazyGroup('Add');
+            var result = add.superb.apply(this, arguments);
+            timing.groupEnd();
+            return result;
+        });
+
+        override('choose', function choose() {
+            timing.lazyGroup('Choose');
+            var result = choose.superb.apply(this, arguments);
+            this._choice = true;
+            timing.groupEnd();
+            return result;
+        });
+
+        override('set', function set(key, value) {
+            timing.group('Set "' + key + '"');
+            return set.superb.apply(this, arguments);
+        });
+
+        override('_record', function _record(importance, key, value) {
+            timing.groupEnd();
+            _record.superb.apply(this, arguments);
+            if (value instanceof MObject) value._subMObjects.push({parent: this, key: key});
+        });
     }
 })(Mobify, Mobify.$);

@@ -1,5 +1,6 @@
 (function(Mobify, $) {
 
+var isDebug = Mobify.config.isDebug;
 var emitDust = function(elem, context, bodies, extras) {
         if (extras === "exists")
             return this.exists(elem, context, bodies);
@@ -50,6 +51,7 @@ MObject.prototype = {
         var source = $.isArray(source[0]) ? source[0] : source
           , mobject = this;
 
+          
         for (var i = 0, l = source.length; i < l; ++i) {
             var addition = source[i];
             try {
@@ -69,7 +71,6 @@ MObject.prototype = {
     }
   , choose: function() {
         this._iterate.call(this, true, arguments);
-        this._choice = true;
         return this;
     }
   , add: function() {
@@ -93,7 +94,7 @@ MObject.prototype = {
         return walk;
     }
   , set: function(key, value) {
-        var importance = this._setImportance;
+        var importance = this._setImportance || 0;
         this._setImportance = 0;
 
         if (typeof value === "function") {
@@ -104,8 +105,11 @@ MObject.prototype = {
                 value = e;
             }
         }
-
-        if ((importance !== -1) && (importance || Mobify.config.isDebug)) {
+        this._record(importance, key, value);
+        return this;        
+    }
+  , _record: function(importance, key, value) {
+        if ((importance !== -1) && (importance || isDebug)) {
             var valueEmpty = isEmpty(value) || (!value && importance);
 
             if (!valueEmpty) {
@@ -117,7 +121,6 @@ MObject.prototype = {
             }
         }
         this[key] = value;
-        if (value instanceof MObject) value._subMObjects.push({parent: this, key: key});
     }
   , can: function() {
         this._setImportance = -1;

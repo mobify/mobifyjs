@@ -16,21 +16,27 @@
             }
 
             throw args;
-        },
-        logGroup : function(fn, title, obj) {
-            var noneWritten = true;
+        }
+      , logCollapsedGroup : function(fn, title, obj) {
+            return this.logGroup(fn, title, obj, !!console.groupCollapsed);
+        }
+      , logGroup : function(fn, title, obj, _collapse) {
+            var justStarted = true;
             $.each(obj, function(key, value) {
-                noneWritten && console.group(title);
+                if (justStarted) {
+                    _collapse ? console.groupCollapsed(title) : console.group(title);
+                }
+
                 if (typeof key == "number") {
-                    console[fn].apply(console, value);
+                    console[fn](value);
                 } else {
                     console[fn](key, value);
                 }
                 
-                noneWritten = false;
+                justStarted = false;
             });
 
-            noneWritten || console.groupEnd();
+            if (!justStarted) console.groupEnd();
         }
     });
 })(Mobify, Mobify.$);

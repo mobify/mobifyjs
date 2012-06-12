@@ -75,6 +75,7 @@
 
         try {
             var boundM = bindM(source, callbackOnce);
+            Mobify.timing.addPoint('Starting extraction');
             fn.call(boundM, source, callbackOnce);
         } catch (e) {
             callbackOnce(e);
