@@ -30,15 +30,15 @@ var $ = Mobify.$
     /**
      * Prepare to make combo requests by rehydrating the cache, if there is one 
      * and getting rid of stale items.
-     * rehydrate, evict stale items and save back the (potentially smaller) 
+     * load, evict stale items and save back the (potentially smaller) 
      * cache to localStorage
      * Note, after this a "live copy" of the cache still exists at 
      * window.Mobify.combo.resources until "the flood"
      */
   , initializeFromCache = function() {
-        combo.rehydrateCache();
+        combo.loadCache();
         caching.evictStale();
-        combo.dehydrateCache();
+        combo.storeCache();
     }
 
     /**
@@ -71,7 +71,7 @@ var $ = Mobify.$
         if (uncachedUrls.length) {
             bootstrap.src = getComboStoreURL(uncachedUrls);
         } else {
-            bootstrap.innerHTML = 'Mobify.combo.rehydrateCache();';
+            bootstrap.innerHTML = 'Mobify.combo.loadCache();';
         }
 
         //DEBUG
@@ -98,7 +98,7 @@ var $ = Mobify.$
         /* Build a script tag that gets the uncached scripts, stores them and then 
            loads/executes them asynchronously */
         uncached = caching.notCachedUrls(urls);
-        var resourceLoader = document.createElement('SCRIPT');
+        var resourceLoader = document.createElement('script');
         resourceLoader.src = getComboStoreandLoadAsyncURL(uncached);
 
         /* Build a second script tag that will be inline, and cause the cached 

@@ -30,15 +30,15 @@
 
     <script src="../api/combo-caching.js"></script>
 
-    <!-- TESTS rehydrateCache-->
+    <!-- TESTS loadCache-->
     <script>
-    module('Mobify.combo rehydrate');
+    module('Mobify.combo loadCache');
 
-    test('rehydrate cache', 2, function() {
+    test('load cache', 2, function() {
         Mobify.combo.clearCache();
 
-        // Let's build a dehydrated cache by hand and test rehydration
-        testMessage = "Hello, from the dehydrated cache."
+        // Let's build a stored cache by hand and test cache laoding
+        testMessage = "Hello, from the stored cache."
 
         test_cache_contents = {
             'key1': {
@@ -51,24 +51,24 @@
 
         localStorage[Mobify.httpCaching.lsKey] = JSON.stringify(test_cache_contents);
 
-        Mobify.combo.rehydrateCache();
+        Mobify.combo.loadCache();
 
-        equal(testMessage, Mobify.combo.resources['key1']['msg'], "key1 rehydrated");
-        equal(testMessage, Mobify.combo.resources['key2']['msg'], "key2 rehydrated");
+        equal(testMessage, Mobify.combo.resources['key1']['msg'], "key1 loaded");
+        equal(testMessage, Mobify.combo.resources['key2']['msg'], "key2 loaded");
     });
 
-    module('Mobify.combo dehydrate')
+    module('Mobify.combo store cache')
 
-    asyncTest('dehydrates successfully, no evictions', 1, function() {
+    asyncTest('stores successfully, no evictions', 1, function() {
         Mobify.combo.clearCache();
 
         Mobify.combo.resources['foo'] = 'bar';
         var resourcesJSON = JSON.stringify(Mobify.combo.resources);
 
-        Mobify.combo.dehydrateCache();
-        // Check asynchronosuly, since dehydrate won't store until after the next tick
+        Mobify.combo.storeCache();
+        // Check asynchronosuly, since storeCache won't store until after the next tick
         setTimeout(function() {
-            equal(localStorage[Mobify.httpCaching.lsKey], resourcesJSON, "dehydrated to localStorage");
+            equal(localStorage[Mobify.httpCaching.lsKey], resourcesJSON, "stored to localStorage");
             start();
         }, 0);
     });
@@ -88,11 +88,11 @@
             lastUsed: 1
         }
 
-        Mobify.combo.dehydrateCache();
+        Mobify.combo.storeCache();
 
         //The big resource is most recently used, so we expect that the empty object's JSON representation should have been stored
         setTimeout( function(){
-            equal(localStorage[Mobify.httpCaching.lsKey], '{}', 'nothing survived eviction in dehydration');
+            equal(localStorage[Mobify.httpCaching.lsKey], '{}', 'nothing survived eviction in cache storing');
             start();
         }, 1500);
     });
@@ -118,11 +118,11 @@
 
         var survivesJSON = JSON.stringify(survives);
 
-        Mobify.combo.dehydrateCache();
+        Mobify.combo.storeCache();
 
         // The big resource is least recently used, so it should be evicted and the smaller resource should be left
         setTimeout( function() {
-            equal(localStorage[Mobify.httpCaching.lsKey], survivesJSON, 'smaller, more recently used item survived cache dehydration');
+            equal(localStorage[Mobify.httpCaching.lsKey], survivesJSON, 'smaller, more recently used item survived cache storing');
             start();
         }, 1500);
     });

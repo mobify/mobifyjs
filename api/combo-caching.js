@@ -233,7 +233,7 @@ var ccPublic = /^\s*public\s*$/
         var serialzed;
 
         if (attempts == 0) {
-            console.log('Mobify.combo.dehydrateCache: evict and store attempts exceeded, aborting');
+            console.log('Mobify.combo.storeCache: evict and store attempts exceeded, aborting');
         // get rid of something.
         } else {
             evictOne(resources);
@@ -241,7 +241,7 @@ var ccPublic = /^\s*public\s*$/
             try {
                 serialzed = JSON.stringify(resources)
             } catch(e) {
-                console.log("Mobify.combo.dehydrateCache error stringifying: " + e.message);
+                console.log("Mobify.combo.storeCache error stringifying: " + e.message);
                 return;
             }
 
@@ -361,7 +361,7 @@ var ccPublic = /^\s*public\s*$/
          * Deserialize resources from localStorage into `resources`.
          * A flag remembers if we've already done this.
          */   
-      , rehydrateCache: function() {
+      , loadCache: function() {
             if (!localStorageAvailable || combo.rehydratedCache == true) {
                 return;
             }
@@ -394,7 +394,7 @@ var ccPublic = /^\s*public\s*$/
          * Store keys from the local resource dictionary back into the localStorage 
          * cache.
          */
-      , dehydrateCache: function() {
+      , storeCache: function() {
             if (!localStorageAvailable) return;
 
             var MAX_ATTEMPTS = 10
@@ -413,14 +413,14 @@ var ccPublic = /^\s*public\s*$/
                 try {
                     var serialized = JSON.stringify(toBeCached)
                 } catch(e) {
-                    console.log("Mobify.combo.dehydrateCache error stringifying: " + e.message);
+                    console.log("Mobify.combo.storeCache error stringifying: " + e.message);
                     return;
                 }
 
                 // An exception is raised when localStorage is ful.
                 try {
                     localStorage.setItem(cache.lsKey, serialized);
-                    console.log('dehydrateCache()')
+                    console.log('storeCache()')
                 } catch(e) {
                     console.log('error');
                     setTimeout(function() {
