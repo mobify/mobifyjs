@@ -55,6 +55,7 @@ var nodeName = function(node) {
 
         return [].map.call(container.childNodes, function(el) {
             var tagName = nodeName(el);
+            if ((' ' + el.className + ' ').match(' mobify-ignore ')) return '';
             if (tagName == '#comment') return '<!--' + el.textContent + '-->';
             if (tagName == 'plaintext') return el.textContent;
             if (tagName == 'script' && ((/mobify\./.test(el.src) || /Mobify/.test(el.textContent)))) {
