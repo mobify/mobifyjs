@@ -26,12 +26,13 @@ Chunk.prototype.block = function(elem, context, bodies) {
     var topElem = elem ? elem.shift() : undefined;
     if (topElem) {          
         context = new context.constructor(
-            context.stack, 
-            $.extend(context.global || {}, {
+            context.stack
+          , $.extend(context.global || {}, {
                 '_SUPER_': function(_elem, context, _bodies) {
                     return _elem.block(elem, context, bodies);
                 }})
-            , context.blocks);
+          , context.blocks
+        );
     }
     
     return oldBlock.call(this, topElem, context, bodies);
