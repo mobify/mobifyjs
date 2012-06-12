@@ -40,31 +40,23 @@ $.extend(Mobify.transform, {
     prepareConf : function(rawConf) {
         var capturedState = Mobify.html.extractDOM();
         capturedState.config = Mobify.config;
-        try {
-            var base = Mobify.mobject.M(capturedState, transform.acceptHTML);
-            rawConf.call(base, capturedState, transform.acceptHTML);
-        } catch (e) {
-            transform.acceptHTML(e)
-        }
+        Mobify.MObject.evalConf(rawConf, capturedState, transform.acceptHTML);
     },
 
     // `acceptHTML` is exposed on `Mobify` so it can be overridden for server-side adaptation.
     // Called when the `konf` has been evaluated.
     acceptHTML: function(markup) {
-        if (markup instanceof Error) markup = markup.payload;
         markup = markup || "";
-
-        if (typeof Mobify.html.memo.accepted == "string") return;
         Mobify.html.memo.accepted = markup;
         timing.addPoint('Adapted passive document');
 
-        markup = Mobify.html.enable(markup);
+        var enabledMarkup = Mobify.html.enable(markup);
         timing.addPoint('Re-enabled external resources');    
-        Mobify.html.writeHTML(markup);
+        Mobify.html.writeHTML(enabledMarkup);
 
         if (Mobify.config.isDebug) {
             timing.logPoints();
-            Mobify.mobject.log();
+            Mobify.MObject.log();
         }
     },
 

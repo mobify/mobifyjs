@@ -1,21 +1,21 @@
 (function(Mobify,$ ) {
-    var MObject = Mobify.mobject.MObject;
-    var console = Mobify.console;
+    var console = Mobify.console
+      , MObject = Mobify.MObject
+      , serviceProperties = ["_M", "_callable", "_empties", "_setImportance", "_on",
+            "_choice", "_outstanding", "_subMObjects"]
+      , descend = function(root, fn, breadcrumbs) {
+            breadcrumbs = breadcrumbs || '';
+            var goInto = fn(root, breadcrumbs);
+            if (!goInto || !goInto.length) return;
 
-    var descend = function(root, fn, breadcrumbs) {
-        breadcrumbs = breadcrumbs || '';
-        var goInto = fn(root, breadcrumbs);
-        if (!goInto || !goInto.length) return;
+            $.each(goInto, function(i, key) {
+                descend(root[key], fn, breadcrumbs + '.' + key);
+            })
+        };
 
-        $.each(goInto, function(i, key) {
-            descend(root[key], fn, breadcrumbs + '.' + key);
-        })
-    };
-
-    var extraProperties = ["_M", "_callable", "_empties", "_nextSet", "_on", "_choice", "_outstanding", "_refs"];
-    Mobify.mobject.log = function() {
-        var results = $.map(Mobify.mobject.allMObjects, function(root) {
-            if (root._refs.length) return;
+    MObject.log = function() {
+        var results = $.map(MObject.all, function(root) {
+            if (root._subMObjects.length) return;
 
             var empties = [], choices = [];
             descend(root, function(current, parentCrumbs) {
@@ -35,10 +35,10 @@
             return {'root': root, 'empties': empties, 'choices': choices};
         });
 
-        $.each(Mobify.mobject.allMObjects, function(j, current) {
-            for (var i = 0, l = extraProperties.length; i < l; ++i) {
-                delete current[extraProperties[i]];
-            }
+        $.each(MObject.all, function(j, current) {
+            $.each(serviceProperties, function(i, property) {
+                delete current[property];
+            });
         });
 
         $.map(results, function(result) {

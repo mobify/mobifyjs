@@ -37,6 +37,7 @@ Mobify.points.push(+new Date);
     {>"/base/vendor/dust-core.js"/}
     {>"/base/api/anchorQuery.js"/}
     {>"/base/api/mObject.js"/}
+    {>"/base/api/mObject.utils.js"/}
     {>"/base/api/mObject.logging.js"/}
     {>"/base/api/tmpl.js"/}
 {/dust}
@@ -65,4 +66,4 @@ Mobify.transform.run({+rawconf}function(sourceHTML, complete) {
 // Version control tag, use an array with version numbers.  Examples:
 // V 1.1: [1,1].  V1.2.3: [1,2,3]
 
-Mobify.api = [1,1];
+Mobify.api = [1, 2, 1];
