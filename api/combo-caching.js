@@ -334,7 +334,7 @@ var ccPublic = /^\s*public\s*$/
             s = document.createElement('script');
             
             // add it if we have it
-            if (r = resources['url']) {
+            if (r = resources[url]) {
                 r.lastUsed = Date.now();
                 r.useCount = r.useCount++ || 1
                 s.src = dataURI(r);

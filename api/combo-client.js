@@ -112,7 +112,7 @@ var $ = Mobify.$
 
         var cachedScriptLoader = document.createElement('SCRIPT');
         cachedScriptLoader.type = 'text/javascript';
-        cachedScriptLoader.innerText = loadCachedAsync;
+        cachedScriptLoader.innerHTML = loadCachedAsync;
 
         return $(resourceLoader).add(cachedScriptLoader);
     }
