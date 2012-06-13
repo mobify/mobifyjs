@@ -83,7 +83,7 @@ var $ = Mobify.$
 
   , comboScriptAsync = $.fn.comboScriptAsync = function() {
         var $scripts = this.filter(defaults.selector).add(this.find(defaults.selector)).remove();
-        var url, urls, uncached, cached, $loaders;
+        var url, urls = [], uncached, cached, $loaders;
 
         // Collect up urls
         $scripts.filter('[' + defaults.attribute + ']').each( function() {
@@ -106,7 +106,7 @@ var $ = Mobify.$
         cached = caching.cachedUrls(urls);
         var loadCachedAsync = '';
         for(var i = 0; i < cached.length; i++) {
-            cachedScriptloaderText += defaults.loadAsyncCallback + 
+            loadCachedAsync += defaults.loadAsyncCallback + 
             "('" + cached[i] + "');\n";
         }
 

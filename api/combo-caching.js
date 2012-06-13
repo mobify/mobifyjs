@@ -311,7 +311,7 @@ var ccPublic = /^\s*public\s*$/
                 storeResource(resource);
             }
 
-            combo.dehydrateCache();
+            combo.storeCache();
         }
 
         /**
