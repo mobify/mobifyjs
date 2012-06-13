@@ -326,7 +326,7 @@ var ccPublic = /^\s*public\s*$/
                 url = dataURI(resource)
             }
 
-            document.write('<script src="' + url + '"></script>');
+            document.write('<script src="' + url + '"></scr' + 'ipt>');
         }
 
       , loadAsync: function(url) {
