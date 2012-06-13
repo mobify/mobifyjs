@@ -22,9 +22,12 @@
     {>"/base/vendor/slide.js"/}
 {/lib}{/lib_export}
 
+{#lib_export name="util"}
+    {>"/base/api/util.js"/}
+{/lib_export}
+
 {>"/base/api/persistHash.js"/}
 {>"/base/api/logging.js"/}
-{>"/base/api/util.js"/}
 {>"/base/api/timing.js"/}
 {>"/base/api/externals.js"/}
 {>"/base/api/extractHTML.js"/}
