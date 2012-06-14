@@ -14,6 +14,7 @@ if (System.args.length > 1) {
     });
 }
 
+
 console.log('[phantomjs] testing:', suites.join(', '))
 
     /**
