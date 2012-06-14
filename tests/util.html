@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" href="qunit/qunit.css">
     <script src="qunit/qunit.js"></script>  
+    
 </head>
 <body>
     <!-- QUNIT -->
@@ -13,23 +14,23 @@
     <ol id="qunit-tests"></ol>  
 
     <!-- FIXTURES -->
-    
+
     <!-- SETUP -->
     <script>Mobify = {config: {}}</script>
     <script src="../vendor/zepto/src/zepto.js"></script>
     <script src="../vendor/zepto/src/event.js"></script>
     <script src="../api/noconflict.js"></script>
 
-    <script src="../api/extractDOM.js"></script>
+    <script src="../api/util.js"></script>
 
     <!-- TESTS -->
     <script>
-        module('api/extractDOM.js')
+        module('api/util.js')
 
-        test('Mobify.html.extractDOM', function() {
-            Mobify.html.extractDOM
+        test('Mobify.desktop', function(t) {
+            Mobify.desktop
             ok(1 == 1)
-        })
+        });
     </script>
 <body>
 </html>

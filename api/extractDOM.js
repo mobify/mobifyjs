@@ -1,10 +1,11 @@
-// provides extractDOM
 (function($, Mobify) {
 
-// During capturing, we will usually end up hiding our </head>/<body ... > boundary
-// within <plaintext> capturing element. To construct shadow DOM, we need to rejoin
-// head and body content, iterate through it to find head/body boundary and expose
-// opening <body ... > tag as a string.
+    /**
+     * During capturing, we will usually end up hiding our </head>/<body ... > boundary
+     * within <plaintext> capturing element. To construct shadow DOM, we need to rejoin
+     * head and body content, iterate through it to find head/body boundary and expose
+     * opening <body ... > tag as a string.
+     */
 var guillotine = function(captured) {
         // Consume comments without grouping to avoid catching
         // <body> inside a comment, common with IE conditional comments.
@@ -47,8 +48,10 @@ var guillotine = function(captured) {
         return captured;
     }
 
-    // Transform a primitive <tag attr="value" ...> into corresponding DOM element
-    // Unlike $('<tag>'), correctly handles <head>, <body> and <html>
+    /**
+     * Transform a primitive <tag attr="value" ...> into corresponding DOM element
+     * Unlike $('<tag>'), correctly handles <head>, <body> and <html>
+     */ 
   , makeElement = function(html) {
         var match = html.match(/^<(\w+)([\s\S]*)/i);
         var el = document.createElement(match[1]);
@@ -60,24 +63,28 @@ var guillotine = function(captured) {
         return $(el);
     }
 
-  , html = Mobify.html || {};
+  , html = Mobify.html = Mobify.html || {}
+
+  , timing = Mobify.timing;
 
 $.extend(html, {
 
-    // 1. Get the original markup from the document.
-    // 2. Disable the markup.
-    // 3. Construct the source pseudoDOM.    
+    /**
+     * 1. Get the original markup from the document.
+     * 2. Disable the markup.
+     * 3. Construct the source pseudoDOM.    
+     */
     extractDOM: function() {
         // Extract escaped markup out of the DOM
         var captured = guillotine(html.extractHTML());
         
-        Mobify.timing.addPoint('Recovered Markup');
+        timing.addPoint('Recovered Markup');
         
         // Disable attributes that can cause loading of external resources
         var disabledHead = this.disable(captured.headContent)
           , disabledBody = this.disable(captured.bodyContent);
         
-        Mobify.timing.addPoint('Disabled Markup');
+        timing.addPoint('Disabled Markup');
 
         // Reinflate HTML strings back into declawed DOM nodes.
         var result = { doctype: captured.doctype };
@@ -85,7 +92,7 @@ $.extend(html, {
         result.$body = makeElement(captured.bodyTag).append(disabledBody);
         result.$html = makeElement(captured.htmlTag).append(result.$head, result.$body);
         
-        Mobify.timing.addPoint('Built Passive DOM');
+        timing.addPoint('Built Passive DOM');
         
         return result;
     }

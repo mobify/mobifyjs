@@ -14,7 +14,19 @@
 
     <!-- FIXTURES -->
     <div id="test-resizeImages">
-        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+        <div>
+            <img x-src="http://test/1.jpg" />
+            <img x-src="/2.jpg" />
+        </div>
+        <img x-src="/3.jpg" />
+    </div>
+
+    <div id="test-resizeImages-args-1">
+        <img x-src="/1.jpg" />
+    </div>
+
+    <div id="test-resizeImages-args-2">
+        <img x-src="/2.jpg" />
     </div>
 
     <!-- SETUP -->
@@ -29,24 +41,30 @@
     <script>
         $ = Mobify.$
 
-        module('resizeImages')
+        module('api/resizeImages.js')
 
-        test('$.fn.resizeImages', function() {
-            var $got = $('#test-resizeImages').resizeImages()
+        test('Mobify.URLHash', function(t) {
+            var got = Mobify.URLHash('http://test/image.jpg')
+              , vow = 3009026534
 
-            equal($got.length, 1);
+            equal(got, vow)
         });
 
         test('Mobify.getImageURL', function() {
-            var got = Mobify.getImageURL('http://test/image.jpg')
-              , vow = '//ir2.mobify.com/http://test/image.jpg'
+            equal(Mobify.getImageURL('http://test/1.jpg'), '//ir3.mobify.com/http://test/1.jpg')
+            equal(Mobify.getImageURL('http://test/1.jpg', {maxWidth: 320}), '//ir3.mobify.com/320/http://test/1.jpg')
+        });
 
-            equal(got, vow)
+        test('$.fn.resizeImages', function() {
+            var $resized = $('#test-resizeImages').resizeImages()
+            equal($resized.length, 3)
+        });
 
-            got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320})
-            vow = '//ir2.mobify.com/320/http://test/image.jpg'
+        test('$.fn.resizeImages with args', function() {
+            var $resized = $('#test-resizeImages-args-1').resizeImages(320)
+            equal($resized.filter('[x-src]').length, 1)
 
-            equal(got, vow)
+            $('#test-resizeImages-args-2').resizeImages({maxWidth: 320})
         });
     </script>
 <body>
