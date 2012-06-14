@@ -89,7 +89,7 @@ var waitFor = function(testFn, onReady) {
             if (result.result == 'fail') {
                 console.log('    <testcase classname="' + result.moduleName + '" name="' + result.testName + '">');
                 console.log('      <failure/>');
-                console.log('    <testcase/>');
+                console.log('    </testcase>');
 
                 fail = 1;
                 return;
