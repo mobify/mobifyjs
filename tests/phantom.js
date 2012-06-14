@@ -1,7 +1,7 @@
 var System = require('system')
   , FS = require('fs')
   , fail = 0
-  , base = 'http://127.0.0.1:3000/tests/'
+  , base = 'http://127.0.0.1:1337/tests/'
   , suites = []
   , results = [];
 
