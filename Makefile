@@ -1,11 +1,11 @@
 install:
-	npm install
+    npm install
 
 test:
-	./tests/runner.sh
+    serve . && phantomjs tests/phantom.js
 
 jenkins:
-	./tests/runner.sh
+    serve . && phantomjs tests/phantom.js | grep '<*>' | tee report.xml
 
 all:
-	install
+    install

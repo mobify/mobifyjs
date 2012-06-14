@@ -3,8 +3,6 @@
 <head>
     <link rel="stylesheet" href="qunit/qunit.css">
     <script src="qunit/qunit.js"></script>  
-    <!-- console.log junit comptabile XML. -->
-    <script src="qunit/junit.js"></script>  
 </head>
 <body>
     <!-- QUNIT -->
@@ -17,21 +15,20 @@
     <!-- FIXTURES -->
     
     <!-- SETUP -->
-    <script src="../vendor/zepto.js"></script>
-    <script>
-        Mobify = window.Mobify || {};
-        Mobify.$ = $
-    </script>
+    <script>Mobify = {config: {}}</script>
+    <script src="../vendor/zepto/src/zepto.js"></script>
+    <script src="../vendor/zepto/src/event.js"></script>
+    <script src="../api/noconflict.js"></script>
+
     <script src="../api/externals.js"></script>
 
     <!-- TESTS -->
     <script>
+        module('extractDOM')
 
-module('extractDOM')
-
-test('ok', function() {
-    ok(1 == 1)
-})
+        test('ok', function() {
+            ok(1 == 1)
+        })
     </script>
 <body>
 </html>

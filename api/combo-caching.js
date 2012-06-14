@@ -175,10 +175,6 @@ var ccPublic = /^\s*public\s*$/
                 }
             }
 
-            //DEBUG
-            // console.log('urls: ' + JSON.stringify(urls));
-            // console.log('notCachedUrls: ' + JSON.stringify(notCachedUrls));
-
             return notCachedUrls;
         }
 
@@ -223,7 +219,6 @@ var ccPublic = /^\s*public\s*$/
             console.log("Combo service failed to retrieve: %s", url);
         }
     }
-
 
     /**
      * asynchronously recursive function that attempts to whittle down a 
@@ -367,9 +362,6 @@ var ccPublic = /^\s*public\s*$/
             }
             combo.rehydratedCache = true;
 
-            //DEBUG
-            console.log("rehydrateCache()")
-
             var cacheContents = localStorage.getItem(cache.lsKey)
               , key;
 
@@ -420,9 +412,7 @@ var ccPublic = /^\s*public\s*$/
                 // An exception is raised when localStorage is ful.
                 try {
                     localStorage.setItem(cache.lsKey, serialized);
-                    console.log('storeCache()')
                 } catch(e) {
-                    console.log('error');
                     setTimeout(function() {
                         evictAndStore(toBeCached, MAX_ATTEMPTS)
                     }, 0);
