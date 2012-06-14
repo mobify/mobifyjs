@@ -4,9 +4,7 @@
 // 4) Give me a goddamn prize
 (function(window, $) {
 
-var absolutify = document.createElement('a')
-
-  , hosts = [
+  var hosts = [
         '//ir0.mobify.com'
       , '//ir1.mobify.com'
       , '//ir2.mobify.com'
@@ -37,7 +35,7 @@ var absolutify = document.createElement('a')
      * Returns a URL suitable for use with the 'ir' service.
      *  :host/:format:quality/:width/:height/:url
      */ 
-  , getImageURL = Mobify.getImageURL = function(url, options) {
+  , getImageResizeURL = Mobify.getImageResizeURL = function(url, options) {
         options = options || {}
 
         var host = hosts[URLHash(url) % hosts.length]
@@ -83,10 +81,10 @@ var absolutify = document.createElement('a')
             }
         }
 
-        return $imgs.each(function() {
+        return $imgs.each(function() { 
             if (attr = this.getAttribute(opts.attribute)) {
-                absolutify.href = attr;
-                this.setAttribute('x-src', getImageURL(absolutify.href, opts))
+                var absoluteURL = Mobify.util.absolutizeURI(document.baseURI, attr)
+                this.setAttribute(defaults.attribute, getImageResizeURL(absoluteURL, opts))
             }
         });
     }

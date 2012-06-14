@@ -33,6 +33,7 @@
 
     <script src="../vendor/zepto.js"></script>
     <script>Mobify = {$: $};</script>
+    <script src="../api/util.js"></script>
     <script src="../api/resizeImages.js"></script>
 
     <!-- TESTS -->
@@ -49,12 +50,12 @@ test('$.fn.resizeImages', function() {
 });
 
 test('Mobify.getImageURL', function() {
-    var got = Mobify.getImageURL('http://test/image.jpg')
+    var got = Mobify.getImageResizeURL('http://test/image.jpg')
       , vow = '//ir2.mobify.com/http://test/image.jpg'
 
     equal(got, vow)
 
-    got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320})
+    got = Mobify.getImageResizeURL('http://test/image.jpg', {maxWidth: 320})
     vow = '//ir2.mobify.com/320/http://test/image.jpg'
 
     equal(got, vow)
