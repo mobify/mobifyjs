@@ -1,7 +1,6 @@
 (function(Mobify) {
 
 var $ = Mobify.$
-
   , caching = Mobify.httpCaching
 
   , combo = Mobify.combo
@@ -23,7 +22,7 @@ var $ = Mobify.$
         return defaults.endpoint + defaults.storeCallback + '/' + JSONURIencode(urls);
     }
     
-  , getComboStoreandLoadAsyncURL = function(urls) {
+  , getComboStoreAndLoadAsyncURL = function(urls) {
         return defaults.endpoint + defaults.storeAndLoadAsyncCallback + '/' + JSONURIencode(urls);
     }
 
@@ -45,7 +44,7 @@ var $ = Mobify.$
      * Searches the collection for scripts and modifies them to use the `combo`
      * service. Returns a collection suitable for use with document.write.
      */
-  , combineScripts = $.fn.combineScripts = function() {
+  , combineScripts = $.fn.combineScripts = function(opts) {
         var $scripts = this.filter(defaults.selector).add(this.find(defaults.selector)).remove()
           , urls = []
           , url
@@ -64,60 +63,43 @@ var $ = Mobify.$
 
         initializeFromCache();
 
-        uncachedUrls = caching.notCachedUrls(urls);
+        uncached = caching.notCachedUrls(urls);
 
         bootstrap = document.createElement('script');
 
-        if (uncachedUrls.length) {
-            bootstrap.src = getComboStoreURL(uncachedUrls);
-        } else {
-            bootstrap.innerHTML = 'Mobify.combo.loadCache();';
+        if(opts && opts.async) {
+            // return async bootstrap
+            bootstrap.src = getComboStoreAndLoadAsyncURL(uncached);
+
+            /* build a second script tag that will be inline, and cause the cached 
+               scripts to be laoded/executed asynchronously */
+            cached = caching.cachedUrls(urls);
+            var loadCachedAsync = '';
+            for(var i = 0; i < cached.length; i++) {
+                loadCachedAsync += defaults.loadAsyncCallback + 
+                "('" + cached[i] + "');\n";
+            }
+
+            var cachedScriptLoader = document.createElement('SCRIPT');
+            cachedScriptLoader.type = 'text/javascript';
+            cachedScriptLoader.innerHTML = loadCachedAsync;
+
+            return $(resourceLoader).add(cachedScriptLoader);
         }
+        else {
+            // return synchronous bootstrap and scripts
+            if (uncached.length) {
+                bootstrap.src = getComboStoreURL(uncached);
+            } else {
+                bootstrap.innerHTML = 'Mobify.combo.loadCache();';
+            }
 
-        //DEBUG
-        console.log('$.fn.comboScriptSync() bootstrap tag: ' + bootstrap.outerHTML);
-
-        $scripts = $(bootstrap).add($scripts);
-        return $scripts;
+            $scripts = $(bootstrap).add($scripts);
+            return $scripts;
+        }
     }
 
-  , comboScriptAsync = $.fn.comboScriptAsync = function() {
-        var $scripts = this.filter(defaults.selector).add(this.find(defaults.selector)).remove();
-        var url, urls = [], uncached, cached, $loaders;
-
-        // Collect up urls
-        $scripts.filter('[' + defaults.attribute + ']').each( function() {
-            absolutify.href = this.getAttribute(defaults.attribute);
-            url = absolutify.href;
-            urls.push(url);
-        });
-
-        /* Attempt to initialize from the localStorage cache */
-        initializeFromCache();        
-
-        /* Build a script tag that gets the uncached scripts, stores them and then 
-           loads/executes them asynchronously */
-        uncached = caching.notCachedUrls(urls);
-        var resourceLoader = document.createElement('script');
-        resourceLoader.src = getComboStoreandLoadAsyncURL(uncached);
-
-        /* Build a second script tag that will be inline, and cause the cached 
-           scripts to be laoded/executed asynchronously */
-        cached = caching.cachedUrls(urls);
-        var loadCachedAsync = '';
-        for(var i = 0; i < cached.length; i++) {
-            loadCachedAsync += defaults.loadAsyncCallback + 
-            "('" + cached[i] + "');\n";
-        }
-
-        var cachedScriptLoader = document.createElement('SCRIPT');
-        cachedScriptLoader.type = 'text/javascript';
-        cachedScriptLoader.innerHTML = loadCachedAsync;
-
-        return $(resourceLoader).add(cachedScriptLoader);
-    }
-
-    // Combo defaults.
+  // Combo defaults.
   , defaults = {
         selector: 'script'
       , attribute: 'x-src'
