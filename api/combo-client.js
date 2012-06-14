@@ -45,7 +45,7 @@ var $ = Mobify.$
      * Searches the collection for scripts and modifies them to use the `combo`
      * service. Returns a collection suitable for use with document.write.
      */
-  , comboScriptSync = $.fn.comboScriptSync = function() {
+  , combineScripts = $.fn.combineScripts = function() {
         var $scripts = this.filter(defaults.selector).add(this.find(defaults.selector)).remove()
           , urls = []
           , url
