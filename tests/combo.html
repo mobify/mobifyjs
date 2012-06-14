@@ -24,10 +24,30 @@
 
     <!-- FIXTURES -->
 
+    <script src="../vendor/zepto.js"></script>
+    <script>
+        Mobify = window.Mobify || {};
+        Mobify.$ = $
+    </script>
+    <script src="../api/combo-caching.js"></script>
+    <script src="../api/combo-client.js"></script>
+
     <iframe src="fixtures/combo/combo-iframe.html" id="combo-iframe"></iframe>
 
+    <script>
+// patient test runner
+Mobify.$('iframe').on('load', function() {
+    WAITING--;
+    if (READY && !WAITING) runTests();
+});
+    
+// iframe setup.
+READY = false
+WAITING = Mobify.$('iframe').length
+    </script>
+
     <!-- Expected state of the document after the flood. -->
-    <textarea id="test-comboScriptSync">
+    <textarea id="test-combineScripts">
         <html>
             <head>
                 <script>Mobify = window.Mobify || {};</script>
@@ -38,30 +58,6 @@
             </body>
         </html>
     </textarea>
-
-    <!-- SETUP -->
-
-    <script src="../vendor/zepto.js"></script>
-    <script>
-        Mobify = window.Mobify || {};
-        Mobify.$ = $
-    </script>
-    <script src="../api/combo-caching.js"></script>
-    <script src="../api/combo-client.js"></script>
-
-    <script>
-// iframe setup.
-READY = false
-WAITING = Mobify.$('iframe').length
-
-// patient test runner
-Mobify.$('iframe').on('load', function() {
-    WAITING--;
-    if (READY && !WAITING) runTests();
-});
-    </script>
-
-
     <!-- TESTS -->
 
     <script>
@@ -79,21 +75,25 @@ var getIframeDocument = function(selector) {
 
 module('Mobify.combo')
 
-asyncTest('Mobify.combo.comboScriptSync', function() {
+asyncTest('Mobify.combo.combineScripts', 1, function() {
 
     //DEBUG
     console.log('asyncTest started');
 
     var doc = getIframeDocument('#combo-iframe')
-      , $got = $('#test-comboScriptSync', doc).comboScriptSync().removeAttr('type')
+      , $got = $('#test-combineScripts', doc).combineScripts().removeAttr('type')
       , scriptsHtml = $.map($got, function(el) {
             return el.outerHTML
         }).join("\n")
-      , html = $('#test-comboScriptSync').text().replace('{scriptsHtml}', scriptsHtml)
+      , html = $('#test-combineScripts').text().replace('{scriptsHtml}', scriptsHtml)
+
+      console.log($got);
 
     doc.open();
     doc.write(html);
     doc.close();
+
+    Mobify.combo.clearCache();
 
     equal(doc.defaultView.combo.length, 3);
     console.log('woo');
