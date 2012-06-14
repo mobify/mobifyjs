@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="qunit/qunit.css">
+    <script src="qunit/qunit.js"></script>  
+</head>
+<body>
+    <!-- QUNIT -->
+    <h1 id="qunit-header">QUnit Test Suite</h1>  
+    <h2 id="qunit-banner"></h2>  
+    <div id="qunit-testrunner-toolbar"></div>  
+    <h2 id="qunit-userAgent"></h2>  
+    <ol id="qunit-tests"></ol>  
+
+    <!-- FIXTURES -->
+
+    <!-- SETUP -->
+    <script>Mobify = {config: {}}</script>
+    <script src="../vendor/zepto/src/zepto.js"></script>
+    <script src="../vendor/zepto/src/event.js"></script>
+    <script src="../api/noconflict.js"></script>
+
+    <script src="../api/combo-caching.js"></script>
+
+    <!-- TESTS -->
+    <script>
+        var cache = Mobify.httpCaching
+          , combo = Mobify.combo
+
+        module('Mobify.combo loadCache');
+
+        test('load cache', 2, function() {
+            combo.clearCache();
+
+            // Let's build a stored cache by hand and test cache laoding
+            var testMessage = "Hello, from the stored cache."
+              , testCacheContents = {
+                    key1: {msg: testMessage}
+                  , key2: {msg: testMessage}
+                }
+
+            localStorage[cache.lsKey] = JSON.stringify(testCacheContents);
+
+            combo.loadCache();
+
+            equal(testMessage, combo.resources.key1.msg, "key1 loaded");
+            equal(testMessage, combo.resources.key2.msg, "key2 loaded");
+        });
+
+        module('Mobify.combo store cache')
+
+        asyncTest('stores successfully, no evictions', 1, function() {
+            combo.clearCache();
+
+            combo.resources.foo = 'bar';
+
+            var resourcesJSON = JSON.stringify(combo.resources);
+
+            combo.storeCache();
+
+            // Check asynchronosuly, since storeCache won't store until after the next tick
+            setTimeout(function() {
+                equal(localStorage[cache.lsKey], resourcesJSON, "stored to localStorage");
+                start();
+            }, 0);
+        });
+
+        asyncTest('evicts all', 1, function() {
+            combo.clearCache();
+
+            // This will produce an 8-million+ character string we can take 
+            // substrings of the build things that should be problematic for 
+            // localStorage
+            var longString = Array(5000000).join('a');
+            
+            // Set up some mock resources
+            combo.resources['http://foo.bar/baz.js'] = {
+                lastUsed: 2
+              , data: longString
+            }
+            
+            combo.resources['http://bar.baz/foo'] = {
+                lastUsed: 1
+            }
+
+            combo.storeCache();
+
+            // The big resource is most recently used, so we expect that the 
+            // empty object's JSON representation should have been stored
+            setTimeout(function() {
+                equal(localStorage[cache.lsKey], '{}', 'nothing survived eviction in cache storing');
+                start();
+            }, 1500);
+        });
+
+        asyncTest('evicts one', 1, function() {
+            combo.clearCache();
+
+            var longString = Array(5000000).join('a');
+
+            combo.resources['http://foo.bar/baz.js'] = {
+                lastUsed: 1
+              , data: longString
+            }
+
+            combo.resources['http://bar.baz/foo'] = {
+                lastUsed: 2
+            }
+
+            var survives = {
+                    'http://bar.baz/foo': {
+                        lastUsed: 2
+                    }
+                }
+              , survivesJSON = JSON.stringify(survives);
+
+            combo.storeCache();
+
+            // The big resource is least recently used, so it should be evicted and the smaller resource should be left
+            setTimeout(function() {
+                equal(localStorage[cache.lsKey], survivesJSON, 'smaller, more recently used item survived cache storing');
+                start();
+            }, 1500);
+        });
+
+        module('http caching staleness');
+
+        test('evicts stale', 8, function() {
+            combo.clearCache();
+
+            // Time offsets in seconds
+            var TWO_WEEKS = 14 * 24 * 60 * 60
+              , TEN_MINUTES = 600
+                // UTC dates
+              , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
+              , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
+              , UTC_NOW = (new Date()).toUTCString()
+                // stale becuase of past expires header
+              , stale = Mobify.combo.resources['http://foo.bar/stale'] = {
+                    headers: {
+                        expires: UTC_TWO_WEEKS_AGO
+                    }
+                }
+                // stale because of date and cache-control headers
+              , stale2 = Mobify.combo.resources['http://foo.bar/stale2'] = {
+                    headers: {
+                        date: UTC_TWO_WEEKS_AGO
+                      , 'cache-control': 'public,max-age=' + TEN_MINUTES
+                    }
+                }
+
+                // fresh because of future expires header
+              , fresh = Mobify.combo.resources['http://foo.bar/fresh'] = {
+                    'headers': {
+                        'expires': UTC_TWO_WEEKS_FROM_NOW
+                    }
+                }
+
+                // fresh because of date and cache-control headers
+              , fresh2 = Mobify.combo.resources['http://foo.bar/fresh2'] = {
+                    'headers': {
+                        'date': UTC_NOW
+                      , 'cache-control': 'public,max-age=' + TEN_MINUTES
+                    }
+                }
+
+            // Check that staleness evaluation works for stale things
+            equal(true, cache.isStale(stale), 'stale via expires resource reads as stale');
+            equal(true, cache.isStale(stale2), 'stale via date and cahe-control resource reads as stale');
+            // And for fresh things
+            equal(false, cache.isStale(fresh), 'fresh via expires resource reads as not stale');
+            equal(false, cache.isStale(fresh2), 'fresh via date and cache-control resource reads as not stale');
+
+            // Now let's make the stale resource get evicted
+            cache.evictStale();
+            equal(undefined, combo.resources['http://foo.bar/stale'], 'stale resource was evicted');
+            equal(undefined, Mobify.combo.resources['http://foo.bar/stale2'], 'date/cache control stale resource was evicted');
+            equal(fresh, combo.resources['http://foo.bar/fresh'], 'fresh resource was not evicted');
+            equal(fresh, combo.resources['http://foo.bar/fresh'], 'fresh date/cache-control resource was not evicted');
+        });
+    </script>
+</body>
+</html>

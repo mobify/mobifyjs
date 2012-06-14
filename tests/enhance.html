@@ -3,11 +3,9 @@
 <head>
     <link rel="stylesheet" href="qunit/qunit.css">
     <script src="qunit/qunit.js"></script>  
-    <!-- <script src="qunit/junit.js"></script> -->
 </head>
 <body>
     <!-- QUNIT -->
-
     <h1 id="qunit-header">QUnit Test Suite</h1>  
     <h2 id="qunit-banner"></h2>  
     <div id="qunit-testrunner-toolbar"></div>  
@@ -16,32 +14,24 @@
 
     <!-- FIXTURES -->
 
-
     <!-- SETUP -->
+    <script>Mobify = {config: {}}</script>
+    <script src="../vendor/zepto/src/zepto.js"></script>
+    <script src="../vendor/zepto/src/event.js"></script>
+    <script src="../api/noconflict.js"></script>
 
-    <script src="../vendor/zepto.js"></script>
-    <script>Mobify = {$: $, config: {}}</script>
+    <script src="../api/orientation.js"></script>
     <script src="../api/enhance.js"></script>
 
     <!-- TESTS -->
-    
     <script>
+        module('Mobify.enhance')
 
+        test('Mobify.enhance', function() {
+            Mobify.enhance()
 
-module('enhance')
-
-test('Mobify.enhance', function() {
-    Mobify.enhance()
-
-    ok(1 == 1)
-});
-
-
-// $(window).bind('orientationchange', function() {
-//    alert(Mobify.getOrientation());
-// });
-
-
+            ok(1 == 1)
+        });
     </script>
 <body>
 </html>

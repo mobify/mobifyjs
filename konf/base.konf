@@ -22,6 +22,11 @@
     {>"/base/vendor/slide.js"/}
 {/lib}{/lib_export}
 
+{#lib_export name="combo"}
+    {>"/base/api/combo-caching.js"/}
+    {>"/base/api/combo-client.js"/}
+{/lib_export}
+
 {>"/base/api/persistHash.js"/}
 {>"/base/api/logging.js"/}
 {>"/base/api/util.js"/}

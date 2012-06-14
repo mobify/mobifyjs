@@ -1,5 +1,6 @@
 #!/bin/bash
-node tests/server.js &
+serve --port 1337 . &
 PID=$!
-phantomjs tests/runner.js | grep '<*>' | tee report.xml
+sleep 1
+phantomjs tests/phantom.js
 kill $PID

@@ -1,6 +1,8 @@
 (function(Mobify) {
 
-var caching = Mobify.httpCaching
+var $ = Mobify.$
+
+  , caching = Mobify.httpCaching
 
   , combo = Mobify.combo
 
@@ -18,7 +20,6 @@ var caching = Mobify.httpCaching
      * given array of URLs
      */
   , getComboStoreURL = function(urls) {
-        urls = caching.notCachedUrls(urls);
         return defaults.endpoint + defaults.storeCallback + '/' + JSONURIencode(urls);
     }
     
@@ -29,15 +30,15 @@ var caching = Mobify.httpCaching
     /**
      * Prepare to make combo requests by rehydrating the cache, if there is one 
      * and getting rid of stale items.
+     * load, evict stale items and save back the (potentially smaller) 
+     * cache to localStorage
+     * Note, after this a "live copy" of the cache still exists at 
+     * window.Mobify.combo.resources until "the flood"
      */
-    // rehydrate, evict stale items and save back the (potentially smaller) 
-    // cache to localStorage
-    // Note, after this a "live copy" of the cache still exists at 
-    // window.Mobify.combo.resources until "the flood"
   , initializeFromCache = function() {
-        combo.rehydrateCache();
+        combo.loadCache();
         caching.evictStale();
-        combo.dehydrateCache();
+        combo.storeCache();
     }
 
     /**
@@ -48,7 +49,8 @@ var caching = Mobify.httpCaching
         var $scripts = this.filter(defaults.selector).add(this.find(defaults.selector)).remove()
           , urls = []
           , url
-          , bootstrap;
+          , bootstrap
+          , uncachedUrls;
 
         $scripts.filter('[' + defaults.attribute + ']').each(function() {
             absolutify.href = this.getAttribute(defaults.attribute);
@@ -56,14 +58,24 @@ var caching = Mobify.httpCaching
             urls.push(url);
 
             this.removeAttribute(defaults.attribute);
-
             this.className += ' x-combo';
-
             this.innerHTML = defaults.loadSyncCallback + "('" + url + "');";
         });
 
+        initializeFromCache();
+
+        uncachedUrls = caching.notCachedUrls(urls);
+
         bootstrap = document.createElement('script');
-        bootstrap.src = getComboStoreURL(urls);
+
+        if (uncachedUrls.length) {
+            bootstrap.src = getComboStoreURL(uncachedUrls);
+        } else {
+            bootstrap.innerHTML = 'Mobify.combo.loadCache();';
+        }
+
+        //DEBUG
+        console.log('$.fn.comboScriptSync() bootstrap tag: ' + bootstrap.outerHTML);
 
         $scripts = $(bootstrap).add($scripts);
         return $scripts;
@@ -71,7 +83,7 @@ var caching = Mobify.httpCaching
 
   , comboScriptAsync = $.fn.comboScriptAsync = function() {
         var $scripts = this.filter(defaults.selector).add(this.find(defaults.selector)).remove();
-        var url, urls, uncached, cached, $loaders;
+        var url, urls = [], uncached, cached, $loaders;
 
         // Collect up urls
         $scripts.filter('[' + defaults.attribute + ']').each( function() {
@@ -80,10 +92,13 @@ var caching = Mobify.httpCaching
             urls.push(url);
         });
 
+        /* Attempt to initialize from the localStorage cache */
+        initializeFromCache();        
+
         /* Build a script tag that gets the uncached scripts, stores them and then 
            loads/executes them asynchronously */
         uncached = caching.notCachedUrls(urls);
-        var resourceLoader = document.createElement('SCRIPT');
+        var resourceLoader = document.createElement('script');
         resourceLoader.src = getComboStoreandLoadAsyncURL(uncached);
 
         /* Build a second script tag that will be inline, and cause the cached 
@@ -91,22 +106,21 @@ var caching = Mobify.httpCaching
         cached = caching.cachedUrls(urls);
         var loadCachedAsync = '';
         for(var i = 0; i < cached.length; i++) {
-            cachedScriptloaderText += defaults.loadAsyncCallback + 
+            loadCachedAsync += defaults.loadAsyncCallback + 
             "('" + cached[i] + "');\n";
         }
 
         var cachedScriptLoader = document.createElement('SCRIPT');
         cachedScriptLoader.type = 'text/javascript';
-        cachedScriptLoader.innerText = loadCachedAsync;
+        cachedScriptLoader.innerHTML = loadCachedAsync;
 
         return $(resourceLoader).add(cachedScriptLoader);
     }
 
     // Combo defaults.
-  , defaults = combo.defaults = {
+  , defaults = {
         selector: 'script'
       , attribute: 'x-src'
-      //, endpoint: '//jazzcat01.mobify.com/jsonp/'
       , endpoint: '//combo.mobify.com/jsonp/'
       , loadSyncCallback: 'Mobify.combo.loadSync'
       , storeCallback: 'Mobify.combo.store'

@@ -3,7 +3,6 @@
 <head>
     <link rel="stylesheet" href="qunit/qunit.css">
     <script src="qunit/qunit.js"></script>  
-    <script src="qunit/junit.js"></script>
 </head>
 <body>
     <!-- QUNIT -->
@@ -74,160 +73,155 @@
     <a href="fixtures-unmobify/basic.html">BASIC</a>
 
     <!-- SETUP -->
-    <script src="../vendor/zepto.js"></script>
-    <script>
-        Mobify = window.Mobify || {};
-        Mobify.$ = $
-    </script>
+    <script>Mobify = {config: {}}</script>
+    <script src="../vendor/zepto/src/zepto.js"></script>
+    <script src="../vendor/zepto/src/event.js"></script>
+    <script src="../api/noconflict.js"></script>
+
     <script src="../api/externals.js"></script>
     <script src="../api/extractHTML.js"></script>
 
-
     <script>
-// iframe setup.
-READY = false
-WAITING = Mobify.$('iframe').length
+        // iframe setup.
+        READY = false
+        WAITING = Mobify.$('iframe').length
 
-Mobify.$('iframe').on('load', function() {
-    WAITING--;
-    if (READY && !WAITING) runTests();
-});
+        Mobify.$('iframe').on('load', function() {
+            WAITING--;
+            if (READY && !WAITING) runTests();
+        });
     </script>
-
 
     <!-- TESTS -->
     <script>
+        function runTests() {
+            var $ = Mobify.$;
 
-function runTests() {
+            function getIframeDocument(selector) {
+                return $(selector)[0].contentDocument
+            }
 
+            function getText(selector) {
+                // Fix <\/script>.
+                // Remove extra whitespace.
+                return $(selector).html()
+                                  .replace(/\\/g, '')
+                                  .replace(/\s+/g, ' ')
+                                  .trim()
+            }
 
-function getIframeDocument(selector) {
-    return $(selector)[0].contentDocument
-}
+            // http://stackoverflow.com/questions/1304374/javascript-can-a-constructor-function-create-a-documentelement-object
+            function createDocument() {
+                var ns = 'http://www.w3.org/1999/xhtml'
+                return document.implementation.createDocument(ns, 'html', null)
+            }
 
+            (function() {
+                module('externals')
 
-function getText(selector) {
-    // Fix <\/script>.
-    // Remove extra whitespace.
-    return $(selector).html()
-                      .replace(/\\/g, '')
-                      .replace(/\s+/g, ' ')
-                      .trim()
-}
+                test('Mobify.html.disable', function() {
+                    var got = Mobify.html.disable(getText('#test-disable-1'))
+                      , vow = '<link x-href="style.css" /> '
+                             + '<img x-src="img.jpg" x-width="1" x-height="1" /> '
+                             + '<iframe x-src="iframe.html"></iframe> '
+                             + '<style media="mobify-media"></style> '
+                             + '<script type="text/mobify-script" x-src="script.js" x-type="text/javascript"><\/script>'
 
-// http://stackoverflow.com/questions/1304374/javascript-can-a-constructor-function-create-a-documentelement-object
-function createDocument() {
-    var ns = 'http://www.w3.org/1999/xhtml'
-    return document.implementation.createDocument(ns, 'html', null)
-}
+                    equal(got, vow);
+                });
 
-(function() {
-    module('externals')
+                test('Mobify.html.disable does not escape resources in scripts', function() {
+                    var got = Mobify.html.disable(getText('#test-disable-2'))
+                      , vow = "<img x-src='src.jpg' /> "
+                            + "<script type=\"text/mobify-script\"> \"<img src='src.jpg' />\"; <\/script> "
+                            + "<img x-src='src.jpg' />"
 
-    test('Mobify.html.disable', function() {
-        var got = Mobify.html.disable(getText('#test-disable-1'))
-          , vow = '<link x-href="style.css" /> '
-                 + '<img x-src="img.jpg" x-width="1" x-height="1" /> '
-                 + '<iframe x-src="iframe.html"></iframe> '
-                 + '<style media="mobify-media"></style> '
-                 + '<script type="text/mobify-script" x-src="script.js" x-type="text/javascript"><\/script>'
+                    equal(got, vow);
+                });
 
-        equal(got, vow);
-    });
+                test('Mobify.html.disable handles multiline resources', function() {
+                    // Don't remove newlines from the test string.
+                    var got = Mobify.html.disable($('#test-disable-multiline').html().replace(/\\/g, '').trim())
+                      , vow = '<script type="text/mobify-script" x-type="text/javascript" x-src="https://t.p.mybuys.com/js/mybuys3.js"> <\/script>'
 
-    test('Mobify.html.disable does not escape resources in scripts', function() {
-        var got = Mobify.html.disable(getText('#test-disable-2'))
-          , vow = "<img x-src='src.jpg' /> "
-                + "<script type=\"text/mobify-script\"> \"<img src='src.jpg' />\"; <\/script> "
-                + "<img x-src='src.jpg' />"
+                    equal(got.replace(/\s+/g, ' '), vow);
+                });
 
-        equal(got, vow);
-    });
+                test('Mobify.html.disable handles <script> in comment', function() {
+                    var got = Mobify.html.disable(getText('#test-disable-script-in-comment'))
+                      , vow = '<!-- <script> --> '
+                            + '<script type="text/mobify-script" x-type="text/javascript" x-src="https://t.p.mybuys.com/js/mybuys3.js"> <\/script>'
+                    
+                    equal(got, vow);
+                });
 
-    test('Mobify.html.disable handles multiline resources', function() {
-        // Don't remove newlines from the test string.
-        var got = Mobify.html.disable($('#test-disable-multiline').html().replace(/\\/g, '').trim())
-          , vow = '<script type="text/mobify-script" x-type="text/javascript" x-src="https://t.p.mybuys.com/js/mybuys3.js"> <\/script>'
+                test('Mobify.html.enable', function() {
+                    var got = Mobify.html.enable(getText('#test-enable-1'))
+                      , vow = '<link href="style.css" /> '
+                            + '<img src="img.jpg" x-width="1" x-height="1" /> '
+                            + '<iframe src="iframe.html"></iframe> '
+                            + '<style></style> '
+                            + '<script src="script.js" type="text/javascript"><\/script>'
 
-        equal(got.replace(/\s+/g, ' '), vow);
-    });
+                    equal(got, vow);
+                });
+            })();
 
-    test('Mobify.html.disable handles <script> in comment', function() {
-        var got = Mobify.html.disable(getText('#test-disable-script-in-comment'))
-          , vow = '<!-- <script> --> '
-                + '<script type="text/mobify-script" x-type="text/javascript" x-src="https://t.p.mybuys.com/js/mybuys3.js"> <\/script>'
-        
-        equal(got, vow);
-    });
+            (function($, HTML) {
+                module('extractDOM')
 
-    test('Mobify.html.enable', function() {
-        var got = Mobify.html.enable(getText('#test-enable-1'))
-          , vow = '<link href="style.css" /> '
-                + '<img src="img.jpg" x-width="1" x-height="1" /> '
-                + '<iframe src="iframe.html"></iframe> '
-                + '<style></style> '
-                + '<script src="script.js" type="text/javascript"><\/script>'
+                test('Mobify.html.openTag', function() {
+                    var got = HTML.openTag($("<div id=\"<>\" class='<>'></div>"))
+                      , vow = "<div id=\"<>\" class=\"<>\">"
 
-        equal(got, vow);
-    });
-})();
+                    equal(got, vow);
+                });
 
-(function($, HTML) {
-    module('extractDOM')
+                test('Mobify.html.closeTag', function() {
+                    var got = HTML.closeTag($("<div></div>"))
+                      , vow = '</div>'
 
-    test('Mobify.html.openTag', function() {
-        var got = HTML.openTag($("<div id=\"<>\" class='<>'></div>"))
-          , vow = "<div id=\"<>\" class=\"<>\">"
+                    equal(got, vow);
+                });
 
-        equal(got, vow);
-    });
+                test('Mobify.html.extractHTML', function() {
+                    var doc = createDocument()
+                    doc.documentElement.innerHTML = getText('#test-extractHTMLFromElement')
 
-    test('Mobify.html.closeTag', function() {
-        var got = HTML.closeTag($("<div></div>"))
-          , vow = '</div>'
+                    var got = HTML.extractHTML(doc);
 
-        equal(got, vow);
-    });
+                    equal(got.doctype, '')
+                    equal(got.htmlTag, '<html>')
+                    equal(got.headTag, '<head>')
+                    equal(got.bodyTag, '<body>')
+                    equal(got.headContent, '')
+                    equal(got.bodyContent, '')
+                    equal(got.all(), '<html><head></head></body></html>')
 
-    test('Mobify.html.extractHTML', function() {
-        var doc = createDocument()
-        doc.documentElement.innerHTML = getText('#test-extractHTMLFromElement')
+                });
 
-        var got = HTML.extractHTML(doc);
+                test('Mobify.html.extractHTMLFromElement', function() {
+                    var el = $(getText('#test-extractHTMLFromElement'))[0]
+                      , got = HTML.extractHTMLFromElement(el)
+                      , vow = '<!--comment--><title>title</title>plaintext</plaintext></div>'
 
-        equal(got.doctype, '')
-        equal(got.htmlTag, '<html>')
-        equal(got.headTag, '<head>')
-        equal(got.bodyTag, '<body>')
-        equal(got.headContent, '')
-        equal(got.bodyContent, '')
-        equal(got.all(), '<html><head></head></body></html>')
+                    equal(got.replace(/\s/g, ''), vow);
+                });
 
-    });
+                // TODO: This test currently fails b/c the result of `unmobify` is cached
+                //       in extractedHTML.
+                test('Mobify.unmobify', function() {
+                    var doc = getIframeDocument('#test-unmobify')
+                    Mobify.unmobify(doc)
+                    ok(true)
+                });
 
-    test('Mobify.html.extractHTMLFromElement', function() {
-        var el = $(getText('#test-extractHTMLFromElement'))[0]
-          , got = HTML.extractHTMLFromElement(el)
-          , vow = '<!--comment--><title>title</title>plaintext</plaintext></div>'
+            })(Mobify.$, Mobify.html);
 
-        equal(got.replace(/\s/g, ''), vow);
-    });
+        } // End runTests
 
-    // TODO: This test currently fails b/c the result of `unmobify` is cached
-    //       in extractedHTML.
-    test('Mobify.unmobify', function() {
-        var doc = getIframeDocument('#test-unmobify')
-        Mobify.unmobify(doc)
-        ok(true)
-    });
-
-})(Mobify.$, Mobify.html);
-
-} // End runTests
-
-READY = true;
-if (!WAITING) runTests()
-
+        READY = true;
+        if (!WAITING) runTests()
     </script>
 <body>
 </html>

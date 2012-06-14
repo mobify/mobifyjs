@@ -2,10 +2,10 @@ install:
 	npm install
 
 test:
-	./tests/runner.sh
+	tests/runner.sh
 
 jenkins:
-	./tests/runner.sh
+	tests/runner.sh | grep '<*>' | tee report.xml
 
 all:
 	install
