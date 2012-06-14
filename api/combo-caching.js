@@ -355,20 +355,20 @@ var ccPublic = /^\s*public\s*$/
         }
 
         /* A guard property to ensure that we only rehydrate the cache once */
-      , rehydratedCache: false  
+      , loadedCache: false  
 
         /**
          * Deserialize resources from localStorage into `resources`.
          * A flag remembers if we've already done this.
          */   
       , loadCache: function() {
-            if (!localStorageAvailable || combo.rehydratedCache == true) {
+            if (!localStorageAvailable || combo.loadedCache === true) {
                 return;
             }
-            combo.rehydratedCache = true;
+            combo.loadedCache = true;
 
             //DEBUG
-            console.log("rehydrateCache()")
+            console.log("loadCache()")
 
             var cacheContents = localStorage.getItem(cache.lsKey)
               , key;
@@ -378,7 +378,7 @@ var ccPublic = /^\s*public\s*$/
             try {
                 cacheContents = JSON.parse(cacheContents);
             } catch(e) {
-                console.log('Mobify.combo.rehydrateCache: Error parsing localStorage[' + this.lsKey + ']: ', e.message);
+                console.log('Mobify.combo.loadCache: Error parsing localStorage[' + this.lsKey + ']: ', e.message);
                 return;
             }
 
