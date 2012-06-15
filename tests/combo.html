@@ -32,13 +32,14 @@
     <script src="../api/combo-caching.js"></script>
     <script src="../api/combo-client.js"></script>
 
-    <iframe src="fixtures/combo/combo-iframe.html" id="combo-iframe"></iframe>
+    <iframe src="fixtures/combo/combo-sync-iframe.html" id="comboSync-iframe"></iframe>
+    <iframe src="fixtures/combo/combo-async-iframe.html" id="comboASync-iframe"></iframe>
 
     <script>
 // patient test runner
 Mobify.$('iframe').on('load', function() {
     WAITING--;
-    if (READY && !WAITING) runTests();
+    if (READY && WAITING === 0) runTests();
 });
     
 // iframe setup.
@@ -64,48 +65,67 @@ WAITING = Mobify.$('iframe').length
 function runTests() {
 
 //DEBUG
-console.log("Running tests!")
+console.log('running tests')
 
 var getIframeDocument = function(selector) {
         var iframe = $(selector)[0];
         return (iframe.contentDocument || iframe.contentWindow.document);
-    }
+}
   , $ = Mobify.$;
 
 
 module('Mobify.combo')
 
 asyncTest('Mobify.combo.combineScripts', 1, function() {
+    Mobify.combo.clearCache();
 
-    //DEBUG
-    console.log('asyncTest started');
-
-    var doc = getIframeDocument('#combo-iframe')
+    var doc = getIframeDocument('#comboSync-iframe')
       , $got = $('#test-combineScripts', doc).combineScripts().removeAttr('type')
       , scriptsHtml = $.map($got, function(el) {
             return el.outerHTML
         }).join("\n")
       , html = $('#test-combineScripts').text().replace('{scriptsHtml}', scriptsHtml)
 
-      console.log($got);
+    // install event handler
+    $('#comboSync-iframe').on('load', function() {
+        equal(doc.defaultView.combo.length, 3);
+        console.log('woo');
+        start();
+    });
 
+    // Modify the iframe contents
     doc.open();
     doc.write(html);
     doc.close();
+});
 
+asyncTest('Mobify.combo.combineScripts Async', 1, function() {
     Mobify.combo.clearCache();
+    
+    var doc = getIframeDocument('#comboASync-iframe')
+      , $got = $('#test-combineScripts', doc).combineScripts({async: true})
+      , scriptsHtml = $.map($got, function(el) {
+            return el.outerHTML
+        }).join("\n")
+      , html = $('#test-combineScripts').text().replace('{scriptsHtml}', scriptsHtml)
 
-    equal(doc.defaultView.combo.length, 3);
-    console.log('woo');
-    start();
+    // install event handler
+    $('#comboASync-iframe').on('load', function() {
+        equal(doc.defaultView.combo, "async!");
+        start();
+    });
 
+    // Modify the iframe contents
+    doc.open();
+    doc.write(html);
+    doc.close();
 });
 
 } //end runTests
 
 // Impatient test runner, the setting of READY must remain at the end
 READY = true;
-if (!WAITING) runTests();
+if (WAITING === 0) runTests();
 
     </script>
 <body>
