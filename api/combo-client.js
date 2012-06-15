@@ -68,11 +68,17 @@ var $ = Mobify.$
         bootstrap = document.createElement('script');
 
         if(opts && opts.async) {
-            // return async bootstrap
-            bootstrap.src = getComboStoreAndLoadAsyncURL(uncached);
+            // return synchronous bootstrap and scripts
+            if (uncached.length > 0) {
+                // use web service to laod all uncached items
+                bootstrap.src = getComboStoreAndLoadAsyncURL(uncached);
+            } else {
+                // when all items are cached, ensure cache is loaded and ready to go
+                bootstrap.innerHTML = 'Mobify.combo.loadCache();';
+            }
 
             /* build a second script tag that will be inline, and cause the cached 
-               scripts to be laoded/executed asynchronously */
+               scripts to be loaded and executed asynchronously */
             cached = caching.cachedUrls(urls);
             var loadCachedAsync = '';
             for(var i = 0; i < cached.length; i++) {
@@ -85,8 +91,7 @@ var $ = Mobify.$
             cachedScriptLoader.innerHTML = loadCachedAsync;
 
             return $(bootstrap).add(cachedScriptLoader);
-        }
-        else {
+        } else {
             // return synchronous bootstrap and scripts
             if (uncached.length > 0) {
                 // use web service to load all uncached items
