@@ -89,6 +89,7 @@ var $ = Mobify.$
         else {
             // return synchronous bootstrap and scripts
             if (uncached.length > 0) {
+                // use web service to load all uncached items
                 bootstrap.src = getComboStoreURL(uncached);
             } else {
                 // when all items are cached, ensure cache is loaded and ready to go
