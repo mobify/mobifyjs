@@ -88,9 +88,10 @@ var $ = Mobify.$
         }
         else {
             // return synchronous bootstrap and scripts
-            if (uncached.length) {
+            if (uncached.length > 0) {
                 bootstrap.src = getComboStoreURL(uncached);
             } else {
+                // when all items are cached, ensure cache is loaded and ready to go
                 bootstrap.innerHTML = 'Mobify.combo.loadCache();';
             }
 
