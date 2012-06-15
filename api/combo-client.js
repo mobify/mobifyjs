@@ -84,7 +84,7 @@ var $ = Mobify.$
             cachedScriptLoader.type = 'text/javascript';
             cachedScriptLoader.innerHTML = loadCachedAsync;
 
-            return $(resourceLoader).add(cachedScriptLoader);
+            return $(bootstrap).add(cachedScriptLoader);
         }
         else {
             // return synchronous bootstrap and scripts
