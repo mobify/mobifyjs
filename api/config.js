@@ -16,4 +16,5 @@
     config.imageDir = config.configDir + 'i/';
 
     config.cssDir = config.configDir;
+    config.ajs = Mobify.ajs;
 })();
