@@ -14,8 +14,6 @@ Mobify.points.push(+new Date);
         {>"/base/vendor/zepto/src/form.js"/}
         {>"/base/vendor/zepto/src/selector.js"/}
         {>"/base/vendor/zepto/src/stack.js"/}
-
-        {>"/base/vendor/zepto.ie.js"/}
     {/jquery}
     {>"/base/api/noconflict.js"/}
 {/lib_export}
