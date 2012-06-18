@@ -191,8 +191,9 @@ var ccPublic = /^\s*public\s*$/
      * Returns the age of `resource` in milliseconds.
      */
   , getAge = function(resource) {
-        var date;
-        return (date = resource.headers.date) ? Date.now() - Date.parse(date) : 0;
+        var date = resource.headers.date;
+        if (date) return Date.now() - Date.parse(date);
+        return 0;
     }
 
     /**
@@ -218,7 +219,7 @@ var ccPublic = /^\s*public\s*$/
                 (cacheControl['no-store'] === null) &&
                 (cacheControl['no-cache'] === null)) {
 
-                // max-age header is in seconds, these functions deal in ms.
+                // The max-age header is represented in seconds, convert to ms.
                 maxAge = parseInt(cacheControl['max-age']) * 1000;
 
                 expires = date + maxAge;                
@@ -237,11 +238,10 @@ var ccPublic = /^\s*public\s*$/
     }
 
     /**
-     * Returns a max-age value for `resource` in seconds.
+     * Returns a max-age value for `resource` in milliseconds.
      */
   , maxAge = function(resource) {
-        var newMaxAge = getFreshnessLifetime(resource) - getAge(resource);
-        return Math.floor(newMaxAge / 1000);
+        return getFreshnessLifetime(resource) - getAge(resource);
     }
 
   , utils = httpCache.utils = {
