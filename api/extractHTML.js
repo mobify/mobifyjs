@@ -81,11 +81,11 @@ var nodeName = function(node) {
             bodyContent: extractHTMLFromElement(bodyEl)
         };
 
-        extractedHTML.all = function() {
+        extractedHTML.all = function(inject) {
             // RR: I assume that Mobify escaping tag is placed in <head>. If so, the <plaintext>
             // it emits would capture the </head><body> boundary, as well as closing </body></html>
             // Therefore, bodyContent will have these tags, and they do not need to be added to .all()
-            return this.doctype + this.htmlTag + this.headTag + this.headContent + this.bodyContent;
+            return this.doctype + this.htmlTag + this.headTag + (inject || '') + this.headContent + this.bodyContent;
         }
 
         return extractedHTML;
@@ -111,10 +111,12 @@ var nodeName = function(node) {
         // TODO: Confirm this.
         // Wait up for IE, which isn't ready to do this just yet.
         setTimeout(function() {
+            var inject = Mobify.ajs && ('<script defer src="' + Mobify.ajs + '"></script>');
+
             doc.open();
             // RR: Undid extractHTML(doc).all().
             // It would not have worked, as doc is blanked by document.open()
-            doc.write(captured.all());
+            doc.write(captured.all(inject));
             doc.close();
         }, 15);
     }
