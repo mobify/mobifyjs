@@ -87,10 +87,10 @@ var html = Mobify.html = {
           , bodyTag: openTag(bodyEl)
           , headContent: extractHTMLFromElement(headEl)
           , bodyContent: extractHTMLFromElement(bodyEl)
-          , all : function() {
+          , all : function(inject) {
                 // RR: I assume that Mobify escaping tag is placed in <head>. If so, the <plaintext>
                 // it emits would capture the </head><body> boundary, as well as closing </body></html>
-                return this.doctype + this.htmlTag + this.headTag + this.headContent + this.bodyContent;
+                return this.doctype + this.htmlTag + this.headTag + (inject || '') + this.headContent + this.bodyContent;
             }
         };
     }
@@ -98,7 +98,11 @@ var html = Mobify.html = {
     // Rewrite document contents with provided markup via document.write() replacement.
     // If provided string is empty, capture the source markup from escaping tags.   
   , 'writeHTML' : function(markup) {
-        markup = markup || html.extractHTML().all();
+        if (!markup) {
+            var inject = Mobify.ajs && ('<script defer src="' + Mobify.ajs + '"></script>');
+            markup = html.extractHTML().all(inject);
+        }
+
         if (html.memo) html.memo.written = markup;
 
         // We'll write markup a tick later, as Firefox logging is async
