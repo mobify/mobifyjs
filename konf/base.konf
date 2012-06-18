@@ -29,6 +29,11 @@ Mobify.points.push(+new Date);
 {>"/base/api/timing.js"/}
 {>"/base/api/config.js"/}
 
+Mobify.$.extend(Mobify.config, {
+    siteConfig: {site_config|s}
+  , buildDate: {build_dt}
+});
+
 {>"/base/api/extractHTML.js"/}
 {>"/base/api/extractDOM.js"/}
 {>"/base/api/externals.js"/}
