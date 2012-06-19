@@ -1,6 +1,5 @@
 (function(Mobify, $) {
 
-var isDebug = Mobify.config.isDebug;
 var emitDust = function(elem, context, bodies, extras) {
         if (extras === "exists")
             return this.exists(elem, context, bodies);
@@ -109,16 +108,8 @@ MObject.prototype = {
         return this;        
     }
   , _record: function(importance, key, value) {
-        if ((importance !== -1) && (importance || isDebug)) {
-            var valueEmpty = isEmpty(value) || (!value && importance);
-
-            if (!valueEmpty) {
-                delete this._empties[key];
-            } else if (importance) {
-                throw new Error("Missed key " + key);
-            } else {
-                this._empties[key] = value;
-            }
+        if ((importance === 1) && (isEmpty(value) || !value)) {
+            throw new Error("Missed key " + key);
         }
         this[key] = value;
     }

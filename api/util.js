@@ -14,6 +14,10 @@ Mobify.desktop = function(url) {
     }
 };
 
+Mobify.die = function() {
+    Mobify.html.unmobify();
+};
+
 // i18n function converts in a list of language types and data and returns
 // a function that allows you to grab translation keys from that data
 Mobify.i18n = function(list, data) {

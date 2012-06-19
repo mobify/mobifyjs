@@ -1,23 +1,12 @@
-(function(Mobify, $) { 
-    var console = Mobify.console = window.console;
+(function(Mobify, $) {
+
     if (!console.group) {
         console.group = console.log;
         console.groupEnd = function(){};
     }
+
     $.extend(console, {
-        die : function() {
-            var args = [].slice.call(arguments);
-            console.group('(T_T) Fatal error (T_T)')
-            console.error.apply(console, args);
-            console.groupEnd();
-
-            if (!Mobify.config.isDebug) {
-                Mobify.html.unmobify();
-            }
-
-            throw args;
-        }
-      , logCollapsedGroup : function(fn, title, obj) {
+        logCollapsedGroup : function(fn, title, obj) {
             return this.logGroup(fn, title, obj, !!console.groupCollapsed);
         }
       , logGroup : function(fn, title, obj, _collapse) {
@@ -39,4 +28,21 @@
             if (!justStarted) console.groupEnd();
         }
     });
+
+    Mobify.die = function() {
+        var args = [].slice.call(arguments);
+        console.group('(T_T) Fatal error (T_T)');
+        console.error.apply(console, args);
+        console.groupEnd();
+
+        throw args;
+    }
+
+    var oldAcceptHTML = Mobify.transform.acceptHTML;
+    Mobify.transform.acceptHTML = function() {
+        oldAcceptHTML.apply(this, arguments);
+        console.logTiming();
+        console.logMObjects();
+    };
+
 })(Mobify, Mobify.$);

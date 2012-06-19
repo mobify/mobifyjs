@@ -32,15 +32,14 @@ replacement HTML was originally sent down the pipe.
 */
 (function(document, $, Mobify) {
 
-var timing = Mobify.timing
-  , transform = Mobify.transform = Mobify.transform || {};
+var timing = Mobify.timing;
 
-$.extend(Mobify.transform, {
+Mobify.transform = {
     // Read the conf, extract the Source DOM and begin the evaluation.
     prepareConf : function(rawConf) {
         var capturedState = Mobify.html.extractDOM();
         capturedState.config = Mobify.config;
-        Mobify.MObject.evalConf(rawConf, capturedState, transform.acceptHTML);
+        Mobify.MObject.evalConf(rawConf, capturedState, Mobify.transform.acceptHTML);
     },
 
     // `acceptHTML` is exposed on `Mobify` so it can be overridden for server-side adaptation.
@@ -53,27 +52,22 @@ $.extend(Mobify.transform, {
         var enabledMarkup = Mobify.html.enable(markup);
         timing.addPoint('Re-enabled external resources');    
         Mobify.html.writeHTML(enabledMarkup);
-
-        if (Mobify.config.isDebug) {
-            timing.logPoints();
-            Mobify.MObject.log();
-        }
     },
 
     // Kickstart processing. Guard against beginning before the document is ready.
     run: function(conf) {
-        Mobify.timing.addPoint('Started adaptation');
+        timing.addPoint('Started adaptation');
         var prepareConf = function() {
             // Do NOT proceed unless we're ready.
             if (!/complete|loaded/.test(document.readyState)) {
                 return setTimeout(prepareConf, 15);
             }
-            Mobify.timing.addPoint('Document ready for extraction');
+            timing.addPoint('Document ready for extraction');
             Mobify.transform.prepareConf(conf);
         };
 
         prepareConf();
     }
-});
+};
 
 })(document, Mobify.$, Mobify);

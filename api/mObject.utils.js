@@ -56,7 +56,7 @@
         boundM.end = completionCallback;
         boundM._emitTemplatingResult = function(err, out) {
             boundM.end(out);
-            err && Mobify.console.die(err);
+            err && Mobify.die(err);
         };
 
         $.extend(boundM, M);

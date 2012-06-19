@@ -1,6 +1,5 @@
 (function(Mobify,$ ) {
-    var console = Mobify.console
-      , MObject = Mobify.MObject
+    var MObject = Mobify.MObject
       , serviceProperties = ["_M", "_callable", "_empties", "_setImportance", "_on",
             "_choice", "_outstanding", "_subMObjects"]
       , descend = function(root, fn, breadcrumbs) {
@@ -13,7 +12,7 @@
             })
         };
 
-    MObject.log = function() {
+    console.logMObjects = function() {
         var results = $.map(MObject.all, function(root) {
             if (root._subMObjects.length) return;
 
@@ -51,38 +50,45 @@
         });
     };
 
-    if (Mobify.config.isDebug) {
-        var timing = Mobify.timing;
+    var timing = Mobify.timing;
 
-        var override = function(name, fn) {
-            fn.superb = MObject.prototype[name];
-            MObject.prototype[name] = fn;
-        };
+    var override = function(name, fn) {
+        fn.superb = MObject.prototype[name];
+        MObject.prototype[name] = fn;
+    };
 
-        override('add', function add() {
-            timing.lazyGroup('Add');
-            var result = add.superb.apply(this, arguments);
-            timing.groupEnd();
-            return result;
-        });
+    override('add', function add() {
+        timing.lazyGroup('Add');
+        var result = add.superb.apply(this, arguments);
+        timing.groupEnd();
+        return result;
+    });
 
-        override('choose', function choose() {
-            timing.lazyGroup('Choose');
-            var result = choose.superb.apply(this, arguments);
-            this._choice = true;
-            timing.groupEnd();
-            return result;
-        });
+    override('choose', function choose() {
+        timing.lazyGroup('Choose');
+        var result = choose.superb.apply(this, arguments);
+        this._choice = true;
+        timing.groupEnd();
+        return result;
+    });
 
-        override('set', function set(key, value) {
-            timing.group('Set "' + key + '"');
-            return set.superb.apply(this, arguments);
-        });
+    override('set', function set(key, value) {
+        timing.group('Set "' + key + '"');
+        return set.superb.apply(this, arguments);
+    });
 
-        override('_record', function _record(importance, key, value) {
-            timing.groupEnd();
-            _record.superb.apply(this, arguments);
-            if (value instanceof MObject) value._subMObjects.push({parent: this, key: key});
-        });
-    }
+    override('_record', function _record(importance, key, value) {
+        if (importance === 0) {
+            if (MObject.isEmpty(value)) {
+                this._empties[key] = value;
+            } else {
+                delete this._empties[key];
+            } 
+        }
+        
+        timing.groupEnd();
+        _record.superb.apply(this, arguments);
+        if (value instanceof MObject) value._subMObjects.push({parent: this, key: key});
+    });
+
 })(Mobify, Mobify.$);

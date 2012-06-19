@@ -22,7 +22,6 @@ Mobify.points.push(+new Date);
     {>"/base/vendor/slide.js"/}
 {/lib}{/lib_export}
 
-{>"/base/api/logging.js"/}
 {>"/base/api/util.js"/}
 {>"/base/api/timing.js"/}
 {>"/base/api/config.js"/}
@@ -41,7 +40,6 @@ Mobify.$.extend(Mobify.config, {
     {>"/base/api/anchorQuery.js"/}
     {>"/base/api/mObject.js"/}
     {>"/base/api/mObject.utils.js"/}
-    {>"/base/api/mObject.logging.js"/}
     {>"/base/api/tmpl.js"/}
 {/dust}
 
@@ -52,6 +50,12 @@ Mobify.$.extend(Mobify.config, {
 
 {>"/base/api/main.js"/}
 {>"/base/api/resizeImages.js"/}
+
+{^production}
+    {>"/base/api/log.js"/}
+    {>"/base/api/log.timing.js"/}
+    {>"/base/api/log.mObject.js"/}
+{/production}
 
 {+tmpl}
     {>"/base/tmpl/*.tmpl"/}
@@ -69,4 +73,4 @@ Mobify.transform.run({+rawconf}function(sourceHTML, complete) {
 // Version control tag, use an array with version numbers.  Examples:
 // V 1.1: [1,1].  V1.2.3: [1,2,3]
 
-Mobify.api = [1, 2, 1];
+Mobify.api = [1, 2, 2];
