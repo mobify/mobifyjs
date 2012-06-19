@@ -270,7 +270,9 @@ var ccPublic = /^\s*public\s*$/
  */
 (function(window, document, Mobify) {
 
-var httpCache = Mobify.httpCache
+var $ = Mobify.$
+
+  , httpCache = Mobify.httpCache
 
   , absolutify = document.createElement('a')
 
@@ -306,8 +308,6 @@ var httpCache = Mobify.httpCache
 
         if (uncached.length) {
             bootstrap.src = getURL(uncached, defaults.loadCallback);
-        } else {
-            bootstrap.innerHTML = defaults.loadCallback + '()';
         }
 
         $scripts = $(bootstrap).add($scripts);
@@ -361,17 +361,18 @@ var httpCache = Mobify.httpCache
     }
 
     /**
-     * Returns a URL suitable for use with the combo service.
+     * Returns a URL suitable for use with the combo service. Sorted to generate
+     * cacheable URLs.
      */
   , getURL = function(urls, callback) {
-        return defaults.endpoint + callback + '/' + JSONURIencode(urls);
+        return defaults.endpoint + callback + '/' + JSONURIencode(urls.slice().sort());
     }
 
   , JSONURIencode = Mobify.JSONURIencode = function(obj) {
         return encodeURIComponent(JSON.stringify(obj));
     };
 
-Mobify.$.fn.combineScripts = function() {
+$.fn.combineScripts = function() {
     return combineScripts.call(window, this)
 }
 
