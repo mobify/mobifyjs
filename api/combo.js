@@ -137,111 +137,31 @@ var get = function(key, increment) {
     * Regular expressions for cache-control directives.
     * See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
     */
-var ccPublic = /^\s*public\s*$/
-  , ccPrivate = /^\s*private\s*$/
-  , ccNoCache = /^\s*no-cache\s*$/
-  , ccNoStore = /^\s*no-store\s*$/
-  , ccNoTransform = /^\s*no-store\s*$/
-  , ccMustRevalidate = /^\s*must-revalidate\s*$/
-  , ccProxyRevalidate = /^\s*proxy-revalidate\s*$/
-  , ccMaxAge = /^\s*max-age\s*=\s*(\d+)\s*$/
-  , ccSMaxAge = /^\s*s-maxage\s*=\s*(\d+)\s*$/
+var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
+  , ccMaxAge = /^\s*(max-age)\s*=\s*(\d+)\s*$/
 
     /**
      * Returns an object representing a parsed HTTP 1.1 Cache-Control directive.
-     * The object will have keys for all cache-control response properties.
-     * Properties are null or boolean except for max-age and s-maxage which  
-     * should be positive integers
+     * The object may contain the following relevant cache-control properties:
+     * - public
+     * - private
+     * - no-cache
+     * - no-store
+     * - max-age
      */
-  , ccParse = function (directive) {
-        var parsedDirective = {
-                'public': null
-              , 'private': null
-              , 'no-cache': null
-              , 'no-store': null
-              , 'no-transform': null
-              , 'must-revalidate': null
-              , 'proxy-revalidate': null
-              , 'max-age': null
-              , 's-maxage': null
-            };
+  , ccParse = function (directives) {
+        var obj = {}
+          , match;
 
-        directive.split(',').forEach(function(d) {
-            var matches;
-            if (ccPublic.test(d)) parsedDirective['public'] = true;
-            else if (ccPrivate.test(d)) parsedDirective['private'] = true;
-            else if (ccNoCache.test(d)) parsedDirective['no-cache'] = true;
-            else if (ccNoStore.test(d)) parsedDirective['no-store'] = true;
-            else if (ccNoTransform.test(d)) parsedDirective['no-transform'] = true;
-            else if (ccMustRevalidate.test(d)) {
-                parsedDirective['must-revalidate'] = true;
-            } else if (ccProxyRevalidate.test(d)) { 
-                parsedDirective['proxy-revalidate'] = true;
-            } else if (matches = ccMaxAge.exec(d)) {
-                parsedDirective['max-age'] = matches[1];
-            } else if (matches = ccSMaxAge.exec(d)) { 
-                parsedDirective['s-maxage'] = matches[1];
+        directives.split(',').forEach(function(directive) {
+            if (match = ccDirectives.exec(directive)) {
+                obj[match[1]] = true
+            } else if (match = ccMaxAge.exec(directive)) {
+                obj[match[1]] = parseInt(match[2])
             }
-        })
+        });
 
-        return parsedDirective;
-    }
-
-    /**
-     * Returns the age of `resource` in milliseconds.
-     */
-  , getAge = function(resource) {
-        var date = resource.headers.date;
-        if (date) return Date.now() - Date.parse(date);
-        return 0;
-    }
-
-    /**
-     * Returns the freshness lifetime of `resource` in milliseconds.
-     */
-  , getFreshnessLifetime = function(resource) {
-        var cacheControl
-          , maxAge
-          , expires
-          , now = Date.now()
-          , headers = resource.headers
-          , date;
-
-        // If there's a max-age cache-control directive, return it
-        if ((cacheControl = headers['cache-control']) && (date = headers.date)) {
-
-            // Parse out the cache control header and date
-            date = Date.parse(headers.date);
-            cacheControl = ccParse(cacheControl);
-
-            if ((cacheControl['max-age'] !== null) && 
-                (cacheControl['private'] === null) &&
-                (cacheControl['no-store'] === null) &&
-                (cacheControl['no-cache'] === null)) {
-
-                // The max-age header is represented in seconds, convert to ms.
-                maxAge = parseInt(cacheControl['max-age']) * 1000;
-
-                expires = date + maxAge;                
-                return expires - now;
-            }
-        }
-
-        // Otherwise, try to compute a max-age from the Expires header.
-        if (expires = headers.expires) {
-            expires = Date.parse(expires);
-            return expires - now;
-        }
-
-        // Otherwise, the freshness lifetime is 0.
-        return 0;
-    }
-
-    /**
-     * Returns a max-age value for `resource` in milliseconds.
-     */
-  , maxAge = function(resource) {
-        return getFreshnessLifetime(resource) - getAge(resource);
+        return obj;
     }
 
   , utils = httpCache.utils = {
@@ -259,7 +179,34 @@ var ccPublic = /^\s*public\s*$/
          * Returns `true` if `resource` is stale by HTTP 1.1 caching rules.
          */
       , isStale: function(resource) {
-            return getAge(resource) > maxAge(resource)
+            var headers = resource.headers
+              , cacheControl = headers['cache-control']
+              , date = headers.date
+              , expires = headers.expires
+              , now = Date.now()
+
+            // If `max-age` is present and no other cache directives exist, then
+            // we are stale if we are older.
+            if (cacheControl && date) {
+                date = Date.parse(date);
+                cacheControl = ccParse(cacheControl);
+
+                if ((cacheControl['max-age']) && 
+                    (!cacheControl['private']) &&
+                    (!cacheControl['no-store']) &&
+                    (!cacheControl['no-cache'])) {
+                    // Convert the max-age directive to ms.
+                    return now > (date + (cacheControl['max-age'] * 1000));
+                }
+            }
+
+            // If `expires` is present, we are stale if we are older.
+            if (expires) {
+                return now > Date.parse(expires);
+            }
+
+            // Otherwise, we are stale.
+            return false;
         }
     };
 
