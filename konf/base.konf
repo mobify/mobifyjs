@@ -22,7 +22,6 @@ Mobify.points.push(+new Date);
     {>"/base/vendor/slide.js"/}
 {/lib}{/lib_export}
 
-{>"/base/api/util.js"/}
 {>"/base/api/timing.js"/}
 {>"/base/api/config.js"/}
 
@@ -46,6 +45,7 @@ Mobify.$.extend(Mobify.config, {
 {#lib_export name="enhance"}{+enhance}
     {>"/base/api/orientation.js"/}
     {>"/base/api/enhance.js"/}
+    {>"/base/api/util.js"/}
 {/enhance}{/lib_export}
 
 {>"/base/api/main.js"/}
