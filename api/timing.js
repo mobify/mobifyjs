@@ -2,9 +2,9 @@
 
 var timing = Mobify.timing = {
     points: []
-  , addPoint: function(str, date, level, groupStart) {
+  , addPoint: function(str, date) {
         var point = date || +new Date;         
-        this.points.push([level || 0, point, str, groupStart]);
+        this.points.push([point, str]);
     }
   , reset: function() {
         this.points = [];

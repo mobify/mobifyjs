@@ -1,42 +1,33 @@
 (function(Mobify, $) {
 
-    var suffix = "ms ";
-    function formatMillis(level, ms) {
-        return paddings[level].slice(0, - suffix.length - ('' + ms).length) + ms + suffix;
-    }
+    var indent
+      , totalIndent
+      , suffix = "ms "
+      , whitespace = new Array(666).join(' ')
+      , indent = []
+      , totalIndent = []
 
-    var deltaLengths = [], paddings = [];
-    var tryForMax = function(level, time) {
-        deltaLengths[level] = Math.max(deltaLengths[level] || 0, (time + '').length);
-    }
-
-    var summarizeLengths = function() {
-        for (var i = -1; i < deltaLengths.length; i++) {
-            if (i > 0) deltaLengths[i] += deltaLengths[i-1] + suffix.length;
-            paddings[i] = new Array(deltaLengths[i] + suffix.length + 1).join(' ');
-        }
-    }
-
-    function diff(entry, i, collection) {
-        var j = 0, level = entry[0], point = entry[1];
-        tryForMax(-1, entry.timeFromStart = point - collection[0][1]);
-        
-        if (i) for (j = i - 1; j > 0; j = j - 1) {
-            if (collection[j][0] <= level) break;
+      , padMillis = function(level, str) {
+            return (whitespace + str).slice(-totalIndent[level]);
         }
 
-        if (!entry[2]) entry[2] = 'Subtotal of ' + collection[j][2];
-        tryForMax(level, entry.timeFromLast = point - collection[j][1]);
-    };
-
-    function format(entry) {
-        return formatMillis(-1, entry.timeFromStart)
-             + formatMillis(entry[0], entry.timeFromLast)
-             + entry[2];
-    }
+      , updateMaximumLength = function(level, str) {
+            indent[level] = Math.max(indent[level] || 0, str.length);
+        };
 
     $.extend(Mobify.timing, {
         level: 0
+      , addPoint: function(str, date, level, groupStart) {
+            var date = date || +new Date;
+            var entry = [date, str];
+            $.extend(entry, {
+                'date': date
+              , 'str': str
+              , 'level': level || 0
+              , 'groupStart' : groupStart
+            });
+            this.points.push(entry);
+        }  
       , group: function(str, date) {
             this.addPoint(str, date, ++this.level, 1);
         }
@@ -46,10 +37,10 @@
       , groupEnd: function() {
             var last = this.points[this.points.length - 1];
             
-            if (last[3]) {
-                if (last[3] === 1) {
-                    last[1] = +new Date;
-                    delete last[3];
+            if (last.groupStart) { // Collapse childless group
+                if (last.groupStart === 1) {
+                    last.point = +new Date;
+                    delete last.groupStart;
                 } else this.points.pop();
             } else {
                 this.addPoint('', +new Date, this.level);
@@ -57,12 +48,44 @@
             --this.level;
         }
     });
+    var timing = Mobify.timing
+      , oldPoints = Mobify.timing.points;
+
+    timing.reset();
+    oldPoints.forEach(function(entry) {
+        timing.addPoint.call(timing, entry[1], entry[0]);
+    });
 
     console.logTiming = function() {
-        Mobify.timing.points.forEach(diff);
-        summarizeLengths();
-        var processed = Mobify.timing.points.map(format);
+        indent = [];
+        totalIndent = [];
 
-        console.logGroup('log', 'Timing', processed);
+        Mobify.timing.points.forEach(function (entry, i, points) {
+            var j = 0;
+
+            entry.timeFromStart = (entry.date - points[0].date) + suffix;
+            updateMaximumLength(-1, entry.timeFromStart);
+            
+            if (i) for (j = i - 1; j > 0; j = j - 1) {
+                if (points[j].level <= entry.level) break;
+            }
+
+            if (!entry.str) entry.str = 'Subtotal of ' + points[j].str;
+            entry.timeFromPrev = (entry.date - points[j].date) + suffix;
+            updateMaximumLength(entry.level, entry.timeFromPrev);
+        });
+
+        for (var i = 0; i < indent.length; i++) {
+            totalIndent[i] = indent[i] + (totalIndent[i-1] || 0);
+        }
+        totalIndent[-1] = indent[-1];
+
+        var indentedTiming = Mobify.timing.points.map(function(entry) {
+            return padMillis(-1, entry.timeFromStart)
+                 + padMillis(entry.level, entry.timeFromPrev)
+                 + entry.str;
+        });
+
+        console.logGroup('log', 'Timing', indentedTiming);
     }
 })(Mobify, Mobify.$);
