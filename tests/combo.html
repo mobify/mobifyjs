@@ -3,18 +3,10 @@
 <head>
     <link rel="stylesheet" href="qunit/qunit.css">
     <script src="qunit/qunit.js"></script>  
-    <!-- <script src="qunit/junit.js"></script> -->
 </head>
 <body>
-    <!-- 
-    USAGE
-    1. run the test server: node tests/server.js
-    2. localtunnel 1337 (so combo can see the scripts)
-    3. navigate to the localtunnel url
-    -->
+    <!-- Usage: -->
 
-
-    <!-- QUNIT -->
 
     <h1 id="qunit-header">QUnit Test Suite</h1>  
     <h2 id="qunit-banner"></h2>  
@@ -22,84 +14,256 @@
     <h2 id="qunit-userAgent"></h2>  
     <ol id="qunit-tests"></ol>  
 
-    <!-- FIXTURES -->
-
-    <iframe src="fixtures/combo/combo-iframe.html" id="combo-iframe"></iframe>
-
-    <!-- Expected state of the document after the flood. -->
-    <textarea id="test-comboScriptSync">
-        <html>
-            <head>
-                <script>Mobify = window.Mobify || {};</script>
-                <script src="../api/combo-caching.js"></script>
-            </head>
-            <body>
-                {scriptsHtml}
-            </body>
-        </html>
+    <div id="fixtures">
+        <script>Mobify = {config: {}}</script>
+        <script src="../vendor/zepto/src/zepto.js"></script>
+        <script src="../vendor/zepto/src/event.js"></script>
+        <script src="../api/noconflict.js"></script>
+        <script src="../api/combo.js"></script>
+    </div>
+    
+    <textarea id="combineScripts-1">
+        <script>var a = ['a']</script>
+        <script x-src="push.js#b"></script>
+        <script>a.push('c')</script>
+        <script x-src="push.js#d"></script>
     </textarea>
 
-    <!-- SETUP -->
-
-    <script src="../vendor/zepto.js"></script>
-    <script>
-        Mobify = window.Mobify || {};
-        Mobify.$ = $
-    </script>
-    <script src="../api/combo-caching.js"></script>
-    <script src="../api/combo-client.js"></script>
+    <textarea id="combineScripts-2">
+        <script x-src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script>var a = !!$</script>
+    </textarea>
 
     <script>
-// iframe setup.
-READY = false
-WAITING = Mobify.$('iframe').length
+        var $ = Mobify.$
+          , httpCache = Mobify.httpCache
+            // Time offsets in seconds
+          , TWO_WEEKS = 14 * 24 * 60 * 60
+          , TEN_MINUTES = 600
+          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
+            // UTC dates
+          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
+          , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
+          , UTC_NOW = (new Date()).toUTCString()
 
-// patient test runner
-Mobify.$('iframe').on('load', function() {
-    WAITING--;
-    if (READY && !WAITING) runTests();
-});
+            // I don't fit in `localStorage` in Chrome or Safari...
+            // But I do seem to fit in FF.
+          , LONG_STRING = Array(5000000).join('1');
+
+
+        module('Mobify.cssURL')
+
+        test('It exists', function() {
+            ok(Mobify.cssURL({}))
+        })
+
+
+        module('$.fn.combineScripts')
+
+        asyncTest('Warm cache', 1, function() {
+            var cache = {
+                    'http://127.0.0.1:1337/tests/push.js': {
+                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}
+                      , 'status': 'ready'
+                      , 'url': 'http://127.0.0.1:1337/tests/1.js'
+                      , 'body': 'var scripts = [].slice.call(document.getElementsByTagName("script"));'
+                             + 'a.push(scripts[scripts.length - 2].innerHTML.split("#")[1][0]);'
+                      , 'text': true
+                    }
+                }
+              , $scripts = $($('#combineScripts-1').text())
+              , $result = $scripts.combineScripts()
+              , html = ''
+
+            httpCache.reset(cache);
+            httpCache.save(function(err) {
+                if (err) return;
+
+                html += $('#fixtures').reduce(function(memo, el) {
+                        return memo + el.outerHTML + '\n';
+                    }, '')
+                html += $result.reduce(function(memo, el) {
+                        return memo + el.outerHTML + '\n';
+                }, '')
+                html = '<html><body>' + html + '</body></html>'
+
+                var iframeEl = document.createElement('iframe');
+
+                $('body').append(iframeEl);
+
+                var iframe = (iframeEl.contentWindow)
+                            ? iframeEl.contentWindow 
+                            : (iframeEl.contentDocument.document) 
+                                ? iframeEl.contentDocument.document 
+                                : iframeEl.contentDocument;
+
+                iframe.document.open();
+                iframe.document.write(html);
+                iframe.document.close();
+
+                function load() {
+                    equal(iframe.window.a.length, 4, 'a = [a, b, c , d]');
+
+                    start();
+                }
+
+                if (iframe.document.readyState == 'complete') {
+                    load();
+                } else {
+                    $(iframeEl).on('load', load);
+                }
+            });
+        });
+
+        asyncTest('Cold cache', 1, function() {
+            var $scripts = $($('#combineScripts-2').text())
+              , $result = $scripts.combineScripts()
+              , html = ''
+
+            html += $('#fixtures').reduce(function(memo, el) {
+                    return memo + el.outerHTML + '\n';
+                }, '')
+            html += $result.reduce(function(memo, el) {
+                    return memo + el.outerHTML + '\n';
+            }, '')
+            html = '<html><body>' + html + '</body></html>'
+
+            var iframeEl = document.createElement('iframe');
+
+            $('body').append(iframeEl);
+
+            var iframe = (iframeEl.contentWindow)
+                        ? iframeEl.contentWindow 
+                        : (iframeEl.contentDocument.document) 
+                            ? iframeEl.contentDocument.document 
+                            : iframeEl.contentDocument;
+
+            iframe.document.open();
+            iframe.document.write(html);
+            iframe.document.close();
+
+            function load() {
+                ok(iframe.window.a, 'jQuery was loaded');
+
+                start();
+            }
+
+            if (iframe.document.readyState == 'complete') {
+                load();
+            } else {
+                $(iframeEl).on('load', load);
+            }
+        });
+
+    
+        module('httpCache')
+
+        asyncTest('Eviction on an unused resource', 2, function() {
+            httpCache.reset();
+            httpCache.save();
+
+            httpCache.set('unused', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
+
+            httpCache.set('used', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'used'})
+            httpCache.get('used', true)
+
+            httpCache.save(function(err) {
+                if (err) return;
+
+                httpCache.reset();
+                httpCache.load();
+
+                ok(!httpCache.get('unused'), '`unused` was evicted');
+                ok(!!httpCache.get('used'), '`used` was cached');
+
+                start();
+            });
+        });
+
+        asyncTest('Least recently used eviction', 2, function() {
+            httpCache.reset();
+            httpCache.save();
+
+            httpCache.set('old', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
+            httpCache.get('old', true)
+
+            setTimeout(function() {
+                httpCache.set('new', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'new'})
+                httpCache.get('new', true)
+
+                httpCache.save(function(err) {
+                    if (err) return;
+
+                    httpCache.reset();
+                    httpCache.load();
+
+                    ok(!httpCache.get('old'), '`old` was evicted');
+                    ok(!!httpCache.get('new'), '`new` was cached');
+
+                    start();
+                });
+            }, 0);
+        });
+
+
+        module('httpCache.utils')
+
+        test('isStale', 7, function() {
+            var isStale = httpCache.utils.isStale
+              , resources = {
+                    'stale-expires': {
+                        'headers': {
+                            'expires': UTC_TWO_WEEKS_AGO
+                        }
+                    }
+
+                  , 'stale-cache-control': {
+                        'headers': {
+                            'date': UTC_TWO_WEEKS_AGO
+                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    }
+
+                  , 'fresh-expires': {
+                        'headers': {
+                            'expires': UTC_TWO_WEEKS_FROM_NOW
+                        }
+                    }
+
+                  , 'fresh-cache-control': {
+                        'headers': {
+                            'date': UTC_NOW
+                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    }
+
+                  , 'no-headers': {
+                        'headers': {}
+                  }
+
+                  , 'invalid-date': {
+                        'headers': {
+                            'date': 'invalid'
+                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    }
+
+                  , 'invalid-expires': {
+                        'headers': {
+                            'expires': 'invalid'
+                        }
+                    }
+                };
+ 
+            ok(isStale(resources['stale-expires']));
+            ok(isStale(resources['stale-cache-control']));
+            ok(!isStale(resources['fresh-expires']));
+            ok(!isStale(resources['fresh-cache-control']));            
+            ok(isStale(resources['no-headers']), 'No cache headers is stale');
+            ok(isStale(resources['invalid-date']), 'Invalid date is stale');
+            ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
+
+        });
+
     </script>
-
-
-    <!-- TESTS -->
-
-    <script>
-function runTests() {
-
-var getIframeDocument = function(selector) {
-        var iframe = $(selector)[0];
-        return (iframe.contentDocument || iframe.contentWindow.document);
-    }
-  , $ = Mobify.$;
-
-
-module('Mobify.combo')
-
-asyncTest('Mobify.combo.comboScriptSync', function() {
-    var doc = getIframeDocument('#combo-iframe')
-      , $got = $('#test-comboScriptSync', doc).comboScriptSync().removeAttr('type')
-      , scriptsHtml = $.map($got, function(el) {
-            return el.outerHTML
-        }).join("\n")
-      , html = $('#test-comboScriptSync').text().replace('{scriptsHtml}', scriptsHtml)
-
-    doc.open();
-    doc.write(html);
-    doc.close();
-
-    $(doc).on('DOMContentLoaded', function() {
-        equal(this.defaultView.combo.length, 3);
-        start();
-    });
-});
-
-} //end runTests
-
-// Impatient test runner, the setting of READY must remain at the end
-READY = true;
-if (!WAITING) runTests();
-
-    </script>
-<body>
-</html>
+</body>
