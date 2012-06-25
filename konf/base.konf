@@ -20,6 +20,10 @@
     {>"/base/vendor/slide.js"/}
 {/lib}{/lib_export}
 
+{#lib_export name="combo"}
+    {>"/base/api/combo.js"/}
+{/lib_export}
+
 {#lib_export name="util"}
     {>"/base/api/util.js"/}
 {/lib_export}
