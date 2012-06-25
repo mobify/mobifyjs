@@ -34,7 +34,7 @@ Note that when we talk about changing levels of context below, we simply mean tr
 
 ## 2\. `{foo}` - Variables: Select & Render A Single Variable
 
-Use any jQuery-like (Zepto) selector to select elements from your source DOM within the konf file. Reference the selection as a variable from any template using the curly brace syntax:
+Use any jQuery-like (Zepto.js) selector to select elements from your source DOM within the konf file. Reference the selection as a variable from any template using the curly brace syntax:
 
 *Original HTML input:*
 

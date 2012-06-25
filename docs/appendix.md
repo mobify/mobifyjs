@@ -60,22 +60,22 @@ Any errors Mobify.js encounters during execution will be logged in the Webkit In
 
 * Page is blank, doesn't render at all
 
-Usually this will be accompanied by the error message: "Uncaught SyntaxError: Unexpected string".
+	Usually this will be accompanied by the error message: "Uncaught SyntaxError: Unexpected string".
 
-SOLUTION: Ensure that you have a comma after every key within your konf, ie.
+	SOLUTION: Ensure that you have a comma after every key within your konf, ie.
 
-    'header': {
-        ...
-    },
-    'content': {
-
-    },
+	    'header': {
+	        ...
+	    },
+	    'content': {
+	
+	    },
 
 * {some-key} displayed on the page
 
-When a variable is rendered to the page instead of parsed with data from your konf, this likely means you have used an illegal character in the key.
-
-SOLUTION: Don't use illegal characters in keys. This includes almost all non-alphanumeric characters, ie. dashes (-), periods (.), commas (,), plus signs (+), etc.
+	When a variable is rendered to the page instead of parsed with data from your konf, this likely means you have used an illegal character in the key.
+	
+	SOLUTION: Don't use illegal characters in keys. This includes almost all non-alphanumeric characters, ie. dashes (-), periods (.), commas (,), plus signs (+), etc.
 
 
 ## Dust.js Documentation

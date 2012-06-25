@@ -210,25 +210,45 @@ Important: changing the DOM within required selections might adversely affect ev
 Your konf object extends a default konf object containing the following reserved keys:
 
 `$html`: Reference to the source DOM element
+
 `$head`: Reference to the source DOM element
+
 `$head`: Reference to the source DOM element
+
 `buildDate`: The date this _mobify.js_ file was built
+
 `config.configDir`: Path to the folder from where _mobify.js_ loaded
+
 `config.configFile`: Path to _mobify.js_
+
 `config.HD`: A boolean flag that will be true if this device has a high density display 
+
 `config.isDebug`: A boolean flag that will be true if mobify.js is running in debug mode
+
 `config.orientation`: A string that will be "portrait" if the device is taller than it is wide, or "landscape" if it is wider than it is tall
+
 `config.os`: A string representing the detected operating system of the device
+
 `config.path`: A string representing the path from where the mobify.js file was loaded
+
 `config.started`: An internal flag used to record whether the page has been transformed
+
 `config.tagVersion`: Version of the Mobify tag used on this site
+
 `config.touch`: A boolean flag that will be true if touch events are supported, false otherwise
+
 `configName`: A property pulled from _project.json_ - most likely the unique identifier for your site
+
 `cssName`: A function returning the name of the css file to be applied
+
 `imageDir`: A function returning a path to where mobify adaptation specific image assets are kept
+
 `mobileViewport`: Contents of the meta viewport tag to be sent
+
 `siteConfig`: An object containing analytics configuration information
+
 `touchIcon`: The location of a file to be used as the bookmark icon for this website on iOS devices
+
 `unmobify`: An internal flag used to record whether the page has been unmobified
 
 ## 7\. Best Practices
