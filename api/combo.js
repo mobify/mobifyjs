@@ -176,18 +176,19 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
         }
 
         /**
-         * Returns `true` if `resource` is stale by HTTP 1.1 caching rules.
+         * Returns `true` if `resource` is stale by HTTP/1.1 caching rules.
+         * Treats invalid headers as stale.
          */
       , isStale: function(resource) {
             var headers = resource.headers
               , cacheControl = headers['cache-control']
-              , date = headers.date
-              , expires = headers.expires
               , now = Date.now()
+              , date
+              , expires
 
             // If `max-age` and `date` are present, and no other no other cache 
             // directives exist, then we are stale if we are older.
-            if (cacheControl && (date = Date.parse(date))) {
+            if (cacheControl && (date = Date.parse(headers.date))) {
                 cacheControl = ccParse(cacheControl);
 
                 if ((cacheControl['max-age']) && 
@@ -200,8 +201,8 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
             }
 
             // If `expires` is present, we are stale if we are older.
-            if (expires) {
-                return now > Date.parse(expires);
+            if (expires = Date.parse(headers.expires)) {
+                return now > expires;
             }
 
             // Otherwise, we are stale.

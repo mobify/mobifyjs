@@ -208,7 +208,7 @@
 
         module('httpCache.utils')
 
-        test('isStale', 6, function() {
+        test('isStale', 7, function() {
             var isStale = httpCache.utils.isStale
               , resources = {
                     'stale-expires': {
@@ -224,7 +224,7 @@
                         }
                     }
 
-                  , 'fresh-far-future': {
+                  , 'fresh-expires': {
                         'headers': {
                             'expires': UTC_TWO_WEEKS_FROM_NOW
                         }
@@ -246,15 +246,23 @@
                             'date': 'invalid'
                           , 'cache-control': 'public,max-age=' + TEN_MINUTES
                         }
-                  }
+                    }
+
+                  , 'invalid-expires': {
+                        'headers': {
+                            'expires': 'invalid'
+                        }
+                    }
                 };
  
             ok(isStale(resources['stale-expires']));
             ok(isStale(resources['stale-cache-control']));
-            ok(!isStale(resources['fresh-far-future']));
+            ok(!isStale(resources['fresh-expires']));
             ok(!isStale(resources['fresh-cache-control']));            
             ok(isStale(resources['no-headers']), 'No cache headers is stale');
             ok(isStale(resources['invalid-date']), 'Invalid date is stale');
+            ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
+
         });
 
     </script>
