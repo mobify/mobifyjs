@@ -5,6 +5,9 @@
     <script src="qunit/qunit.js"></script>  
 </head>
 <body>
+    <!-- Usage: -->
+
+
     <h1 id="qunit-header">QUnit Test Suite</h1>  
     <h2 id="qunit-banner"></h2>  
     <div id="qunit-testrunner-toolbar"></div>  
@@ -33,7 +36,20 @@
 
     <script>
         var $ = Mobify.$
-          , httpCache = Mobify.httpCache;
+          , httpCache = Mobify.httpCache
+            // Time offsets in seconds
+          , TWO_WEEKS = 14 * 24 * 60 * 60
+          , TEN_MINUTES = 600
+          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
+            // UTC dates
+          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
+          , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
+          , UTC_NOW = (new Date()).toUTCString()
+
+            // I don't fit in `localStorage` in Chrome or Safari...
+            // But I do seem to fit in FF.
+          , LONG_STRING = Array(5000000).join('1');
+
 
         module('Mobify.cssURL')
 
@@ -41,17 +57,18 @@
             ok(Mobify.cssURL({}))
         })
 
+
         module('$.fn.combineScripts')
 
         asyncTest('Warm cache', 1, function() {
             var cache = {
                     'http://127.0.0.1:1337/tests/push.js': {
-                        headers: {}
-                      , status: 'ready'
-                      , url: 'http://127.0.0.1:1337/tests/1.js'
-                      , body: 'var scripts = [].slice.call(document.getElementsByTagName("script"));'
-                            + 'a.push(scripts[scripts.length - 2].innerHTML.split("#")[1][0]);'
-                      , text: true
+                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}
+                      , 'status': 'ready'
+                      , 'url': 'http://127.0.0.1:1337/tests/1.js'
+                      , 'body': 'var scripts = [].slice.call(document.getElementsByTagName("script"));'
+                             + 'a.push(scripts[scripts.length - 2].innerHTML.split("#")[1][0]);'
+                      , 'text': true
                     }
                 }
               , $scripts = $($('#combineScripts-1').text())
@@ -137,20 +154,17 @@
                 $(iframeEl).on('load', load);
             }
         });
+
     
         module('httpCache')
-
-        // I don't fit in `localStorage` in Chrome or Safari...
-        // But I do seem to fit in FF.
-        var longString = Array(5000000).join('1');
 
         asyncTest('Eviction on an unused resource', 2, function() {
             httpCache.reset();
             httpCache.save();
 
-            httpCache.set('unused', {headers: {}, body: longString})
+            httpCache.set('unused', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
 
-            httpCache.set('used', {headers: {}, body: 'used'})
+            httpCache.set('used', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'used'})
             httpCache.get('used', true)
 
             httpCache.save(function(err) {
@@ -170,11 +184,11 @@
             httpCache.reset();
             httpCache.save();
 
-            httpCache.set('old', {headers: {}, body: longString})
+            httpCache.set('old', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
             httpCache.get('old', true)
 
             setTimeout(function() {
-                httpCache.set('new', {headers: {}, body: 'new'})
+                httpCache.set('new', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'new'})
                 httpCache.get('new', true)
 
                 httpCache.save(function(err) {
@@ -194,16 +208,8 @@
 
         module('httpCache.utils')
 
-        test('isStale', 4, function() {
+        test('isStale', 6, function() {
             var isStale = httpCache.utils.isStale
-                // Time offsets in seconds
-              , TWO_WEEKS = 14 * 24 * 60 * 60
-              , TEN_MINUTES = 600
-                // UTC dates
-              , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
-              , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
-              , UTC_NOW = (new Date()).toUTCString()
-
               , resources = {
                     'stale-expires': {
                         'headers': {
@@ -211,7 +217,7 @@
                         }
                     }
 
-                  , 'state-cache-control': {
+                  , 'stale-cache-control': {
                         'headers': {
                             'date': UTC_TWO_WEEKS_AGO
                           , 'cache-control': 'public,max-age=' + TEN_MINUTES
@@ -230,12 +236,25 @@
                           , 'cache-control': 'public,max-age=' + TEN_MINUTES
                         }
                     }
+
+                  , 'no-headers': {
+                        'headers': {}
+                  }
+
+                  , 'invalid-date': {
+                        'headers': {
+                            'date': 'invalid'
+                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                  }
                 };
  
             ok(isStale(resources['stale-expires']));
-            ok(isStale(resources['state-cache-control']));
+            ok(isStale(resources['stale-cache-control']));
             ok(!isStale(resources['fresh-far-future']));
-            ok(!isStale(resources['fresh-cache-control']));
+            ok(!isStale(resources['fresh-cache-control']));            
+            ok(isStale(resources['no-headers']), 'No cache headers is stale');
+            ok(isStale(resources['invalid-date']), 'Invalid date is stale');
         });
 
     </script>

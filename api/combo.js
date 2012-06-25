@@ -185,10 +185,9 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
               , expires = headers.expires
               , now = Date.now()
 
-            // If `max-age` is present and no other cache directives exist, then
-            // we are stale if we are older.
-            if (cacheControl && date) {
-                date = Date.parse(date);
+            // If `max-age` and `date` are present, and no other no other cache 
+            // directives exist, then we are stale if we are older.
+            if (cacheControl && (date = Date.parse(date))) {
                 cacheControl = ccParse(cacheControl);
 
                 if ((cacheControl['max-age']) && 
@@ -206,7 +205,7 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
             }
 
             // Otherwise, we are stale.
-            return false;
+            return true;
         }
     };
 
@@ -255,6 +254,8 @@ var $ = Mobify.$
 
         if (uncached.length) {
             bootstrap.src = getURL(uncached, defaults.loadCallback);
+        } else {
+            bootstrap.innerHTML = defaults.loadCallback + '();';
         }
 
         $scripts = $(bootstrap).add($scripts);
@@ -309,7 +310,7 @@ var $ = Mobify.$
 
     /**
      * Returns a URL suitable for use with the combo service. Sorted to generate
-     * cacheable URLs.
+     * consistent URLs.
      */
   , getURL = function(urls, callback) {
         return defaults.endpoint + callback + '/' + JSONURIencode(urls.slice().sort());
