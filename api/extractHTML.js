@@ -8,7 +8,9 @@ var nodeName = function(node) {
         return s.replace('"', '&quot;');
     }
 
-    // Return a string for the opening tag of DOMElement `element`.
+    /**
+     * Return a string for the opening tag of DOMElement `element`.
+     */
   , openTag = function(element) {
         if (!element) return '';
         if (element.length) element = element[0];
@@ -22,7 +24,9 @@ var nodeName = function(node) {
         return '<' + nodeName(element) + stringBuffer.join('') + '>';
     }
 
-    // Return a string for the closing tag of DOMElement `element`.
+    /**
+     * Return a string for the closing tag of DOMElement `element`.
+     */
   , closeTag = function(element) {
         if (!element) return '';
         if (element.length) element = element[0];
@@ -30,7 +34,9 @@ var nodeName = function(node) {
         return '</' + nodeName(element) + '>';
     }
 
-    // Return a string for the doctype of the current document.
+    /**
+     * Return a string for the doctype of the current document.
+     */
   , doctype = function(doc) {
         var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
                 return el.nodeType == Node.DOCUMENT_TYPE_NODE
@@ -44,17 +50,17 @@ var nodeName = function(node) {
             + '>';
     }
 
-    // Returns a string of the unesacped content from a plaintext escaped `container`.
+    /**
+     * Returns a string of the unesacped content from a plaintext escaped `container`.
+     */
   , extractHTMLFromElement = function(container) {
         if (!container) return '';
 
         return [].map.call(container.childNodes, function(el) {
             var tagName = nodeName(el);
-            if (tagName == '#comment') return '<!--' + el.textContent + '-->'
-            if (tagName == 'plaintext') return el.textContent
-            if (tagName == 'script' && ((/mobify\./.test(el.src) || /Mobify/.test(el.textContent)))) {
-                return '';  
-            }
+            if (tagName == '#comment') return '<!--' + el.textContent + '-->';
+            if (tagName == 'plaintext') return el.textContent;
+            if (tagName == 'script' && ((/mobify\./.test(el.src) || /Mobify/.test(el.textContent)))) return '';
             return el.outerHTML || el.nodeValue;
         }).join('');
     }
@@ -62,8 +68,10 @@ var nodeName = function(node) {
     // Memoize result of extract
   , extractedHTML
 
-    // Returns an object containing the state of the original page. Caches the object
-    // in `extractedHTML` for later use.
+    /**
+     * Returns an object containing the state of the original page. Caches the object
+     * in `extractedHTML` for later use.
+     */
   , extractHTML = function(doc) {
         if (extractedHTML) return extractedHTML;
 
@@ -81,11 +89,13 @@ var nodeName = function(node) {
             bodyContent: extractHTMLFromElement(bodyEl)
         };
 
-        extractedHTML.all = function() {
-            // RR: I assume that Mobify escaping tag is placed in <head>. If so, the <plaintext>
-            // it emits would capture the </head><body> boundary, as well as closing </body></html>
-            // Therefore, bodyContent will have these tags, and they do not need to be added to .all()
-            return this.doctype + this.htmlTag + this.headTag + this.headContent + this.bodyContent;
+        /**
+         * RR: I assume that Mobify escaping tag is placed in <head>. If so, the <plaintext>
+         * it emits would capture the </head><body> boundary, as well as closing </body></html>
+         * Therefore, bodyContent will have these tags, and they do not need to be added to .all()
+         */
+        extractedHTML.all = function(inject) {
+            return this.doctype + this.htmlTag + this.headTag + (inject || '') + this.headContent + this.bodyContent;
         }
 
         return extractedHTML;
@@ -100,21 +110,21 @@ var nodeName = function(node) {
         }
     }
 
-    // Gather escaped content from the DOM, unescaped it, and then use 
-    // `document.write` to revert to the original page.
+    /** 
+     * Gather escaped content from the DOM, unescaped it, and then use 
+     * `document.write` to revert to the original page.
+     */
   , unmobifier = function(doc) {
-        //RR: Why all the document-getting plumbing instead of using normal 'document'?
         doc = (doc && doc.target || doc) || document
         doc.removeEventListener('DOMContentLoaded', unmobifier, false);
         var captured = extractHTML(doc);
 
-        // TODO: Confirm this.
-        // Wait up for IE, which isn't ready to do this just yet.
+        // Wait up for IE, which may not be ready to.
         setTimeout(function() {
+            var inject = Mobify.ajs && ('<script async src="' + Mobify.ajs + '#t=miss"></script>');
+
             doc.open();
-            // RR: Undid extractHTML(doc).all().
-            // It would not have worked, as doc is blanked by document.open()
-            doc.write(captured.all());
+            doc.write(captured.all(inject));
             doc.close();
         }, 15);
     }
