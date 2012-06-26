@@ -282,8 +282,10 @@ var $ = Mobify.$
             if (resource = httpCache.get(url, true)) {
                 url = httpCache.utils.dataURI(resource);
             }
-
-            document.write('<script src="' + url + '"><\/script>');
+            
+            // Firefox will choke on closing script tags passed through
+            // the ark.
+            document.write('<script src="' + url + '"><\/scr'+'ipt>');
         }
 
         /**
