@@ -19,16 +19,19 @@
         },
         logGroup : function(fn, title, obj) {
             var noneWritten = true;
-            $.each(obj, function(key, value) {
-                noneWritten && console.group(title);
-                if (typeof key == "number") {
-                    console[fn].apply(window, value);
-                } else {
-                    console[fn](key, value);
-                }
-                
-                noneWritten = false;
-            });
+
+            if (obj) {
+                $.each(obj, function(key, value) {
+                    noneWritten && console.group(title);
+                    if (typeof key == "number") {
+                        console[fn].apply(window, value);
+                    } else {
+                        console[fn](key, value);
+                    }
+                    
+                    noneWritten = false;
+                });
+            }
 
             noneWritten || console.groupEnd();
         }

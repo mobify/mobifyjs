@@ -12,4 +12,5 @@
         config.configFile = Mobify.$('script[src*="mobify.js"]').first().attr('src') || '';
     }
     config.configDir = config.configFile.replace(/\/[^\/]*$/, '/');
+    config.ajs = Mobify.ajs;
 })();
