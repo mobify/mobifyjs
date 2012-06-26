@@ -57,7 +57,7 @@ var guillotine = function(captured) {
             el.setAttribute(attr.nodeName, attr.nodeValue);
         });
 
-        return $(el);
+        return el;
     }
 
   , html = Mobify.html || {};
@@ -80,11 +80,23 @@ $.extend(html, {
         Mobify.timing.addPoint('Disabled Markup');
 
         // Reinflate HTML strings back into declawed DOM nodes.
-        var result = { doctype: captured.doctype };
-        result.$head = makeElement(captured.headTag).append(disabledHead);
-        result.$body = makeElement(captured.bodyTag).append(disabledBody);
-        result.$html = makeElement(captured.htmlTag).append(result.$head, result.$body);
-        
+        var div = document.createElement('div');
+        var headEl = makeElement(captured.headTag);
+        var bodyEl = makeElement(captured.bodyTag);
+        var htmlEl = makeElement(captured.htmlTag);
+
+        var result = {
+            'doctype' : captured.doctype
+          , '$head' : $(headEl)
+          , '$body' : $(bodyEl)
+          , '$html' : $(htmlEl)
+        };
+
+        for (div.innerHTML = disabledHead; div.firstChild; headEl.appendChild(div.firstChild));
+        for (div.innerHTML = disabledBody; div.firstChild; bodyEl.appendChild(div.firstChild));
+        htmlEl.appendChild(headEl);
+        htmlEl.appendChild(bodyEl);
+                
         Mobify.timing.addPoint('Built Passive DOM');
         
         return result;
