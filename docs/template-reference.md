@@ -241,7 +241,7 @@ This would insert the output of the template _logo.tmpl_ into _foo.tmpl_.
 
 ## 7\. `{+bar} ... {/bar}` - Block Placeholders
 
-Blocks allow you to define snippets of template code that may be overridden by any templates that reference this template:
+Blocks allow you to define snippets of template code that may be overridden by other templates:
 
 *Adding an overridable block `header` to _foo.tmpl_:*
     {+header}Plain Old Default Header{/header}
