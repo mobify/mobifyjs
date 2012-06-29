@@ -20,7 +20,9 @@ In this guide:
   2. Previewing your work
   3. Introducing the Konf
   4. Introducing Templates
-  5. Creating a template for a different page of your site:0
+  5. Creating a template for a different page of your site
+  6. Pushing a bundle up to Cloud
+  7. Publishing to Production
 
 
 * * *
@@ -101,12 +103,12 @@ passed into context.choose(). In order to determine what template to use, the
 Mobify frameworks determines which template to render by asking you to
 describe what DOM elements must match for a particular template to render.
 This DOM description is also used as the context which is used when rendering
-templates - &nbsp_place_holder;so you can see in the example above, you have a
+templates - so you can see in the example above, you have a
 "!phonenumber" and "!blurb" key, and if those keys match the DOM of the page,
 then the "about" template will be rendered. These keys are then accessible as
 data within the template (so, for example, you could access the phone number
 like this: {content.phonenumber} ). Keys with ! prefixed are
-_required_&nbsp_place_holder;in order for the template to render. Sometimes,
+_required_ in order for the template to render. Sometimes,
 you may want to extract data from a page, but it isn't something that is
 required in order to render the page. In that case, you simply add a key
 without the ! prefix.
