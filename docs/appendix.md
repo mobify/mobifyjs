@@ -7,79 +7,70 @@
 2. Common Errors
 3. Dust.js Documentation
 
-
-1. Debugging
+# Debugging
 
 ## Tools
 
-Debugging Mobify.js adaptations requires the use of an advanced web inspection tool like Webkit Inspector or Firebug. You're likely well-acquainted with one of these, but here are a few quick start tips if not.
+Debugging Mobify.js adaptations requires the use of a web inspection tool like Webkit Inspector or Firebug. You're likely well-acquainted with one of these, but here are a few quick start tips if not.
 
 **Webkit Inspector**
 
-Webkit Inspector is built in to Safari and Chrome. To initialize, open the browser's 'View' menu and select the Developer option. Opening either Developer Tools or JavaScript Console will pop up the Inspector.
+The Webkit Inspector is a powerful web development tool that is built into the Safari and Chrome browsers.
 
-If using Safari, you may have to first enable the development menu. Open Safari Preferences and select the Advanced tab, then check the development menu checkbox.
+To enable the inspector in Safari, open the Preferences pane, click Advanced, then select "Show Develop menu in menu bar". Open the inspector by right clicking on an element in a webpage and then selecting "Inspect Element".
 
-Once open, you can switch back and forth between JavaScript Console and DOM views with the 'Console' and 'Elements' tabs at top, respectively.
+In Chrome, open the inspector by right clicking on an element in a webpage and then selecting "Inspect Element".
 
-*Firebug*
+**Firebug**
 
-If you're using Firefox, you will need to [install Firebug] http://getfirebug.com/. Once installed, in the browser's 'View' menu, click the 'Firebug' option at the bottom to initialize.
+Firebug provides similiar behaviour to the WebKit Inspector in the Firefox browser. [Install the Firebug plugin.](http://getfirebug.com/). Once installed, in the browser's "View" menu, click the "Firebug" option at the bottom to initialize.
 
-Once open, you can switch back and forth between JavaScript Console and DOM views with the 'Console' and 'HTML' tabs at top, respectively.
-
-For more on getting started with Firebug, watch this [helpful video] http://www.youtube.com/watch?v=2xxfvuZFHsM
-
+For more on getting started with Firebug, watch this [helpful video](http://www.youtube.com/watch?v=2xxfvuZFHsM).
 
 ## Debugging the Konf
 
-Since the konf is written in JavaScript, you will often find syntax or logic errors springing up as you develop. The best way to debug the konf object is with the Webkit Inspector or the Firebug extension.
+The konf is written in JavaScript and you will often find syntax or logic errors springing up as you develop. The best way to debug the konf is with the Webkit Inspector or the Firebug extension.
 
-Once in development mode, you can view context (the result of the evaluated konf object) since it is logged to the JavaScript console. Look for a the item 'All Extracted Data', which you can expand to see exactly what values were assigned to which keys. **Note**: Extracted Data will not be present after you have published your mobile site, it can only be viewed by browsing your site through http://preview.mobify.com/
+In development mode, the result of the evaluated konf, the context, is logged to the JavaScript console. Look for a the item 'All Extracted Data', which can be expanded to show what values were assigned to what keys. **Note**: Extracted Data is only available in development mode, which can be activated by browsing your site through http://preview.mobify.com/
 
-If you are stumped you can add a `debugger;` statement into your konf object that will cause the inspector's debugger to pause as the konf is evaluated:
+If you are stumped, try adding a `debugger;` statement into your konf. This will cause the inspector's debugger to pause as the konf is evaluated:
 
-    'content': function(context) {
+    'content': function() {
         debugger;
-        return $('.content')
+        return $('.content');
     }
 
+You can then use the inspector to step through the execution of your konf.
 
 ## Debugging Templates (Viewing source, inspecting rendered DOM)
 
-Mobify.js adaptations are evaluated against the original DOM, but the latter is what you'll see if you view the page source. This isn't terribly helpful when you need insight into whether a particular adaptation is working or not.
+Mobify.js adaptations are evaluated against the source DOM. "View Source" shows the source DOM, not the result of the adaptation. In situations where you need to view the rendered DOM, use Firebug or the WebKit inspector. The DOM tab (labelled 'HTML' or 'Elements') displays a DOM tree that shows the adaptated DOM. Browse this tree to see the full result of the adaptation.
 
-In situations where you need to view the rendered DOM, use Firebug or the WebKit inspector.
+# Common Issues
 
-The DOM tab (labelled 'HTML' or 'Elements') displays a DOM tree that outlines the post-adaptation DOM. You are able to browse this tree and view the full result of the Mobify adaptation.
+Errors Mobify.js encounters during execution are logged to the JavaScript console. You can view these errors using Webkit Inspector or Firebug. If things don't appear to be working, we suggest starting there!
 
+* **Page is blank, doesn't render at all**
 
-## Common Errors
+    Usually this will be accompanied by the error message: "Uncaught SyntaxError: Unexpected string".
 
-Any errors Mobify.js encounters during execution will be logged in the Webkit Inspector / Firebug JavaScript Console. When things don't appear to be working, we suggest starting there.
+    SOLUTION: Ensure that you have a comma after every key within your konf, ie.
 
-* Page is blank, doesn't render at all
+        'header': {
+            ...
+        },
+        'content': {
 
-	Usually this will be accompanied by the error message: "Uncaught SyntaxError: Unexpected string".
+        },
 
-	SOLUTION: Ensure that you have a comma after every key within your konf, ie.
+* **{some-key} displayed on the page**
 
-	    'header': {
-	        ...
-	    },
-	    'content': {
-	
-	    },
+    When a variable is rendered to the page instead of parsed with data from your konf, this likely means you have used an illegal character in the key.
 
-* {some-key} displayed on the page
+    SOLUTION: Don't use illegal characters in keys. This includes almost all non-alphanumeric characters, ie. dashes (-), periods (.), commas (,), plus signs (+), etc.
 
-	When a variable is rendered to the page instead of parsed with data from your konf, this likely means you have used an illegal character in the key.
-	
-	SOLUTION: Don't use illegal characters in keys. This includes almost all non-alphanumeric characters, ie. dashes (-), periods (.), commas (,), plus signs (+), etc.
+# Dust.js Documentation
 
-
-## Dust.js Documentation
-
-Mobify.js templates extend the Dust.js JavaScript templating language. For more advanced examples of the syntax, you might find it helpful to browse the [Dust documentation] http://akdubya.github.com/dustjs/.
+Mobify.js templates extend the Dust.js JavaScript templating language. For more advanced examples of the syntax, you might find it helpful to browse the [Dust documentation](http://akdubya.github.com/dustjs/).
 
 You will likely find there to be differences in terminology and syntax, so we suggest making sure you're knowledgable about Mobify.js templates before doing so.
