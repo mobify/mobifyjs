@@ -20,7 +20,8 @@ In this guide:
   2. Previewing your work
   3. Introducing the Konf
   4. Introducing Templates
-  5. Creating a template for a different page of your site
+  5. Creating a template for a different page of your site:0
+
 
 * * *
 
@@ -37,7 +38,6 @@ The Mobify Client allows you to preview changes you make to your local bundle.
 Do the following:
 
   1. In a Terminal window in your project's directory, run:&nbsp_place_holder;`mobify preview.`&nbsp_place_holder;This command will be generate a bundle locally, on the fly, as you edit your files. You'll want to keep this window open to see debugging information as you work on your mobified site.
-
   2. On http://cloud.mobify.com, navigate to your project, then click 'Preview' in the left-hand navigation. If preview is running, then 'localhost' will be selected by default.
 
 Each time you make a change to your files, you can hit the refresh button to
@@ -114,7 +114,7 @@ without the ! prefix.
 Now, you need to create a corresponding template for the 'About' page. Here is
 an example of what it may look like.
 
-####  about.tmpl
+### about.tmpl
     
     {>base/}
     
@@ -129,3 +129,25 @@ running!, and you will see your About page rendered through Mobify.js. If for
 some reason you see your desktop site, open up the javascript console to see
 any potential errors.
 
+## Pushing a bundle up to Cloud
+
+Now that your site is looking decent, you might want to start thinking about 
+pushing up bundles to the Cloud in order to view them on your mobile device, if you
+have a bundle that you think you might want to publish to production.
+
+In order to do that, you can simply go to the root directory of your project folder
+and execute this command:
+
+    mobify push --message "Initial Push"
+    
+After you've pushed, go back to the Preview page and refresh, and you will see the bundle
+you just pushed in the "Available Bundles" dropdown. Once you select your bundle,
+you'll notice that you can email this link to yourself or someone else in order to 
+see it on your mobile phone through the interface on Cloud.
+
+## Publishing to Production
+
+Once you've gone through and modified your mobile site to your liking, you can publish your
+bundle to production. Just click on the "Publishing" page on the left hand side, and you'll
+see a list of bundles that you've pushed up to cloud. From there, you can select the one
+you want to publish!
