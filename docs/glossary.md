@@ -2,18 +2,18 @@
 
 * ATTRIBUTES - Additional data values which may be returned along with variables. Each attribute maps to a specific member key within the parent key in the konf.
 
-* CONTEXT - Within the konf, you select data and objects from your source DOM. When the konf is evaluated, those selections are returned for use in a mobile template. A view context is a variable name/value mapping that is passed on to the template. [Learn more about context] https://support.mobify.com/customer/portal/articles/511697-template-reference
+* CONTEXT - A set of key-value pairs that is used to provide values for variables in templates. The Mobify.js konf produces a context, built from your selections, and renders a template with that context.
 
-* KEYS - Labels that uniquely reference each selection you make within the konf file. Also serve as variable/attribute names within your templates.
+* KEY - A name that uniquely references a selection you make within the konf file, also serves as variable/attribute names within your templates.
 
-* KONF - A JavaScript file that enables content selection from a source DOM.
+* KONF - A JavaScript file that enables content selection and template rendering from a source DOM.
 
 * RENDERED DOM - The mobile site's post-adaptation DOM, the output of Mobify.js.
 
-* SELECTIONS - Data and objects returned by a jQuery-like (Zepto) selector within the konf file.
+* SELECTION - DOM elements or other data returned by functions defined in the konf file, provide the values of variables in templates to produce the rendered DOM.
 
-* SOURCE DOM - Your site's original DOM, ie. the DOM tree you'd see if you viewed source before Mobifying.
+* SOURCE DOM - The DOM built from your site's original HTML, without running javascript, ie. the DOM tree you'd see if you viewed source before Mobifying.
 
-* TEMPLATES - A template is a text file that contains regular HTML markup, plus variables that are replaced when the template is rendered.
+* TEMPLATE - A text file that contains regular HTML markup, plus variables that are replaced when the template is rendered.
 
-* VARIABLES - Context mapped data returned to your template from the konf selections. Each variable maps to a key in the context.
+* TEMPLATE VARIABLE - A placeholder name in templates that is replaced by the selection of the same name in the context when the template is rendered.
