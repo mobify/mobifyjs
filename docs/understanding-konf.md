@@ -1,6 +1,11 @@
+---
+layout: doc
+title: Understanding the Konf 
+---
+
 # Understanding The Konf
 
-The konf file is JavaScript code written to select content from the source DOM. Selections made in the konf are used as the context for templates to render the mobile page. [Learn more about templates] https://support.mobify.com/customer/portal/articles/511698-understanding-templates
+The konf file is JavaScript code written to select content from the source DOM. Selections made in the konf are used as the context for templates to render the mobile page. [Learn more about templates](https://support.mobify.com/customer/portal/articles/511698-understanding-templates)
 
 A konf file is required in any Mobify project and by default lives at 'src/mobify.konf':
 
@@ -55,4 +60,4 @@ The `context` argument is optional, but enables additional functionality when pa
         return context.data('body').find('img')
     }
 
-`context.choose`, `context.data`, and `context.tmpl` are functions that require `context` to be passed, [learn more about them] https://support.mobify.com/customer/portal/articles/511630-konf-reference
+`context.choose`, `context.data`, and `context.tmpl` are functions that require `context` to be passed, [learn more about them](https://support.mobify.com/customer/portal/articles/511630-konf-reference)

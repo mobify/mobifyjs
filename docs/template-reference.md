@@ -1,3 +1,8 @@
+---
+layout: doc
+title: Template Reference 
+---
+
 # Template Reference
 
 1. Understanding Context
@@ -10,7 +15,7 @@
 8. `{<bar}...{/bar}` - Block Overrides
 9. `{?foo}...{/foo}` - Conditional (existence)
 10. `{^foo}...{/foo}` - Conditional (non-existence)
-11. `{%script}...{/script}` - Inline Script Pragma
+11. `{ %script}...{/script}` - Inline Script Pragma
 12. `{! Comment !}` - Template Comments
 
 **Best Practices**
@@ -218,7 +223,7 @@ Partials, also known as template includes, allow you to compose a template made 
 
     {site.logo}
 
-*`Referencing a partial to include in your template _foo.tmpl_:*
+*Referencing a partial to include in your template _foo.tmpl_:*
 
     <div id="header">
         {>logo/}
@@ -295,16 +300,16 @@ Provide conditional output based on the non-existence of a variable.
     {/user}
 
 
-## 11\. {%script} ... {/script} - Inline Script Pragma
+## 11\. { %script} ... {/script} - Inline Script Pragma
 
-By default, templates collapse whitespace. This is a problem when templating elements where whitespace matters, like inline scripts featuring single-line comments. The `{%script}` pragma is provided to safely handle inline scripting in templates.
+By default, templates collapse whitespace. This is a problem when templating elements where whitespace matters, like inline scripts featuring single-line comments. The `{ %script}` pragma is provided to safely handle inline scripting in templates.
 
-    {%script}
+    { %script}
         // Show an alert dialog
         alert("Hello Mobify!")
     {/script}
 
-See [handling JavaScript] https://support.mobify.com/customer/portal/articles/513026-handling-javascript-with-mobify-js for more detail.
+See [handling JavaScript](https://support.mobify.com/customer/portal/articles/513026-handling-javascript-with-mobify-js) for more detail.
 
 
 ## 12\. `{! Comment !}` - Template Comments

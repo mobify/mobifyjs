@@ -1,3 +1,8 @@
+---
+layout: doc
+title: Konf Reference 
+---
+
 # Konf Reference
 
 1. Using Konf

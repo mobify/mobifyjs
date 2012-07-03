@@ -1,13 +1,14 @@
+---
+layout: doc
+title: Appendix
+---
+
 # Appendix
 
-1. Debugging
-    - Tools
-    - Debugging the Konf
-    - Debugging Templates
-2. Common Errors
-3. Dust.js Documentation
+* TOC
+{:toc}
 
-# Debugging
+# Debugging 
 
 ## Tools
 
@@ -15,26 +16,26 @@ Debugging Mobify.js adaptations requires the use of a web inspection tool like
 Webkit Inspector or Firebug. You're likely well-acquainted with one of these, 
 but here are a few quick start tips if not.
 
-**Webkit Inspector**
+### Webkit Inspector
 
 The Webkit Inspector is a powerful web development tool that is built into the 
 Safari and Chrome browsers.
 
 To enable the inspector in Safari, open the Preferences pane, click Advanced, 
-then select "Show Develop menu in menu bar". Open the inspector by right 
-clicking on an element in a webpage and then selecting "Inspect Element".
+then select _"Show Develop menu in menu bar"_. Open the inspector by right-clicking
+on an element in a web page and then selecting _"Inspect Element"_.
 
 In Chrome, open the inspector by right clicking on an element in a webpage and 
-then selecting "Inspect Element".
+then selecting _"Inspect Element"_.
 
-**Firebug**
+### Firebug
 
 Firebug provides similiar behaviour to the WebKit Inspector in the Firefox 
-browser. [Install the Firebug plugin.](http://getfirebug.com/). Once installed, 
-in the browser's "View" menu, click the "Firebug" option at the bottom to 
+browser. [Install the Firebug plugin](http://getfirebug.com/). Once installed, 
+in the browser's _"View"_ menu, click the _"Firebug"_ option at the bottom to 
 initialize.
 
-For more on getting started with Firebug, watch this [helpful 
+For more on getting started with Firebug, watch [this helpful 
 video](http://www.youtube.com/watch?v=2xxfvuZFHsM).
 
 ## Debugging the Konf
@@ -44,19 +45,22 @@ springing up as you develop. The best way to debug the konf is with the Webkit
 Inspector or the Firebug extension.
 
 In development mode, the result of the evaluated konf, the context, is logged to
-the JavaScript console. Look for a the item 'All Extracted Data', which can be 
-expanded to show what values were assigned to what keys. **Note**: Extracted 
-Data is only available in development mode, which can be activated by browsing 
-your site through http://preview.mobify.com/
+the JavaScript console. Look for a the item _'All Extracted Data'_, which can be 
+expanded to show what values were assigned to what keys.
+
+**Note**: Extracted 
+Data is only available in development mode, which can be activated by browsing to
+your site through <https://preview.mobify.com/>.
 
 If you are stumped, try adding a `debugger;` statement into your konf. This will 
 cause the inspector's debugger to pause as the konf is evaluated:
-
-    'content': function() {
-        debugger;
-        return $('.content');
-    }
-
+{% highlight javascript %}
+'content': function() {
+    debugger;
+    // The debugger will pause here.
+    return $('.content');
+}
+{% endhighlight %}
 You can then use the inspector to step through the execution of your konf.
 
 ## Debugging Templates (Viewing source, inspecting rendered DOM)
@@ -73,27 +77,29 @@ Errors Mobify.js encounters during execution are logged to the JavaScript
 console. You can view these errors using Webkit Inspector or Firebug. If things 
 don't appear to be working, we suggest starting there!
 
-* **Page is blank, doesn't render at all**
+## Page is blank, doesn't render at all
 
-    Usually this will be accompanied by the error message: 
+Usually this will be accompanied by the error message: 
 
-        Uncaught SyntaxError: Unexpected string.
+    Uncaught SyntaxError: Unexpected string.
 
-    SOLUTION: Ensure that you have a comma after every key within your konf, ie.
+**Solution:** Ensure that you have a comma after every key within your konf, ie.
 
-        'header': {
-            ...
-        },
-        'content': {
+{% highlight javascript %}
+    'header': {
+        ...
+    }, // Commas between each key are required
+    'content': {
 
-        },
+    },
+{% endhighlight %}
 
-* **{some-key} displayed on the page**
+## "{some-key}" displayed on the page
 
-    When a variable is rendered to the page instead of parsed with data from 
-    your konf, this likely means you have used an illegal character in the key.
+When a variable is rendered to the page instead of parsed with data from 
+your konf, this likely means you have used an illegal character in the key.
 
-    SOLUTION: Don't use illegal characters in keys. This includes almost all 
+**Solution:** Don't use illegal characters in keys. This includes almost all 
     non-alphanumeric characters, ie. dashes (-), periods (.), commas (,), plus 
     signs (+), etc.
 
