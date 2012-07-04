@@ -44,7 +44,7 @@ springing up as you develop. The best way to debug the konf is with the Webkit
 Inspector or the Firebug extension.
 
 In development mode, the result of the evaluated konf, the context, is logged to
-the JavaScript console. Look for a the item 'All Extracted Data', which can be 
+the JavaScript console. Look for the item 'All Extracted Data', which can be 
 expanded to show what values were assigned to what keys. **Note**: Extracted 
 Data is only available in development mode, which can be activated by browsing 
 your site through http://preview.mobify.com/
@@ -57,15 +57,15 @@ cause the inspector's debugger to pause as the konf is evaluated:
         return $('.content');
     }
 
-You can then use the inspector to step through the execution of your konf.
+You can then use the inspector to step through the execution of your konf and identify the error. Remeber to remove the `debugger;` statement when you are done!
 
 ## Debugging Templates (Viewing source, inspecting rendered DOM)
 
 Mobify.js adaptations are evaluated against the source DOM. "View Source" shows
- the source DOM, not the result of the adaptation. In situations where you need 
- to view the rendered DOM, use Firebug or the WebKit inspector. The DOM tab 
- (labelled 'HTML' or 'Elements') displays a DOM tree that shows the adaptated 
- DOM. Browse this tree to see the full result of the adaptation.
+the source HTML, not the result of the adaptation. In situations where you need 
+to view the rendered DOM, use Firebug or the WebKit inspector. The DOM tab 
+(labelled 'HTML' or 'Elements') displays a DOM tree that shows the adaptated 
+DOM. Browse this tree to see the full result of the adaptation.
 
 # Common Issues
 
