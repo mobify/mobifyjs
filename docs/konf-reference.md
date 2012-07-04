@@ -168,13 +168,13 @@ If no matching objects are found `context.choose` returns undefined. Multiple ke
         },
     }
 
-So in this case if both selectors evaluate to true within the current page, the home key will be assigned the value of `templateName`, otherwise it remains unassigned.
+So in this case if both selections evaluate to truthy values within the current page, the home key will be assigned the value of `templateName`, otherwise it remains unassigned.
 
 A common pattern in a konf object is to use `context.choose` to select template specific content and set a key which will be used as the template name:
 
     'content': function(context) {
         return context.choose({
-            'template': 'home',
+            'templateName': 'home',
             '!home': function(context) {
                 return $('#product-carousel')
             }
@@ -186,38 +186,38 @@ A common pattern in a konf object is to use `context.choose` to select template 
         })
     },
     'OUTPUTHTML': function(context) {
-        var template = context.data('content.template')
+        var template = context.data('content.templateName')
         if (template) {
             return context.tmpl(template)
         }
     }
 
 
-**Truthiness Of `!`**
+**Truthiness Of Required Selections, Keys Prefixed With `!`**
 
-`context.choose` considers a value to be truthy if it matches one of the following conditions:
+`context.choose()` considers a selection to be truthy if it matches one of the following conditions:
 
     obj.length && obj.length > 0
     obj == true
 
 If none of these conditions are true then a value is considered falsey.
 
-Important: changing the DOM within required selections might adversely affect evaluation further down the konf. We recommend avoiding DOM manipulation on required selections in the konf.
+**Do not change the DOM in required selections in the konf**: you may adversely affect evaluation further down the konf
 
 
 ## 6\. Reserved Keys
 
 Your konf object extends a default konf object containing the following reserved keys:
 
-`$html`: Reference to the source DOM element
+`$html`: Reference to the source DOM `<html>` element
 
-`$head`: Reference to the source DOM element
+`$head`: Reference to the source DOM `<head>` element
 
-`$head`: Reference to the source DOM element
+`$body`: Reference to the source DOM `<body>` element
 
 `buildDate`: The date this _mobify.js_ file was built
 
-`config.configDir`: Path to the folder from where _mobify.js_ loaded
+`config.configDir`: Path to the directory from which _mobify.js_ loaded
 
 `config.configFile`: Path to _mobify.js_
 
@@ -231,7 +231,7 @@ Your konf object extends a default konf object containing the following reserved
 
 `config.path`: A string representing the path from where the mobify.js file was loaded
 
-`config.started`: An internal flag used to record whether the page has been transformed
+`config.started`: An internal flag used to record whether the page has been adapted
 
 `config.tagVersion`: Version of the Mobify tag used on this site
 
@@ -241,7 +241,7 @@ Your konf object extends a default konf object containing the following reserved
 
 `cssName`: A function returning the name of the css file to be applied
 
-`imageDir`: A function returning a path to where mobify adaptation specific image assets are kept
+`imageDir`: A function returning a path to where mobify adaptation specific images are kept
 
 `mobileViewport`: Contents of the meta viewport tag to be sent
 
@@ -255,4 +255,4 @@ Your konf object extends a default konf object containing the following reserved
 
 * DO: Prefer the matching of more complete DOM outlines over single selectors when assigning templates to specific pages.
 
-* DO NOT: alter the source DOM in required selectors, as they are evaluated regardless of whether they are used as a context to evaluate templates.
+* DO NOT: alter the source DOM in required selectors, as they are evaluated regardless of whether they are used as a context to evaluate templates. If you need to alter the source DOM before templating, do it with a non-required (un-prefixed) selection key.
