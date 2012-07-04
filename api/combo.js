@@ -29,7 +29,9 @@ var get = function(key, increment) {
         var data = localStorage.getItem(localStorageKey)
           , key;
 
-        if (data === null) return;
+        if (data === null) {
+            return;
+        }
 
         try {
             data = JSON.parse(data)
@@ -180,11 +182,11 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
          * Treats invalid headers as stale.
          */
       , isStale: function(resource) {
-            var headers = resource.headers
+            var headers = resource.headers || {}
               , cacheControl = headers['cache-control']
               , now = Date.now()
               , date
-              , expires
+              , expires;
 
             // If `max-age` and `date` are present, and no other no other cache 
             // directives exist, then we are stale if we are older.
@@ -212,6 +214,7 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
 
 })(Mobify.httpCache);
 
+
 /**
  * combineScripts: Clientside API to the combo service.
  */
@@ -231,7 +234,9 @@ var $ = Mobify.$
           , url;
 
         // Fastfail if there are no scripts or if required modules are missing.
-        if (!$scripts.length || !window.localStorage || !window.JSON) return $scripts;
+        if (!$scripts.length || !window.localStorage || !window.JSON) {
+            return $scripts;
+        }
 
         httpCache.load();
 
@@ -249,7 +254,9 @@ var $ = Mobify.$
             this.innerHTML = defaults.execCallback + "('" + url + "');";
         });
 
-        if (!combo) return $scripts;
+        if (!combo) {
+            return $scripts;
+        }
 
         bootstrap = document.createElement('script')
 
