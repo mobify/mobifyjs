@@ -35,11 +35,17 @@ In this guide:
 
 ##  Previewing your work
 
-The Mobify Client allows you to preview changes you make to your local bundle.
+The Mobify Client allows you to preview changes you make to a bundle locally.
 
 Do the following:
 
-  1. In a Terminal window in your project's directory, run:&nbsp_place_holder;`mobify preview.`&nbsp_place_holder;This command will be generate a bundle locally, on the fly, as you edit your files. You'll want to keep this window open to see debugging information as you work on your mobified site.
+  1. In a Terminal window in your project's directory, run: 
+  
+      
+          mobify preview
+  
+  
+    This command will be generate a bundle locally, on the fly, as you edit your files. You'll want to keep this window open to see debugging information as you work on your mobified site.
   2. On http://cloud.mobify.com, navigate to your project, then click 'Preview' in the left-hand navigation. If preview is running, then 'localhost' will be selected by default.
 
 Each time you make a change to your files, you can hit the refresh button to
