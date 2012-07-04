@@ -11,9 +11,9 @@
 
 ## 1\. Using Konf
 
-The Mobify.js konf selects elements from the source DOM to be rendered on the mobile site. To make selection easy, mobify.js includes Zepto.js, a minimalist JavaScript selector library optimized for mobile with a jQuery-compatible API. 
+The Mobify.js konf selects elements from the source DOM to be rendered on the mobile site. To make selection easy, Mobify.js includes Zepto, a minimalist JavaScript DOM library optimized for mobile with a jQuery-compatible API. 
 
-A simple selector to assign the site's logo to a key might look like this:
+A simple selection to assign the site's logo to a key might look like this:
 
     'logo': function() {
         return $('.identity img')
@@ -37,15 +37,15 @@ The konf is also used to determine which templates will render for each page by 
 
 The first selector will search the current page for an element with the id of `product-carousel`. If it finds it, the required key `products` evaluates to true and the page will immediately be rendered with _homePage.tmpl_. If not, then (and only then) the second selector is evaluated and if an element with a `product-list` class is found, the page will instead be rendered with _productPage.tmpl_. See below for more on how `context.choose` works.
 
-Only templates with conditions that evaluate to true will render, and when multiple templates could potentially apply only the first matching template will be chosen for the page.
+Only templates with required keys that evaluate to truthy values will render, and when multiple templates could potentially apply only the first matching template will be chosen for the page.
 
-Template mapping is accomplished indirectly through DOM matching, note that there is no direct way to select a template for a specific page on your site. 
+Template mapping is accomplished through DOM matching.
 
 For example, instead of simply defining templates this way:
 
     'homePage': 'home.tmpl'
 
-You would instead find unique selectors that only apply on the page you want to render a template, then assign that template using `context.choose`:
+You would instead find unique selectors that only apply on the page you want to render with a template, then assign that template using `context.choose`:
 
     return context.choose({
         'templateName': 'homePage',
@@ -71,9 +71,9 @@ Single selectors as above are easy enough, but we recommend instead describing (
 
 Why do it this more verbose way? We believe the most robust method of selecting content for your mobile site is by describing the overall makeup of the page rather than having your selectors rely too heavily on any one specific class or id.
 
-We all know that websites change. When your source DOM becomes even superficially different from when you developed your mobile site, there's a chance that your once-valid selections will stop matching and your mobile users will experience blank pages. 
+We all know that websites change. When your source DOM becomes even superficially different from when you developed your mobile site, there's a chance that your once-valid selections will stop matching and your mobile users will experience missing content or blank pages. 
 
-With the above example, what happens when the sale ends? Sales items removed from the DOM mean the required `saleItems` key no longer returns a valid result. Mobify.js has a choice in this situation - it could either stop rendering required items, or fall back to the desktop site. Since `productCarousel` and `customerService` are also required, they would not render at all if we were to choose the former approach.
+With the above example, what happens when the sale ends? Sales items removed from the DOM mean the required `saleItems` key no longer returns a truthy result. Mobify.js has a choice in this situation - it could either stop rendering required items, or fall back to the desktop site. Since `productCarousel` and `customerService` are also required, they would not render at all if we were to choose the former approach.
 
 On the chance that `productCarousel`, `customerService` or any other required selections make up the bulk of your home page content, we think it's far better to fall back to the desktop site. This approach will continue to provide your users with content instead of serving them a mostly empty mobile site.
 
@@ -89,7 +89,7 @@ On the chance that `productCarousel`, `customerService` or any other required se
 
 ## 3\. `context.data(key)`
 
-Returns the value of an previously-assigned key in the konf object. Since the konf object is evaluated from top to bottom, it is possible to access previous keys in later assignments. For example you may wish to reuse a selection made for the `content` within `footer`. 
+Returns the value of a previously-assigned key in the konf object. Since the konf object is evaluated from top to bottom, it is possible to access previous keys in later assignments. For example you may wish to reuse a selection made for the `content` within `footer`. 
 
     'content': function() {
         return $('.page-content')
@@ -98,7 +98,7 @@ Returns the value of an previously-assigned key in the konf object. Since the ko
         return context.data('content');
     }
 
-This passes to `footer` the value of the `content` key, which is in turn the evaluated return of the selector `$('.content')`.
+This passes to `footer` the value of the `content` key, which is in turn the evaluated return of `$('.page-content')`.
 
 **Variable Resolution**
 
