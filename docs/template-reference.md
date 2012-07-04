@@ -15,7 +15,7 @@ title: Template Reference
 8. `{<bar}...{/bar}` - Block Overrides
 9. `{?foo}...{/foo}` - Conditional (existence)
 10. `{^foo}...{/foo}` - Conditional (non-existence)
-11. `{%script}...{/script}` - Inline Script Pragma
+11. `{ %script}...{/script}` - Inline Script Pragma
 12. `{! Comment !}` - Template Comments
 
 **Best Practices**
@@ -314,9 +314,9 @@ Provide conditional output based on the non-existence of a variable. This templa
 
 By default, templates collapse whitespace. This is a problem when templating elements where whitespace matters, like inline scripts featuring single-line comments. 
 
-The `{%script}` pragma is provided to safely handle inline scripting in templates.
+The `{ %script}` pragma is provided to safely handle inline scripting in templates.
 
-    {%script}
+    { %script}
         // Show an alert dialog
         alert("Hello Mobify!")
     {/script}
