@@ -58,7 +58,6 @@ Mobify.$.extend(Mobify.config, {
 {/production}
 
 {+tmpl}
-    {>"/base/tmpl/*.tmpl"/}
     {>"tmpl/*.tmpl"/}
 {/tmpl}
 
