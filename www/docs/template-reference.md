@@ -15,7 +15,7 @@ title: Template Reference
   * `{<bar}...{/bar}` - Block Overrides
   * `{?foo}...{/foo}` - Conditional (existence)
   * `{^foo}...{/foo}` - Conditional (non-existence)
-  * `{%script}...{/script}` - Inline Script Pragma
+  * `{{ '{%' }}script}...{/script}` - Inline Script Pragma
   * `{! Comment !}` - Template Comments
   {:toc}
 
@@ -366,16 +366,16 @@ This template will render be the same as above.
     
 
 
-## `{%script} ... {/script}` - Inline Script Pragma
+## `{{ '{%' }}script} ... {/script}` - Inline Script Pragma
 
 By default, templates collapse whitespace. This is a problem when
 templating elements where whitespace matters, like inline scripts
 featuring single-line comments.
 
-The `{%script}` pragma is provided to safely handle inline scripting
+The `{{ '{%' }}script}` pragma is provided to safely handle inline scripting
 in templates.
 
-    {%script}
+    {{ '{%' }}script}
         // Show an alert dialog
         alert("Hello Mobify!")
     {/script}
