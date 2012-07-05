@@ -48,19 +48,19 @@ In development mode, the result of the evaluated konf, the context, is logged to
 the JavaScript console. Look for a the item _'All Extracted Data'_, which can be 
 expanded to show what values were assigned to what keys.
 
-**Note**: Extracted 
-Data is only available in development mode, which can be activated by browsing to
-your site through <https://preview.mobify.com/>.
+**Note**: Extracted Data is only available in development mode, which can be 
+activated by browsing to your site through <https://preview.mobify.com/>.
 
 If you are stumped, try adding a `debugger;` statement into your konf. This will 
 cause the inspector's debugger to pause as the konf is evaluated:
-{% highlight javascript %}
-'content': function() {
-    debugger;
-    // The debugger will pause here.
-    return $('.content');
-}
-{% endhighlight %}
+
+
+    'content': function() {
+        debugger;
+        // The debugger will pause here.
+        return $('.content');
+    }
+
 You can then use the inspector to step through the execution of your konf.
 
 ## Debugging Templates (Viewing source, inspecting rendered DOM)
@@ -85,14 +85,12 @@ Usually this will be accompanied by the error message:
 
 **Solution:** Ensure that you have a comma after every key within your konf, ie.
 
-{% highlight javascript %}
     'header': {
         ...
     }, // Commas between each key are required
     'content': {
 
     },
-{% endhighlight %}
 
 ## "{some-key}" displayed on the page
 
