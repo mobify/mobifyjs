@@ -5,20 +5,22 @@ title: Template Reference
 
 # Template Reference
 
-1. Understanding Context
-2. `{foo}` - Variables
-3. `{foo|bar}` - Variable Filters
-4. `{#foo}...{/foo}` - Attributes
-5. `{#foo}...{.}...{/foo}` - Iteration
-6. `{>foo/}` - Includes
-7. `{+bar}...{/bar}` - Block Placeholders
-8. `{<bar}...{/bar}` - Block Overrides
-9. `{?foo}...{/foo}` - Conditional (existence)
-10. `{^foo}...{/foo}` - Conditional (non-existence)
-11. `{ %script}...{/script}` - Inline Script Pragma
-12. `{! Comment !}` - Template Comments
+  * Understanding Context
+  * `{foo}` - Variables
+  * `{foo|bar}` - Variable Filters
+  * `{#foo}...{/foo}` - Attributes
+  * `{#foo}...{.}...{/foo}` - Iteration
+  * `{>foo/}` - Includes
+  * `{+bar}...{/bar}` - Block Placeholders
+  * `{<bar}...{/bar}` - Block Overrides
+  * `{?foo}...{/foo}` - Conditional (existence)
+  * `{^foo}...{/foo}` - Conditional (non-existence)
+  * `{%script}...{/script}` - Inline Script Pragma
+  * `{! Comment !}` - Template Comments
+  {:toc}
 
-**Best Practices**
+
+## Best Practices
 
 - Template File Naming Conventions
 - Use a Base Template
@@ -26,7 +28,7 @@ title: Template Reference
 
 
 
-## 1\. Understanding Context
+##  Understanding Context
 
 Templates are HTML documents containing variables to be filled in with
 data. This data comes from the evaluated konf output, referred to as
@@ -48,7 +50,7 @@ Note that when we talk about changing levels of context below, we
 simply mean traversing the levels of this context tree.
 
 
-## 2\. `{foo}` - Variables: Select & Render A Single Variable
+##  `{foo}` - Variables: Select & Render A Single Variable
 
 Select elements from your source DOM in the konf file, then reference
 the selection as a variable from any template using the curly brace
@@ -101,7 +103,7 @@ context, and so forth until it is found, or the highest level of the
 context is reached.
 
 
-## 3\. `{foo|bar}` - Variable Filters: Pass The Value `foo` Through Filter `bar`
+##  `{foo|bar}` - Variable Filters: Pass The Value `foo` Through Filter `bar`
 
 If you would like to change how a variables value is rendered,
 especially values produced from Zepto collections or a DOM element,
@@ -151,7 +153,7 @@ the previous one.
         as values filtered through the `innerHTML` filter.
 
 
-## 4\. `{#foo} ... {/foo}` - Accessing Attributes Of, Or Descending Into The Variable `foo`
+## `{#foo} ... {/foo}` - Accessing Attributes Of, Or Descending Into The Variable `foo`
 
 You are able to access any variable and its attributes. To simply
 access an attribute, you can use the simpler '{variable.attribute}'
@@ -202,7 +204,7 @@ would be identical to the last example:
     </div>
 
 
-## 5\. `{#foo} ... {.} ... {/foo}` - Iterate Over The Variable `foo`
+## `{#foo} ... {.} ... {/foo}` - Iterate Over The Variable `foo`
 
 When you make a selection within the konf that returns a set with
 multiple elements, you can easily iterate through those elements in
@@ -259,7 +261,7 @@ attributes, also iterate `nav`:*
     </div>            
 
 
-## 6\. `{>foo/}` - Include The Partial `foo` Inside The Current Template
+## `{>foo/}` - Include The Partial `foo` Inside The Current Template
 
 Partials, also known as template includes, allow you to make a
 template composed of other templates:
@@ -289,7 +291,7 @@ This would insert the template _logo.tmpl_ into _foo.tmpl_.
     </div>
 
 
-## 7\. `{+bar} ... {/bar}` - Block Placeholders
+## `{+bar} ... {/bar}` - Block Placeholders
 
 Blocks allow you to define snippets of template code that may be
 overridden by other templates:
@@ -301,7 +303,7 @@ overridden by other templates:
 See *Block Overrides* below for override usage.
 
 
-## 8\. `{<bar} ... {/bar}` - Block Overrides
+## `{<bar} ... {/bar}` - Block Overrides
 
 Adding an overridable block `header` to _foo.tmpl_:
 
@@ -336,7 +338,7 @@ would be the contents of both headings combined:
 See 'Block Placeholders' above for placeholder usage.
 
 
-## 9\. `{?foo} ... {/foo}` - Conditional, Check For The Existence Of Variable `foo`
+## `{?foo} ... {/foo}` - Conditional, Check For The Existence Of Variable `foo`
 
 Provide conditional output based on the existence of a variable.
 
@@ -351,7 +353,7 @@ template will render a greeting to the user, otherwise, it will render
 the text "Please Login".
 
 
-## 10\. `{^foo} ... {/foo}` - Conditional, Check For The Non-existence Of Variable `foo`
+## `{^foo} ... {/foo}` - Conditional, Check For The Non-existence Of Variable `foo`
 
 Provide conditional output based on the non-existence of a variable.
 This template will render be the same as above.
@@ -364,16 +366,16 @@ This template will render be the same as above.
     
 
 
-## 11\. { %script} ... {/script} - Inline Script Pragma
+## `{%script} ... {/script}` - Inline Script Pragma
 
 By default, templates collapse whitespace. This is a problem when
 templating elements where whitespace matters, like inline scripts
 featuring single-line comments.
 
-The `{ %script}` pragma is provided to safely handle inline scripting
+The `{%script}` pragma is provided to safely handle inline scripting
 in templates.
 
-    { %script}
+    {%script}
         // Show an alert dialog
         alert("Hello Mobify!")
     {/script}
@@ -381,7 +383,7 @@ in templates.
 See [handling JavaScript](https://support.mobify.com/customer/portal/articles/513026-handling-javascript-with-mobify-js) for more detail.
 
 
-## 12\. `{! Comment !}` - Template Comments
+## `{! Comment !}` - Template Comments
 
 Text surrounded by `{!` and `!}` are considered comments and will not be rendered.
 

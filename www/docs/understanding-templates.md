@@ -21,12 +21,12 @@ The following konf renders the `home` template to the browser:
         return context.choose({
             'templateName': 'home',
             '!products': function(context) {
-                return $('#products')
+                return $('#products');
             }
         })
     },
     'OUTPUTHTML': function(context) {
-        var templateName = context.data(mobileSite.templateName)
+        var templateName = context.data(mobileSite.templateName);
         if (templateName) {
             return context.tmpl(templateName);
         }

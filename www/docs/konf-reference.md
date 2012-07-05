@@ -5,16 +5,16 @@ title: Konf Reference
 
 # Konf Reference
 
-1. Using Konf
-2. OUTPUTHTML
-3. context.data
-4. context.tmpl
-5. context.choose
-6. Reserved Keys
-7. Best Practices
+ - Using Konf
+ - OUTPUTHTML
+ - context.data
+ - context.tmpl
+ - context.choose
+ - Reserved Keys
+ - Best Practices
+{:toc}
 
-
-## 1\. Using Konf
+##  Using Konf
 
 The Konf selects elements from the source DOM to be rendered 
 on the mobile site. To make selection easy, Mobify.js includes Zepto, 
@@ -25,7 +25,7 @@ A simple selection to assign the site's logo to a key might look like
 this:
 
     'logo': function() {
-        return $('.identity img')
+        return $('.identity img');
     },
 
 This key will apply to every page where the selector evaluates to true. 
@@ -38,12 +38,12 @@ each page by evaluating selectors against the current page:
     return context.choose({
         'templateName': 'homePage',
         '!products': function() {
-            return $('#product-carousel')
+            return $('#product-carousel');
         }
     }, {
         'templateName': 'productPage',
         '!class': function() {
-            return $('.product-list')
+            return $('.product-list');
         },
     }
 
@@ -72,7 +72,7 @@ you want to render with a template, then assign that template using
     return context.choose({
         'templateName': 'homePage',
         '!class': function() {
-            return $('body.home-page')
+            return $('body.home-page');
         },
     }        
 
@@ -84,13 +84,13 @@ template to that desired DOM:
     return context.choose({
         'templateName': 'homePage',
         '!productCarousel': function() {
-            return $('.product-carousel')
+            return $('.product-carousel');
         },
         '!saleItems': function() {
-            return $('.sale-items')
+            return $('.sale-items');
         },
         '!customerService': function() {
-            return $('.customer-service')
+            return $('.customer-service');
         }
     },
 
@@ -119,7 +119,7 @@ will continue to provide your users with content instead of serving
 them a mostly empty mobile site.
 
 
-## 2\. `OUTPUTHTML`
+##  `OUTPUTHTML`
     
 `OUTPUTHTML` is a special key of the konf object. Any string it 
 returns will be rendered immediately as the output of the page. 
@@ -127,11 +127,11 @@ For this reason, it should **always** be declared as the very last
 key of the konf object:
 
     'OUTPUTHTML': function(context) {
-        return '<html><body><h1>HELLO MOBIFY!</h1></body></html>'
+        return '<html><body><h1>HELLO MOBIFY!</h1></body></html>';
     }
 
 
-## 3\. `context.data(key)`
+##  `context.data(key)`
 
 Returns the value of a previously-assigned key in the konf object. 
 Since the konf object is evaluated from top to bottom, it is possible 
@@ -139,7 +139,7 @@ to access previous keys in later assignments. For example you may wish
 to reuse a selection made for the `content` within `footer`. 
 
     'content': function() {
-        return $('.page-content')
+        return $('.page-content');
     },
     'footer': function(context) {
         return context.data('content');
@@ -155,13 +155,13 @@ the key is not found at the current level, it ascends to the parent
 level and tries again. 
 
 
-## 4\. `context.tmpl(template)`
+##  `context.tmpl(template)`
 
 Returns the specified .tmpl file template, rendered against the 
 evaluated konf object. 
 
     'OUTPUTHTML': function(context) {
-        return context.tmpl('home')
+        return context.tmpl('home');
     }
 
 This renders the _home.tmpl_ via the `OUTPUTHTML` key. By default, 
@@ -175,8 +175,8 @@ then use `context.tmpl` to render the selected template using the
 
     'template': 'home',
     'OUTPUTHTML': function(context) {
-        var template = context.data('template')
-        return context.tmpl(template)
+        var template = context.data('template');
+        return context.tmpl(template);
     }
 
 This assigns a value of `home` to the key later referenced by 
@@ -184,7 +184,7 @@ This assigns a value of `home` to the key later referenced by
 template name, which is returned to `OUTPUTHTML` for rendering.
 
 
-## 5\. `context.choose(obj1[, obj2[, ...]])`
+##  `context.choose(obj1[, obj2[, ...]])`
 
 Accepts anonymous JSON objects as parameters and returns the first 
 object that matches. An object is considered to match if all internal 
@@ -193,11 +193,11 @@ keys prefixed with `!` evaluate to a truthy value:
     'content': function(context) {
         return context.choose({
             '!home': function(context) {
-                return $('#product-carousel')
+                return $('#product-carousel');
             }
         }, {
             '!products': function(context) {
-                return $('.product-listing')
+                return $('.product-listing');
             }
         })
     }
@@ -212,7 +212,7 @@ An object with no required selections always matches:
     'content': function(context) {
         return context.choose({
             'home': function(context) {
-                return $('#product-carousel')
+                return $('#product-carousel');
             }
         })
     }
@@ -224,10 +224,10 @@ Multiple keys may be prefixed with `!` to create `and` conditions:
         return context.choose({
             'templateName': 'homePage',
             '!productCarousel': function() {
-                return $('#product-carousel')
+                return $('#product-carousel');
             },
             '!saleItems': function() {
-                return $('.sale-items')
+                return $('.sale-items');
             }
         },
     }
@@ -244,19 +244,19 @@ template name:
         return context.choose({
             'templateName': 'home',
             '!home': function(context) {
-                return $('#product-carousel')
+                return $('#product-carousel');
             }
         }, {
             'template': 'saleItems',
             '!item': function(context) {
-                return $('.sale-items')
+                return $('.sale-items');
             }
         })
     },
     'OUTPUTHTML': function(context) {
-        var template = context.data('content.templateName')
+        var template = context.data('content.templateName');
         if (template) {
-            return context.tmpl(template)
+            return context.tmpl(template);
         }
     }
 
@@ -276,54 +276,75 @@ falsey.
 adversely affect evaluation further down the konf
 
 
-## 6\. Reserved Keys
+##  Reserved Keys
 
 Your konf object extends a default konf object containing the 
 following reserved keys:
 
-`$html`: Reference to the source DOM `<html>` element
+`$html`
+: Reference to the source DOM `<html>` element
 
-`$head`: Reference to the source DOM `<head>` element
+`$head`
+: Reference to the source DOM `<head>` element
 
-`$body`: Reference to the source DOM `<body>` element
+`$body`
+: Reference to the source DOM `<body>` element
 
-`buildDate`: The date this _mobify.js_ file was built
+`buildDate`
+: The date this _mobify.js_ file was built
 
-`config.configDir`: Path to the directory from which _mobify.js_ loaded
+`config.configDir`
+: Path to the directory from which _mobify.js_ loaded
 
-`config.configFile`: Path to _mobify.js_
+`config.configFile`
+: Path to _mobify.js_
 
-`config.HD`: A boolean flag that will be true if this device has a high density display 
+`config.HD`
+: A boolean flag that will be true if this device has a high density display 
 
-`config.isDebug`: A boolean flag that will be true if mobify.js is running in debug mode
+`config.isDebug`
+: A boolean flag that will be true if mobify.js is running in debug mode
 
-`config.orientation`: A string that will be "portrait" if the device is taller than it is wide, or "landscape" if it is wider than it is tall
+`config.orientation`
+: A string that will be "portrait" if the device is taller than it is wide, or "landscape" if it is wider than it is tall
 
-`config.os`: A string representing the detected operating system of the device
+`config.os`
+: A string representing the detected operating system of the device
 
-`config.path`: A string representing the path from where the mobify.js file was loaded
+`config.path`
+: A string representing the path from where the mobify.js file was loaded
 
-`config.started`: An internal flag used to record whether the page has been adapted
+`config.started`
+: An internal flag used to record whether the page has been adapted
 
-`config.tagVersion`: Version of the Mobify tag used on this site
+`config.tagVersion`
+: Version of the Mobify tag used on this site
 
-`config.touch`: A boolean flag that will be true if touch events are supported, false otherwise
+`config.touch`
+: A boolean flag that will be true if touch events are supported, false otherwise
 
-`configName`: A property pulled from _project.json_ - most likely the unique identifier for your site
+`configName`
+: A property pulled from _project.json_ - most likely the unique identifier for your site
 
-`cssName`: A function returning the name of the css file to be applied
+`cssName`
+: A function returning the name of the css file to be applied
 
-`imageDir`: A function returning a path to where mobify adaptation specific images are kept
+`imageDir`
+: A function returning a path to where mobify adaptation specific images are kept
 
-`mobileViewport`: Contents of the meta viewport tag to be sent
+`mobileViewport`
+: Contents of the meta viewport tag to be sent
 
-`siteConfig`: An object containing analytics configuration information
+`siteConfig`
+: An object containing analytics configuration information
 
-`touchIcon`: The location of a file to be used as the bookmark icon for this website on iOS devices
+`touchIcon`
+: The location of a file to be used as the bookmark icon for this website on iOS devices
 
-`unmobify`: An internal flag used to record whether the page has been unmobified
+`unmobify`
+: An internal flag used to record whether the page has been unmobified
 
-## 7\. Best Practices
+##  Best Practices
 
 * DO: Prefer the matching of more complete DOM outlines over single 
       selectors when assigning templates to specific pages.

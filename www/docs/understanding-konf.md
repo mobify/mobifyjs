@@ -19,7 +19,7 @@ Here is a very minimal _mobify.konf_:
     {>"/base/lib/base_konf.konf"/}
     {<data} {
         'OUTPUTHTML': function(context) {
-            return '<html><body><h1>HELLO MOBIFY!</h1></body></html>'
+            return '<html><body><h1>HELLO MOBIFY!</h1></body></html>';
         }
     } {/data}
 
@@ -38,10 +38,10 @@ arbitrary keys to it:
     {>"/base/lib/base_konf.konf"/}
     {<data} {
         'body-elemnt': function(context) {
-            return $('body')
+            return $('body');
         },
         'OUTPUTHTML': function(context) {
-            return '<html><body><h1>HELLO MOBIFY!</h1></body></html>'
+            return '<html><body><h1>HELLO MOBIFY!</h1></body></html>';
         }
     } {/data}
 
@@ -56,16 +56,16 @@ Konf key values _must_ be anonymous functions that explicitly return
 the selected data:
 
     // WRONG! Not a function!
-    'body-element': $('body')
+    'body-element': $('body');
 
     // RIGHT! Here's a function:
     'body-element': function() {
-        return $('body')
+        return $('body');
     }
 
     // RIGHT! Another function, but this one takes an argument:
     'body-element': function(context) {
-        return $('body')
+        return $('body');
     }
 
 When called, these functions will be passed an argument that is
@@ -73,10 +73,10 @@ conventionally named `context`. Using this argument is optional, but
 it enables additional functionality:
 
     'body-element': function() {
-        return $('body')
+        return $('body');
     },
     'images': function(context) {
-        return context.data('body-element').find('img')
+        return context.data('body-element').find('img');
     }
     
 Here, the function assigned to the key `'images'` uses the
