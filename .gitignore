@@ -1,3 +1,4 @@
 *.swp
 .DS_STORE
-www/src/_site
+_site
+node_modules

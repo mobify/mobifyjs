@@ -4,19 +4,22 @@
         <title>{{ page.title }}</title>
 
         <link rel="stylesheet" href="/static/css/bootstrap.css" type="text/css" media="screen, projection" />
+        <link rel="stylesheet" href="/static/css/syntax.css" type="text/css" media="screen, projection" />
         <link rel="stylesheet" href="/static/css/font-awesome.css" type="text/css" media="screen, projection" />
+        <link rel="stylesheet" href="/static/js/highlight/styles/github.css" type="text/css" media="screen, projection" />
+
+        <script src="/static/js/highlight/highlight.pack.js"></script>
+        <script type="text/javascript">hljs.initHighlightingOnLoad();</script>
     </head>
     <body>
 
         <div class="container-fluid">
             <div class="navbar">
                 <div class="navbar-inner"> 
-                    <a class="brand">mobify.js</a>
+                    <a class="brand" href="/">mobify.js</a>
 
                     <ul class="nav">
                         <li>
-                            <a href="/">Home</a>
-                        </li><li>
                             <a href="/about/">About</a>
                         </li><li>
                             <a href="/docs/">Docs</a>
@@ -46,7 +49,7 @@
                         <li>
                             <a href="http://twitter.com/mobify" title="Mobify on Twitter"><i class="icon-twitter"></i>Mobify</a>
                         </li><li>
-                            <a href="http://githubm.com/mobify" title="Mobify on Github"><i class="icon-github"></i>Github</a>
+                            <a href="http://github.com/mobify" title="Mobify on Github"><i class="icon-github"></i>Github</a>
                         </li><li>
                             <a href="/license/">License</a>
                         </li>
