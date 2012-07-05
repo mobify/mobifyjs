@@ -3,7 +3,7 @@ layout: base
 title: Documentation
 ---
 
-Documentation Index
+# Documentation Index
 
   - [Getting Started](getting-started/)
   - [Understanding the Konf](understanding-konf/)
@@ -11,5 +11,5 @@ Documentation Index
   - [Konf Reference](konf-reference/)
   - [Template Reference](template-reference/)
   - [Glossary](glossary/)
-  - [Appendinx](appendix/)
+  - [Appendix](appendix/)
     
