@@ -1,5 +1,6 @@
 #!/bin/bash
 node tests/server.js &
 PID=$!
-phantomjs tests/runner.js | grep '<*>' | tee report.xml
+sleep 1
+phantomjs tests/phantom.js | grep '<*>' | tee report.xml
 kill $PID
