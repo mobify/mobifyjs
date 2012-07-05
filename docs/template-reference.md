@@ -28,18 +28,31 @@ title: Template Reference
 
 ## 1\. Understanding Context
 
-Templates are HTML documents containing variables to be filled in with data. This data comes from the evaluated konf output, referred to as the _context_ for the template.
+Templates are HTML documents containing variables to be filled in with
+data. This data comes from the evaluated konf output, referred to as
+the _context_ for the template.
 
-The context is a tree of all the keys that your konf has evaluated that apply to this template. 
+The context is a tree of all the keys that your konf has evaluated
+that apply to this template.
 
-When developing with Mobify.js, you can view the full tree within your browser's Javascript console (see our tools guide in the Appendix if you're not familiar with its use). Browse to the page you'd like to inspect, open the console and find 'All extracted data' -- expand it to view all evaluated keys. Any of these are available for use as variables within your template. You'll find many internal keys that Mobify generates during operation, see Reserved Keys for a list of these.
+When developing with Mobify.js, you can view the full tree within your
+browser's Javascript console (see our tools guide in the Appendix if
+you're not familiar with its use). Browse to the page you'd like to
+inspect, open the console and find 'All extracted data' -- expand it
+to view all evaluated keys. Any of these are available for use as
+variables within your template. You'll find many internal keys that
+Mobify generates during operation, see Reserved Keys for a list of
+these.
 
-Note that when we talk about changing levels of context below, we simply mean traversing the levels of this context tree. 
+Note that when we talk about changing levels of context below, we
+simply mean traversing the levels of this context tree.
 
 
 ## 2\. `{foo}` - Variables: Select & Render A Single Variable
 
-Select elements from your source DOM in the konf file, then reference the selection as a variable from any template using the curly brace syntax:
+Select elements from your source DOM in the konf file, then reference
+the selection as a variable from any template using the curly brace
+syntax:
 
 *Source HTML input:*
 
@@ -53,7 +66,8 @@ Select elements from your source DOM in the konf file, then reference the select
          return $("form#search"); 
      },
 
-*Render the result of the `search` key selection in the konf as a variable within your template:*
+*Render the result of the `search` key selection in the konf as a
+*variable within your template:
 
      <div class="search">
          {search}
@@ -69,20 +83,30 @@ Select elements from your source DOM in the konf file, then reference the select
 
 **Variable Evaluation**
 
-Zepto collections are evaluated by iterating the objects in the collection, taking the JavaScript `outerHTML` attribute of each of them, then concatenating these together. 
+Zepto collections are evaluated by iterating the objects in the
+collection, taking the JavaScript `outerHTML` attribute of each of
+them, then concatenating these together.
 
 A single DOM Element will evaluate to its `outerHTML` attribute.
 
-Note that all strings are escaped by default, so use a filter (see filter reference below) if you'd like to output HTML.
+Note that all strings are escaped by default, so use a filter (see
+filter reference below) if you'd like to output HTML.
 
 **Variable Resolution**
 
-Variables are first looked-up in the keys at the current level of the context. If a key matching the variable name is not found at this level, the key will be searched for at the next highest level of the context, and so forth until it is found, or the highest level of the context is reached. 
+Variables are first looked-up in the keys at the current level of the
+context. If a key matching the variable name is not found at this
+level, the key will be searched for at the next highest level of the
+context, and so forth until it is found, or the highest level of the
+context is reached.
 
 
 ## 3\. `{foo|bar}` - Variable Filters: Pass The Value `foo` Through Filter `bar`
 
-If you would like to change how a variables value is rendered, especially values produced from Zepto collections or a DOM element, you can use filters. Add a pipe symbol `|` and filter name inside the template tag:
+If you would like to change how a variables value is rendered,
+especially values produced from Zepto collections or a DOM element,
+you can use filters. Add a pipe symbol `|` and filter name inside the
+template tag:
 
 *Source HTML input:*
 
@@ -104,23 +128,34 @@ If you would like to change how a variables value is rendered, especially values
 
     <img src="icon.png" class="icon"> Warning: your balance is low
 
-You can apply multiple filters in a chain by appending another pipe symbol `|` and filter name inside the template tag. Note that filters are cumulative, and will apply each additional filter to the output of the previous one.
+You can apply multiple filters in a chain by appending another pipe
+symbol `|` and filter name inside the template tag. Note that filters
+are cumulative, and will apply each additional filter to the output of
+the previous one.
 
 **Available Filters**
 
-* `innerHTML` - render the `innerHTML` of a Zepto collection or DOM element. Note: the output of this filter will be HTML escaped, chain with `s` to safely render as HTML.
+* `innerHTML` - render the `innerHTML` of a Zepto collection or DOM 
+                element. Note: the output of this filter will be HTML 
+                escaped, chain with `s` to safely render as HTML.
 
-* `openTag` - output the literal opening tag of a DOM element. Note: the output of this filter will be HTML escaped, chain with `s` to safely render as HTML.
+* `openTag` - output the literal opening tag of a DOM element. Note: 
+              the output of this filter will be HTML escaped, chain 
+              with `s` to safely render as HTML.
 
-* `closeTag` - output the literal closing tag of a DOM element. Note: the output of this filter will be HTML escaped, chain with `s` to safely render as HTML.
+* `closeTag` - output the literal closing tag of a DOM element. 
+               Note: the output of this filter will be HTML escaped, 
+               chain with `s` to safely render as HTML.
 
-* `s` - render HTML safe output, unescapes HTML escaped strings, such as values filtered through the `innerHTML` filter.
-
+* `s` - render HTML safe output, unescapes HTML escaped strings, such 
+        as values filtered through the `innerHTML` filter.
 
 
 ## 4\. `{#foo} ... {/foo}` - Accessing Attributes Of, Or Descending Into The Variable `foo`
 
-You are able to access any variable and its attributes. To simply access an attribute, you can use the simpler '{variable.attribute}' syntax:
+You are able to access any variable and its attributes. To simply
+access an attribute, you can use the simpler '{variable.attribute}'
+syntax:
 
 *Source HTML input:*
 
@@ -155,7 +190,10 @@ You are able to access any variable and its attributes. To simply access an attr
         <h1>DemoCorp Inc.</h1>
     </div>            
 
-Note that you can also access the same attribute within your template by descending into the header block, which is valuable when you have attached multiple attributes to the same variable. The output HTML would be identical to the last example:
+Note that you can also access the same attribute within your template
+by descending into the header block, which is valuable when you have
+attached multiple attributes to the same variable. The output HTML
+would be identical to the last example:
 
     <div id="fixed-nav">
         {#header}
@@ -166,7 +204,10 @@ Note that you can also access the same attribute within your template by descend
 
 ## 5\. `{#foo} ... {.} ... {/foo}` - Iterate Over The Variable `foo`
 
-When you make a selection within the konf that returns a set with multiple elements, you can easily iterate through those elements in your template using the '.' attribute, which is a reference to the current iteration:
+When you make a selection within the konf that returns a set with
+multiple elements, you can easily iterate through those elements in
+your template using the '.' attribute, which is a reference to the
+current iteration:
 
 *Source HTML input:*
 
@@ -192,7 +233,8 @@ When you make a selection within the konf that returns a set with multiple eleme
         }
     }
 
-*Descend into the `header` variable to access `logo` and `nav` attributes, also iterate `nav`:*
+*Descend into the `header` variable to access `logo` and `nav` 
+attributes, also iterate `nav`:*
 
     <div id="fixed-nav">
         {#header}
@@ -219,7 +261,8 @@ When you make a selection within the konf that returns a set with multiple eleme
 
 ## 6\. `{>foo/}` - Include The Partial `foo` Inside The Current Template
 
-Partials, also known as template includes, allow you to make a template composed of other templates:
+Partials, also known as template includes, allow you to make a
+template composed of other templates:
 
 *Contents of partial `logo`:*
 
@@ -248,9 +291,11 @@ This would insert the template _logo.tmpl_ into _foo.tmpl_.
 
 ## 7\. `{+bar} ... {/bar}` - Block Placeholders
 
-Blocks allow you to define snippets of template code that may be overridden by other templates:
+Blocks allow you to define snippets of template code that may be
+overridden by other templates:
 
 *Adding an overridable block `header` to _foo.tmpl_:*
+
     {+header}Plain Old Default Header{/header}
 
 See *Block Overrides* below for override usage.
@@ -265,20 +310,26 @@ Adding an overridable block `header` to _foo.tmpl_:
     {/header}
     {>products/}
 
-Overrides the content of `header` in _foo.tmpl_ from within the included template _products.tmpl_:
+Overrides the content of `header` in _foo.tmpl_ from within the
+included template _products.tmpl_:
 
     {<header}
         Exciting New More Specific Products Header!
     {/header}
     
-Note that a special variable is available within a block that allows you to access the content that would otherwise be replaced from a block being overridden. This variable is called `_SUPER_` and it allows you to extend, instead of override, the previous contents of the block.
+Note that a special variable is available within a block that allows
+you to access the content that would otherwise be replaced from a
+block being overridden. This variable is called `_SUPER_` and it
+allows you to extend, instead of override, the previous contents of
+the block.
 
     {<header}
         {_SUPER_}
         Exciting New More Specific Products Header!
     {/header}
 
-In our example above, the resulting contents of header with `_SUPER_` would be the contents of both headings combined:
+In our example above, the resulting contents of header with `_SUPER_`
+would be the contents of both headings combined:
 
     Plain Old Default Header Exciting New More Specific Products Header!
 
@@ -295,12 +346,15 @@ Provide conditional output based on the existence of a variable.
         Please login.
     {/user}
     
-Here, if the key 'user' is defined and non-empty in the context, the template will render a greeting to the user, otherwise, it will render the text "Please Login".
+Here, if the key 'user' is defined and non-empty in the context, the
+template will render a greeting to the user, otherwise, it will render
+the text "Please Login".
 
 
 ## 10\. `{^foo} ... {/foo}` - Conditional, Check For The Non-existence Of Variable `foo`
 
-Provide conditional output based on the non-existence of a variable. This template will render be the same as above.
+Provide conditional output based on the non-existence of a variable.
+This template will render be the same as above.
     
     {^user}
         Please login.
@@ -312,9 +366,12 @@ Provide conditional output based on the non-existence of a variable. This templa
 
 ## 11\. { %script} ... {/script} - Inline Script Pragma
 
-By default, templates collapse whitespace. This is a problem when templating elements where whitespace matters, like inline scripts featuring single-line comments. 
+By default, templates collapse whitespace. This is a problem when
+templating elements where whitespace matters, like inline scripts
+featuring single-line comments.
 
-The `{ %script}` pragma is provided to safely handle inline scripting in templates.
+The `{ %script}` pragma is provided to safely handle inline scripting
+in templates.
 
     { %script}
         // Show an alert dialog
@@ -338,14 +395,16 @@ Text surrounded by `{!` and `!}` are considered comments and will not be rendere
 
 ## Template File Naming Conventions
 
-Templates must be stored in your project folder under _src/tmpl/_ using the _.tmpl_ file name extension:
+Templates must be stored in your project folder under _src/tmpl/_
+using the _.tmpl_ file name extension:
 
     <project>/src/tmpl/home.tmpl
 
 
 ## Use A Base Template
 
-The bulk of your template logic should be inherited from another template using partials and blocks. For example, _base.tmpl_:
+The bulk of your template logic should be inherited from another
+template using partials and blocks. For example, _base.tmpl_:
 
     <!DOCTYPE html>
     <head>
@@ -371,10 +430,15 @@ And in `home`:
 
 ## Prefix Introduced Styling Attributes With `x-`
 
-Mobify.js preserves the attributes and content of elements selected from the source DOM. To differentiate between content from templates and content selected from the source DOM, it can be helpful to prefix attributes you introduce in your templates for the sake of styling.
+Mobify.js preserves the attributes and content of elements selected
+from the source DOM. To differentiate between content from templates
+and content selected from the source DOM, it can be helpful to prefix
+attributes you introduce in your templates for the sake of styling.
 
     <div class="x-banner">
         {banner}
     </div>
 
-We recommend you prefix all classes and IDs introduced in templates with `x-` to allow you to easily identify content introduced with the template.
+We recommend you prefix all classes and IDs introduced in templates
+with `x-` to allow you to easily identify content introduced with the
+template.
