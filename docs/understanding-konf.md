@@ -17,15 +17,11 @@ _src/mobify.konf_.
 Here is a very minimal _mobify.konf_:
 
     {>"/base/lib/base_konf.konf"/}
-    {<data} 
-    {
-
+    {<data} {
         'OUTPUTHTML': function(context) {
             return '<html><body><h1>HELLO MOBIFY!</h1></body></html>'
         }
-
-    } 
-    {/data}
+    } {/data}
 
 Inside the `{<data} ... {/data}` block, we declare a JavaScript object
 called the konf object. Inside, we assign the key `OUTPUTHTML` to a
@@ -40,16 +36,14 @@ The konf object is an ordinary JavaScript object so we can add
 arbitrary keys to it:
 
     {>"/base/lib/base_konf.konf"/}
-    {<data} 
-    {
+    {<data} {
         'body-elemnt': function(context) {
             return $('body')
         },
         'OUTPUTHTML': function(context) {
             return '<html><body><h1>HELLO MOBIFY!</h1></body></html>'
         }
-    } 
-    {/data}
+    } {/data}
 
 Here we have added the key `body-element` which makes a selection by
 calling `$('body')` and returning the results. Here, `$` is an
