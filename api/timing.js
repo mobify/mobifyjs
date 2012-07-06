@@ -3,7 +3,7 @@
 var timing = Mobify.timing = {
     points: []
   , addPoint: function(str, date) {
-        var point = date || +new Date;         
+        var point = date || new Date;         
         this.points.push([point, str]);
     }
   , reset: function() {

@@ -1,4 +1,4 @@
-Mobify.points.push(+new Date);
+Mobify.points.push(new Date);
 
 {>"/base/api/ark.js"/}
 

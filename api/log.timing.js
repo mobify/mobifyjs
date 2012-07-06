@@ -18,7 +18,7 @@
     $.extend(Mobify.timing, {
         level: 0
       , addPoint: function(str, date, level, groupStart) {
-            var date = date || +new Date;
+            var date = date || new Date;
             var entry = [date, str];
             $.extend(entry, {
                 'date': date
@@ -39,11 +39,11 @@
             
             if (last.groupStart) { // Collapse childless group
                 if (last.groupStart === 1) {
-                    last.point = +new Date;
+                    last.point = new Date;
                     delete last.groupStart;
                 } else this.points.pop();
             } else {
-                this.addPoint('', +new Date, this.level);
+                this.addPoint('', new Date, this.level);
             }
             --this.level;
         }
