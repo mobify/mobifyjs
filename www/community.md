@@ -3,9 +3,10 @@ layout: page
 title: Community
 ---
 
-# Community
-
-The Mobify.js project is open source and we actively encourage contributions in all forms: code, docs, issues, suggestions, and criticism.
+<div class="lead-in rounded shaded">
+<h1>Community</h1>
+<p>The Mobify.js project is open source and we actively encourage contributions in all forms: code, docs, issues, suggestions, and criticism.</p>
+</div>
 
 ## Where to get help?
 
