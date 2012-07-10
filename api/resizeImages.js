@@ -13,6 +13,8 @@ var absolutify = document.createElement('a')
       , '//ir3.mobify.com'
     ]
 
+    , projectName = Mobify.conf.projectName || ""
+
     /**
      * Hash `url` into a well distributed int.
      */
@@ -41,6 +43,7 @@ var absolutify = document.createElement('a')
         options = options || {}
 
         var host = hosts[URLHash(url) % hosts.length]
+          , projectIdeintifier = "project-" + projectName
           , bits = [host];
 
         if (options.format) {
