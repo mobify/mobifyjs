@@ -23,6 +23,11 @@
     
     // Populated from `site.json`.
     siteConfig: {site_config|s},
+
+    //Project name slug from project.json
+    {?project_name}
+    projectName: {project_name},
+    {/project_name}
     
     // Timestamp when this string was made.
     buildDate: {build_dt},
