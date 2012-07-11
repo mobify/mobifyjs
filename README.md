@@ -9,3 +9,15 @@ and contribute to the Mobify.js project:
 https://github.com/mobify/mobify-client/
 
 For information on using Mobify.js see [http://cloud.mobify.com/](http://cloud.mobify.com/).
+
+Documention
+===========
+
+The documentation lives on mobifyjs.com, which is created using the static site generator Jekyll.
+In order to view the documentation, you need RubyGems.
+
+    cd www/src
+    gem install jekyll
+    jekyll --server --auto
+    
+Then navigate to http://localhost:4000
