@@ -15,8 +15,6 @@ var absolutify = document.createElement('a')
       , '//ir3.mobify.com'
     ]
 
-    , projectName = Mobify.conf.projectName || ""
-
     /**
      * Hash `url` into a well distributed int.
      */
