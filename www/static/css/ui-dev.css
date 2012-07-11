@@ -24,10 +24,21 @@ a, a:visited {
 		color: #eb804c;
 	}
 code {
-	background: none;
 	border: none;
-	padding: 0;
+	font-size: 16px;
+	text-decoration: none;
+	color: #9ccbd2;
+	background: rgba(255,255,255,0.2);
+	-webkit-box-shadow: rgba(0,0,0,0.15) 0 1px 1px;
+	-moz-box-shadow: rgba(0,0,0,0.15) 0 1px 1px;
+	box-shadow: rgba(0,0,0,0.15) 0 1px 1px;
 }
+	pre code {
+		background: transparent;
+		-webkit-box-shadow: none;
+		-moz-box-shadow: none;
+		box-shadow: none;
+	}
 h1, h2, h3, h4, h5, h6 {
 	font-weight: normal;
 }
@@ -39,9 +50,29 @@ h2 {
 	color: #fff;
 	text-shadow: rgba(0,0,0,0.15) 0 1px 0;
 }
+ol, ul {
+	margin: 1em 0;
+}
 ol li {
 	list-style: decimal;
 	margin: 0.5em 0 0.5em 2em;
+}
+ul li {
+	list-style: square;
+	margin: 0.5em 0 0.5em 2em;	
+}
+pre {
+	background: rgba(255,255,255,0.95);
+	border: none;
+	margin: 1.5em 0;
+	-webkit-border-radius: 9px;
+	-moz-border-radius: 9px;
+	border-radius: 9px;
+	-webkit-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
+	-moz-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
+	-ms-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
+	-o-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
+	box-shadow: rgba(0,0,0,0.15) 0 3px 0;	
 }
 strong {
 	font-weight: normal;
@@ -230,13 +261,29 @@ strong {
 
 
 /* Page Components */
+.page h2 {
+	text-align: left;
+	font-size: 26px;
+	margin: 1.3846em 0 0.346em 0;
+}
 .lead-in {
 	background: rgba(255,255,255,0.15);
 	padding: 40px;
+	margin-bottom: 1em;
 }
 	.lead-in h1 {
+		float: left;
+		color: #fff;
+		font-size: 36px;
+		width: 32.5%;
+	}
+@media (max-width: 999px) {
+	.lead-in h1 {
+		float: none;
+		width: auto;
 		margin-bottom: 0.5em;
 	}
+}
 
 
 /* Footer Layout */
@@ -260,11 +307,11 @@ strong {
 		font-size: 16px;
 		color: #83a5ad;
 		text-decoration: none;
-		-webkit-transition: color 0.25s ease-out;			
-		-moz-transition: color 0.25s ease-out;			
-		-ms-transition: color 0.25s ease-out;			
-		-o-transition: color 0.25s ease-out;			
-		transition: color 0.25s ease-out;			
+		-webkit-transition: color 0.2s ease-out;			
+		-moz-transition: color 0.2s ease-out;			
+		-ms-transition: color 0.2s ease-out;			
+		-o-transition: color 0.2s ease-out;			
+		transition: color 0.2s ease-out;			
 	}
 		.footer a:hover i {
 			color: #074a5b;
@@ -364,6 +411,15 @@ strong {
 		color: #fcb248;
 		padding-right: 5px;
 		font-size: 16px;
+		text-decoration: none;
+		-webkit-transition: color 0.2s ease-out;			
+		-moz-transition: color 0.2s ease-out;			
+		-ms-transition: color 0.2s ease-out;			
+		-o-transition: color 0.2s ease-out;			
+		transition: color 0.2s ease-out;			
+	}
+	.install-summary a:hover i {
+		color: #f29a5c;
 	}
 .install-instructions {
 	background: #f2f7f8;
