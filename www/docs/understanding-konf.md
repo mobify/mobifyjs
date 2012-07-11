@@ -37,7 +37,7 @@ arbitrary keys to it:
 
     {>"/base/lib/base_konf.konf"/}
     {<data} {
-        'body-elemnt': function(context) {
+        'body-element': function(context) {
             return $('body');
         },
         'OUTPUTHTML': function(context) {
