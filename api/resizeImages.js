@@ -5,6 +5,8 @@
 (function(window, $) {
 
 var absolutify = document.createElement('a')
+    // A regex for detecting http(s) URLs
+  , protocolMatcher = /^http(s)?/
 
   , hosts = [
         '//ir0.mobify.com'
@@ -95,7 +97,10 @@ var absolutify = document.createElement('a')
         return $imgs.each(function() {
             if (attr = this.getAttribute(opts.attribute)) {
                 absolutify.href = attr;
-                this.setAttribute('x-src', getImageURL(absolutify.href, opts))
+                // Produce an image resize url only for matched protocols
+                if(protocolMatcher.exec(absolutify.href)) {
+                    this.setAttribute('x-src', getImageURL(absolutify.href, opts))
+                }
             }
         });
     }
