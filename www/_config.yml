@@ -5,5 +5,6 @@ kramdown:
     use_coderay: true
     entity_output: symbolic
 
+baseurl: /mobifyjs
 
-bar: foobared
+
