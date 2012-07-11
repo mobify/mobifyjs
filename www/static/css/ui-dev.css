@@ -25,7 +25,7 @@ a, a:visited {
 	}
 code {
 	border: none;
-	font-size: 16px;
+	font-size: 0.888889em;
 	text-decoration: none;
 	color: #9ccbd2;
 	background: rgba(255,255,255,0.2);
@@ -43,14 +43,13 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: normal;
 }
 h1 {
-	font-size: 36px;
+	font-size: 2em;
 	color: #fff;
 }
 h2 {
 	font-weight: normal;
-	font-size: 36px;
-	text-align: center;
-	margin: 40px 0;
+	font-size: 2em;
+	margin: 1em 0;
 	color: #fff;
 	text-shadow: rgba(0,0,0,0.15) 0 1px 0;
 }
@@ -94,8 +93,8 @@ strong {
 		color: #032c32;
 	}
 .btn, a.btn {
-	font-size: 18px;
-	line-height: 28px;
+	font-size: 1em;
+	line-height: 1.555556em;
 	text-transform: uppercase;
 	border: none;
 	color: #fff;
@@ -142,7 +141,7 @@ strong {
 	border-width: 13px 13px 0 13px;
 }
 	.page .viewport, .docs .viewport {
-		padding-bottom: 70px;
+		padding-bottom: 4em;
 	}
 .footer .row-fluid, .viewport .row-fluid {
 	margin: 0 auto;
@@ -151,6 +150,12 @@ strong {
 @media (max-width: 767px) {
 	body {
 		padding: 0;
+		font-size: 15px;
+		line-height: 23.33334px;
+	}
+	.viewport {
+		border-width: 0;
+		border-top-width: 6px;
 	}
 	.footer .row-fluid, .viewport .row-fluid {
 		width: 85%;
@@ -188,7 +193,7 @@ strong {
 	overflow: hidden;
 }
 .navbar {
-	padding: 50px 0 60px 0;
+	padding: 3em 0 4em 0;
 }
 .navbar .brand {
 	font-size: 0;
@@ -205,10 +210,13 @@ strong {
 	white-space: nowrap;
 	margin: 0;
 }
+.navbar .nav li {
+	margin: 0;
+}
 .navbar .nav > li > a {
 	line-height: 1;
 	text-transform: uppercase;
-	padding: 8px 13px 9px 13px;
+	padding: 9px 13px 8px 13px;
 	color: #f29a5c;
 	text-shadow: rgba(0,0,0,0.15) 0 1px 0;
 	-webkit-transition: color 0.25s ease-out;			
@@ -242,7 +250,7 @@ strong {
 	}
 @media (max-width: 767px) {
 	.navbar {
-		padding: 30px 0 40px 0;
+		padding: 2em 0 3em 0;
 	}
 	.navbar-inner {
 		text-align: center;
@@ -252,7 +260,7 @@ strong {
 		float: none;
 	}
 	.navbar .nav-wrapper {
-		padding-top: 50px;
+		padding-top: 2em;
 		clear: left;
 		text-align: center;
 	}
@@ -260,8 +268,29 @@ strong {
 		float: none;
 		display: inline-block;
 	}
+}
+@media (max-width: 480px) {
+	.navbar ul.nav {
+		display: block;
+	}
 	.navbar .nav li {
-		margin-left: 0;
+		text-align: center;
+		float: left;
+		width: 50%;
+		padding: 0;
+		margin: 0;
+	}
+	.navbar .nav > li > a {
+		background: rgba(0,0,0,0.1);
+		margin: 2px;
+		padding: 9px 0 8px 0;
+	}
+	.navbar .nav > li > a.active {
+		margin: 0;
+	}
+	.navbar .nav > li > a:hover, .navbar .nav > li > a:active {
+		color: #fff;
+		background: rgba(0,0,0,0.2);
 	}
 }
 
@@ -270,19 +299,18 @@ strong {
 
 /* Page Components */
 .page h2 {
-	text-align: left;
-	font-size: 26px;
+	font-size: 1.444444em;
 	margin: 1.3846em 0 0.346em 0;
 }
 .lead-in {
 	background: rgba(255,255,255,0.15);
-	padding: 40px;
+	padding: 2em;
 	margin-bottom: 1em;
 }
 	.lead-in h1 {
 		float: left;
 		color: #fff;
-		font-size: 36px;
+		font-size: 2em;
 		width: 32.5%;
 	}
 @media (max-width: 999px) {
@@ -294,11 +322,13 @@ strong {
 }
 
 
+
+
 /* Footer Layout */
 .footer {
 	color: #83a5ad;
 	background: #fff;
-	font-size: 13px;
+	font-size: 0.72222em;
 	text-transform: uppercase;
 }
 	.footer .span6 {
@@ -312,7 +342,7 @@ strong {
 			background: transparent;
 		}
 	.footer i {
-		font-size: 16px;
+		font-size: 0.88889px;
 		color: #83a5ad;
 		text-decoration: none;
 		-webkit-transition: color 0.2s ease-out;			
@@ -348,10 +378,15 @@ strong {
 
 
 
+
 /* Page Layout: Home Page */
+.home h2 {
+	text-align: center;
+	padding: 0 0.5em;
+}
 .lead {
-	font-size: 26px;
-	line-height: 56px;
+	font-size: 1.4444em;
+	line-height: 2.153846em;
 	text-align: center;
 	text-shadow: rgba(0,0,0,0.15) 0 2px 0;
 }
@@ -398,7 +433,7 @@ strong {
 	}
 	.video h3 {
 		color: #d5ecf2;
-		padding: 25px 0;
+		padding: 1em 0;
 		text-align: center;
 		background: rgba(39,40,34,0.7);
 		-webkit-border-bottom-left-radius: 9px;
@@ -412,17 +447,17 @@ strong {
 		box-shadow: rgba(0,0,0,0.5) 0 -20px 40px 0;
 	}
 .install-client {
-	padding-top: 30px;
+	padding-top: 2.5em;
 }
 .install-container {
 	padding: 5px;
 }
 .install-summary {
-	padding: 40px;
+	padding: 2em 3.5em;
 }
 	.install-summary a {
 		padding: 0.5em 0;
-		padding-right: 20px;
+		padding-right: 1em;
 		white-space: nowrap;
 	}
 	.install-summary a:last-child {
@@ -431,7 +466,7 @@ strong {
 	.install-summary i {
 		color: #fcb248;
 		padding-right: 5px;
-		font-size: 16px;
+		font-size: 0.88889em;
 		text-decoration: none;
 		-webkit-transition: color 0.2s ease-out;			
 		-moz-transition: color 0.2s ease-out;			
@@ -445,7 +480,7 @@ strong {
 .install-instructions {
 	background: #f2f7f8;
 	overflow: hidden;
-	padding: 30px 50px;
+	padding: 2em 3.5em;
 	margin: 0;
 	-webkit-border-top-right-radius: 3px;
 	-webkit-border-bottom-right-radius: 3px;
@@ -471,11 +506,11 @@ strong {
 		margin: 1em 0 1em 2em;
 	}
 .remix-site {
-	padding: 40px 0 70px 0;
+	padding: 2em 0 3.5em 0;
 }
 	.remix-site .clients h3 {
 		text-align: center;
-		font-size: 15px;
+		font-size: 0.833333em;
 		color: #97c7d0;
 	}
 	.remix-site .clients .well {
@@ -485,7 +520,7 @@ strong {
 .next-level {
 	background: #1e7e8b;
 	background: rgba(255,255,255,0.1);
-	padding: 50px 0 70px 0;
+	padding: 2em 0 4em 0;
 }
 	.next-level .graphic, .next-level .cta {
 		text-align: center;
@@ -500,6 +535,14 @@ strong {
 @media (max-width: 320px) {
 	.remix-site .clients img {
 		width: 100%;
+	}
+	.video .play i {
+		top: 40%;
+	}
+}
+@media (max-width: 480px) {
+	.remix-site .clients h3 {
+		padding-top: 2em;
 	}
 }
 @media (min-width: 480px) {
@@ -521,7 +564,11 @@ strong {
 		padding-top: 100px;
 	}
 }
-
+@media (min-width: 768px) and (max-width: 999px) {
+	.lead {
+		font-size: 1.1em;
+	}
+}
 
 
 
@@ -555,11 +602,11 @@ strong {
 	.docs-nav li {
 		list-style: none;
 		margin: 1em 0;
-		line-height: 20px;
+		line-height: 1.5em;
 	}
 		.docs-nav li li {
 			margin: 0.5em 0;
-			font-size: 15px;
+			font-size: 0.833333em;
 		}
 		.docs-nav li li a, .docs-nav li li a:visited {
 			color: #f29a5c;
@@ -568,7 +615,7 @@ strong {
 			color: #f29a5c;
 			background: none;
 			padding: 0;
-			font-size: 14px;
+			font-size: 1em;
 			-webkit-box-shadow: none;
 			-moz-box-shadow: none;
 			box-shadow: none;
