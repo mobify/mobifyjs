@@ -498,6 +498,25 @@ strong {
 
 
 
+/* Page Layout: Docs */
+.docs-nav {
+	background: rgba(255,255,255,0.15);
+	padding: 20px 40px;
+}
+.docs-nav a, .docs-nav a:visited {
+	color: #fff;
+}
+.docs-nav ul {
+	margin: 0;
+}
+.docs-nav li {
+	list-style: none;
+	margin-left: 0;
+}
+.docs-nav li li {
+	margin-left: 1em;
+}
+
 
 /* -- Web Fonts -- */
 @font-face {
