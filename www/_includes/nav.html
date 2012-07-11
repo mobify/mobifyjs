@@ -1,8 +1,11 @@
                     <div class="nav-wrapper">
 	                    <ul class="nav">
 	                        <li>
-	                            <a href="/mobifyjs/" class="active rounded">About</a>
+                        {% active_links %}
+	                            <a href="/mobifyjs/" class="rounded">About</a>
+                        {% endactive_links %}
 	                        </li><li>
+                        {% active_links prefix %}
 	                            <a href="/mobifyjs/examples/demostore/" class="rounded">Examples</a>
 	                        </li><li>
 	                            <a href="/mobifyjs/docs/" class="rounded">Docs</a>
@@ -10,4 +13,5 @@
 	                            <a href="/mobifyjs/community/" class="rounded">Community</a>
 	                        </li>
 	                    </ul><!-- .nav -->
+                        {% endactive_links %}
 	                </div>

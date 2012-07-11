@@ -1,6 +1,6 @@
 # Documentation Index
   
-  - [Getting Started]({{ site.baseurl }}/docs/{{ site.baseurl }}/docs/getting-started/)
+  - [Getting Started]({{ site.baseurl }}/docs/getting-started/)
   - [Understanding the Konf]({{ site.baseurl }}/docs/understanding-konf/)
   - [Understanding Templates]({{ site.baseurl }}/docs/understanding-templates/)
   - [Konf Reference]({{ site.baseurl }}/docs/konf-reference/)

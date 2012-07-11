@@ -20,4 +20,4 @@ In order to view the documentation, you need RubyGems.
     gem install jekyll
     jekyll --server --auto
     
-Then navigate to http://localhost:4000
+Then navigate to http://localhost:4000/mobifyjs/docs/

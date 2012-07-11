@@ -8,6 +8,6 @@ bodyclass: docs
 	    {{ content }}
     </div>
     <div class="span4 docs-nav rounded shaded">
-		{% markdown %}{% include nav-docs.md %}{% endmarkdown %}
+		{% active_links %}{% markdown %}{% include nav-docs.md %}{% endmarkdown %}{% endactive_links %}
 	</div>
 </div>
