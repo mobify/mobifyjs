@@ -55,6 +55,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 h1 {
 	font-size: 2em;
+	margin: 0 0 0.5em 0;
 	color: #fff;
 }
 h2 {
@@ -624,9 +625,6 @@ strong {
 	float: left;
 	margin-left: 0;
 }
-.docs h1 {
-	margin-bottom: 0.5em;
-}
 .docs-nav {
 	background: rgba(255,255,255,0.15);
 	padding: 20px 40px;
@@ -706,14 +704,25 @@ strong {
 	}
 }
 
+
+
 /* Page Layout: Examples */
-.examples .span12 {
+.examples .span8 {
+	width: 62%;
+	padding-left: 3.95744680199999%;
+	float: right;
+	margin-bottom: 50px;
+}
+.examples .span4 {
+	float: left;
+	margin-left: 0;
+}
+.examples-nav {
 	background: rgba(255,255,255,0.15);
 	padding: 20px 40px;
 }
-.examples h2 {
-    font-size: 1.5em;
-}
+
+
 
 /* -- Web Fonts -- */
 @font-face {
