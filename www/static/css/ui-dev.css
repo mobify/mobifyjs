@@ -226,7 +226,7 @@ strong {
 	overflow: hidden;
 }
 .navbar {
-	padding: 3em 0 4em 0;
+	padding: 4em 0;
 }
 .navbar .brand {
 	font-size: 0;
@@ -498,7 +498,7 @@ strong {
 	padding: 2em 3.5em;
 }
 	.install-summary a {
-		padding: 0.5em 0;
+		padding: 0.75em 0;
 		padding-right: 1em;
 		white-space: nowrap;
 	}
@@ -520,6 +520,7 @@ strong {
 		color: #f29a5c;
 	}
 .install-instructions {
+	position: relative;
 	background: #f2f7f8;
 	overflow: hidden;
 	padding: 2em 3.5em;
@@ -530,9 +531,6 @@ strong {
 	-moz-border-bottom-right-radius: 3px;
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;
-	-webkit-box-shadow: inset #ebf0f1 12px 0 12px 0;
-	-moz-box-shadow: inset #ebf0f1 12px 0 12px 0;
-	box-shadow: inset #ebf0f1 12px 0 12px 0;
 }
 	.install-instructions span {
 		color: #032c32;
@@ -545,7 +543,18 @@ strong {
 	}
 	.install-instructions li {
 		color: #7a9fa5;
-		margin: 1em 0 1em 2em;
+		margin: 0.5em 0 0.5em 2em;
+	}
+	.install-instructions:before {
+		content: "";
+		display: block;
+		background: #fff;
+		position: absolute;
+		-webkit-transform: rotate(45deg);
+		-moz-transform: rotate(45deg);
+		-ms-transform: rotate(45deg);
+		-o-transform: rotate(45deg);
+		transform: rotate(45deg);
 	}
 .remix-site {
 	padding: 2em 0 3.5em 0;
@@ -582,14 +591,29 @@ strong {
 		top: 40%;
 	}
 }
-@media (max-width: 480px) {
-	.remix-site .clients h3 {
-		padding-top: 2em;
-	}
-}
 @media (min-width: 480px) {
 	.lead {
 		text-align: left;
+	}
+}
+@media (max-width: 767px) {
+	.install-instructions {
+		-webkit-box-shadow: inset #ebf0f1 0 12px 12px 0;
+		-moz-box-shadow: inset #ebf0f1 0 12px 12px 0;
+		box-shadow: inset #ebf0f1 0 12px 12px 0;		
+	}
+	.install-instructions:before {
+		top: -18px;
+		left: 50%;
+		margin-left: -18px;
+		width: 36px;
+		height: 36px;
+		-webkit-box-shadow: #ebf0f1 0 9px 12px 0;
+		-moz-box-shadow: #ebf0f1 0 9px 12px 0;
+		box-shadow: #ebf0f1 0 9px 12px 0;		
+	}
+	.remix-site .clients h3 {
+		padding-top: 2em;
 	}
 }
 @media (min-width: 768px) {
@@ -603,7 +627,22 @@ strong {
 		float: right;
 	}
 	.install-summary {
-		padding-top: 100px;
+		padding-top: 4em;
+	}
+	.install-instructions {
+		-webkit-box-shadow: inset #ebf0f1 12px 0 12px 0;
+		-moz-box-shadow: inset #ebf0f1 12px 0 12px 0;
+		box-shadow: inset #ebf0f1 12px 0 12px 0;		
+	}
+	.install-instructions:before {
+		top: 50%;
+		left: -24px;
+		margin-top: -24px;
+		width: 48px;
+		height: 48px;
+		-webkit-box-shadow: #ebf0f1 12px 0 12px 0;
+		-moz-box-shadow: #ebf0f1 12px 0 12px 0;
+		box-shadow: #ebf0f1 12px 0 12px 0;		
 	}
 }
 @media (min-width: 768px) and (max-width: 999px) {
