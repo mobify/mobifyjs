@@ -1,8 +1,3 @@
----
-layout: doc
-title: Documentation
----
-
 # Documentation Index
 
   - [Getting Started](getting-started/)

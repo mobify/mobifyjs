@@ -106,6 +106,9 @@ strong {
 	border: solid 13px rgba(255,255,255,0.1);	
 	border-width: 13px 13px 0 13px;
 }
+	.page .viewport, .docs .viewport {
+		padding-bottom: 70px;
+	}
 .footer .row-fluid, .viewport .row-fluid {
 	margin: 0 auto;
 	width: 100%;
@@ -213,7 +216,7 @@ strong {
 		float: none;
 	}
 	.navbar .nav-wrapper {
-		padding-top: 30px;
+		padding-top: 50px;
 		clear: left;
 		text-align: center;
 	}
@@ -231,6 +234,9 @@ strong {
 	background: rgba(255,255,255,0.15);
 	padding: 40px;
 }
+	.lead-in h1 {
+		margin-bottom: 0.5em;
+	}
 
 
 /* Footer Layout */
@@ -284,6 +290,9 @@ strong {
 .well .row-fluid {
 	width: 100%;
 }
+.row-fluid .video-container {
+	padding-top: 1em;
+}
 .video {
 	background: #272822 url(../img/code-example.min.png) 15px 10px no-repeat;
 	padding-top: 200px;
@@ -309,7 +318,7 @@ strong {
 		left: 50%;
 		margin: -49px 0 0 -49px;
 		background: url(../img/sprites.png) -138px -51px no-repeat;
-		opacity: 0.7;
+		opacity: 0.4;
 		-webkit-transition: opacity 0.25s ease-out;
 		-moz-transition: opacity 0.25s ease-out;
 		-ms-transition: opacity 0.25s ease-out;
@@ -334,12 +343,28 @@ strong {
 		-moz-box-shadow: rgba(0,0,0,0.5) 0 -20px 40px 0;
 		box-shadow: rgba(0,0,0,0.5) 0 -20px 40px 0;
 	}
+.install-client {
+	padding-top: 30px;
+}
 .install-container {
 	padding: 5px;
 }
 .install-summary {
 	padding: 40px;
 }
+	.install-summary a {
+		padding: 0.5em 0;
+		padding-right: 20px;
+		white-space: nowrap;
+	}
+	.install-summary a:last-child {
+		padding-right: 0;
+	}
+	.install-summary i {
+		color: #fcb248;
+		padding-right: 5px;
+		font-size: 16px;
+	}
 .install-instructions {
 	background: #f2f7f8;
 	overflow: hidden;
@@ -363,12 +388,16 @@ strong {
 		margin: 1em 0 1em 2em;
 	}
 .remix-site {
-	padding: 70px 0;
+	padding: 40px 0 70px 0;
 }
 	.remix-site .clients h3 {
 		text-align: center;
 		font-size: 15px;
 		color: #97c7d0;
+	}
+	.remix-site .clients .well {
+		text-align: center;
+		background: #7bb3bb;
 	}
 .next-level {
 	background: #1e7e8b;
@@ -385,6 +414,11 @@ strong {
 		margin-top: 1em;
 		padding: 18px 20px;
 	}
+@media (max-width: 320px) {
+	.remix-site .clients img {
+		width: 100%;
+	}
+}
 @media (min-width: 480px) {
 	.lead {
 		text-align: left;
@@ -397,8 +431,13 @@ strong {
 	.next-level .btn {
 		margin-top: 2.5em;
 	}
+	.row-fluid .video-container {
+		float: right;
+	}
+	.install-summary {
+		padding-top: 100px;
+	}
 }
-
 
 
 
