@@ -42,6 +42,10 @@ code {
 h1, h2, h3, h4, h5, h6 {
 	font-weight: normal;
 }
+h1 {
+	font-size: 36px;
+	color: #fff;
+}
 h2 {
 	font-weight: normal;
 	font-size: 36px;
@@ -64,7 +68,7 @@ ul li {
 pre {
 	background: rgba(255,255,255,0.95);
 	border: none;
-	margin: 1.5em 0;
+	margin: 2em 0;
 	-webkit-border-radius: 9px;
 	-moz-border-radius: 9px;
 	border-radius: 9px;
@@ -196,9 +200,10 @@ strong {
 	margin: 0;
 	background: url(../img/sprites.png) 0 0;
 }
-.navbar .nav {
+.navbar ul.nav {
 	float: right;
 	white-space: nowrap;
+	margin: 0;
 }
 .navbar .nav > li > a {
 	line-height: 1;
@@ -251,9 +256,12 @@ strong {
 		clear: left;
 		text-align: center;
 	}
-	.navbar .nav {
+	.navbar ul.nav {
 		float: none;
 		display: inline-block;
+	}
+	.navbar .nav li {
+		margin-left: 0;
 	}
 }
 
@@ -323,7 +331,20 @@ strong {
 			display: inline-block;
 			margin: 0 0 0 20px;
 		}
-
+@media (max-width: 767px) {
+	.footer {
+		padding-bottom: 25px;
+	}
+	.footer p {
+		text-align: center;
+	}
+	.footer .span6 {
+		padding-bottom: 0;
+	}
+	.footer .span6 + .span6 {
+		padding-top: 0;
+	}
+}
 
 
 
@@ -439,6 +460,12 @@ strong {
 	.install-instructions span {
 		color: #032c32;
 	}
+	.install-instructions code {
+		padding: 0;
+		-webkit-box-shadow: none;
+		-moz-box-shadow: none;
+		box-shadow: none;
+	}
 	.install-instructions li {
 		color: #7a9fa5;
 		margin: 1em 0 1em 2em;
@@ -499,23 +526,66 @@ strong {
 
 
 /* Page Layout: Docs */
+.docs .span8 {
+	width: 60%;
+	padding-left: 5.95744680199999%;
+	float: right;
+	margin-bottom: 50px;
+}
+.docs .span4 {
+	float: left;
+	margin-left: 0;
+}
+.docs h1 {
+	margin-bottom: 0.5em;
+}
 .docs-nav {
 	background: rgba(255,255,255,0.15);
 	padding: 20px 40px;
 }
-.docs-nav a, .docs-nav a:visited {
-	color: #fff;
+	.docs-nav h1 {
+		display: none;
+	}
+	.docs-nav a, .docs-nav a:visited {
+		color: #fff;
+	}
+	.docs-nav ul {
+		margin: 0;
+	}
+	.docs-nav li {
+		list-style: none;
+		margin: 1em 0;
+		line-height: 20px;
+	}
+		.docs-nav li li {
+			margin: 0.5em 0;
+			font-size: 15px;
+		}
+		.docs-nav li li a, .docs-nav li li a:visited {
+			color: #f29a5c;
+		}
+		.docs-nav li li code {
+			color: #f29a5c;
+			background: none;
+			padding: 0;
+			font-size: 14px;
+			-webkit-box-shadow: none;
+			-moz-box-shadow: none;
+			box-shadow: none;
+		}
+		.docs-nav li li li {
+			display: none;
+		}
+@media (max-width: 767px) {
+	.docs .span8 {
+		padding: 0;
+		width: 100%;
+	}
+	.docs .span4 {
+		width: 100%;
+	}
 }
-.docs-nav ul {
-	margin: 0;
-}
-.docs-nav li {
-	list-style: none;
-	margin-left: 0;
-}
-.docs-nav li li {
-	margin-left: 1em;
-}
+
 
 
 /* -- Web Fonts -- */

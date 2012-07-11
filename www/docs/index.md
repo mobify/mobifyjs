@@ -3,4 +3,4 @@ layout: doc
 title: Documentation
 ---
 
-placeholder
+placeholder for John's awesome intro doc

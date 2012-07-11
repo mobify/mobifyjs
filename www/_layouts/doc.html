@@ -4,62 +4,10 @@ bodyclass: docs
 ---
 
 <div class="row-fluid">
-    <div class="span4 docs-nav rounded shaded">
-    	<ul>
-  <li><a href="getting-started/">Getting Started</a></li>
-  <li><a href="understanding-konf/">Understanding the Konf</a></li>
-  <li><a href="understanding-templates/">Understanding Templates</a></li>
-  <li><a href="konf-reference/">Konf Reference</a>
-    <ul>
-      <li><a href="konf-reference/#using-konf">Using Konf</a></li>
-      <li><a href="konf-reference/#outputhtml"><code>OUTPUTHTML</code></a></li>
-      <li><a href="konf-reference/#contextdatakey"><code>context.data(key)</code></a></li>
-      <li><a href="konf-reference/#contexttmpltemplate"><code>context.tmpl(template)</code></a></li>
-      <li><a href="konf-reference/#contextchooseobj1-obj2-"><code>context.choose(obj1[, obj2[, ...]])</code></a></li>
-      <li><a href="konf-reference/#reserved-keys">Reserved Keys</a></li>
-      <li><a href="konf-reference/#best-practices">Best Practices</a></li>
-    </ul>
-  </li>
-  <li><a href="template-reference/">Template Reference</a>
-    <ul>
-      <li><a href="template-reference/#best-practices-1">Best Practices</a>
-        <ul>
-          <li><a href="template-reference/#template-file-naming-conventions">Template File Naming Conventions</a></li>
-          <li><a href="template-reference/#use-a-base-template">Use A Base Template</a></li>
-          <li><a href="template-reference/#prefix-introduced-styling-attributes-with-x-">Prefix Introduced Styling Attributes With <code>x-</code></a></li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li><a href="glossary/">Glossary</a></li>
-  <li><a href="appendix/">Appendix</a>
-    <ul>
-      <li><a href="appendix/#debugging">Debugging</a>
-        <ul>
-          <li><a href="appendix/#tools">Tools</a>
-            <ul>
-              <li><a href="appendix/#webkit-inspector">Webkit Inspector</a></li>
-              <li><a href="appendix/#firebug">Firebug</a></li>
-            </ul>
-          </li>
-          <li><a href="appendix/#debugging-the-konf">Debugging the Konf</a></li>
-          <li><a href="appendix/#debugging-templates-viewing-source-inspecting-rendered-dom">Debugging Templates (Viewing source, inspecting rendered DOM)</a></li>
-        </ul>
-      </li>
-      <li><a href="appendix/#common-issues">Common Issues</a>
-        <ul>
-          <li><a href="appendix/#page-is-blank-doesnt-render-at-all">Page is blank, doesn&rsquo;t render at all</a></li>
-          <li><a href="appendix/#some-key-displayed-on-the-page">&ldquo;{some-key}&rdquo; displayed on the page</a></li>
-        </ul>
-      </li>
-      <li><a href="appendix/#dustjs-documentation">Dust.js Documentation</a></li>
-    </ul>
-  </li>
-</ul>
-
-	    {% include x-nav-docs.md %}
-	</div>
     <div class="span8">
 	    {{ content }}
     </div>
+    <div class="span4 docs-nav rounded shaded">
+		{% markdown %}{% include nav-docs.md %}{% endmarkdown %}
+	</div>
 </div>
