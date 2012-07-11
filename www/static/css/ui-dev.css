@@ -634,6 +634,10 @@ strong {
 }
 
 
+.examples .span12 {
+	background: rgba(255,255,255,0.15);
+	padding: 20px 40px;
+}
 
 /* -- Web Fonts -- */
 @font-face {
