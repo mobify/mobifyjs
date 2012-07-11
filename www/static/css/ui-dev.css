@@ -33,6 +33,10 @@ code {
 	-moz-box-shadow: rgba(0,0,0,0.15) 0 1px 1px;
 	box-shadow: rgba(0,0,0,0.15) 0 1px 1px;
 }
+pre {
+	font-size: 1em;
+	line-height: 1.555556;
+}
 	pre code {
 		background: transparent;
 		-webkit-box-shadow: none;
@@ -114,6 +118,14 @@ strong {
 }
 	.btn:hover, a.btn:hover {
 		background-position: 0 0;
+		background: #ffba54; /* Old browsers */
+		background: -moz-linear-gradient(top,  #ffba54 0%, #ffaa47 90.3%, #ff9c3f 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffba54), color-stop(90.3%,#ffaa47), color-stop(100%,#ff9c3f)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffba54', endColorstr='#ff9c3f',GradientType=0 ); /* IE6-9 */
 		-webkit-transition: none;
 		-moz-transition: none;
 		-ms-transition: none;
@@ -247,6 +259,14 @@ strong {
 	}
 	.navbar .nav > li > a.active:hover {
 		color: #fff;
+		background: #ffba54; /* Old browsers */
+		background: -moz-linear-gradient(top,  #ffba54 0%, #ffaa47 90.3%, #ff9c3f 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffba54), color-stop(90.3%,#ffaa47), color-stop(100%,#ff9c3f)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(top,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(top,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(top,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* IE10+ */
+		background: linear-gradient(to bottom,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffba54', endColorstr='#ff9c3f',GradientType=0 ); /* IE6-9 */
 	}
 @media (max-width: 767px) {
 	.navbar {
@@ -574,8 +594,8 @@ strong {
 
 /* Page Layout: Docs */
 .docs .span8 {
-	width: 60%;
-	padding-left: 5.95744680199999%;
+	width: 62%;
+	padding-left: 3.95744680199999%;
 	float: right;
 	margin-bottom: 50px;
 }
@@ -585,6 +605,10 @@ strong {
 }
 .docs h1 {
 	margin-bottom: 0.5em;
+}
+.docs h2 {
+	font-size: 1.444444em;
+	margin: 1em 0 0.5em 0;
 }
 .docs-nav {
 	background: rgba(255,255,255,0.15);
@@ -623,6 +647,23 @@ strong {
 		.docs-nav li li li {
 			display: none;
 		}
+#markdown-toc {
+	margin: 1em 0 2em 0;
+}
+#markdown-toc li {
+	list-style: none;
+	margin: 1.5em 0 0 0;
+}
+	#markdown-toc li ul {
+		margin: 0;
+	}
+	#markdown-toc li li {
+		margin: 0.5em 0 0 1.5em;
+		list-style: decimal;
+	}
+	#markdown-toc li li li {
+		list-style: square;
+	}
 @media (max-width: 767px) {
 	.docs .span8 {
 		padding: 0;
