@@ -74,6 +74,10 @@
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
+    <div id="resizeImages-non-http">
+        <img x-src="gopher://archie.ftp.mailto/somanyprotocols" />
+    </div>
+
 
     <script id="test-disable-1" type="text/test">
         <link href="style.css" />
@@ -381,9 +385,20 @@
         module('resizeImages');
 
         test('$.fn.resizeImages', function() {
-            var $got = $('#resizeImages').resizeImages()
+            var $got = $('#resizeImages').resizeImages();
 
             equal($got.length, 1);
+        });
+
+        test('$.fn.resizeImages non-http-url', function() {
+            expect(1);
+
+            $('#resizeImages-non-http').resizeImages()
+            var i = $('#resizeImages-non-http img')
+            var url = i.attr('x-src')
+
+            equal(url, "gopher://archie.ftp.mailto/somanyprotocols", 
+                "Non-http url unchanged");
         });
 
         test('Mobify.getImageURL', function() {
