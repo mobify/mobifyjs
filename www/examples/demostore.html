@@ -3,6 +3,63 @@ layout: example
 title: Mobify.js examples
 ---
 
-<h1>Demo Store</h1>
+<div class="demostore">
+    <h1>Demo Store</h1>
 
-<p>An example of a Magento store that uses Mobify.js to create a mobile website.</p>
+    <p>An example of a Magento store that uses Mobify.js to create a mobile website.</p>
+    <p><a href="http://demostore.mobify.com">http://demostore.mobify.com</a></p>
+
+    <div class="install">
+        <h3>Run the mobile site locally</h3>
+        <p>If you want to see a more in-depth example of Mobify.js then what came with your 
+        initial scaffold, it's easy to download the code and make modifications locally.</p>
+
+        <ul>
+            <li>
+                <p>Install Mobify (incase you haven't):</p>
+                <p><code>$ sudo npm -g install mobify-client</code></p>
+            </li>
+            <li>
+                <p>Download a zip of the examples from Github:</p>
+                <p><a href="https://github.com/mobify/mobifyjs-demos/zipball/master">https://github.com/mobify/mobifyjs-demos/zipball/master</a></p>
+            </li>
+            <li>
+                <p>Unzip the folder, go into the demostore directory and run the preview server:</p>
+                <p><code>$ cd demostore</code></p>
+                <p><code>$ mobify preview</code></p>
+            </li>
+        </ul>
+
+        <p>The tag is generally hard-coded to the path of where your Mobify.js file exists. 
+        In order to load this file locally without changing the Mobify
+        tag on the Demo Store, we use a special tag that allows you to dynamically swap the
+        file being loaded. But you'll need to authorize the swap first.</p>
+
+        <ul>
+            <li>
+                <p>Go to <a href="https://preview.mobify.com/?url=http%3A%2F%2Fdemostore.mobify.com%2F&site_folder=http%3A%2F%2Flocalhost%3A8080%2F&enable_mobile=1&enable_site_folder=1&enable_debug=1&scope=1">preview.mobify.com</a> and click "Authorize"</p>
+            </li>
+        </ul>
+    </div>
+    <div class="play">
+        <h3>Play around with the code</h3>
+        <p>With the preview server running on your local computer, you can edit the files
+        and make adjustments to the Demo Store. Here is an explaination of the most 
+        relevant files:</p>
+        <ul>
+            <li>
+                <p><b>src/mobify.konf</b> is where the DOM manipulation, content selection, and template
+                rendering logic happens</p>
+            </li>
+            <li>
+                <p><b>src/tmpl/*.tmpl</b> is where the mobile templates exist. <b>base.tmpl</b> is
+                included as the base for all page templates.</p>
+            </li>
+            <li>
+                <p><b>src/scss/*</b> is where the mobile stylesheets exist. We used SCSS instead of regular
+                old CSS. <a href="http://sass-lang.com/">Click here</a> if you don't know what SCSS is and
+                want to learn.</p>
+            </li>
+        </ul>
+    </div>
+</div>
