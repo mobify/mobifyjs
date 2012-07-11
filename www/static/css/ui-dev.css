@@ -633,10 +633,13 @@ strong {
 	}
 }
 
-
+/* Page Layout: Examples */
 .examples .span12 {
 	background: rgba(255,255,255,0.15);
 	padding: 20px 40px;
+}
+.examples h2 {
+    font-size: 1.5em;
 }
 
 /* -- Web Fonts -- */
