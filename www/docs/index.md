@@ -16,7 +16,6 @@ title: Documentation
     - [`context.choose(obj1[, obj2[, ...]])`](konf-reference/#contextchooseobj1-obj2-)
     - [Reserved Keys](konf-reference/#reserved-keys)
     - [Best Practices](konf-reference/#best-practices)
-
   - [Template Reference](template-reference/)
     - [Template Reference](template-reference/#template-reference)
       - [Best Practices](template-reference/#best-practices)
@@ -45,7 +44,7 @@ title: Documentation
       - [Debugging the Konf](appendix/#debugging-the-konf)
       - [Debugging Templates (Viewing source, inspecting rendered DOM)](appendix/#debugging-templates-viewing-source-inspecting-rendered-dom)
     - [Common Issues](appendix/#common-issues)
-      - [Page is blank, doesn’t render at all](appendix/#page-is-blank-doesnt-render-at-all)
-      - [“{some-key}” displayed on the page](appendix/#some-key-displayed-on-the-page)
+      - [Page is blank, doesn't render at all](appendix/#page-is-blank-doesnt-render-at-all)
+      - ["{some-key}" displayed on the page](appendix/#some-key-displayed-on-the-page)
     - [Dust.js Documentation](appendix/#dustjs-documentation)
     
