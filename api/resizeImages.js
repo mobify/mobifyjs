@@ -46,7 +46,7 @@ var absolutify = document.createElement('a')
           , bits = [host];
 
         // If a projectName is set on the conf object, put it in resized image urls
-        if(Mobify.conf && && Mobify.conf.data && Mobify.conf.data.projectName) {
+        if(Mobify.conf && Mobify.conf.data && Mobify.conf.data.projectName) {
             var projectName = Mobify.conf.data.projectName
             var projectIdeintifier = "project-" + projectName
             bits.push(projectIdeintifier);
