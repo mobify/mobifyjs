@@ -44,8 +44,8 @@ Mobify.js is a JavaScript framework for adapting existing websites for tablet an
 
 1. Set your browser's User Agent to "iPhone":
 
-    * [In Chrome use the User-Agent Switcher plugin](https://chrome.google.com/webstore/detail/djflhoibgkdhkhhcedjiklpkjnoahfmg)
-    * In Safari Develop > User Agent > iPhone
+    * In Chrome, open Webkit Inspector, click the gear in the bottom right, then the "User agent" tab. Check "Override User Agent" then select "iPhone" from the dropdown.
+    * In Safari click "Develop" > "User Agent" > "iPhone"
 
 1. Navigate to your page. If the demo gods are kind, you'll see this:
 
