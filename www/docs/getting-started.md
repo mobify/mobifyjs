@@ -3,163 +3,93 @@ layout: doc
 title: Getting Started
 ---
 
-# Getting Started
+# Gettings Started
 
- * TOC
- {:toc}
+You've downloaded the mobify-client, created a project scaffold *myproject*,
+and put the tag on the page you'd like to adapt. You've seen "Hello World", but
+crave more.
 
-Mobify.js adapts existing websites for mobile devices using their
-source HTML. The Mobify.js tag loads a bundle, which contains the
-Konf, templates and other resources. Using the 'Konf', we select and
-adapt HTML elements from the original site content, then we render the
-adapted content using 'templates' to produce a new page for the
-browser.
+Open *myproject/src/mobify.konf* in your text editor. The konf is a JavaScript
+file required by every Mobify.js project. It contains the DOM operations
+performed on the source DOM. By default, the scaffold project selects the text
+content of the &lt;title&gt; element and renders a template to display it.
 
-In this guide you will learn how to:
+Let's change it to display to first &lt;a&gt; on the page. Update the *content*
+key to the following:
 
- * Use the Konf to select content from your site's source DOM.
- * Output your adaptation to the browser using templates.
+    'content': function(context) {
+        return context.choose({
+            'templateName': 'home'
+          , '!link': function() {
+                return $('a[href]').first();
+            }
+        })
+    },
 
-##  Tutorial Requirements
-
-**We assume you have have created a project and installed the Mobify 
-Client.**
-
-**[If you haven't, go do it now!](http://cloud.mobify.com/projects/new/)**
-
-##  Previewing Your Work
-
-The Mobify Client allows you to preview changes you make to your local 
-bundle.
-
-Do the following:
-
-1. In a *Terminal* window in your project's directory, run: 
-   `mobify preview`
- 
-   This command compile your bundle locally, on the fly, as you edit 
-   your files. You'll want to keep this window open to see debugging 
-   information as you work on your mobified site.
-
-2. On <http://cloud.mobify.com>, navigate to your project, then click
-   _'Preview'_ in the left-hand navigation. If preview is running, 
-   then _'localhost'_ will be selected by default.
-
-Each time you make a change to your files, you can hit the refresh 
-button to see your changes. If you ever refresh, and suddenly you 
-are viewing your desktop site, try opening up the JavaScript console.
-
-##  What is a 'Konf'?
-
-The Konf is JavaScript that selects and adapts content from a site's
-source DOM. The selections made in the Konf are used as the context 
-to render a template, producing the mobified page. The Konf file is 
-required in any Mobify project, and by default lives at 
-**'src/mobify.konf'**.
-
-##  Templates
-
-A template is a text file that contains variables which are replaced
-when the template is rendered. In Mobify.js, templates are used to 
-remix the source DOM and give you control over the output of your 
-mobified page.
-
-By default, a project starts with four templates:
-
- - **base.tmpl**: An example base template which contains the HTML
-   skeleton of your project, which contains a default css file,
-   viewport, and set of sane block placeholders which are ment to be
-   overridden in other templates (such as home.tmpl).
-
- - **home.tmpl**: An example template for use with a home page.
-
- - **\_header.tmpl**: A template which gets included immediately 
-   below the opening body tag in base.tmpl.
-
- - **\_footer.tmpl**: A template which gets included immediately 
-   above the closing body tag in base.tmpl
-
-##  Creating a template for a different page of your site
-
-To mobify more pages, we need more templates!
-  
-We'll adapt a hypothetical 'About' page for the purposes of this 
-tutorial. If you don't have an 'About' page, or want to try mobifying
-a different set of pages, just substitute another page you want to 
-mobify.
-
-Start by uncommenting the following block in your mobify.konf file:
-
-    /* {
-        '!templateName': 'about',
-        '!phonenumber' : function() {
-            return $('.selector_for_phone_number');
-        },
-        '!blurb': function() {
-            return $('.selector_for_blurb');
-        }
-    } */
+Now open *myproject/src/tmpl/home.tmpl* and update *p.extract*:
     
-Make sure you change `.selector_for_phone_number` and
-`.selector_for_blurb` to something that is unique to the page you're
-mobifying.
+    <p class="extract">{content.link}</p>
 
-You may have noticed that this object you uncommented is an argument 
-that gets passed into `context.choose()`. In order to determine what 
-template to use, the Mobify frameworks determines which template to 
-render by asking you to describe what DOM elements must match for a 
-particular template to render.This DOM description is also used as the
-context which is used when rendering templates - so you can see in the
-example above, you have a `!phonenumber` and `!blurb` key, and if 
-those keys match the DOM of the page, then the **"about"** template 
-will be rendered. These keys are then accessible as data within the 
-template (so, for example, you could access the phone number like 
-this: `{content.phonenumber}` ). Keys with `!` prefixed are _required_ 
-in order for the template to render. Sometimes, you may want to 
-extract data from a page, but it isn't something that is required in 
-order to render the page. In that case, you simply add a key without 
-the `!` prefix.
+Save your changes and then refresh the page. You should see the first link from
+your adapted page:
 
-Now, you need to create a corresponding template for the 'About' page. 
-Here is an example of what it may look like.
+![Yippy, we've got a link!](/mobifyjs/static/img/getting-started-link.png)
 
-####  about.tmpl
+Inside the konf, `$` is bound to [Zepto](http://zeptojs.com) which queries the 
+source DOM. We've told the konf to select the first link and store it in the 
+context under the key *content.link*. We then updated the key in the template to
+match what is in the konf.
 
-    {base/}
-    
-    {<content}
-        <h1>About page</h1>
-        <h3>My phone number: "{content.phonenumber}"</h3>
-        <p>{content.blurb}</p>
-    {/content}
+Follow the link on your browser.
 
-Simply navigate to the about page (make sure `mobify preview` is still
-running!, and you will see your About page rendered through Mobify.js. 
-If for some reason you see your desktop site, open up the JavaScript 
-console to see any potential errors.
+The same adaptation is being applied to this page! Let's change the konf to 
+make different selections on this page and render a different template.
 
-## Pushing a bundle up to Cloud
+Update your konf:
 
-Now that your site is looking decent, you might want to start thinking 
-about pushing up bundles to the Cloud in order to view them on your 
-mobile device, if you have a bundle that you think you might want to 
-publish to production.
+    'content': function(context) {
+        return context.choose({
+            'templateName': 'subpage'
+          , '!routing': function() {
+                return location.pathname != '/';
+            }
+          , 'headings': function() {
+                return $('h1');
+            }
+        }, {
+            'templateName': 'home'
+          , '!link': function(context) {
+                return $('a[href]').slice(7, 8);
+            }
+        })
+    },
 
-In order to do that, you can simply go to the root directory of your 
-project folder and execute this command:
+Refresh the page.
 
-    mobify push --message "Initial Push"
-    
-After you've pushed, go back to the Preview page and refresh, and you 
-will see the bundle you just pushed in the "Available Bundles" 
-dropdown. Once you select your bundle, you'll notice that you can 
-email this link to yourself or someone else in order to see it on your 
-mobile phone through the interface on Cloud.
+Egads! It's a blank page. What's going on? Open the Webkit Inspector to see 
+debugging information:
 
-## Publishing to Production
+![Helpful debugging information is output to the console](/mobifyjs/static/img/getting-started-error.png)
 
-Once you've gone through and modified your mobile site to your liking, 
-you can publish your bundle to production. Just click on the 
-"Publishing" page on the left hand side, and you'll see a list of 
-bundles that you've pushed up to cloud. From there, you can select the 
-one you want to publish!
+We told Mobify.js to use the *subpage* template for this page but didn't create
+a *src/tmpl/subpage.tmpl*. Let's make that now:
+
+    {>base/}
+
+    {<body}
+        <h1>Template Name: {content.templateName}</h1>
+        <ul>
+            {#content.headings}
+                <li>{.|innerHTML}</li>
+            {/content.headings}
+        </ul>
+    {/body}
+
+The template we just created inherits for *base.tmpl* and overrides the *body*
+block within it. If you open up the *base.tmpl*, you can see that you have full
+control over the HTML layout of our adapted page!
+
+## Where next?
+
+* [Understanding the Konf](../understanding-konf/)
+* [Understanding Templates](../understanding-templates/)
