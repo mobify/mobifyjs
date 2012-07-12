@@ -44,6 +44,10 @@ dt, dd {
 	dd {
 		margin: 0 0 1em 0;
 	}
+em {
+	font-style: normal;
+	color: #fff;
+}
 pre {
 	font-size: 1em;
 	line-height: 1.555556;
@@ -127,6 +131,13 @@ pre {
 strong {
 	font-weight: normal;
 	color: #fff;
+	padding: 1px 4px;
+	background: rgba(0,0,0,0.1);
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-ms-border-radius: 3px;
+	-o-border-radius: 3px;
+	border-radius: 3px;
 }
 .well {
 	color: #032c32;
