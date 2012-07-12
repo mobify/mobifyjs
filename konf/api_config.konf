@@ -1,3 +1,5 @@
+{! API Configuration !}
+
 (function(Mobify) {
 
 {! project "name" slug from project.json !}
@@ -5,6 +7,7 @@
 
 var projectName = '{project_name}';
 
+{! Add it to image resizing defaults !}
 Mobify.$.fn.resizeImages.defaults.projectName = projectName;
 
 {/project_name}
