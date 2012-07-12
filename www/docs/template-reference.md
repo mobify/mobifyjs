@@ -19,15 +19,6 @@ title: Template Reference
   * `{! Comment !}` - Template Comments
   {:toc}
 
-
-## Best Practices
-
-- Template File Naming Conventions
-- Use a Base Template
-- Prefix Introduced Styling Attributes With `'x-'`
-
-
-
 ##  Understanding Context
 
 Templates are HTML documents containing variables to be filled in with
@@ -391,6 +382,11 @@ Text surrounded by `{!` and `!}` are considered comments and will not be rendere
         Comments are useful for explaining complex template logic.
     !}
 
+## Mobify.desktop() - Back to Desktop
+
+Add this anchor tag to your website to allow users to revert back to Desktop:
+
+    <a href="" onclick="Mobify.desktop(); return false;">View Full Site</a>
 
 
 # Best Practices
@@ -444,3 +440,4 @@ attributes you introduce in your templates for the sake of styling.
 We recommend you prefix all classes and IDs introduced in templates
 with `x-` to allow you to easily identify content introduced with the
 template.
+

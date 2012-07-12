@@ -37,8 +37,12 @@ dt, dd {
 	font-size: 1em;
 	line-height: 1.555556;
 }
+	dt {
+		font-weight: normal;
+		color: #fff;
+	}
 	dd {
-		margin-bottom: 1em;
+		margin: 0 0 1em 0;
 	}
 pre {
 	font-size: 1em;
@@ -353,6 +357,23 @@ strong {
 		font-size: 2em;
 		width: 32.5%;
 	}
+.illustration {
+	display: block;
+	margin: 2em auto;
+	text-align: center;
+}
+.illustration img {
+	-webkit-border-radius: 9px;
+	-moz-border-radius: 9px;
+	-ms-border-radius: 9px;
+	-o-border-radius: 9px;
+	border-radius: 9px;
+	-webkit-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
+	-moz-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
+	-ms-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
+	-o-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
+	box-shadow: rgba(0,0,0,0.15) 0 3px 0;	
+}
 @media (max-width: 999px) {
 	.lead-in h1 {
 		float: none;
@@ -760,15 +781,19 @@ strong {
 	background: rgba(255,255,255,0.15);
 	padding: 20px 40px;
 }
-
+@media (max-width: 767px) {
+	.examples .span8 {
+		padding: 0;
+		width: 100%;
+	}
+	.examples .span4 {
+		width: 100%;
+	}
+}
 
 
 /* -- Web Fonts -- */
 @font-face {
 	font-family: 'DagnyWeb';
 	src: url('../type/DagnyWeb.eot?') format('eot'), url('../type/DagnyWeb.woff') format('woff'), url('../type/DagnyWeb.ttf') format('truetype');
-}
-@font-face {
-	font-family: 'DagnyWebBold';
-	src: url('../type/DagnyWeb-Bold.eot?') format('eot'), url('../type/DagnyWeb-Bold.woff') format('woff'), url('../type/DagnyWeb-Bold.ttf') format('truetype');
 }
