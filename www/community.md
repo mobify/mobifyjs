@@ -5,31 +5,31 @@ title: Community
 
 ## Where to get help?
 
-Questions are best posted on [StackOverflow](https://stackoverflow.com/) under the tag **mobifyjs**. Our team members are active on StackOverflow for mobify.js and other projects.
+Questions are best posted on [StackOverflow](https://stackoverflow.com/) under the tag **mobifyjs**. Our team is active on StackOverflow for mobify.js and other projects.
 
-If you have a problem with the [Mobify Cloud Platform](https://cloud.mobify.com/) or you wish to reach our paid support personnel you can reach us through our [support site](https://support.mobify.com/).
+If you have a problem with the [Mobify Cloud Platform](https://cloud.mobify.com/) or you wish to reach our Mobify Cloud support personnel you can reach us through our [support site](https://support.mobify.com/).
 {:.cloud}
 
 ## Where to report bugs?
 
-Bugs and feature requests should be submitted to our public bug repo and bug tracker on Github:
+Bugs and feature requests should be submitted to our issue tracker on Github:
 
   - [Issues for the mobify.js Framework](https://github.com/mobify/mobifyjs/issues)
   - [Issues for the mobify-client tools](https://github.com/mobify/mobify-client/issues)
 
-If your not sure under which project to submit your issues, submit them to either and we will sort them out.
+If you're not sure which project to submit your issues to, submit to either and we will sort them out.
 
 ## How to Contribute
 
-Mobify.js's development takes place on [Mobify's Github account](https://github.com/mobify). We have to primary repos dedicated to mobify.js: the [mobify.js framework](https://github.com/mobify/mobifyjs) and the [mobify-client](https://github.com/mobify/mobify-client) which is our build tool.
+Mobify.js's development takes place on [Mobify's Github account](https://github.com/mobify). We have two primary repositories dedicated to mobify.js: the [mobify.js framework](https://github.com/mobify/mobifyjs) and the [mobify-client](https://github.com/mobify/mobify-client), which is our build tool.
 
-Contributing changes is a straight forward process:
+Contributing changes is straightforward:
 
-  1. Fork It on Github
+  1. Fork the repository on Github
   2. Push your changes to your fork
-  3. Open a Pull Request
-  4. Get Feedback
-  5. Update Code
-  6. Get it Merged
+  3. Open a Pull Request from your fork
+  4. Get feedback
+  5. Update code
+  6. Get it merged back
 
 
