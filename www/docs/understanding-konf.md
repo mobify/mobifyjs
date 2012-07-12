@@ -86,4 +86,4 @@ DOM's `<body>` element, and then finds all of its child `<img>`
 elements using Zepto's `.find()` function.
 
 `context.choose`, `context.data`, and `context.tmpl` are functions 
-that require `context` to be passed, [learn more about them](https://support.mobify.com/customer/portal/articles/511630-konf-reference)
+that require `context` to be passed, [learn more about them]({{ site.baseurl }}/docs/konf-reference/)
