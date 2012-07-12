@@ -7,6 +7,8 @@ title: Documentation
 
 Mobify.js is a JavaScript framework for adapting existing websites for tablet and mobile.
 
+1. Install <a href="http://nodejs.org/">Node.js</a> if you don't have it already.
+
 1. Download the [mobify-client](https://github.com/mobify/mobify-client):
 
         sudo npm -g install mobify-client
@@ -50,9 +52,11 @@ Mobify.js is a JavaScript framework for adapting existing websites for tablet an
 
 1. Navigate to your page. If the demo gods are kind, you'll see this:
 
-    <img src="/mobifyjs/static/img/init.png">
+<div class="illustration">
+    <img src="/mobifyjs/static/img/init.min.png">
+</div>
 
-# How it works:
+## How it works:
 
 Mobify.js uses a technique called **client side adaptation** to remix HTML on the browser. The remixed content is interrupted by the browser as if the server had sent it in the first place!
 
@@ -62,7 +66,7 @@ The development server is part of the **Mobify Client**, a command line tool for
 
 Adaptations are expressed as a series of DOM operations on the **source DOM**, the DOM constructed from the page's original HTML. Selected elements can be stored in a context object which is then passed to a template. Then the rendered template is outputted to the browser!
 
-# Where to next?
+## Where to next?
 
 * [See how to change the scaffold files in "Getting Started"generated in the "Getting Started"](./getting-started/)
 * [Learn about how to adapt your site using DOM operations in "Understanding the Konf"](./understanding-konf/)
