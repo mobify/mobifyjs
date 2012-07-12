@@ -3,7 +3,7 @@
 
     // If loaded with preview, set debug, otherwise debug is off.
     var match = /mobify-path=([^&;]*)/g.exec(document.cookie);
-    config.isDebug = match && match[1] ? 1 : 0;
+    config.isDebug = config.isDebug || (match && match[1] ? 1 : 0);
 
     // configFile my already exists if rendering server side, so only grab mobify.js script tag 
     // if configFile is undefined.
