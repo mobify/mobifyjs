@@ -86,16 +86,18 @@ h2 {
 		-moz-box-shadow: none;
 		box-shadow: none;
 	}
+<<<<<<< HEAD
 hr {
 	margin: 2em 0;
 	border-bottom-color: rgba(255,255,255,0.1);
 	border-top-color: rgba(0,0,0,0.1);
-}
+=======
 h3 {
     font-size: 1em;
     margin: 1em 0 0.5em 0;
     font-weight: normal;
     color: #fff;
+>>>>>>> ff14cc63e15da6ea4fa41ae82e2a03b9b3bb5fd2
 }
 li {
 	line-height: 1.555556;

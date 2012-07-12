@@ -19,32 +19,25 @@ title: Template Reference
   * `{! Comment !}` - Template Comments
   {:toc}
 
-
-## Best Practices
-
-- Template File Naming Conventions
-- Use a Base Template
-- Prefix Introduced Styling Attributes With `'x-'`
-
-
-
 ##  Understanding Context
 
 Templates are HTML documents containing variables to be filled in with
 data. This data comes from the evaluated konf output, referred to as
-the _context_ for the template.
+the **context** for the template.
 
 The context is a tree of all the keys that your konf has evaluated
 that apply to this template.
 
 When developing with Mobify.js, you can view the full tree within your
-browser's Javascript console (see our tools guide in the Appendix if
+browser's Javascript console (see [our tools guide in the
+appendix]({{ site.baseurl }}/docs/appendix/#tools), if
 you're not familiar with its use). Browse to the page you'd like to
-inspect, open the console and find 'All extracted data' -- expand it
+inspect, open the console and find `All extracted data` -- expand it
 to view all evaluated keys. Any of these are available for use as
 variables within your template. You'll find many internal keys that
-Mobify generates during operation, see Reserved Keys for a list of
-these.
+Mobify generates during operation, see
+[Reserved Keys]({{ site.baseurl }}/docs/konf-reference/#reserved-keys)
+for a list of these.
 
 Note that when we talk about changing levels of context below, we
 simply mean traversing the levels of this context tree.
@@ -56,26 +49,26 @@ Select elements from your source DOM in the konf file, then reference
 the selection as a variable from any template using the curly brace
 syntax:
 
-*Source HTML input:*
+**Source HTML input:**
 
      <form id="search">
          <input type="submit" value="Send" />
      </form>
 
-*Assign a selection to a key, in the konf:*
+**Assign a selection to a key, in the konf:**
 
      'search': function() {
          return $("form#search"); 
      },
 
-*Render the result of the `search` key selection in the konf as a
-*variable within your template:
+**Render the result of the `search` key selection in the konf as a
+variable within your template:**
 
      <div class="search">
          {search}
      </div>
 
-*Output HTML:*
+**Output HTML:**
 
      <div class="search">
          <form id="search">
@@ -83,7 +76,7 @@ syntax:
          </form>
      </div>
 
-**Variable Evaluation**
+### Variable Evaluation
 
 Zepto collections are evaluated by iterating the objects in the
 collection, taking the JavaScript `outerHTML` attribute of each of
@@ -92,9 +85,9 @@ them, then concatenating these together.
 A single DOM Element will evaluate to its `outerHTML` attribute.
 
 Note that all strings are escaped by default, so use a filter (see
-filter reference below) if you'd like to output HTML.
+[filter reference below](#filters)) if you'd like to output HTML.
 
-**Variable Resolution**
+### Variable Resolution
 
 Variables are first looked-up in the keys at the current level of the
 context. If a key matching the variable name is not found at this
@@ -103,30 +96,30 @@ context, and so forth until it is found, or the highest level of the
 context is reached.
 
 
-##  `{foo|bar}` - Variable Filters: Pass The Value `foo` Through Filter `bar`
+##  `{foo|bar}` - Variable Filters: Pass The Value `foo` Through Filter `bar` {#filters}
 
 If you would like to change how a variables value is rendered,
 especially values produced from Zepto collections or a DOM element,
 you can use filters. Add a pipe symbol `|` and filter name inside the
 template tag:
 
-*Source HTML input:*
+**Source HTML input:**
 
     <h3 class="warning">
         <img src="icon.png" class="icon"> Warning: your balance is low
     </h3>
 
-*The selection in the konf:*
+**The selection in the konf:**
 
     'warning': function() {
         return $(".warning"); 
     },
 
-*Add a filter to the `warning` variable within your template:*
+**Add a filter to the `warning` variable within your template:**
 
     {warning|innerHTML|s}
 
-*Output HTML:*
+**Output HTML:**
 
     <img src="icon.png" class="icon"> Warning: your balance is low
 
@@ -135,7 +128,7 @@ symbol `|` and filter name inside the template tag. Note that filters
 are cumulative, and will apply each additional filter to the output of
 the previous one.
 
-**Available Filters**
+### Available Filters
 
 * `innerHTML` - render the `innerHTML` of a Zepto collection or DOM 
                 element. Note: the output of this filter will be HTML 
@@ -156,10 +149,10 @@ the previous one.
 ## `{#foo} ... {/foo}` - Accessing Attributes Of, Or Descending Into The Variable `foo`
 
 You are able to access any variable and its attributes. To simply
-access an attribute, you can use the simpler '{variable.attribute}'
+access an attribute, you can use the simpler `{variable.attribute}`
 syntax:
 
-*Source HTML input:*
+**Source HTML input:**
 
     <div class="site-header">
         <h1>DemoCorp Inc.</h1>
@@ -172,21 +165,21 @@ syntax:
         </nav>
     </div>
 
-*Create a header variable with logo attribute in the konf:*
+**Create a header variable with logo attribute in the konf:**
 
     'header': {
         'logo': function() {
-            return $('.site-header h1')
+            return $('.site-header h1');
         }
     }
 
-*Access the `logo` attribute within your template:*
+**Access the `logo` attribute within your template:**
 
     <div id="fixed-nav">
         {header.logo}
     </div>
 
-*Output HTML:*
+**Output HTML:**
 
     <div id="fixed-nav">
         <h1>DemoCorp Inc.</h1>
@@ -208,10 +201,10 @@ would be identical to the last example:
 
 When you make a selection within the konf that returns a set with
 multiple elements, you can easily iterate through those elements in
-your template using the '.' attribute, which is a reference to the
+your template using the `.` attribute, which is a reference to the
 current iteration:
 
-*Source HTML input:*
+**Source HTML input:**
 
     <div class="site-header">
         <h1>DemoCorp Inc.</h1>
@@ -224,19 +217,19 @@ current iteration:
         </nav>
     </div>
 
-*Create a variable with attributes in the konf:*
+**Create a variable with attributes in the konf:**
 
     'header': {
         'logo': function() {
-            return $('.site-header h1')
+            return $('.site-header h1');
         },
         'nav': function() {
-            return $('.site-header nav a')
+            return $('.site-header nav a');
         }
     }
 
-*Descend into the `header` variable to access `logo` and `nav` 
-attributes, also iterate `nav`:*
+**Descend into the `header` variable to access `logo` and `nav` 
+attributes, also iterate `nav`:**
 
     <div id="fixed-nav">
         {#header}
@@ -249,7 +242,7 @@ attributes, also iterate `nav`:*
         {/header}
     </div>
 
-*Output HTML:*
+**Output HTML:**
 
     <div id="fixed-nav">
         <h1>DemoCorp Inc.</h1>
@@ -266,11 +259,11 @@ attributes, also iterate `nav`:*
 Partials, also known as template includes, allow you to make a
 template composed of other templates:
 
-*Contents of partial `logo`:*
+**Contents of partial `logo`:**
 
     {site.logo}
 
-*Referencing a partial to include in your template _foo.tmpl_:*
+**Referencing a partial to include in your template _foo.tmpl_:**
 
     <div id="header">
         {>logo/}
@@ -279,7 +272,7 @@ template composed of other templates:
 
 This would insert the template _logo.tmpl_ into _foo.tmpl_.
 
-*Resulting markup of the combined _logo.tmpl_ and _foo.tmpl_ templates:*
+**Resulting markup of the combined _logo.tmpl_ and _foo.tmpl_ templates:**
 
     <div id="header">
         <h1>DemoCorp Inc.</h1>
@@ -291,19 +284,19 @@ This would insert the template _logo.tmpl_ into _foo.tmpl_.
     </div>
 
 
-## `{+bar} ... {/bar}` - Block Placeholders
+## `{+bar} ... {/bar}` - Block Placeholders {#block-placeholders}
 
 Blocks allow you to define snippets of template code that may be
 overridden by other templates:
 
-*Adding an overridable block `header` to _foo.tmpl_:*
+**Adding an overridable block `header` to _foo.tmpl_:**
 
     {+header}Plain Old Default Header{/header}
 
-See *Block Overrides* below for override usage.
+See [Block Overrides](#block-overrides) for override usage.
 
 
-## `{<bar} ... {/bar}` - Block Overrides
+## `{<bar} ... {/bar}` - Block Overrides {#block-overrides}
 
 Adding an overridable block `header` to _foo.tmpl_:
 
@@ -335,7 +328,7 @@ would be the contents of both headings combined:
 
     Plain Old Default Header Exciting New More Specific Products Header!
 
-See 'Block Placeholders' above for placeholder usage.
+See [Block Placeholders](#block-placeholders) for placeholder usage.
 
 
 ## `{?foo} ... {/foo}` - Conditional, Check For The Existence Of Variable `foo`
@@ -391,6 +384,11 @@ Text surrounded by `{!` and `!}` are considered comments and will not be rendere
         Comments are useful for explaining complex template logic.
     !}
 
+## Mobify.desktop() - Back to Desktop
+
+Add this anchor tag to your website to allow users to revert back to Desktop:
+
+    <a href="" onclick="Mobify.desktop(); return false;">View Full Site</a>
 
 
 # Best Practices
@@ -444,3 +442,4 @@ attributes you introduce in your templates for the sake of styling.
 We recommend you prefix all classes and IDs introduced in templates
 with `x-` to allow you to easily identify content introduced with the
 template.
+

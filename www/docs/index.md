@@ -15,9 +15,11 @@ Mobify.js is a JavaScript framework for adapting existing websites for tablet an
 
 1. Create a project scaffold and start the Mobify.js development server:
 
-        mobify init myproject && cd myproject && mobify preview
+        mobify init myproject
+        cd myproject
+        mobify preview
 
-1. Insert the Mobify.js tag **immediately** after the opening <head> tag of the website you want to adapt:
+1. Insert the Mobify.js tag **immediately** after the opening <head> tag on the website you want to adapt:
 
         <script>
         (function(window, document, mjs) {
@@ -58,17 +60,17 @@ Mobify.js is a JavaScript framework for adapting existing websites for tablet an
 
 ## How it works:
 
-Mobify.js uses a technique called **client side adaptation** to remix HTML on the browser. The remixed content is interrupted by the browser as if the server had sent it in the first place!
+Mobify.js uses a technique called **client side adaptation** to remix HTML in the browser. The remixed content is interpreted by the browser as if the server had sent it in the first place!
 
-The **Mobify.js tag** bootstraps the adaptation and loads the **Mobify.js file** which performs it. The tag activates for iOS, Android and BlackBerry browsers. By default, the Mobify.js file is loaded from the development server.
+The **Mobify.js tag** bootstraps the adaptation and loads the **Mobify.js file**, which performs it. The tag activates in iOS, Android and BlackBerry browsers. By default, the Mobify.js file is loaded from the development server.
 
 The development server is part of the **Mobify Client**, a command line tool for building Mobify.js projects. It compiles the Mobify.js file dynamically per request. The file contains two parts, the **Mobify.js API** and site specific adaptations.
 
-Adaptations are expressed as a series of DOM operations on the **source DOM**, the DOM constructed from the page's original HTML. Selected elements can be stored in a context object which is then passed to a template. Then the rendered template is outputted to the browser!
+Adaptations are expressed as a series of operations on the **source DOM**, the DOM constructed from the page's original HTML. HTML Elements can be selected, then rendered with a template. Finally, the rendered template is written to the browser.
 
 ## Where to next?
 
-* [See how to change the scaffold files in "Getting Started"generated in the "Getting Started"](./getting-started/)
+* [See how to change the generated scaffold files in "Getting Started"](./getting-started/)
 * [Learn about how to adapt your site using DOM operations in "Understanding the Konf"](./understanding-konf/)
 * [See how templates can be used to control the adaptation in "Understanding Templates"](./understanding-templates/)
 * [Read tips for debugging Mobify.js in the Appendix](./appendix/)

@@ -8,8 +8,7 @@ title: Understanding the Konf
 The konf file is JavaScript code that makes selections from the source
 DOM, chooses a template to render and renders that template with those
 selections as the context. [Learn more about
-templates](https://support.mobify.com/customer/portal/articles/511698
--understanding-templates)
+templates]({{ site.baseurl }}/docs/template-reference/)
 
 A konf file is required in every Mobify project and lives at
 _src/mobify.konf_.
@@ -86,4 +85,4 @@ DOM's `<body>` element, and then finds all of its child `<img>`
 elements using Zepto's `.find()` function.
 
 `context.choose`, `context.data`, and `context.tmpl` are functions 
-that require `context` to be passed, [learn more about them](https://support.mobify.com/customer/portal/articles/511630-konf-reference)
+that require `context` to be passed, [learn more about them]({{ site.baseurl }}/docs/konf-reference/)

@@ -17,7 +17,7 @@ title: Konf Reference
 ##  Using Konf
 
 The Konf selects elements from the source DOM to be rendered 
-on the mobile site. To make selection easy, Mobify.js includes Zepto, 
+on the mobile site. To make selection easy Mobify.js includes [Zepto](http://zeptojs.com/), 
 a minimalist JavaScript DOM library optimized for mobile with a 
 jQuery-like API. 
 
@@ -52,8 +52,8 @@ the id of `product-carousel`. If it finds it, the required key
 `products` evaluates to true and the page will immediately be rendered 
 with _homePage.tmpl_. If not, then (and only then) the second selector 
 is evaluated and if an element with a `product-list` class is found, 
-the page will instead be rendered with _productPage.tmpl_. See below 
-for more on how `context.choose` works.
+the page will instead be rendered with _productPage.tmpl_. See [here
+for more on how `context.choose` works](#context-choose).
 
 Only templates with required keys that evaluate to truthy values will 
 render, and when multiple templates could potentially apply only the 
@@ -157,7 +157,7 @@ level and tries again.
 
 ##  `context.tmpl(template)`
 
-Returns the specified .tmpl file template, rendered against the 
+Returns the specified _.tmpl_ file template, rendered against the 
 evaluated konf object. 
 
     'OUTPUTHTML': function(context) {
@@ -184,7 +184,7 @@ This assigns a value of `home` to the key later referenced by
 template name, which is returned to `OUTPUTHTML` for rendering.
 
 
-##  `context.choose(obj1[, obj2[, ...]])`
+##  `context.choose(obj1[, obj2[, ...]])` {#context-choose}
 
 Accepts anonymous JSON objects as parameters and returns the first 
 object that matches. An object is considered to match if all internal 
@@ -218,7 +218,7 @@ An object with no required selections always matches:
     }
 
 If no matching objects are found `context.choose` returns undefined. 
-Multiple keys may be prefixed with `!` to create `and` conditions: 
+Multiple keys may be prefixed with `!` to create "and" conditions: 
 
     'home': function(context) {
         return context.choose({
@@ -261,7 +261,7 @@ template name:
     }
 
 
-**Truthiness Of Required Selections, Keys Prefixed With `!`**
+### Truthiness Of Required Selections, Keys Prefixed With `!`
 
 `context.choose()` considers a selection to be truthy if it matches 
 one of the following conditions:
@@ -272,9 +272,15 @@ one of the following conditions:
 If none of these conditions are true then a value is considered 
 falsey.
 
-**Do not change the DOM in required selections in the konf**: you may 
-adversely affect evaluation further down the konf
+### Do not change the DOM in required selections in the konf {#do-not-modify-dom-in-required}
 
+All required keys in any block may be evaluated, while non-required
+keys are only evaluated in the block that is selected by 
+`context.chooose()`. If you made modifications to the DOM, you may
+adversely affect evaluation further down the konf. This often leads to
+hard to find bugs. It is recommended you select for certain elements 
+in required keys, but if the DOM requires modification, do it in a 
+non-required key.
 
 ##  Reserved Keys
 
@@ -349,8 +355,4 @@ following reserved keys:
 * DO: Prefer the matching of more complete DOM outlines over single 
       selectors when assigning templates to specific pages.
 
-* DO NOT: alter the source DOM in required selectors, as they are 
-          evaluated regardless of whether they are used as a context 
-          to evaluate templates. If you need to alter the source DOM 
-          before templating, do it with a non-required (un-prefixed) 
-          selection key.
+* DO NOT: [Alter the source DOM in required selectors](#do-not-modify-dom-in-required)
