@@ -54,6 +54,8 @@
 {>"/base/api/main.js"/}
 {>"/base/api/resizeImages.js"/}
 
+{>"api_config.konf"/}
+
 {+tmpl}
     {>"/base/tmpl/*.tmpl"/}
     {>"tmpl/*.tmpl"/}

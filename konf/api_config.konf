@@ -1,0 +1,12 @@
+(function(Mobify) {
+
+{! project "name" slug from project.json !}
+{?project_name}
+
+var projectName = '{project_name}';
+
+Mobify.$.fn.resizeImages.defaults.projectName = projectName;
+
+{/project_name}
+
+})(window.Mobify);

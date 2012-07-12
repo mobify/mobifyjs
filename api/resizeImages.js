@@ -45,10 +45,9 @@ var absolutify = document.createElement('a')
         var host = hosts[URLHash(url) % hosts.length]
           , bits = [host];
 
-        // If a projectName is set on the conf object, put it in resized image urls
-        if(Mobify.conf && Mobify.conf.data && Mobify.conf.data.projectName) {
-            var projectName = Mobify.conf.data.projectName
-            var projectIdeintifier = "project-" + projectName
+        // If projectName is set on defaults and truthy, put it in resized image urls
+        if(defaults.projectName) {
+            var projectIdeintifier = "project-" + defaults.projectName
             bits.push(projectIdeintifier);
         }
 
@@ -105,6 +104,7 @@ var absolutify = document.createElement('a')
   , defaults = resizeImages.defaults = {
         selector: 'img[x-src]'
       , attribute: 'x-src'
+      , projectName: ''
     }
 
 })(this, Mobify.$);
