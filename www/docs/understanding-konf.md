@@ -8,8 +8,7 @@ title: Understanding the Konf
 The konf file is JavaScript code that makes selections from the source
 DOM, chooses a template to render and renders that template with those
 selections as the context. [Learn more about
-templates](https://support.mobify.com/customer/portal/articles/511698
--understanding-templates)
+templates]({{ site.baseurl }}/docs/template-reference/)
 
 A konf file is required in every Mobify project and lives at
 _src/mobify.konf_.
