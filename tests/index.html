@@ -24,7 +24,9 @@
     <ol id="qunit-tests"></ol>  
 
     <div id="fixtures">
-        <script>Mobify = {points: [+new Date], config: {}, conf: {} }</script>
+        <script>
+        Mobify = { points: [+new Date], config: {}, conf: { data: {} } }
+        </script>
         <script src="../vendor/zepto/src/zepto.js"></script>
         <script src="../vendor/zepto/src/event.js"></script>
 
@@ -415,10 +417,10 @@
             equal(got, vow);
         });
 
-        test('Mobify.getImageURL - projectName set on Mobify.conf', function() {
+        test('Mobify.getImageURL - projectName set on Mobify.conf.data', function() {
             expect(1);
             
-            Mobify.conf.projectName = 'testing'
+            Mobify.conf.data.projectName = 'testing'
 
             got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
             vow = "//ir2.mobify.com/project-testing/320/http://test/image.jpg"
