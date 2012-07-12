@@ -15,7 +15,9 @@ Mobify.js is a JavaScript framework for adapting existing websites for tablet an
 
 1. Create a project scaffold and start the Mobify.js development server:
 
-        mobify init myproject && cd myproject && mobify preview
+        mobify init myproject
+        cd myproject
+        mobify preview
 
 1. Insert the Mobify.js tag **immediately** after the opening <head> tag on the website you want to adapt:
 

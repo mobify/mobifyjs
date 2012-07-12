@@ -50,7 +50,15 @@ pre {
 }
 	pre code {
 		background: transparent;
-		-webkit-box-shadow: none;
+
+        /* Preseve whitespace in code, scroll horizontally */
+        overflow-x: scroll;
+        
+        word-break: normal;
+        word-wrap: normal;
+        white-space: pre;
+		
+        -webkit-box-shadow: none;
 		-moz-box-shadow: none;
 		box-shadow: none;
 	}
