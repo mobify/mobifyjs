@@ -420,14 +420,14 @@
         test('Mobify.getImageURL - projectName set on Mobify.conf.data', function() {
             expect(1);
             
-            Mobify.conf.data.projectName = 'testing'
+            Mobify.$.fn.resizeImages.defaults.projectName = 'testing'
 
             got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
             vow = "//ir2.mobify.com/project-testing/320/http://test/image.jpg"
 
             equal(got, vow);
 
-            delete Mobify.conf.projectName;
+            delete Mobify.$.fn.resizeImages.defaults.projectName;
         });
 
 
