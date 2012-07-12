@@ -53,7 +53,7 @@ Mobify.js is a JavaScript framework for adapting existing websites for tablet an
 1. Navigate to your page. If the demo gods are kind, you'll see this:
 
 <div class="illustration">
-    <img src="/mobifyjs/static/img/init.png">
+    <img src="/mobifyjs/static/img/init.min.png">
 </div>
 
 ## How it works:
