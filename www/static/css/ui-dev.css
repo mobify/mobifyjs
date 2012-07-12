@@ -517,6 +517,7 @@ strong {
 	.video h3 {
 		color: #d5ecf2;
 		padding: 1em 0;
+		margin: 0;
 		text-align: center;
 		background: rgba(39,40,34,0.7);
 		-webkit-border-bottom-left-radius: 9px;
@@ -602,6 +603,14 @@ strong {
 		-o-transform: rotate(45deg);
 		transform: rotate(45deg);
 	}
+	.installing-tag {
+		color: #032c32;
+		display: none;
+		margin: 1em 0;
+	}
+	.installing-tag strong {
+		color: #7a9fa5;
+	}
 .remix-site {
 	padding: 2em 0 3.5em 0;
 }
@@ -673,7 +682,7 @@ strong {
 		float: right;
 	}
 	.install-summary {
-		padding-top: 3em;
+		padding-top: 4em;
 	}
 	.install-instructions {
 		-webkit-box-shadow: inset #ebf0f1 12px 0 12px 0;
@@ -697,6 +706,8 @@ strong {
 	}
 }
 
+
+/* Home Page Variation: show tag info */
 
 
 /* Home Page Variation: Display Video */
