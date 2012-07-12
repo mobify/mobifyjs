@@ -5,7 +5,7 @@ title: Community
 
 ## Where to get help?
 
-Questions are best posted on [StackOverflow](https://stackoverflow.com/) under the tag **mobifyjs**. Our team is active on StackOverflow for mobify.js and other projects.
+Questions are best posted on [StackOverflow](http://stackoverflow.com/) under the tag **mobifyjs**. Our team is active on StackOverflow for mobify.js and other projects.
 
 If you have a problem with the [Mobify Cloud Platform](https://cloud.mobify.com/) or you wish to reach our Mobify Cloud support personnel you can reach us through our [support site](https://support.mobify.com/).
 {:.cloud}

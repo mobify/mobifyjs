@@ -16,7 +16,8 @@ Context
 : A set of key-value pairs that is used to provide values for 
 variables in templates. The Mobify.js konf produces a context, 
 built from your selections, and renders a template with that 
-context. [Learn more about context](../template-reference/#understanding-context)
+context.
+[Learn more about context](../template-reference/#understanding-context).
 
 Keys
 

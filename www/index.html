@@ -4,8 +4,8 @@ title: mobify.js
 bodyclass: home
 ---
 
-<div class="row-fluid">
-    <div class="span5">
+<div class="row-fluid intro">
+    <div class="span5 video-intro">
         <p class="lead">
             Use Mobify to quickly adapt <strong>any website</strong> to support <strong>any device</strong>.
         </p>
@@ -18,6 +18,7 @@ bodyclass: home
         <div class="video rounded shaded">
             <a href="https://vimeo.com/45657333" class="play"><i>Play Video</i></a>
             <h3>Building a mobile web site with Mobify.js</h3>
+            <iframe src="http://player.vimeo.com/video/45657333" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen autoplay></iframe>
         </div>
     </div>
 </div>
@@ -39,11 +40,9 @@ bodyclass: home
 
                     <div class="span6">
                         <ol class="install-instructions">
-                            <li><span>Install Mobify tag</span> <a href="/tag/">(how?)</a></li>
                             <li><code>sudo npm -g install mobify-client</code></li>
-                            <li><code>mobify init myproject</code></li>
-                            <li><code>cd myproject</code></li>
-                            <li><code>mobify preview</code></li>
+                            <li><code>mobify init myproject &amp;&amp; cd myproject &amp;&amp; mobify preview</code></li>
+                            <li><span>Install Mobify tag</span> <a href="/tag/">(how?)</a></li>
                         </ol>
                     </div>
                 </div><!-- nested .row -->
@@ -94,4 +93,14 @@ bodyclass: home
 </div><!-- .next-level -->
 
 
+<script>
+    
+    $("a.play").click(function() {
+        $("div.video-container").parent().addClass("animate-video");
+        $("div.video-container iframe").show(500);
+        return(false);
+    });
 
+
+
+</script>
