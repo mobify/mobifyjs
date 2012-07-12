@@ -41,7 +41,7 @@ the rendered DOM.
 Source DOM 
 
 : The DOM built from your site's original HTML, without running 
-JavsScript, ie. the DOM you'd see if you viewed source.
+JavaScript, ie. the DOM you'd see if you viewed source.
 
 Templates
 
