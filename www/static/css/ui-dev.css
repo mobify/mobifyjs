@@ -59,7 +59,7 @@ pre {
 		background: transparent;
 
         /* Preseve whitespace in code, scroll horizontally */
-        overflow-x: scroll;
+        overflow-x: auto;
         
         word-break: normal;
         word-wrap: normal;
