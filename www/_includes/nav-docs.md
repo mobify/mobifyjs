@@ -4,6 +4,7 @@
   - [Getting Started]({{ site.baseurl }}/docs/getting-started/)
   - [Understanding the Konf]({{ site.baseurl }}/docs/understanding-konf/)
   - [Understanding Templates]({{ site.baseurl }}/docs/understanding-templates/)
+  - [Mobify.js in Production]({{ site.baseurl }}/docs/mobifyjs-in-production/)
   - [Konf Reference]({{ site.baseurl }}/docs/konf-reference/)
     - [Using Konf]({{ site.baseurl }}/docs/konf-reference/#using-konf)
     - [`OUTPUTHTML`]({{ site.baseurl }}/docs/konf-reference/#outputhtml)
