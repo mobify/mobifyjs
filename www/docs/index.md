@@ -3,7 +3,7 @@ layout: doc
 title: Documentation
 ---
 
-# Quick Start
+# Installation and Project Setup 
 
 Mobify.js is a JavaScript framework for adapting existing websites for tablet and mobile.
 
