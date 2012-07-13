@@ -136,6 +136,8 @@ pre {
 	margin: 2em 0;
 	-webkit-border-radius: 9px;
 	-moz-border-radius: 9px;
+	-ms-border-radius: 9px;
+	-o-border-radius: 9px;
 	border-radius: 9px;
 	-webkit-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
 	-moz-box-shadow: rgba(0,0,0,0.15) 0 3px 0;
@@ -273,9 +275,10 @@ strong {
 
 
 /* Header Layout */
-.navbar, .navbar-inner {
+.navbar, .navbar-inner, .nav-wrapper {
 	color: #d5ecf2;
-	background: transparent;
+	background: none;
+	filter: none;
 	-webkit-box-shadow: none;
 	-moz-box-shadow: none;
 	-ms-box-shadow: none;
