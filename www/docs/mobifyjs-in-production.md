@@ -9,38 +9,35 @@ You have created a mobile site using Mobify.js and you want to go live
 with it, or you want to run it on a testing/staging environment.
 Excellent! There are just a few steps to make that happen.
 
-## Generating Bundles
 
-When you run the development server in Mobify Client, you are serving a
-collection of files, including Mobify.js, which is a combination of your
-selections in your `mobify.konf`, your mobile `templates`, and the 
-Mobify.js Framework. We refer to this collection of files as a `bundle`.
+##  Compiling Files
 
-In Staging/Production, you do not want to be generating bundles on the fly
-for each request. Instead, you generate bundles that you can host on 
-your own web server.
+In development, Mobify.js files are served dynamically by the 
+Mobify Client development server. In production, we'd like to serve 
+these files from a static webserver.
 
-To do that, issue the following command in your project directory:
+Run the `mobify build` command from root project folder to compile the
+project for static serving:
 
     mobify build
 
-Your bundle will be generated and saved in the bld/ directory inside your
-project. Copy the bld folder into the location where you keep static
-files on your webserver.
+The compiled files are placed inside the _bld_ folder in the root
+of your project. Ensure that the build finishes correctly and that the
+mobify.js file and all other project assets are in the _bld_ folder then
+copy it to the appropriate location on your static webserver.
 
 
-## Change the Bundle location in the tag
+##  Updating the Mobify.js tag
 
-Now that your bundle is hosted on your webserver, you must change the 
-location that your tag points to:
+By default, the Mobify.js tag is configured to load the mobify.js file from
+the development server at _http://127.0.0.1:8080/mobify.js_. Alter the path
+in the tag to point to the location of the mobify.js file on your static
+webserver:
 
     })(this, document, '/path/to/static/bld/mobify.js');
 
-But this is a problem because now you have to issue the `mobify build` 
-command every time you want edit your mobile website. To fix that, you
-should conditionally swap the build location depending on your environment. 
-
-For example, you might have this logic similar to this in your backend code:
+Typically you'll want to automate this process by including serverside
+logic to alter the location depending on your environment:
 
     MOBIFY_BUNDLE = '/path/to/static/bld/mobify.js'
     if ENVIRONMENT == 'dev':
@@ -50,10 +47,12 @@ And then use this variable in your templates:
 
     })(this, document, '<%= MOBIFY_BUNDLE %>');
 
-## You're done!
+----
 
-That's all it takes to host Mobify.js in a Production environment. If you
-don't want to have to manage these bundles yourself, consider using the 
-[Mobify Cloud](https://cloud.mobify.com).
+## The Mobify Cloud
 
+Once you have a finely-tuned mobile site, let the experts behind Mobify.js help you take it further.
 
+The Mobify Cloud offers a distributed CDN, mobile workflow management, QA testing, automatic image resizing, and smart JavaScript optimization.
+
+<a href="//cloud.mobify.com/" class="btn btn-primary rounded">Try Mobify Cloud for Free</a>
