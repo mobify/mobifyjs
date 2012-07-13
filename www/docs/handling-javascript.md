@@ -15,7 +15,7 @@ pay attention to ordering and dependencies.
 The default Mobify project selects all scripts from the source DOM and
 stores them under the key `script`:
 
-        'script': function(cont) {
+    'script': function(cont) {
         return $('script').remove()
     }
 
@@ -97,7 +97,8 @@ execute. Imagine a script that increments the element returned by the
 selector `#counter`:
 
     var counterEl = document.getElementById('counter');
-    counterEl.innerHTML = parseInt(counterEl.innerHTML) + 1;
+    counterEl.innerHTML = 
+        parseInt(counterEl.innerHTML) + 1;
 
 If the element matching the CSS selector \#counter does not exist in the
 DOM at the time this script is executed, it will raise an error:
