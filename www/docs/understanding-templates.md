@@ -9,15 +9,15 @@ With Mobify.js, you use templates to place the selections you make
 from the source DOM into the mobified web page. A template is a text
 file that contains regular HTML markup, as well as variables that are
 replaced with the selections from your konf when the template is
-rendered. [Learn more about konf files]({{ site.baseurl }}/docs/understanding-konf/)
+rendered. [Learn more about konf files]({{ site.baseurl }}/docs/understanding-konf/).
 
 ## Templates in Theory
 
 A common pattern is to create an object in the konf that selects data
-from the source DOM and then call `context.tmpl(templateName)` to 
-render the template and assign the result to the `OUTPUTHTML` key.
+from the source DOM and calls `context.tmpl` to render a template and 
+assign the result to the _OUTPUTHTML_ key.
 
-The following konf renders the `home` template to the browser:
+The following konf renders the _home_ template to the browser:
 
     'content': function(context) {
         return context.choose(
@@ -36,12 +36,11 @@ The following konf renders the `home` template to the browser:
     }
 
 
-In this example, if the `home` object is matched, then the value
-`home` will be assigned to the key `context.templateName`.
+In this example, if the _home_ argument is matched, then the value
+`'home'` will be assigned to the key _content.templateName_.
 
-Mobify.js compiles all files ending in _.tmpl_ in the _/src/tmpl/_
-directory and makes them available to the `context.tmpl()` function as
-the portion of their filename before _.tmpl_.
+By default, Mobify.js compiles files ending in _.tmpl_ from the _src/tmpl/_
+directory and makes them available to `context.tmpl`.
 
 This example would render the template _home_, which is compiled from
 _src/tmpl/home.tmpl_. This is explained in more detail in the [Konf
@@ -62,7 +61,7 @@ _home_ template might look like this:
     </body>
     </html>
 
-Assuming that the key `content.products` selected a set of `<div>`
+Assuming that the key _content.products_ selected a set of _<div>_
 elements, calling `context.tmpl('home')` would evaluate the template
 with the selected data, producing a string containing the following
 markup:
@@ -98,9 +97,9 @@ example, a home template would typically look like this:
         </ul>
     {/content}
 
-_{>base/}_ is a `partial`, or template include, that uses base as it's
-parent template. _{<content}_ is a `block override` that overrides the 
-content `block placeholder` within the base template. Here is a basic 
+_{>base/}_ is a **partial**, or template include, that uses base as its
+parent template. _{<content}_ is a **block override** that overrides the 
+content **block placeholder** within the base template. Here is a basic 
 example of a base template:
 
     <html>
@@ -110,15 +109,14 @@ example of a base template:
     </head>
     <body>
         {>_header/}
-        {+content}
-        {/content}
+        {+content}{/content}
         {>_footer/}
     </body>
     </html>
 
-{+content} is the `block placeholder` being overridden in the 
+{+content} is the block placeholder being overridden in the 
 home template. We also have {>_header} and {>_footer}, which are two more
-`partials` that insert the _header and _footer files above and below the
+partials that insert the _header and _footer files above and below the
 content block. Thus, any page that includes base will also have the header 
 and footer.
 
