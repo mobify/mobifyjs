@@ -46,8 +46,8 @@ var absolutify = document.createElement('a')
           , bits = [host];
 
         // If projectName is set on defaults and truthy, put it in resized image urls
-        if(defaults.projectName) {
-            var projectIdeintifier = "project-" + defaults.projectName
+        if (defaults.projectName) {
+            var projectIdeintifier = "project-" + defaults.projectName;
             bits.push(projectIdeintifier);
         }
 
@@ -94,9 +94,10 @@ var absolutify = document.createElement('a')
         return $imgs.each(function() {
             if (attr = this.getAttribute(opts.attribute)) {
                 absolutify.href = attr;
+                var url = absolutify.href;
                 // Produce an image resize url only for matched protocols
-                if(protocolMatcher.exec(absolutify.href)) {
-                    this.setAttribute('x-src', getImageURL(absolutify.href, opts))
+                if(protocolMatcher.exec(url)) {
+                    this.setAttribute('x-src', getImageURL(url, opts));
                 }
             }
         });

@@ -25,7 +25,7 @@
 
     <div id="fixtures">
         <script>
-        Mobify = { points: [+new Date], config: {}, conf: { data: {} } }
+        Mobify = { points: [+new Date], config: {}, conf: { data: {} } };
         </script>
         <script src="../vendor/zepto/src/zepto.js"></script>
         <script src="../vendor/zepto/src/event.js"></script>
@@ -395,9 +395,9 @@
         test('$.fn.resizeImages non-http-url', function() {
             expect(1);
 
-            $('#resizeImages-non-http').resizeImages()
-            var i = $('#resizeImages-non-http img')
-            var url = i.attr('x-src')
+            $('#resizeImages-non-http').resizeImages();
+            var i = $('#resizeImages-non-http img');
+            var url = i.attr('x-src');
 
             equal(url, "gopher://archie.ftp.mailto/somanyprotocols", 
                 "Non-http url unchanged");
@@ -420,10 +420,10 @@
         test('Mobify.getImageURL - projectName set on Mobify.conf.data', function() {
             expect(1);
             
-            Mobify.$.fn.resizeImages.defaults.projectName = 'testing'
+            Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
 
             got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
-            vow = "//ir2.mobify.com/project-testing/320/http://test/image.jpg"
+            vow = "//ir2.mobify.com/project-testing/320/http://test/image.jpg";
 
             equal(got, vow);
 
@@ -434,8 +434,8 @@
         module('enhance');
 
         test('Mobify.enhance', function() {
-            Mobify.enhance()
-            ok(1)
+            Mobify.enhance();
+            ok(1);
         });
 
 
