@@ -28,8 +28,8 @@ Let's change it to display to first &lt;a&gt; element on the page. Change the
         })
     },
 
-Now open _myproject/src/tmpl/home.tmpl_ and replace `content.firstp` with 
-`content.link`:
+Now open _myproject/src/tmpl/home.tmpl_ and replace _content.firstp_ with 
+_content.link_:
     
     <p class="extract">
         {content.link}
