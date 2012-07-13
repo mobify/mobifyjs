@@ -1,4 +1,16 @@
 /* Basic Styling */
+::-webkit-selection {
+	color: rgba(20,108,124,0.3);
+	text-shadow: none;
+}
+::-moz-selection {
+	background: rgba(20,108,124,0.3);
+	text-shadow: none;
+}
+::selection {
+	background: rgba(20,108,124,0.3);
+	text-shadow: none;
+}  
 html {
 	min-height: 100%;
 	height: 100%;
@@ -204,6 +216,9 @@ strong {
 	box-shadow: rgba(0,0,0,0.15) 0 3px 0;	
 }
 
+
+
+
 /* Base Layout */
 .viewport {
 	border: solid 13px rgba(255,255,255,0.1);	
@@ -223,10 +238,6 @@ strong {
 		font-size: 15px;
 		line-height: 23.33334px;
 	}
-	.viewport {
-		border-width: 0;
-		border-top-width: 6px;
-	}
 	.footer .row-fluid, .viewport .row-fluid {
 		width: 85%;
 	}
@@ -237,10 +248,22 @@ strong {
 }
 @media (min-width: 768px) and (max-width: 999px) {
 	.footer .row-fluid, .viewport .row-fluid {
-		width: 720px;
+		width: 680px;
 	}
 }
-@media (min-width: 1000px) {
+@media (max-width: 999px) {
+	.viewport {
+		border-width: 0;
+		border-top-width: 6px;
+	}	
+}
+/* a bit of tweaking necessary here to make page margins a bit roomier */
+@media (min-width: 1000px) and (max-width: 1080px) {
+	.footer .row-fluid, .viewport .row-fluid {
+		width: 920px;
+	}
+}
+@media (min-width: 1080px) {
 	.footer .row-fluid, .viewport .row-fluid {
 		width: 960px;
 	}
@@ -273,7 +296,7 @@ strong {
 	height: 51px;
 	padding: 0;
 	margin: 0;
-	background: url(../img/sprites.png) 0 0;
+	background: url(../img/sprites.min.png) 0 0;
 }
 .navbar ul.nav {
 	float: right;
@@ -370,7 +393,11 @@ strong {
 		margin: 0;
 	}
 }
-
+@media (min-width: 768px) and (max-width: 999px) {
+	.navbar .nav > li > a {
+		padding: 14px 14px 13px 14px;
+	}
+}
 
 
 
@@ -522,7 +549,7 @@ strong {
 		top: 50%;
 		left: 50%;
 		margin: -49px 0 0 -49px;
-		background: url(../img/sprites.png) -138px -51px no-repeat;
+		background: url(../img/sprites.min.png) -138px -51px no-repeat;
 		opacity: 0.4;
 		-webkit-transition: opacity 0.25s ease-out;
 		-moz-transition: opacity 0.25s ease-out;
@@ -641,6 +668,16 @@ strong {
 	.remix-site .clients .well {
 		text-align: center;
 		background: #7bb3bb;
+		padding: 20px 10px;
+	}
+	.remix-site .clients span {
+		display: inline-block;
+		width: 262px;
+		height: 110px;
+		max-width: 100%;
+		font-size: 0;
+		text-indent: -999px;
+		background: url(../img/logos.min.png) 0 0 no-repeat;
 	}
 .next-level {
 	background: #1e7e8b;
@@ -650,7 +687,14 @@ strong {
 	.next-level .graphic, .next-level .cta {
 		text-align: center;
 	}
-	.next-level .graphic img {
+	.next-level .graphic span {
+		display: inline-block;
+		width: 138px;
+		height: 138px;
+		max-width: 100%;
+		font-size: 0;
+		text-indent: -999px;
+		background: url(../img/sprites.min.png) 0 -51px no-repeat;
 		margin: 0 0 2em 0;
 	}
 	.next-level .btn {
@@ -910,4 +954,25 @@ strong {
 @font-face {
 	font-family: 'DagnyWeb';
 	src: url('../type/DagnyWeb.eot?') format('eot'), url('../type/DagnyWeb.woff') format('woff'), url('../type/DagnyWeb.ttf') format('truetype');
+}
+
+
+/* -- Retina tweaks -- */
+@media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
+	body {
+		background-size: 174px 174px;
+	}
+	.navbar .brand, .video .play i, .next-level .graphic span {
+		background-image: url(../img/sprites@2x.min.png);
+		background-size: 237px 189px;
+	}
+	.remix-site .clients span {
+		background-image: url(../img/logos@2x.min.png);
+		background-size: 100% auto;
+	}
+	.shaded {
+		-webkit-box-shadow: rgba(0,0,0,0.15) 0 1.5px 0;
+		-moz-box-shadow: rgba(0,0,0,0.15) 0 1.5px 0;
+		box-shadow: rgba(0,0,0,0.15) 0 1.5px 0;	
+	}
 }
