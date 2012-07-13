@@ -29,7 +29,7 @@ provide an optimized view for mobile devices.
 
 * Browse to [preview.mobify.com](https://preview.mobify.com/?url=http%3A%2F%2Fdemostore.mobify.com)
   to instruct the Mobify.js tag to load the Mobify.js
-  file from your local computer. Click "Authorize".
+  file from your local computer. Click _"Authorize"_.
 
 * If the everything worked you should see the Demo Store mobile adaptation being
   served off your local computer!
