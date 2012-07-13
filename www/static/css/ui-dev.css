@@ -48,6 +48,9 @@ em {
 	font-style: normal;
 	color: #fff;
 }
+img {
+	max-width: 100%;
+}
 pre {
 	font-size: 1em;
 	line-height: 1.555556;
@@ -428,7 +431,8 @@ strong {
 			background: transparent;
 		}
 	.footer i {
-		font-size: 0.88889px;
+		font-size: 0.88889em;
+		padding-right: 5px;
 		color: #83a5ad;
 		text-decoration: none;
 		-webkit-transition: color 0.2s ease-out;			
@@ -481,6 +485,10 @@ strong {
 	text-align: center;
 	text-shadow: rgba(0,0,0,0.15) 0 2px 0;
 }
+	.lead strong {
+		padding: 0;
+		background: none;
+	}
 .well .row-fluid {
 	width: 100%;
 }
@@ -650,9 +658,6 @@ strong {
 		padding: 18px 20px;
 	}
 @media (max-width: 320px) {
-	.remix-site .clients img {
-		width: 100%;
-	}
 	.video .play i {
 		top: 40%;
 	}
@@ -887,6 +892,9 @@ strong {
 	background: rgba(255,255,255,0.15);
 	padding: 20px 40px;
 }
+	.examples-nav h3 a {
+		color: #fff;
+	}
 @media (max-width: 767px) {
 	.examples .span8 {
 		padding: 0;
