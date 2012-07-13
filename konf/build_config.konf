@@ -6,7 +6,7 @@
 var config = Mobify.config = Mobify.config || {};
 
 // Stamp calls to the imageresizer.
-{?project_name}Mobify.$.fn.resizeImages.defaults.projectName = '{project_name}';{/project_name}
+{?project_name}config.projectName = '{project_name}';{/project_name}
 
 // We're in debug mode if this isn't a production compilation.
 {^production}config.isDebug = 1;{/production}
