@@ -1,0 +1,14 @@
+/**
+ * Variables injected at build time.
+ */
+(function(Mobify) {
+
+var config = Mobify.config = Mobify.config || {};
+
+// Stamp calls to the imageresizer.
+{?project_name}config.projectName = '{project_name}';{/project_name}
+
+// We're in debug mode if this isn't a production compilation.
+{^production}config.isDebug = 1;{/production}
+
+})(Mobify);
