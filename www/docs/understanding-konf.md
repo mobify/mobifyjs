@@ -17,9 +17,11 @@ Here is a minimal _mobify.konf_:
 
     {>"/base/lib/base_konf.konf"/}
     {<konf} {
-        'OUTPUTHTML': function() {
-            return '<html><body><h1>HELLO MOBIFY!</h1></body></html>';
-        }
+
+    'OUTPUTHTML': function() {
+        return '<html><body><h1>HELLO MOBIFY!</h1></body></html>';
+    }
+
     } {/konf}
 
 Inside the `{<konf} ... {/konf}` block, we declare an object
@@ -33,12 +35,14 @@ to it:
 
     {>"/base/lib/base_konf.konf"/}
     {<konf} {
-        'body-element': function() {
-            return $('body');
-        },
-        'OUTPUTHTML': function() {
-            return '<html><body><h1>HELLO MOBIFY!</h1></body></html>';
-        }
+
+    'body-element': function() {
+        return $('body');
+    },
+    'OUTPUTHTML': function() {
+        return '<html><body><h1>HELLO MOBIFY!</h1></body></html>';
+    }
+
     } {/konf}
 
 Here we have added the key _body-element_ which queries the source DOM
@@ -103,8 +107,7 @@ adding additional keys to konf.
 Often the konf will contain selections that should only be used on certain 
 pages. For example, an image carousel may only appear on the homepage.
 To manage selections that should only be made on certain pages we use
-the [`context.choose`]({{ site.baseurl }}/docs/konf-reference/#context-choose) 
-function:
+[`context.choose`]({{ site.baseurl }}/docs/konf-reference/#context-choose):
 
     'content': function(context) {
         // `context.choose` is used to conditionally
@@ -123,31 +126,20 @@ function:
     }
 
 `context.choose` accepts a variable number of objects as arguments and
-adds returns the first one that matches. An argument is said to match if
+evaluates the first one that matches. An argument is said to match if
 its keys starting with `!` all evaluate to truthy values.
 
 In the example above, when _content_ is evaluted, `context.choose` will
 be called. It inspects the first argument and finds one required key 
-_carousel_. If `$('#main .pics')` is found on the page then the value of
-_carousel_ will be truthy and the first argument will match. `context.choose`
-will then add the keys _templateName_ and _carousel_ under the group _content_.
+_carousel_. If `$('#main .pics')` is found on the page then the first 
+argument will match. `context.choose` will then add the keys 
+_templateName_ and _carousel_ under the group _content_.
 
-If the _carousel_ key was assigned to a falsey value, `context.choose` 
-would move to the next argument and repeat the process.
-
-##  Which selections should be required?
-
-... in progress ...
-
-
-
-
+If `$('#main .pics')` was not found, it would move to the next argument
+and repeat the process.
 
 ---
 
-## Where Next?
+##  Where Next?
 
 * [The Konf Reference contains a complete list of all function available on the `context` object]({{ site.baseurl }}/docs/konf-reference/)
-
-
-

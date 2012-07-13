@@ -3,13 +3,13 @@ layout: doc
 title: Documentation
 ---
 
-# Installation and Project Setup 
+# Quick Start
 
 Mobify.js is a JavaScript framework for adapting existing websites for tablet and mobile.
 
 1. Install <a href="http://nodejs.org/">Node.js</a> if you don't have it already.
 
-1. Download the [mobify-client](https://github.com/mobify/mobify-client):
+1. Download the [Mobify Client](https://github.com/mobify/mobify-client):
 
         sudo npm -g install mobify-client
 
@@ -21,7 +21,7 @@ Mobify.js is a JavaScript framework for adapting existing websites for tablet an
 
 ## Install the Mobify.js Tag
 
-Insert the Mobify.js tag **immediately** after the opening `<head>` tag on the website you want to adapt:
+Insert the Mobify.js tag **immediately** after the opening _<head>_ tag on the website you want to adapt:
 
         <script>
         (function(window, document, mjs) {
