@@ -13,7 +13,7 @@ Excellent! There are just a few steps to make that happen.
 
 When you run the development server in Mobify Client, you are serving a
 collection of files, including Mobify.js, which is a combination of your
-selections in your `Mobify.konf`, your mobile `templates`, and the 
+selections in your `mobify.konf`, your mobile `templates`, and the 
 Mobify.js Framework. We refer to this collection of files as a `bundle`.
 
 In Staging/Production, you do not want to be generating bundles on the fly
