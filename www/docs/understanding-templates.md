@@ -79,7 +79,6 @@ markup:
     </body>
     </html>
 
-This string is then written to the browser using `document.write`.
 
 ## Templates in Practice
 
