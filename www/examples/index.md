@@ -13,7 +13,7 @@ The code is available on Github:
 
 ----
 
-## Demo Store - [demostore.mobify.com](http://demostore.mobify.com) {#demostore}
+## Demo Site - [demostore.mobify.com](http://demostore.mobify.com) {#demostore}
 
 Uncle Merlin's Discount Potions is a Magento store that uses Mobify.js to 
 provide an optimized view for mobile devices.
@@ -47,11 +47,7 @@ changes. Start with these files:
     from _src/tmpl/base.tmpl_ which is the base template that provides the
     blocks for other templates to override.
 
-* _src/scss/pages/_home.scss_ contains the [SCSS](http://sass-lang.com/) used 
-    on the homepage.is where the mobile stylesheets exist. We used SCSS instead
-    instead of CSS. You will need to [install Compass](http://compass-style.org/)
-    to if you want to recompile the stylesheet. **Note:** In your own projects, 
-    you are free to use CSS or any other CSS preprocessor you like.
+* _src/scss/pages/_home.scss_ contains the [SCSS](http://sass-lang.com/) used on the homepage.is where the mobile stylesheets exist. We used SCSS, but you are free to use LESS or regular CSS if you prefer. (You will need to [install Compass](http://compass-style.org/) to if you wish to recompile this stylesheet.)
 
 ----
 
