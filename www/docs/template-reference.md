@@ -49,26 +49,26 @@ Select elements from your source DOM in the konf file, then reference
 the selection as a variable from any template using the curly brace
 syntax:
 
-**Source HTML input:**
+### Source HTML input:
 
      <form id="search">
          <input type="submit" value="Send" />
      </form>
 
-**Assign a selection to a key, in the konf:**
+### Assign a selection to a key, in the konf:
 
      'search': function() {
          return $("form#search"); 
      },
 
-**Render the result of the `search` key selection in the konf as a
-variable within your template:**
+### Render the result of the `search` key selection in the konf as a
+variable within your template:
 
      <div class="search">
          {search}
      </div>
 
-**Output HTML:**
+### Output HTML:
 
      <div class="search">
          <form id="search">
@@ -103,23 +103,23 @@ especially values produced from Zepto collections or a DOM element,
 you can use filters. Add a pipe symbol `|` and filter name inside the
 template tag:
 
-**Source HTML input:**
+### Source HTML input:
 
     <h3 class="warning">
         <img src="icon.png" class="icon"> Warning: your balance is low
     </h3>
 
-**The selection in the konf:**
+### The selection in the konf:
 
     'warning': function() {
         return $(".warning"); 
     },
 
-**Add a filter to the `warning` variable within your template:**
+### Add a filter to the `warning` variable within your template:
 
     {warning|innerHTML|s}
 
-**Output HTML:**
+### Output HTML:
 
     <img src="icon.png" class="icon"> Warning: your balance is low
 
@@ -152,7 +152,7 @@ You are able to access any variable and its attributes. To simply
 access an attribute, you can use the simpler `{variable.attribute}`
 syntax:
 
-**Source HTML input:**
+### Source HTML input:
 
     <div class="site-header">
         <h1>DemoCorp Inc.</h1>
@@ -165,7 +165,7 @@ syntax:
         </nav>
     </div>
 
-**Create a header variable with logo attribute in the konf:**
+### Create a header variable with logo attribute in the konf:
 
     'header': {
         'logo': function() {
@@ -173,13 +173,13 @@ syntax:
         }
     }
 
-**Access the `logo` attribute within your template:**
+### Access the `logo` attribute within your template:
 
     <div id="fixed-nav">
         {header.logo}
     </div>
 
-**Output HTML:**
+### Output HTML:
 
     <div id="fixed-nav">
         <h1>DemoCorp Inc.</h1>
@@ -204,7 +204,7 @@ multiple elements, you can easily iterate through those elements in
 your template using the `.` attribute, which is a reference to the
 current iteration:
 
-**Source HTML input:**
+### Source HTML input:
 
     <div class="site-header">
         <h1>DemoCorp Inc.</h1>
@@ -217,7 +217,7 @@ current iteration:
         </nav>
     </div>
 
-**Create a variable with attributes in the konf:**
+### Create a variable with attributes in the konf:
 
     'header': {
         'logo': function() {
@@ -228,8 +228,8 @@ current iteration:
         }
     }
 
-**Descend into the `header` variable to access `logo` and `nav` 
-attributes, also iterate `nav`:**
+### Descend into the `header` variable to access `logo` and `nav` 
+attributes, also iterate `nav`:
 
     <div id="fixed-nav">
         {#header}
@@ -242,7 +242,7 @@ attributes, also iterate `nav`:**
         {/header}
     </div>
 
-**Output HTML:**
+### Output HTML:
 
     <div id="fixed-nav">
         <h1>DemoCorp Inc.</h1>
@@ -259,11 +259,11 @@ attributes, also iterate `nav`:**
 Partials, also known as template includes, allow you to make a
 template composed of other templates:
 
-**Contents of partial `logo`:**
+### Contents of partial `logo`:
 
     {site.logo}
 
-**Referencing a partial to include in your template _foo.tmpl_:**
+### Referencing a partial to include in your template _foo.tmpl_:
 
     <div id="header">
         {>logo/}
@@ -272,7 +272,7 @@ template composed of other templates:
 
 This would insert the template _logo.tmpl_ into _foo.tmpl_.
 
-**Resulting markup of the combined _logo.tmpl_ and _foo.tmpl_ templates:**
+### Resulting markup of the combined _logo.tmpl_ and _foo.tmpl_ templates:
 
     <div id="header">
         <h1>DemoCorp Inc.</h1>
@@ -289,7 +289,7 @@ This would insert the template _logo.tmpl_ into _foo.tmpl_.
 Blocks allow you to define snippets of template code that may be
 overridden by other templates:
 
-**Adding an overridable block `header` to _foo.tmpl_:**
+### Adding an overridable block `header` to _foo.tmpl_:
 
     {+header}Plain Old Default Header{/header}
 

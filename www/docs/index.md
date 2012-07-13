@@ -19,7 +19,9 @@ Mobify.js is a JavaScript framework for adapting existing websites for tablet an
         cd myproject
         mobify preview
 
-1. Insert the Mobify.js tag **immediately** after the opening <head> tag on the website you want to adapt:
+## Install the Mobify.js Tag
+
+Insert the Mobify.js tag **immediately** after the opening `<head>` tag on the website you want to adapt:
 
         <script>
         (function(window, document, mjs) {
@@ -45,6 +47,8 @@ Mobify.js is a JavaScript framework for adapting existing websites for tablet an
 
         })(this, document, 'http://127.0.0.1:8080/mobify.js');
         </script>
+
+## Preview your mobile site
 
 1. Set your browser's User Agent to "iPhone":
 

@@ -44,6 +44,13 @@ dt, dd {
 	dd {
 		margin: 0 0 1em 0;
 	}
+em {
+	font-style: normal;
+	color: #fff;
+}
+img {
+	max-width: 100%;
+}
 pre {
 	font-size: 1em;
 	line-height: 1.555556;
@@ -127,6 +134,13 @@ pre {
 strong {
 	font-weight: normal;
 	color: #fff;
+	padding: 1px 4px;
+	background: rgba(0,0,0,0.1);
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-ms-border-radius: 3px;
+	-o-border-radius: 3px;
+	border-radius: 3px;
 }
 .well {
 	color: #032c32;
@@ -417,7 +431,8 @@ strong {
 			background: transparent;
 		}
 	.footer i {
-		font-size: 0.88889px;
+		font-size: 0.88889em;
+		padding-right: 5px;
 		color: #83a5ad;
 		text-decoration: none;
 		-webkit-transition: color 0.2s ease-out;			
@@ -470,6 +485,10 @@ strong {
 	text-align: center;
 	text-shadow: rgba(0,0,0,0.15) 0 2px 0;
 }
+	.lead strong {
+		padding: 0;
+		background: none;
+	}
 .well .row-fluid {
 	width: 100%;
 }
@@ -517,6 +536,7 @@ strong {
 	.video h3 {
 		color: #d5ecf2;
 		padding: 1em 0;
+		margin: 0;
 		text-align: center;
 		background: rgba(39,40,34,0.7);
 		-webkit-border-bottom-left-radius: 9px;
@@ -602,6 +622,14 @@ strong {
 		-o-transform: rotate(45deg);
 		transform: rotate(45deg);
 	}
+	.installing-tag {
+		color: #032c32;
+		display: none;
+		margin: 1em 0;
+	}
+	.installing-tag strong {
+		color: #7a9fa5;
+	}
 .remix-site {
 	padding: 2em 0 3.5em 0;
 }
@@ -630,9 +658,6 @@ strong {
 		padding: 18px 20px;
 	}
 @media (max-width: 320px) {
-	.remix-site .clients img {
-		width: 100%;
-	}
 	.video .play i {
 		top: 40%;
 	}
@@ -673,7 +698,7 @@ strong {
 		float: right;
 	}
 	.install-summary {
-		padding-top: 3em;
+		padding-top: 4em;
 	}
 	.install-instructions {
 		-webkit-box-shadow: inset #ebf0f1 12px 0 12px 0;
@@ -698,24 +723,38 @@ strong {
 }
 
 
+/* Home Page Variation: show tag info */
+
 
 /* Home Page Variation: Display Video */
 .animate-video .video-intro {
 	position: absolute;
 	opacity: 0;
 	-webkit-transition: opacity 0.5s ease-out;
+	-moz-transition: opacity 0.5s ease-out;
+	-ms-transition: opacity 0.5s ease-out;
+	-o-transition: opacity 0.5s ease-out;
+	transition: opacity 0.5s ease-out;
 }
 .animate-video .video-container {
 	width: 100%;
 	margin-left: 0;
 	text-align: center;	
 	-webkit-transition: width 0.5s ease-out;
+	-moz-transition: width 0.5s ease-out;
+	-ms-transition: width 0.5s ease-out;
+	-o-transition: width 0.5s ease-out;
+	transition: width 0.5s ease-out;
 }
 .animate-video .video {
 	padding: 10px;
 	height: 300px;
 	background: #272822;
 	-webkit-transition: height 0.5s ease-out;
+	-moz-transition: height 0.5s ease-out;
+	-ms-transition: height 0.5s ease-out;
+	-o-transition: height 0.5s ease-out;
+	transition: height 0.5s ease-out;
 }
 .animate-video .video .play {
 	display: none;
@@ -727,6 +766,10 @@ strong {
 	width: 100%;
 	opacity: 0;
 	-webkit-transition: opacity 0.5s ease-out;
+	-moz-transition: opacity 0.5s ease-out;
+	-ms-transition: opacity 0.5s ease-out;
+	-o-transition: opacity 0.5s ease-out;
+	transition: opacity 0.5s ease-out;
 }
 .animate-video iframe {
 	display: inline-block;
@@ -849,6 +892,9 @@ strong {
 	background: rgba(255,255,255,0.15);
 	padding: 20px 40px;
 }
+	.examples-nav h3 a {
+		color: #fff;
+	}
 @media (max-width: 767px) {
 	.examples .span8 {
 		padding: 0;
