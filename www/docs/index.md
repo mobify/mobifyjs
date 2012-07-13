@@ -1,6 +1,6 @@
 ---
 layout: doc
-title: Documentation
+title: Mobify.js Documentation
 ---
 
 # Quick Start
