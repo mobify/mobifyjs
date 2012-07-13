@@ -1,23 +1,32 @@
-Mobify.js
-=========
+# Mobify.js
 
-This repository is where we keep the core Mobify.js API. But in order to build/run Mobify.js, 
-you need the Mobify Client, which includes this repository as many submodules (one submodule for 
-each version). You can find this repository here, which includes instructions on how to develop 
-and contribute to the Mobify.js project:
+Mobify.js is a client side adaptation framework for quickly adapting 
+websites to support mobile and tablet devices.
 
-https://github.com/mobify/mobify-client/
+This repository contains the Mobify.js core. The [Mobify Client](https://github.com/mobify/mobify-client/)
+is required to compile the core.
 
-For information on using Mobify.js see [http://cloud.mobify.com/](http://cloud.mobify.com/).
+To get started with Mobify.js, follow the instructions on [mobifyjs.com](https://www.mobifyjs.com/).
 
-Documention
-===========
+## Install
 
-The documentation lives on mobifyjs.com, which is created using the static site generator Jekyll.
-In order to view the documentation, you need RubyGems.
+    make
 
-    cd www/src
+## Tests
+
+Running the tests requires [PhantomJS](http://phantomjs.org/):
+
+    make test
+
+##  Docs
+
+The compiled documentation for Mobify.js can be found online at [mobifyjs.com](https://www.mobifyjs.com/).
+
+To compile the documentation yourself, install [Jekyll](http://jekyllrb.com/)
+and run it from `www` folder:
+
     gem install jekyll
+    cd www
     jekyll --server --auto
     
-Then navigate to http://localhost:4000/mobifyjs/docs/
+Then navigate to http://localhost:4000/mobifyjs/docs/.
