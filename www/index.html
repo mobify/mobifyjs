@@ -101,7 +101,7 @@ bodyclass: home
 <script>
     
     $("a.play").click(function() {
-        $("div.video-container").parent().addClass("animate-video");
+        $("div.video-container").parent().addClass("animate-video").delay(500).addClass("display-video");
         $("div.video-container iframe").show(500);
         return(false);
     });
