@@ -105,7 +105,7 @@ var absolutify = document.createElement('a')
   , defaults = resizeImages.defaults = {
         selector: 'img[x-src]'
       , attribute: 'x-src'
-      , projectName: ''
+      , projectName: Mobify.config.projectName || ''
     }
 
 })(this, Mobify.$);
