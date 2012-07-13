@@ -17,8 +17,9 @@ render the template and assign the result to the `OUTPUTHTML` key.
 
 The following konf renders the `home` template to the browser:
 
-    'mobileSite': function(context) {
-        return context.choose({
+    'content': function(context) {
+        return context.choose(
+        {
             'templateName': 'home',
             '!products': function(context) {
                 return $('#products');
