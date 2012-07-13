@@ -5,52 +5,45 @@ title: Konf Reference
 
 # Konf Reference
 
- - Using Konf
- - OUTPUTHTML
- - context.data
- - context.tmpl
- - context.choose
- - Reserved Keys
- - Best Practices
+ - TOC
 {:toc}
 
-##  Using Konf
+##  Using the Konf
 
-The Konf selects elements from the source DOM to be rendered 
-on the mobile site. To make selection easy Mobify.js includes [Zepto](http://zeptojs.com/), 
-a minimalist JavaScript DOM library optimized for mobile with a 
-jQuery-like API. 
+The konf is a JavaScript file required by every Mobify.js project.
+It contains DOM operations that select elements from the source
+DOM to be rendered in the adaptation. To make selection easy Mobify.js 
+includes [Zepto](http://zeptojs.com/), a JavaScript DOM library 
+optimized for mobile with a jQuery-like API. 
 
-A simple selection to assign the site's logo to a key might look like 
-this:
+A selection to assign the site's logo to a key might look like this:
 
     'logo': function() {
         return $('.identity img');
     },
 
-This key will apply to every page where the selector evaluates to true. 
-Note that the corresponding page template needs to include a variable 
-that references the key for it to render.
+Note that the corresponding page template must include a reference to
+the key _logo_ for it to render.
 
-The konf is also used to determine which templates will render for 
-each page by evaluating selectors against the current page:
+The konf can be used to make page specific selections:
 
-    return context.choose({
-        'templateName': 'homePage',
-        '!products': function() {
+    return context.choose(
+    {
+        'templateName': 'homePage'
+      , '!products': function() {
             return $('#product-carousel');
         }
     }, {
-        'templateName': 'productPage',
-        '!class': function() {
+        'templateName': 'productPage'
+      , '!class': function() {
             return $('.product-list');
-        },
+        }
     }
 
-The first selector will search the current page for an element with 
-the id of `product-carousel`. If it finds it, the required key 
-`products` evaluates to true and the page will immediately be rendered 
-with _homePage.tmpl_. If not, then (and only then) the second selector 
+The first selector will search the source DOM for an element with 
+the id of `product-carousel`. If the element is found, the required
+key _products_ will be set to a truthy value, and the _homePage.tmpl_
+will be selected. If not, then (and only then) the second selector 
 is evaluated and if an element with a `product-list` class is found, 
 the page will instead be rendered with _productPage.tmpl_. See [here
 for more on how `context.choose` works](#context-choose).
@@ -121,22 +114,22 @@ them a mostly empty mobile site.
 
 ##  `OUTPUTHTML`
     
-`OUTPUTHTML` is a special key of the konf object. Any string it 
-returns will be rendered immediately as the output of the page. 
-For this reason, it should **always** be declared as the very last 
-key of the konf object:
+Is a special key in the konf. Any string assigned to it will be 
+rendered immediately as the output of the page. For this reason, 
+it should **always** be declared as the very last key of the konf 
+object:
 
-    'OUTPUTHTML': function(context) {
+    'OUTPUTHTML': function() {
         return '<html><body><h1>HELLO MOBIFY!</h1></body></html>';
     }
 
 
 ##  `context.data(key)`
 
-Returns the value of a previously-assigned key in the konf object. 
-Since the konf object is evaluated from top to bottom, it is possible 
-to access previous keys in later assignments. For example you may wish 
-to reuse a selection made for the `content` within `footer`. 
+Returns the value of a previously-assigned key.  The konf is evaluated 
+from top to bottom, so it is possible to access previous keys in later 
+assignments. For example you may wish to reuse a selection made for the 
+_content_ within _footer_. 
 
     'content': function() {
         return $('.page-content');
@@ -145,7 +138,7 @@ to reuse a selection made for the `content` within `footer`.
         return context.data('content');
     }
 
-This passes to `footer` the value of the `content` key, which is in 
+This passes to _footer_ the value of the _content_ key, which is in 
 turn the evaluated return of `$('.page-content')`.
 
 **Variable Resolution**
@@ -155,23 +148,21 @@ the key is not found at the current level, it ascends to the parent
 level and tries again. 
 
 
-##  `context.tmpl(template)`
+##  `context.tmpl(templateName)`
 
-Returns the specified _.tmpl_ file template, rendered against the 
-evaluated konf object. 
+Returns the matching _.tmpl_ file rendered against the evaluated konf.
 
     'OUTPUTHTML': function(context) {
         return context.tmpl('home');
     }
 
-This renders the _home.tmpl_ via the `OUTPUTHTML` key. By default, 
+This renders the _home.tmpl_ using the _OUTPUTHTML_ key. By default, 
 all _.tmpl_ files in the project's _tmpl/_ folder are available to the 
 `context.tmpl` function.
 
 A common pattern is to conditionally assign template names to a 
-specific key in the konf object, access the key with `context.data`, 
-then use `context.tmpl` to render the selected template using the 
-`OUTPUTHTML` key:
+specific key in the konf, access the key with `context.data`, then use 
+`context.tmpl` to render the selected template using _OUTPUTHTML_:
 
     'template': 'home',
     'OUTPUTHTML': function(context) {
@@ -186,38 +177,39 @@ template name, which is returned to `OUTPUTHTML` for rendering.
 
 ##  `context.choose(obj1[, obj2[, ...]])` {#context-choose}
 
-Accepts anonymous JSON objects as parameters and returns the first 
-object that matches. An object is considered to match if all internal 
-keys prefixed with `!` evaluate to a truthy value:
+Accepts a variable number of objects as arguments and executes the
+first one that matches. An argument is considered to match if its
+keys starting with `!` all evaluate to a truthy values:
 
     'content': function(context) {
         return context.choose({
-            '!home': function(context) {
+            '!home': function() {
                 return $('#product-carousel');
             }
         }, {
-            '!products': function(context) {
+            '!products': function() {
                 return $('.product-listing');
             }
         })
     }
 
-In this example, the first object would match if the function assigned 
-to the key `!home` evaluated to a truthy value. If it did not, the 
-first object would not match and the next object would be tested. If 
-both match, only the first is returned.
+In this example, the first argument matches if the function assigned 
+to the key `!home` evalutes to a truthy value. If it doesn't, it would
+be considered to not matching and the next argument would be tested.
+Only the first matching argument is executed.
 
-An object with no required selections always matches:
+An argument with no required keys always matches:
 
     'content': function(context) {
         return context.choose({
-            'home': function(context) {
+            'home': function() {
                 return $('#product-carousel');
             }
         })
     }
 
-If no matching objects are found `context.choose` returns undefined. 
+If no matching arguments are found `context.choose` returns undefined. 
+
 Multiple keys may be prefixed with `!` to create "and" conditions: 
 
     'home': function(context) {
@@ -232,23 +224,22 @@ Multiple keys may be prefixed with `!` to create "and" conditions:
         },
     }
 
-So in this case if both selections evaluate to truthy values within 
-the current page, the home key will be assigned the value of 
-`templateName`, otherwise it remains unassigned.
+In this case only if both productCarousel_ and _saleItems_ evaluate
+to truthy values will the argument match and _templateName_ be assigned.
 
-A common pattern in a konf object is to use `context.choose` to select 
+A common pattern in a konf is to use `context.choose` to select 
 template specific content and set a key which will be used as the 
 template name:
 
     'content': function(context) {
         return context.choose({
             'templateName': 'home',
-            '!home': function(context) {
+            '!home': function() {
                 return $('#product-carousel');
             }
         }, {
             'template': 'saleItems',
-            '!item': function(context) {
+            '!item': function() {
                 return $('.sale-items');
             }
         })
@@ -263,7 +254,7 @@ template name:
 
 ### Truthiness Of Required Selections, Keys Prefixed With `!`
 
-`context.choose()` considers a selection to be truthy if it matches 
+`context.choose` considers a selection to be truthy if it matches 
 one of the following conditions:
 
     obj.length && obj.length > 0
@@ -272,20 +263,19 @@ one of the following conditions:
 If none of these conditions are true then a value is considered 
 falsey.
 
-### Do not change the DOM in required selections in the konf {#do-not-modify-dom-in-required}
+### Do not change the DOM in required selections {#do-not-modify-dom-in-required}
 
 All required keys in any block may be evaluated, while non-required
-keys are only evaluated in the block that is selected by 
-`context.chooose()`. If you made modifications to the DOM, you may
-adversely affect evaluation further down the konf. This often leads to
-hard to find bugs. It is recommended you select for certain elements 
-in required keys, but if the DOM requires modification, do it in a 
-non-required key.
+keys are only evaluated if the argument is matched. If you made modifications
+to the DOM, you may adversely affect evaluation further down the konf. 
+This often leads to hard to find bugs. It is recommended you select for 
+certain elements in required keys, but if the DOM requires modification, 
+do it in a non-required key.
 
 ##  Reserved Keys
 
-Your konf object extends a default konf object containing the 
-following reserved keys:
+The konf is extended by a default konf containing the following reserved
+keys:
 
 `$html`
 : Reference to the source DOM `<html>` element
@@ -309,7 +299,7 @@ following reserved keys:
 : A boolean flag that will be true if this device has a high density display 
 
 `config.isDebug`
-: A boolean flag that will be true if mobify.js is running in debug mode
+: A boolean flag that will be true if Mobify.js is running in debug mode
 
 `config.orientation`
 : A string that will be "portrait" if the device is taller than it is wide, or "landscape" if it is wider than it is tall

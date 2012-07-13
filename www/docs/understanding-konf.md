@@ -5,15 +5,15 @@ title: Understanding the Konf
 
 # Understanding The Konf
 
-The konf file is JavaScript code that makes selections from the source
+The konf is a JavaScript file  is JavaScript code that makes selections from the source
 DOM, chooses a template to render and renders that template with those
 selections as the context. [Learn more about
 templates]({{ site.baseurl }}/docs/template-reference/)
 
-A konf file is required in every Mobify project and lives at
+A konf file is required in every Mobify.js project and lives at
 _src/mobify.konf_.
 
-Here is a very minimal _mobify.konf_:
+Here is a minimal _mobify.konf_:
 
     {>"/base/lib/base_konf.konf"/}
     {<data} {
@@ -23,16 +23,16 @@ Here is a very minimal _mobify.konf_:
     } {/data}
 
 Inside the `{<data} ... {/data}` block, we declare a JavaScript object
-called the konf object. Inside, we assign the key `OUTPUTHTML` to a
+called the konf object. Inside, we assign the key _OUTPUTHTML_ to a
 function that returns an HTML string. When the konf object is
-evaluated, the function assigned to `OUTPUTHTML` is called and the
+evaluated, the function assigned to _OUTPUTHTML_ is called and the
 result is written to the browser.
 
-Because of this, the `OUTPUTHTML` key must be the last key assigned in
+Because of this, the _OUTPUTHTML_ key must be the last key assigned in
 the konf object.
 
-The konf object is an ordinary JavaScript object so we can add
-arbitrary keys to it:
+The konf object is an ordinary JavaScript object so we can add other keys 
+to it:
 
     {>"/base/lib/base_konf.konf"/}
     {<data} {
@@ -45,14 +45,13 @@ arbitrary keys to it:
     } {/data}
 
 Here we have added the key `body-element` which makes a selection by
-calling `$('body')` and returning the results. Here, `$` is an
-instance of Zepto, a lightweight jQuery-compatible DOM library.
+calling `$('body')` and returning the results. Inside the konf, `$` 
+references the [Zepto](http://zeptojs.com/) object which can be used 
+to query the source DOM.
 
-We use it to make selections from the source DOM, in this case it will
-return the source DOM's `<body>` element.
+In this case it will return the source DOM's _&lt;body&gt;_ element.
 
-Konf key values _must_ be anonymous functions that explicitly return
-the selected data:
+Konf key values _must_ be functions that return their selections:
 
     // WRONG! Not a function!
     'body-element': $('body');
@@ -67,7 +66,7 @@ the selected data:
         return $('body');
     }
 
-When called, these functions will be passed an argument that is
+When called, these functions are passed an argument that is 
 conventionally named `context`. Using this argument is optional, but
 it enables additional functionality:
 
@@ -78,11 +77,14 @@ it enables additional functionality:
         return context.data('body-element').find('img');
     }
     
-Here, the function assigned to the key `'images'` uses the
-`context.data()` function to look up the previously assigned value of
-the key `'body-element'`, which is a Zepto set containing the source
-DOM's `<body>` element, and then finds all of its child `<img>`
-elements using Zepto's `.find()` function.
+Here, the function assigned to the key _images_ uses `context.data`
+to look up the previously assigned value of the key _body-element_, 
+which is a Zepto set containing the source DOM's _<body>_ element, 
+and then finds all of its child _<img>_ elements using Zepto's 
+`find` function.
 
-`context.choose`, `context.data`, and `context.tmpl` are functions 
-that require `context` to be passed, [learn more about them]({{ site.baseurl }}/docs/konf-reference/)
+---
+
+## Where to Next?
+
+* [The Konf Reference contains a full reference for the `context` object]({{ site.baseurl }}/docs/konf-reference/)
