@@ -19,7 +19,7 @@ body {
 	color: #d5ecf2;
 	background: #046f7e url(../img/body-bg.min.png);
 	min-height: 100%;
-	font-family: DagnyWeb, "Helvetica Neue", sans-serif;
+	font-family: "ff-dagny-web-pro", "DagnyWeb", "Helvetica Neue", sans-serif;
 	font-weight: normal;
 	font-size: 18px;
 	line-height: 28px;
@@ -949,12 +949,6 @@ strong {
 	}
 }
 
-
-/* -- Web Fonts -- */
-@font-face {
-	font-family: 'DagnyWeb';
-	src: url('../type/DagnyWeb.eot?') format('eot'), url('../type/DagnyWeb.woff') format('woff'), url('../type/DagnyWeb.ttf') format('truetype');
-}
 
 
 /* -- Retina tweaks -- */
