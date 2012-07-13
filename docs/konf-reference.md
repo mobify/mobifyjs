@@ -317,6 +317,8 @@ following reserved keys:
 
 `mobileViewport`: Contents of the meta viewport tag to be sent
 
+`projectName`: The Mobify project's name, as taken from project.json
+
 `siteConfig`: An object containing analytics configuration information
 
 `touchIcon`: The location of a file to be used as the bookmark icon for this website on iOS devices

@@ -54,6 +54,9 @@
 {>"/base/api/main.js"/}
 {>"/base/api/resizeImages.js"/}
 
+{! configure API defaults before transform !}
+{>"/base/konf/api_config.konf"/}
+
 {+tmpl}
     {>"/base/tmpl/*.tmpl"/}
     {>"tmpl/*.tmpl"/}
