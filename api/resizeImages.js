@@ -5,6 +5,8 @@
 (function(window, $) {
 
 var absolutify = document.createElement('a')
+    // A regex for detecting http(s) URLs
+  , protocolMatcher = /^http(s)?/
 
   , hosts = [
         '//ir0.mobify.com'
@@ -42,6 +44,12 @@ var absolutify = document.createElement('a')
 
         var host = hosts[URLHash(url) % hosts.length]
           , bits = [host];
+
+        // If projectName is set on defaults and truthy, put it in resized image urls
+        if (defaults.projectName) {
+            var projectIdeintifier = "project-" + defaults.projectName;
+            bits.push(projectIdeintifier);
+        }
 
         if (options.format) {
             bits.push(options.format + (options.quality || ''));
@@ -86,13 +94,18 @@ var absolutify = document.createElement('a')
         return $imgs.each(function() {
             if (attr = this.getAttribute(opts.attribute)) {
                 absolutify.href = attr;
-                this.setAttribute('x-src', getImageURL(absolutify.href, opts))
+                var url = absolutify.href;
+                // Produce an image resize url only for matched protocols
+                if(protocolMatcher.exec(url)) {
+                    this.setAttribute('x-src', getImageURL(url, opts));
+                }
             }
         });
     }
   , defaults = resizeImages.defaults = {
         selector: 'img[x-src]'
       , attribute: 'x-src'
+      , projectName: Mobify.config.projectName || ''
     }
 
 })(this, Mobify.$);

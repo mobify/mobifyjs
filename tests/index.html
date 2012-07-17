@@ -24,7 +24,9 @@
     <ol id="qunit-tests"></ol>  
 
     <div id="fixtures">
-        <script>Mobify = {points: [+new Date], config: {}}</script>
+        <script>
+        Mobify = { points: [+new Date], config: {}, conf: { data: {} } };
+        </script>
         <script src="../vendor/zepto/src/zepto.js"></script>
         <script src="../vendor/zepto/src/event.js"></script>
 
@@ -72,6 +74,10 @@
 
     <div id="resizeImages">
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
+    <div id="resizeImages-non-http">
+        <img x-src="gopher://archie.ftp.mailto/somanyprotocols" />
     </div>
 
 
@@ -381,12 +387,25 @@
         module('resizeImages');
 
         test('$.fn.resizeImages', function() {
-            var $got = $('#resizeImages').resizeImages()
+            var $got = $('#resizeImages').resizeImages();
 
             equal($got.length, 1);
         });
 
+        test('$.fn.resizeImages non-http-url', function() {
+            expect(1);
+
+            $('#resizeImages-non-http').resizeImages();
+            var i = $('#resizeImages-non-http img');
+            var url = i.attr('x-src');
+
+            equal(url, "gopher://archie.ftp.mailto/somanyprotocols", 
+                "Non-http url unchanged");
+        });
+
         test('Mobify.getImageURL', function() {
+            expect(2);
+
             var got = Mobify.getImageURL('http://test/image.jpg')
               , vow = '//ir2.mobify.com/http://test/image.jpg';
 
@@ -398,12 +417,25 @@
             equal(got, vow);
         });
 
+        test('Mobify.getImageURL - projectName set on Mobify.conf.data', function() {
+            expect(1);
+            
+            Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
+
+            got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
+            vow = "//ir2.mobify.com/project-testing/320/http://test/image.jpg";
+
+            equal(got, vow);
+
+            delete Mobify.$.fn.resizeImages.defaults.projectName;
+        });
+
 
         module('enhance');
 
         test('Mobify.enhance', function() {
-            Mobify.enhance()
-            ok(1)
+            Mobify.enhance();
+            ok(1);
         });
 
 
