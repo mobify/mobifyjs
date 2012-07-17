@@ -48,12 +48,8 @@ In development mode, the result of the evaluated konf, the context, is logged to
 the JavaScript console. Look for a the item _'All Extracted Data'_, which can be 
 expanded to show what values were assigned to what keys.
 
-**Note**: Extracted Data is only available in development mode, which can be 
-activated by browsing to your site through <https://preview.mobify.com/>.
-
 If you are stumped, try adding a `debugger;` statement into your konf. This will 
 cause the inspector's debugger to pause as the konf is evaluated:
-
 
     'content': function() {
         debugger;
@@ -65,7 +61,7 @@ You can then use the inspector to step through the execution of your konf.
 
 ## Debugging Templates (Viewing source, inspecting rendered DOM)
 
-Mobify.js adaptations are evaluated against the source DOM. "View Source" shows
+Mobify.js adaptations are evaluated against the source DOM. _"View Source"_ shows
 the source HTML, not the result of the adaptation. In situations where you need 
 to view the rendered DOM, use Firebug or the WebKit inspector. The DOM tab 
 (labelled 'HTML' or 'Elements') displays a DOM tree that shows the adaptated 

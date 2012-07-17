@@ -1,0 +1,246 @@
+---
+layout: doc
+title: Konf Reference 
+---
+
+# Konf Reference
+
+ - TOC
+{:toc}
+
+
+##  `OUTPUTHTML`
+    
+Is a special key in the konf. Any string assigned to it will be 
+rendered immediately as the output of the page. For this reason, 
+it should **always** be declared as the last key of the konf 
+object:
+
+    'OUTPUTHTML': function() {
+        return '<html><body><h1>HELLO MOBIFY!</h1></body></html>';
+    }
+
+If a falsey value is assigned to _OUTPUTHTML_, the original page
+will be rendered.
+
+
+##  `context.data(key)`
+
+Returns the value of a previously assigned key.  The konf is evaluated 
+from top to bottom, so it is possible to access the value of previously
+assigned keys. For example you may wish to reuse a selection made for the 
+_content_ within _footer_. 
+
+    'content': function() {
+        return $('.page-content');
+    },
+    'footer': function(context) {
+        return context.data('content');
+    }
+
+This assigns the value of the _content_ key to _footer_.
+
+**Variable Resolution**
+
+`context.data` returns the matching key at the closest level. If 
+the key is not found at the current level, it ascends to the parent 
+level and tries again. 
+
+
+##  `context.tmpl(templateName)`
+
+Returns the matching _.tmpl_ file rendered against the evaluated konf.
+
+    'OUTPUTHTML': function(context) {
+        return context.tmpl('home');
+    }
+
+By default, all _.tmpl_ files in the project's _tmpl/_ folder are 
+available to `context.tmpl`.
+
+A common pattern is to assign a template name to a key in the konf and 
+later look it up with `context.data`. The template name can then be 
+passed to `context.tmpl` for output with _OUTPUTHTML_:
+
+    'templateName': 'home',
+    'OUTPUTHTML': function(context) {
+        var template = context.data('template');
+        return context.tmpl(template);
+    }
+
+This assigns the value `"home"` to the templateName key. `context.data`
+looks up the value and passes it to `context.tmpl` which finds the matching
+template and renders it. The result is then output ot the browser!
+
+
+##  `context.choose(obj1[, obj2[, ...]])` {#context-choose}
+
+Accepts a variable number of objects as arguments and executes the
+first one that matches. An argument is said to match if its keys 
+starting with `!` all evaluate to a truthy values:
+
+    'content': function(context) {
+        return context.choose({
+            '!home': function() {
+                return $('#product-carousel');
+            }
+        }, {
+            '!products': function() {
+                return $('.product-listing');
+            }
+        })
+    }
+
+In this example, the first argument matches if the function assigned 
+to the key `!home` evalutes to a truthy value. If it doesn't, it would
+be considered to not matching and the next argument would be tested.
+Only the first matching argument is executed.
+
+An argument with no required keys always matches:
+
+    'content': function(context) {
+        return context.choose({
+            'home': function() {
+                return $('#product-carousel');
+            }
+        })
+    }
+
+If no matching arguments are found `context.choose` returns `undefined`.
+
+Multiple keys may be prefixed with `!` to create "and" conditions: 
+
+    'home': function(context) {
+        return context.choose({
+            'templateName': 'homePage',
+            '!productCarousel': function() {
+                return $('#product-carousel');
+            },
+            '!saleItems': function() {
+                return $('.sale-items');
+            }
+        },
+    }
+
+In this case only if both _productCarousel_ and _saleItems_ evaluate
+to truthy values will the argument match and _templateName_ be assigned.
+
+A common pattern in the konf is to use `context.choose` to select 
+template specific content and assign a key which will be used as the
+template name:
+
+    'content': function(context) {
+        return context.choose({
+            'templateName': 'home',
+            '!home': function() {
+                return $('#product-carousel');
+            }
+        }, {
+            'template': 'saleItems',
+            '!item': function() {
+                return $('.sale-items');
+            }
+        })
+    },
+    'OUTPUTHTML': function(context) {
+        var template = context.data('content.templateName');
+        if (template) {
+            return context.tmpl(template);
+        }
+    }
+
+
+### Truthiness Of Required Selections, Keys Prefixed With `!`
+
+`context.choose` considers a value to be truthy if it matches 
+one of the following conditions:
+
+    obj.length && obj.length > 0
+    obj == true
+
+If none of these conditions are true then a value is considered 
+falsey.
+
+### Do not change the DOM in required selections {#do-not-modify-dom-in-required}
+
+All required keys in any block may be evaluated, while non-required
+keys are only evaluated if the argument is matched. If you make modifications
+to the DOM in a required key, you may adversely affect evaluation further 
+down the konf. This often leads to hard to find bugs. It is recommended 
+you select for elements in required keys, but execute DOM modification in
+non-required keys.
+
+##  Reserved Keys
+
+The konf is extended by a default konf containing the following reserved
+keys:
+
+`$html`
+: Reference to the source DOM `<html>` element
+
+`$head`
+: Reference to the source DOM `<head>` element
+
+`$body`
+: Reference to the source DOM `<body>` element
+
+`buildDate`
+: The date this _mobify.js_ file was built
+
+`config.configDir`
+: Path to the directory from which _mobify.js_ loaded
+
+`config.configFile`
+: Path to _mobify.js_
+
+`config.HD`
+: A boolean flag that will be true if this device has a high density display 
+
+`config.isDebug`
+: A boolean flag that will be true if Mobify.js is running in debug mode
+
+`config.orientation`
+: A string that will be "portrait" if the device is taller than it is wide, or "landscape" if it is wider than it is tall
+
+`config.os`
+: A string representing the detected operating system of the device
+
+`config.path`
+: A string representing the path from where the mobify.js file was loaded
+
+`config.started`
+: An internal flag used to record whether the page has been adapted
+
+`config.tagVersion`
+: Version of the Mobify tag used on this site
+
+`config.touch`
+: A boolean flag that will be true if touch events are supported, false otherwise
+
+`configName`
+: A property pulled from _project.json_ - most likely the unique identifier for your site
+
+`cssName`
+: A function returning the name of the css file to be applied
+
+`imageDir`
+: A function returning a path to where mobify adaptation specific images are kept
+
+`mobileViewport`
+: Contents of the meta viewport tag to be sent
+
+`siteConfig`
+: An object containing analytics configuration information
+
+`touchIcon`
+: The location of a file to be used as the bookmark icon for this website on iOS devices
+
+`unmobify`
+: An internal flag used to record whether the page has been unmobified
+
+##  Best Practices
+
+* DO: Prefer the matching of more complete DOM outlines over single 
+      selectors when assigning templates to specific pages.
+
+* DO NOT: [Alter the source DOM in required selectors](#do-not-modify-dom-in-required)
