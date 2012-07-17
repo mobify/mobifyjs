@@ -156,6 +156,40 @@ strong {
 	-o-border-radius: 3px;
 	border-radius: 3px;
 }
+th, td {
+	padding: 5px 1em;
+}
+th {
+	text-align: left;
+	background: rgba(0,0,0,0.1);
+}
+	tr th:first-child {
+		-webkit-border-top-left-radius: 9px;
+		-webkit-border-bottom-left-radius: 9px;
+		-moz-border-top-left-radius: 9px;
+		-moz-border-bottom-left-radius: 9px;
+		-ms-border-top-left-radius: 9px;
+		-ms-border-bottom-left-radius: 9px;
+		-o-border-top-left-radius: 9px;
+		-o-border-bottom-left-radius: 9px;
+		border-top-left-radius: 9px;
+		border-bottom-left-radius: 9px;
+	}
+	tr th:last-child {
+		-webkit-border-top-right-radius: 9px;
+		-webkit-border-bottom-right-radius: 9px;
+		-moz-border-top-right-radius: 9px;
+		-moz-border-bottom-right-radius: 9px;
+		-ms-border-top-right-radius: 9px;
+		-ms-border-bottom-right-radius: 9px;
+		-o-border-top-right-radius: 9px;
+		-o-border-bottom-right-radius: 9px;
+		border-top-right-radius: 9px;
+		border-bottom-right-radius: 9px;
+	}
+td {
+	vertical-align: top;
+}
 .well {
 	color: #032c32;
 	background: #fff;
@@ -404,6 +438,9 @@ strong {
 		width: 50%;
 		padding: 0;
 		margin: 0;
+	}
+	.navbar .nav .nav-about {
+		display: none;
 	}
 }
 @media (min-width: 768px) and (max-width: 999px) {
@@ -948,6 +985,64 @@ strong {
 	}
 }
 
+
+
+/* Page Layout: Widgets */
+.widget-gallery {
+	overflow: hidden;
+	clear: left;
+}
+.widget-gallery li {
+	margin: 0 2% 2% 0;
+	width: 32%;
+	list-style: none;
+	float: left;
+}
+.widget-gallery li a, .widget-gallery li a:visited {
+	display: block;
+	padding: 20px;
+	background-color: rgba(0,0,0,0.1);
+	border: solid 1px rgba(0,0,0,0);
+	text-align: center;
+	-webkit-border-radius: 9px;
+	-moz-border-radius: 9px;
+	-ms-border-radius: 9px;
+	-o-border-radius: 9px;
+	border-radius: 9px;
+	-webkit-transition: background-color 0.25s ease-out;
+}
+	.widget-gallery li:nth-child(3n) {
+		margin-right: 0;
+	}
+	.widget-gallery a:hover, .widget-gallery a:focus, .widget-gallery a:active {
+		text-decoration: none;
+		background-color: rgba(0,0,0,0.2);
+		border: solid 1px rgba(255,255,255,0.025);
+		box-shadow: rgba(255, 255, 255, 0.1) 0 0 7px;
+	}
+	.widget-gallery img {
+		width: 100%;
+		height: 100px;
+	}
+	.widget-gallery h3 {
+		text-align: left;
+		text-decoration: none;
+		font-size: 1.444444em;
+		margin: 0;
+		padding: 20px 0 10px 0;
+	}
+	.widget-gallery p {
+		text-align: left;
+		text-decoration: none;
+		color: #d5ecf2;
+		margin: 0;
+		padding: 0;
+	}
+.widget-single img {
+	/* temp throwaway styling */
+	display: inline-block;
+	padding: 20px 0 20px 20px;
+}
 
 
 /* -- Retina tweaks -- */
