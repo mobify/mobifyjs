@@ -5,7 +5,7 @@ title: Documentation
 
 # Quick Start
 
-Mobify.js is a JavaScript framework for adapting existing websites for tablet and mobile.
+Mobify.js is a JavaScript framework for adapting websites for tablet and mobile.
 
 1. Install <a href="http://nodejs.org/">Node.js</a> if you don't have it already.
 
