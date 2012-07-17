@@ -234,6 +234,16 @@ strong {
 	margin: 0 auto;
 	width: 100%;
 }
+.reversed-column .span8 {
+	width: 62%;
+	padding-left: 3.95744680199999%;
+	float: right;
+	margin-bottom: 50px;
+}
+	.reversed-column .span4 {
+		float: left;
+		margin-left: 0;
+	}
 @media (max-width: 767px) {
 	body {
 		padding: 0;
@@ -495,6 +505,16 @@ strong {
 		padding-top: 0;
 	}
 }
+
+
+/* Sidebar Nav */
+.sidebar-nav {
+	background: rgba(255,255,255,0.15);
+	padding: 20px 40px;
+}
+	.sidebar-nav h3 a {
+		color: #fff;
+	}
 
 
 
@@ -836,16 +856,6 @@ strong {
 
 
 /* Page Layout: Docs */
-.docs .span8 {
-	width: 62%;
-	padding-left: 3.95744680199999%;
-	float: right;
-	margin-bottom: 50px;
-}
-.docs .span4 {
-	float: left;
-	margin-left: 0;
-}
 .docs-nav {
 	background: rgba(255,255,255,0.15);
 	padding: 20px 40px;
@@ -928,23 +938,6 @@ strong {
 
 
 /* Page Layout: Examples */
-.examples .span8 {
-	width: 62%;
-	padding-left: 3.95744680199999%;
-	float: right;
-	margin-bottom: 50px;
-}
-.examples .span4 {
-	float: left;
-	margin-left: 0;
-}
-.examples-nav {
-	background: rgba(255,255,255,0.15);
-	padding: 20px 40px;
-}
-	.examples-nav h3 a {
-		color: #fff;
-	}
 @media (max-width: 767px) {
 	.examples .span8 {
 		padding: 0;
