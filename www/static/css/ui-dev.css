@@ -1,14 +1,14 @@
 /* Basic Styling */
 ::-webkit-selection {
-	color: rgba(20,108,124,0.3);
+	background: rgba(213,236,243,0.5);
 	text-shadow: none;
 }
 ::-moz-selection {
-	background: rgba(20,108,124,0.3);
+	background: rgba(213,236,243,0.5);
 	text-shadow: none;
 }
 ::selection {
-	background: rgba(20,108,124,0.3);
+	background: rgba(213,236,243,0.5);
 	text-shadow: none;
 }  
 html {
