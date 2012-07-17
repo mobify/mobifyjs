@@ -1,0 +1,19 @@
+
+                    <div class="nav-examples">
+                        <div class="demostore">
+<<<<<<< HEAD
+                            <a href="/examples/demostore/"><h3>Demo Site</h3></a>
+                            <p>Uncle Merlins Discount Potions store</p>
+=======
+                            <a href="/examples/demostore/"><h3>Demo Store</h3></a>
+                            <p>Uncle Merlins Discount Potions</p>
+>>>>>>> aaa0475b62a1654178e759170d8b6170846c796f
+                        </div>
+                        <!-- 
+                        <div class="demoblog">
+                            <a href="/examples/demoblog/"><h3>Demo Blog</h3></a>
+                            <p>Description</p>
+                        </div>
+                        -->
+                    </div>
+
