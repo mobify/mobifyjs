@@ -518,7 +518,6 @@ strong {
 	.lead strong {
 		padding: 0;
 		background: none;
-		white-space: nowrap;
 	}
 .lead-mini {
 	line-height: 1.75em;
@@ -743,7 +742,6 @@ strong {
 }
 @media (min-width: 768px) {
 	.lead {
-		padding-top: 1em;
 		text-align: left;
 	}
 	.next-level .graphic img {
