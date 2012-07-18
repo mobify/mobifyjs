@@ -518,7 +518,11 @@ strong {
 	.lead strong {
 		padding: 0;
 		background: none;
+		white-space: nowrap;
 	}
+.lead-mini {
+	line-height: 1.75em;
+}
 .well .row-fluid {
 	width: 100%;
 }
@@ -594,9 +598,13 @@ strong {
 .install-summary {
 	padding: 2em 3.5em;
 }
+	.install-summary .actions {
+		display: block;
+		clear: left;
+		padding-top: 0.5em;
+	}
 	.install-summary a {
-		padding: 1em 0 0 0;
-		padding-right: 1em;
+		padding: 0 1em 0 0;
 		white-space: nowrap;
 	}
 	.install-summary a:last-child {
@@ -668,6 +676,7 @@ strong {
 		text-align: center;
 		font-size: 0.833333em;
 		color: #97c7d0;
+		margin-top: 0;
 	}
 	.remix-site .clients .well {
 		text-align: center;
@@ -712,11 +721,6 @@ strong {
 		top: 40%;
 	}
 }
-@media (min-width: 480px) {
-	.lead {
-		text-align: left;
-	}
-}
 @media (max-width: 767px) {
 	.install-instructions {
 		-webkit-box-shadow: inset #ebf0f1 0 12px 12px 0;
@@ -738,6 +742,10 @@ strong {
 	}
 }
 @media (min-width: 768px) {
+	.lead {
+		padding-top: 1em;
+		text-align: left;
+	}
 	.next-level .graphic img {
 		margin: 0.5em 0 0 0;
 	}
@@ -748,7 +756,7 @@ strong {
 		float: right;
 	}
 	.install-summary {
-		padding-top: 4em;
+		padding-top: 3em;
 	}
 	.install-instructions {
 		-webkit-box-shadow: inset #ebf0f1 12px 0 12px 0;
