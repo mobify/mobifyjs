@@ -145,7 +145,7 @@ instead of the `<script>` tag when working with inline scripts:
     <script></script>
 
     <!-- GOOD -->
-    {%script}{/script}
+    {{ '{%' }}script}{/script}
 
 Whitespace is correctly preserved inside the `{{ '{%' }}script}...{/script}` pragma and as a
 bonus, the JavaScript is minified during deployment!
