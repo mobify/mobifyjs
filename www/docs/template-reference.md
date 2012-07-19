@@ -21,7 +21,7 @@ title: Template Reference
 
 ##  Understanding Context
 
-Templates are HTML documents containing variables to be filled in with
+Templates are HTML documents containing variables to be replaced by
 data. This data comes from the evaluated konf output, referred to as
 the **context** for the template.
 
@@ -29,7 +29,7 @@ The context is a tree of all the keys that your konf has evaluated
 that apply to this template.
 
 When developing with Mobify.js, you can view the full tree within your
-browser's Javascript console (see [our tools guide in the
+browser's Javascript console (see [our tools guide in the 
 appendix]({{ site.baseurl }}/docs/appendix/#tools), if
 you're not familiar with its use). Browse to the page you'd like to
 inspect, open the console and find `All extracted data` -- expand it
@@ -39,8 +39,8 @@ Mobify generates during operation, see
 [Reserved Keys]({{ site.baseurl }}/docs/konf-reference/#reserved-keys)
 for a list of these.
 
-Note that when we talk about changing levels of context below, we
-simply mean traversing the levels of this context tree.
+Note that when we talk about changing levels of context below, we mean traversing 
+the levels of this context tree.
 
 
 ##  `{foo}` - Variables: Select & Render A Single Variable
@@ -200,7 +200,7 @@ would be identical to the last example:
 ## `{#foo} ... {.} ... {/foo}` - Iterate Over The Variable `foo`
 
 When you make a selection within the konf that returns a set with
-multiple elements, you can easily iterate through those elements in
+multiple elements, you can iterate through those elements in
 your template using the `.` attribute, which is a reference to the
 current iteration:
 
@@ -247,9 +247,15 @@ attributes, also iterate `nav`:
     <div id="fixed-nav">
         <h1>DemoCorp Inc.</h1>
         <ul class="pull-right">
-            <li><a href="/">Home</a></li>
-            <li><a href="/products/">Products</a></li>
-            <li><a href="/contact/">Contact</a></li>
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li>
+                <a href="/products/">Products</a>
+            </li>
+            <li>
+                <a href="/contact/">Contact</a>
+            </li>
         </ul>
     </div>            
 
@@ -301,7 +307,7 @@ See [Block Overrides](#block-overrides) for override usage.
 Adding an overridable block `header` to _foo.tmpl_:
 
     {+header}
-        Plain Old Default Header
+        Plain Old Header
     {/header}
     {>products/}
 
@@ -309,7 +315,7 @@ Overrides the content of `header` in _foo.tmpl_ from within the
 included template _products.tmpl_:
 
     {<header}
-        Exciting New More Specific Products Header!
+        More Specific Products Header!
     {/header}
     
 Note that a special variable is available within a block that allows
@@ -320,13 +326,13 @@ the block.
 
     {<header}
         {_SUPER_}
-        Exciting New More Specific Products Header!
+        More Specific Products Header!
     {/header}
 
 In our example above, the resulting contents of header with `_SUPER_`
 would be the contents of both headings combined:
 
-    Plain Old Default Header Exciting New More Specific Products Header!
+    Plain Old Header More Specific Products Header!
 
 See [Block Placeholders](#block-placeholders) for placeholder usage.
 
@@ -380,15 +386,17 @@ See [handling JavaScript](https://support.mobify.com/customer/portal/articles/51
 
 Text surrounded by `{!` and `!}` are considered comments and will not be rendered.
 
-    {! 
-        Comments are useful for explaining complex template logic.
-    !}
+    {! Comments are a good way to explain
+       complex template logic. !}
 
 ## Mobify.desktop() - Back to Desktop
 
-Add this anchor tag to your website to allow users to revert back to Desktop:
+Add this anchor tag to your templates to allow users to revert back to the 
+non-mobified version of your site:
 
-    <a href="" onclick="Mobify.desktop(); return false;">View Full Site</a>
+    <a href="" onclick="Mobify.desktop();return false;">
+    View Full Site
+    </a>
 
 
 # Best Practices
@@ -440,6 +448,6 @@ attributes you introduce in your templates for the sake of styling.
     </div>
 
 We recommend you prefix all classes and IDs introduced in templates
-with `x-` to allow you to easily identify content introduced with the
+with `x-` to allow you to identify content introduced with the
 template.
 
