@@ -1,0 +1,28 @@
+.carousel {
+    position: relative;
+    overflow-x: hidden;
+}
+
+.carousel-inner {
+    position: relative;
+    width: 10000%;
+    padding: 0;
+}
+
+.carousel-inner .item {
+    float: left;
+    padding: 0;
+    margin 0;
+}
+
+.fluid .carousel-inner .item {
+    width: 1%;
+}
+
+.carousel .item img {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+
+
+}

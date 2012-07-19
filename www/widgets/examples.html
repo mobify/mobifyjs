@@ -1,0 +1,71 @@
+---
+layout: widgets
+title: Mobify.js Carousel Examples
+---
+
+<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel.css">
+<style>
+.carousel .item img {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+</style>
+
+<h3>Fixed Width Elements</h3>
+<div id="carousel-example-1" class="carousel">
+  <!-- Carousel items -->
+  <div class="carousel-inner">
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/lantern.jpg">
+    </div>
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/polar_bear.jpg">
+    </div>
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/geese.jpg">
+    </div>
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/flower.jpg">
+    </div>
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/tree.jpg">
+    </div>
+  </div>
+  <!-- Carousel nav -->
+  <a class="carousel-control left" href="#myCarousel" data-slide="prev">Previous</a>
+  <a class="carousel-control right" href="#myCarousel" data-slide="next">Next</a>
+</div>
+
+<h3>Fluid Sized Images</h3>
+<div id="carousel-example-2" class="carousel fluid">
+  <!-- Carousel items -->
+  <div class="carousel-inner">
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/lantern.jpg">
+    </div>
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/polar_bear.jpg">
+    </div>
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/geese.jpg">
+    </div>
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/flower.jpg">
+    </div>
+    <div class="item">
+        <img src="{{ site.baseurl }}/static/examples/img/tree.jpg">
+    </div>
+  </div>
+  <!-- Carousel nav -->
+  <a class="carousel-control left" href="#myCarousel" data-slide="prev">Previous</a>
+  <a class="carousel-control right" href="#myCarousel" data-slide="next">Next</a>
+</div>
+
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="{{ site.baseurl }}/static/examples/js/carousel.js"></script>
+<script>
+    $('.carousel').carousel();
+</script>
