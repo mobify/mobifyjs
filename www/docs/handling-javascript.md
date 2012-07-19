@@ -138,7 +138,7 @@ Advanced techniques for handling scripts
 By default the Dust.js templating engine doesn't preserve whitespace.
 This is great for most HTML but problematic for things like scripts
 where whitespace is significant, for example, with single line comments.
-To avoid the issue, use the `{%script} ... {/script}` template pragma
+To avoid the issue, use the `{{ '{%' }}script}...{/script} ... {/script}` template pragma
 instead of the `<script>` tag when working with inline scripts:
 
     <!-- BAD -->
@@ -147,7 +147,7 @@ instead of the `<script>` tag when working with inline scripts:
     <!-- GOOD -->
     {%script}{/script}
 
-Whitespace is correctly preserved inside the `{%script}` pragma and as a
+Whitespace is correctly preserved inside the `{{ '{%' }}script}...{/script}` pragma and as a
 bonus, the JavaScript is minified during deployment!
 
 External scripts can be written in templates as normal:
