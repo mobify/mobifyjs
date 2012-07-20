@@ -1,12 +1,19 @@
 .carousel {
     position: relative;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
 .carousel-inner {
     position: relative;
     width: 10000%;
     padding: 0;
+
+    -webkit-transition-property: -webkit-transform;
+    -moz-transition-property: -moz-transform;
+    -ms-transition-property: -ms-transform;
+    -o-transition-property: -o-transform;
+    transition-property: transform;
 }
 
 .carousel-inner .item {
@@ -17,12 +24,4 @@
 
 .fluid .carousel-inner .item {
     width: 1%;
-}
-
-.carousel .item img {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-
-
 }
