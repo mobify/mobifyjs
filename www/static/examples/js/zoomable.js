@@ -9,14 +9,15 @@ var $ = window.Mobify ? Mobify.$ : window.$;
 
 Mobify.UI.Zoomable = (function() {
     var defaults = {
-        stage: "<div id='m-zoomStage'>"
-      , classNames: {
+        classNames: {
             zooming : 'zooming'
           , close : 'close'
+          , stage: 'zoomableStage'
           , canvas: 'zoomableCanvas'
           , thumb: 'zoomableThumb'
           , full: 'zoomableFull'
       }
+      , global: true
       , ratio: 2.0
       , canvasStyle: {
           position: 'absolute'
@@ -29,12 +30,27 @@ Mobify.UI.Zoomable = (function() {
         , top: '0'
         , left: '0'
         , maxWidth: 'none'
-        , maxHeight: 'none'
+        , maxHeight: 'none'        
       }
-      , stageHTML: function() {
-          return '<div class="' + this._getClass('canvas') + '"><img class="'
-              + this._getClass('thumb') + '"><img class="'
-              + this._getClass('full') + '"></div>';
+      , stage: function() {
+            var $stage = $('#' + this._getClass('stage'));
+            if (!$stage.length) {
+                $stage = $('<div>').attr('id', this._getClass('stage'));
+                
+            }
+
+            if (this.options.global || !$stage.parent().length) {
+                this.$body.append($stage);
+            }
+
+            if (!$stage.html().trim().length) {
+                $stage.html(
+                    '<div class="' + this._getClass('canvas') + '"><img class="'
+                  + this._getClass('thumb') + '"><img class="'
+                  + this._getClass('full') + '"></div>');
+            }
+
+            return $stage;
       }
       , globalStyle: function() {
           return 'body.' + this._getClass('zooming') + ' { overflow: hidden; }'
@@ -51,19 +67,16 @@ Mobify.UI.Zoomable = (function() {
         this.options.classNames = $.extend(defaults.classNames, this.options.classNames);
         this.options.imageStyle.width = 100 * this.options.ratio + '%';
 
+        this.$body = $('body');
         this.$element = $(element);
-        this.$stage = $(this.options.stage).css('display', 'none !important');
-        if (!this.$stage.html().trim().length) this.$stage.html(this.options.stageHTML.call(this));
+        this.$stage = $(this.options.stage.call(this)).css('display', 'none !important');
         this.$canvas = this.$stage.find('.' + this._getClass('canvas')).css(this.options.canvasStyle);
         this.$thumb = this.$stage.find('.' + this._getClass('thumb')).css(this.options.imageStyle);
         this.$full = this.$stage.find('.' + this._getClass('full')).css(this.options.imageStyle);
-        this.$body = $('body');
 
         if (this.options.clickCloses) this.$canvas.addClass(this._getClass('close'));
 
-        if (!this.$stage.parent().length) {
-            this.global = true;
-            this.$body.append(this.$stage);
+        if (this.options.global) {
             if (!$('style[data-zoomable="' + this._getClass('zooming') + '"]').length) {
                 var style = document.createElement('style');
                 style.innerHTML = this.options.globalStyle.call(this);
