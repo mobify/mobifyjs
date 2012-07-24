@@ -54,11 +54,11 @@ Mobify.UI.Zoomable = (function() {
       }
       , globalStyle: function() {
           return 'body.' + this._getClass('zooming') + ' { overflow: hidden; }'
-              + 'body.' + this._getClass('zooming') +' > * { display: none !important; }';
+              + 'body.' + this._getClass('zooming') +' > * { display: none !important; }'
+              + 'body.' + this._getClass('zooming') +' > #' + this._getClass('stage') + ' { display: block !important; }';
       }
       , clickCloses: true
     };
-    
 
     var Zoomable = function(element, options) {
         var self = this;
@@ -69,7 +69,7 @@ Mobify.UI.Zoomable = (function() {
 
         this.$body = $('body');
         this.$element = $(element);
-        this.$stage = $(this.options.stage.call(this)).css('display', 'none !important');
+        this.$stage = $(this.options.stage.call(this)).hide();
         this.$canvas = this.$stage.find('.' + this._getClass('canvas')).css(this.options.canvasStyle);
         this.$thumb = this.$stage.find('.' + this._getClass('thumb')).css(this.options.imageStyle);
         this.$full = this.$stage.find('.' + this._getClass('full')).css(this.options.imageStyle);
@@ -103,7 +103,7 @@ Mobify.UI.Zoomable = (function() {
             if (!this.isOpen) return;
             this.isOpen = false;
             this.$body.removeClass(this._getClass('zooming'));
-            this.$stage.css('display', 'none !important');
+            this.$stage.removeClass(this._getClass('zooming'));
 
             if (this.global) {
                 document.body.scrollTop = this.oldScrollTop;
@@ -135,7 +135,7 @@ Mobify.UI.Zoomable = (function() {
             if (this.global) this.oldScrollTop = document.body.scrollTop;
 
             this.$body.addClass(this._getClass('zooming'));
-            this.$stage.css('display', 'block !important');            
+            this.$stage.addClass(this._getClass('zooming'));
 
 
             var smallWidth = this.$canvas.prop('offsetWidth')
