@@ -5,11 +5,9 @@ title: Mobify.js Examples
 
 # Examples
 
-We've create a few examples to help you get a feel for Mobify.js!
+We&#8217;re creating examples to help you get a feel for Mobify.js. Watch this space for more in the near future.
 
-The code is available on Github:
-
-[github.com/mobify/mobifyjs-demos](https://github.com/mobify/mobifyjs-demos)
+All code is available on Github: [github.com/mobify/mobifyjs-demos](https://github.com/mobify/mobifyjs-demos)
 
 ----
 
