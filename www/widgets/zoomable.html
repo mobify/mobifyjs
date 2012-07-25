@@ -5,7 +5,20 @@ title: Mobify.js Zoomable Example
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <script src="{{ site.baseurl }}/static/examples/js/zoomable.js"></script>
+<style>
+	.corner.m-close { color: white; background: black; position: absolute; right: 0; top: 0;
+		font-weight: bold; font-size: 18px; padding: 10px;
+	}
+</style>
 
-<a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
-<a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg">Zoom me</a>
-<script>$('a[href$="jpg"]').zoomable();</script>
+<h2>Basic zoomable, click to close</h2>
+<p class="z1"><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg">Zoom in to center</a><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
+</p>
+<script>$('.z1 a[href$="jpg"]').zoomable();</script>
+
+<h2>Explicit close button, clicking does not close</h2>
+<p class="z2"><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg">Zoom in to center</a><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
+</p>
+<script>$('.z2 a[href$="jpg"]').zoomable({ clickCloses: false, stageHTML: function() {
+	return Mobify.UI.Zoomable.defaults.stageHTML.call(this) + '<div class="m-close corner">Close</div>';
+}});</script>

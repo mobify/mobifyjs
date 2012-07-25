@@ -12,12 +12,11 @@ Mobify.UI.Zoomable = (function() {
         classNames: {
             zooming : 'zooming'
           , close : 'close'
-          , stage: 'zoomableStage'
+          , control: 'zoomableControl'
           , canvas: 'zoomableCanvas'
           , thumb: 'zoomableThumb'
           , full: 'zoomableFull'
       }
-      , global: true
       , ratio: 2.0
       , canvasStyle: {
           position: 'absolute'
@@ -32,47 +31,46 @@ Mobify.UI.Zoomable = (function() {
         , maxWidth: 'none'
         , maxHeight: 'none'        
       }
-      , stage: function() {
-            var $stage = $('#' + this._getClass('stage'));
-            if (!$stage.length) {
-                $stage = $('<div>').attr('id', this._getClass('stage'));
-                
-            }
-
-            if (this.options.global || !$stage.parent().length) {
-                this.$body.append($stage);
-            }
-
-            if (!$stage.html().trim().length) {
-                $stage.html(
-                    '<div class="' + this._getClass('canvas') + '"><img class="'
-                  + this._getClass('thumb') + '"><img class="'
-                  + this._getClass('full') + '"></div>');
-            }
-
-            return $stage;
+      , stageHTML: function() {
+            return '<div class="' + this._getClass('canvas') + '"><img class="'
+                + this._getClass('thumb') + '"><img class="'
+                + this._getClass('full') + '"></div>';
       }
       , globalStyle: function() {
-          return 'body.' + this._getClass('zooming') + ' { overflow: hidden; }'
-              + 'body.' + this._getClass('zooming') +' > * { display: none !important; }'
-              + 'body.' + this._getClass('zooming') +' > #' + this._getClass('stage') + ' { display: block !important; }';
+            var zooming = '.' + this._getClass('zooming');
+            return zooming + ' { overflow: hidden; }'
+              + zooming + ' > * { display: none !important; }'
+              + zooming + ' > .' + this._getClass('control') + ' { display: block !important; }';
       }
       , clickCloses: true
     };
 
     var Zoomable = function(element, options) {
-        var self = this;
-
         this.options = $.extend({}, Zoomable.defaults, options);
         this.options.classNames = $.extend(defaults.classNames, this.options.classNames);
         this.options.imageStyle.width = 100 * this.options.ratio + '%';
+        if (!this.options.stage) {
+            this.options.stage = $('body');
+            this.options.global = true;
+        }
 
-        this.$body = $('body');
         this.$element = $(element);
-        this.$stage = $(this.options.stage.call(this)).hide();
-        this.$canvas = this.$stage.find('.' + this._getClass('canvas')).css(this.options.canvasStyle);
-        this.$thumb = this.$stage.find('.' + this._getClass('thumb')).css(this.options.imageStyle);
-        this.$full = this.$stage.find('.' + this._getClass('full')).css(this.options.imageStyle);
+        this.bind();
+    };
+
+    Zoomable.defaults = defaults;
+
+    Zoomable.prototype.unbind = function() {   
+        return this.bind(true);
+    };
+
+    Zoomable.prototype.makeElems = function() {
+        this.$stage = this.options.stage;
+        this.$canvas = $(this.options.stageHTML.call(this)).addClass(this._getClass('control'));
+        this.$canvas.first().css(this.options.canvasStyle);
+
+        this.$thumb = this.$canvas.find('.' + this._getClass('thumb')).css(this.options.imageStyle);
+        this.$full = this.$canvas.find('.' + this._getClass('full')).css(this.options.imageStyle);
 
         if (this.options.clickCloses) this.$canvas.addClass(this._getClass('close'));
 
@@ -86,71 +84,78 @@ Mobify.UI.Zoomable = (function() {
             this.$stage.css('position', 'relative');
         }
 
-        this.bind();
+        var closeSelector = '.' + this._getClass('close');
+        this.$close = this.$canvas.find(closeSelector).add(this.$canvas.filter(closeSelector));
+        this.bindClose('bind');
+    }
+
+    Zoomable.prototype.close = function(ev) {
+        if (!this.isOpen) return;
+        this.isOpen = false;
+
+        this.$canvas.detach();
+        this.$stage.removeClass(this._getClass('zooming'));
+
+        if (this.options.global) {
+            document.body.scrollTop = this.oldScrollTop;
+        }
     };
 
-    Zoomable.defaults = defaults;
+    Zoomable.prototype.open = function(ev) {
+        ev.preventDefault();
+        if (this.isOpen) return;
+        this.isOpen = true;
 
-    Zoomable.prototype.unbind = function() {   
-        return this.bind(true);
+        if (!this.$stage) this.makeElems();
+
+        var leftRatio = 0.5, topRatio = 0.5, $img, src;
+        if (ev.target.tagName !== "IMG") {
+            var $parents = this.$element.parents();
+            for (var i = 0; i < $parents.length; ++i) {
+                $img = $($parents[i]).find('img');
+                if ($img.length) break;  
+            }
+        } else {
+            $img = $(ev.target);
+            leftRatio = ev.offsetX / $img.prop('offsetWidth');
+            topRatio = ev.offsetY / $img.prop('offsetHeight');
+        }
+
+        src = $img.parent('[href]').attr('href') || $img.attr('src');
+        this.$thumb.attr('src', $img.attr('src'));
+        this.$full.attr('src', src);
+        if (this.options.global) this.oldScrollTop = document.body.scrollTop;
+
+        this.$stage.append(this.$canvas);
+        this.$stage.addClass(this._getClass('zooming'));            
+
+        var imgAspect = $img.prop('naturalHeight') / $img.prop('naturalWidth')
+          , thumbWidth = this.$thumb.prop('offsetWidth')
+          , smallWidth = this.$canvas.prop('offsetWidth')
+          , bigWidth = thumbWidth
+          , smallHeight = this.$canvas.prop('offsetHeight')
+          , bigHeight = thumbWidth * imgAspect;
+
+        this.$canvas.prop('scrollLeft', Math.max(0, Math.min(bigWidth - smallWidth,
+            bigWidth * leftRatio - smallWidth / 2)));
+        this.$canvas.prop('scrollTop', Math.max(0, Math.min(bigHeight - smallHeight,
+            bigHeight * topRatio - smallHeight / 2)));
     };
+
+    Zoomable.prototype.bindClose = function(op) {
+        if (this.$close) this.$close[op]('click', this.boundClose);
+    }
 
     Zoomable.prototype.bind = function(undo) {
         var self = this;
         var op = undo ? 'unbind' : 'bind';
 
-        this.closeFn = this.closeFn || $.proxy(function(ev) {
-            if (!this.isOpen) return;
-            this.isOpen = false;
-            this.$body.removeClass(this._getClass('zooming'));
-            this.$stage.removeClass(this._getClass('zooming'));
+        this.boundClose = this.boundClose || function(ev) { return self.close.apply(self, arguments); }
+        this.boundOpen = this.boundOpen || function(ev) { return self.open.apply(self, arguments); }
 
-            if (this.global) {
-                document.body.scrollTop = this.oldScrollTop;
-            }
-        }, this);
+        this.$element[op]('click', this.boundOpen);
 
-        this.openFn = this.openFn || $.proxy(function(ev) {
-            ev.preventDefault();
-            if (this.isOpen) return;
-
-            this.isOpen = true;
-
-            var leftRatio = 0.5, topRatio = 0.5, $img, src;
-            if (ev.target.tagName !== "IMG") {
-                var $parents = $(this).parents();
-                for (var i = 0; i < $parents.length; ++i) {
-                    $img = $($parents[i]).find('img');
-                    if ($img.length) break;  
-                }
-            } else {
-                $img = $(ev.target);
-                leftRatio = ev.offsetX / $img.prop('offsetWidth');
-                topRatio = ev.offsetY / $img.prop('offsetHeight');
-            }
-
-            src = $img.parent('[href]').attr('href') || $img.attr('src');
-            this.$thumb.attr('src', $img.attr('src'));
-            this.$full.attr('src', src);
-            if (this.global) this.oldScrollTop = document.body.scrollTop;
-
-            this.$body.addClass(this._getClass('zooming'));
-            this.$stage.addClass(this._getClass('zooming'));
-
-
-            var smallWidth = this.$canvas.prop('offsetWidth')
-              , bigWidth = this.$thumb.prop('offsetWidth') - smallWidth
-              , smallHeight = this.$canvas.prop('offsetHeight')
-              , bigHeight = this.$thumb.prop('offsetHeight') - smallHeight;
-
-            this.$canvas.prop('scrollLeft', Math.max(0, Math.min(bigWidth,
-                (bigWidth + smallWidth) * leftRatio - smallWidth / 2)));
-            this.$canvas.prop('scrollTop', Math.max(0, Math.min(bigHeight,
-                (bigHeight + smallHeight) * topRatio - smallHeight / 2)));
-        }, this)
-
-        this.$element[op]('click', function(ev) { return self.openFn(ev)});
-        this.$stage.find('.' + this._getClass('close'))[op]('click', function(ev) { return self.closeFn(ev)});
+        this.bindClose(op);
     };
 
     Zoomable.prototype._getClass = function(id) {
@@ -188,6 +193,7 @@ $.fn.zoomable = function (action, options) {
 
             if (action === 'destroy') {
                 $this.data(name, null);
+                $this.$canvas.remove();
             }
         }
         
