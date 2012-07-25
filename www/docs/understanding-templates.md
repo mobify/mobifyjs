@@ -5,19 +5,14 @@ title: Understanding Templates
 
 # Understanding Templates
     
-With Mobify.js, you use templates to place the selections you make
-from the source DOM into the mobified web page. A template is a text
-file that contains regular HTML markup, as well as variables that are
-replaced with the selections from your konf when the template is
-rendered. [Learn more about konf files]({{ site.baseurl }}/docs/understanding-konf/).
+In Mobify.js, templates are text files that contain HTML markup, as
+well as variables that are replaced with the selections from the konf
+when the template is rendered.
 
 ## Templates in Theory
 
-A common pattern is to create an object in the konf that selects data
-from the source DOM and calls `context.tmpl` to render a template and 
-assign the result to the _OUTPUTHTML_ key.
-
-The following konf renders the _home_ template to the browser:
+A common pattern is to assign a template name to _content.templateName_
+and later call `context.tmpl` on it:
 
     'content': function(context) {
         return context.choose(
@@ -36,15 +31,12 @@ The following konf renders the _home_ template to the browser:
     }
 
 
-In this example, if the _home_ argument is matched, then the value
-`'home'` will be assigned to the key _content.templateName_.
+If `'home'` is assigned to _content.templateName_ the template
+compiled from _src/tmpl/home.tmpl_ will be rendered. This is explained 
+in more detail in the [Konf Reference]({{ site.baseurl }}/docs/konf-reference/).
 
-By default, Mobify.js compiles files ending in _.tmpl_ from the _src/tmpl/_
+By default, Mobify.js compiles _.tmpl_ files from the _src/tmpl/_
 directory and makes them available to `context.tmpl`.
-
-This example would render the template _home_, which is compiled from
-_src/tmpl/home.tmpl_. This is explained in more detail in the [Konf
-Reference]({{ site.baseurl }}/docs/konf-reference/).
 
 Templates are text files that construct an HTML document. A simple 
 _home_ template might look like this:
