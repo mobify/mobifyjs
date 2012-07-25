@@ -759,10 +759,12 @@ strong {
 	}
 	.how-it-works .manipulate-dom:before {
 		top: 21px;
+		width: 80%;
 		height: 125px;
 		background-image: url(../img/illustration-dom.min.png);
 	}
 	.how-it-works .desktop-content:before {
+		width: 90%;
 		height: 146px;
 		background-image: url(../img/illustration-content.min.png);
 	}
@@ -827,6 +829,9 @@ strong {
 @media (min-width: 768px) {
 	.lead {
 		text-align: left;
+	}
+	.how-it-works p {
+		padding-right: 20px;
 	}
 	.next-level .graphic img {
 		margin: 0.5em 0 0 0;
