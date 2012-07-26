@@ -42,14 +42,6 @@
     transition-duration: 0.5s;
 }
 
-.m-carousel-inner.m-dragging {
-    -webkit-transition-duration: 0;
-    -moz-transition-duration: 0;
-    -ms-transition-duration: 0;
-    -o-transition-duration: 0;
-    transition-duration: 0;
-}
-
 .m-carousel-inner .m-item {
     /* To use any padding or border on the
      * elements, you can use border-box.
