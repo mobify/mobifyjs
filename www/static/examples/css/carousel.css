@@ -1,27 +1,141 @@
-.carousel {
+.m-carousel {
     position: relative;
     overflow-x: hidden;
+
+    border: 1px solid black;
+    
+    /* Disable subpixel font smoothing which causes pop effect while transforming */
     -webkit-font-smoothing: antialiased;
+
 }
 
-.carousel-inner {
+.m-carousel-inner {
     position: relative;
-    width: 10000%;
-    padding: 0;
+    display: inline-block;
 
+    /* Sizes to match the area of the container */
+    width: 100%;
+    white-space: nowrap;
+
+    /* Removes inline-block gaps due to whitespace */
+    font-size: 0;
+
+
+    /* Configure animations */
     -webkit-transition-property: -webkit-transform;
     -moz-transition-property: -moz-transform;
     -ms-transition-property: -ms-transform;
     -o-transition-property: -o-transform;
     transition-property: transform;
+    
+    /* iOS like slide timings */
+    -webkit-transition-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
+    -moz-transition-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
+    -ms-transition-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
+    -o-transition-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
+    transition-timing-function: cubic-bezier(0.33, 0.66, 0.66, 1);
+    
+    -webkit-transition-duration: 0.5s;
+    -moz-transition-duration: 0.5s;
+    -ms-transition-duration: 0.5s;
+    -o-transition-duration: 0.5s;
+    transition-duration: 0.5s;
 }
 
-.carousel-inner .item {
-    float: left;
-    padding: 0;
-    margin 0;
+.m-carousel-inner.m-dragging {
+    -webkit-transition-duration: 0;
+    -moz-transition-duration: 0;
+    -ms-transition-duration: 0;
+    -o-transition-duration: 0;
+    transition-duration: 0;
 }
 
-.fluid .carousel-inner .item {
-    width: 1%;
+.m-carousel-inner .m-item {
+    /* To use any padding or border on the
+     * elements, you can use border-box.
+     */
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    
+    /* We use inline-block and disable wrapping
+     * to keep the items on the same line
+     */
+    display: inline-block;
+    
+
+    /* We must reset the font-size here */
+    font-size: 16px;
+}
+
+.m-fluid .m-carousel-inner .m-item {
+    /* We must give it an explicit width
+     * because it is inline-block
+     */
+    width: 100%;
+}
+
+
+
+/* A width-filling 1,2,3-up carousel
+ * can be set up in a few ways
+ *
+ * The gutter (margin) between items is applied
+ * as a `margin-right` on the .items.
+ *
+ *
+ * Because the items are sized in percentages relative
+ * to the containerm padding on the left and right must
+ * also include the sum of the visible gutters.
+ *
+ * Thus, for a 3-up display, which has two visible gutters
+ * the caclulation would be:
+ *
+ * padding: 0, (Regular Padding) + 2*Gutter/2;
+ *
+ * We then use relative positioning on the .carousel-inner
+ * to shift it left by the amount we have exceeded our
+ * desired padding:
+ *
+ * left: -2*Gutter/2;
+ *
+ * Note: For carousel that are centered, this value
+ * is computed in Javascript. We must reset the
+ * `left` attribute.
+ *
+ * .center .carousel-inner {
+ *   left: 0;
+ * }
+ *
+ */
+
+
+.m-carousel.m-fluid-2 {
+    padding: 0 7.5px;
+}
+
+.m-fluid-2 .m-carousel-inner {
+    left: -2.5px;
+}
+
+.m-fluid-2 .m-carousel-inner .m-item {
+    width: 50%;
+    margin-right: 5px;
+}
+
+
+.m-carousel.m-fluid-3 {
+    padding: 0 9px;
+}
+
+.m-fluid-3 .m-carousel-inner {
+    left: -5px;
+}
+
+.m-fluid-3 .m-carousel-inner .m-item {
+    width: 33.4%;
+    margin-right: 5px;
+}
+
+.m-carousel.m-center .m-carousel-inner {
+    left: 0;
 }

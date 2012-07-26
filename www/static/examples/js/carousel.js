@@ -1,8 +1,6 @@
 var Mobify = window.Mobify = window.Mobify || {};
-$ = Mobify.$ = $ || Mobify.$ || window.Zepto || jQuery;
-Mobify.UI = Mobify.UI || {};
-
-
+Mobify.$ = Mobify.$ || window.Zepto || window.jQuery;
+Mobify.UI = Mobify.UI || { classPrefix: 'm-' };
 
 (function($, document) {
     $.support = $.support || {};
@@ -69,26 +67,29 @@ Mobify.UI.Utils = (function($) {
     var transformProperty = exports.getProperty("Transform");
     if (has.transform3d) {
         exports.translateX = function(element, delta) {
-             element.style[transformProperty] = "translate3d(" + delta  + "px,0,0)";
+             if (typeof delta == "number") delta = delta + 'px';
+             element.style[transformProperty] = "translate3d(" + delta  + ",0,0)";
         };
     } else if (has.transform) {
         exports.translateX = function(element, delta) {
-             element.style[transformProperty] = "translate(" + delta  + "px,0)";
+             if (typeof delta == "number") delta = delta + 'px';
+             element.style[transformProperty] = "translate(" + delta  + ",0)";
         };
     } else {
         exports.translateX = function(element, delta) {
-            element.style['left'] = delta + "px";
+            if (typeof delta == "number") delta = delta + 'px';
+            element.style['left'] = delta;
         };
     }
 
     // setTransitions
     var transitionProperty = exports.getProperty("Transition");
     var durationProperty = exports.getProperty("TransitionDuration");
-    exports.setTransitions = function(element, duration) {
-        if (duration <= 0) {
-            element.style[durationProperty] = "0s";
+    exports.setTransitions = function(element, enable) {
+        if (enable) {
+            element.style[durationProperty] = "";
         } else {
-            element.style[durationProperty] = duration;
+            element.style[durationProperty] = "0s";
         }
     }
 
@@ -114,56 +115,128 @@ Mobify.UI.Utils = (function($) {
 
     return exports;
 
-})($);
+})(Mobify.$);
 
 Mobify.UI.Carousel = (function($, Utils) {
     var defaults = {
-        duration: '0.5s'
-        , dragRadius: 10
+          dragRadius: 10
         , moveRadius: 20
+        , classPrefix: undefined
+        , center: undefined
+        , classNames: {
+            outer: "carousel"
+          , inner: "carousel-inner"
+          , item: "item"
+          , center: "center"
+          , touch: "has-touch"
+          , dragging: "dragging"
+        }
     };
 
     var has = $.support;
 
     // Constructor
     var Carousel = function(element, options) {
+        this.setOptions(options);
+        this.initElements(element);
+        this.initOffsets();
+        this.initAnimation();
+        this.bind();
+    };
+
+    // Expose Dfaults
+    Carousel.defaults = defaults;
+    
+    Carousel.prototype.setOptions = function(opts) {
+        var options = this.options || $.extend({}, defaults, opts);
+        
+        /* classNames requires a deep copy */
+        options.classNames = $.extend({}, options.classNames, opts.classNames || {});
+
+        /* By default, classPrefix is `undefined`, which means to use the Mobify-wide level prefix */
+        options.classPrefix = options.classPrefix || Mobify.UI.classPrefix;
+
+        
+        this.options = options;
+    };
+
+    Carousel.prototype.initElements = function(element) {
+        this._index = 1;
+        
         this.element = element;
         this.$element = $(element);
-        this.$inner = this.$element.find('.carousel-inner');
-        this.$items = this.$inner.find('.item');
-
-        this.options = $.extend({}, defaults, options);
-        
-        this._index = 0;
-        this._offset = 0;
-        this._length = this.$items.length;
-        
+        this.$inner = this.$element.find('.' + this._getClass('inner'));
+        this.$items = this.$inner.children();
         
         this.$start = this.$items.eq(0);
+        this.$sec = this.$items.eq(1);
         this.$current = this.$items.eq(this._index);
 
-        this.animating = false;
-        this._enableAnimation();
-
-        this.dragging = false;
-        this._offsetDrag = 0;
-        this._needsUpdate = false;
-
-        this.bind();
-
+        this._length = this.$items.length;
+        this._center = this.$element.hasClass(this._getClass('center'));
 
     };
 
-    // Expose Defaults
-    Carousel.defaults = defaults;
+    Carousel.prototype.initOffsets = function() {
+        this._offset = 0;
+        this._offsetDrag = 0;
+        this._offsetAlign = 0;
 
+        this._calculateOffsetAlign();
+
+        var self = this;
+        $(window).load(function() {
+            self._calculateOffsetAlign();
+        });
+
+        $(window).resize(function() {
+            self._calculateOffsetAlign();
+        });
+    }
+
+    Carousel.prototype.initAnimation = function() {
+        this.animating = false;
+        this.dragging = false;
+        this._needsUpdate = false;
+        this._enableAnimation();
+    };
+
+
+    Carousel.prototype._getClass = function(id) {
+        return this.options.classPrefix + this.options.classNames[id];
+    };
+
+
+    Carousel.prototype._calculateOffsetAlign = function() {
+        if (!this._center) {
+            return;
+        }
+        
+        var self = this
+          , innerWidth = this.$inner.outerWidth()
+          , itemWidth = this.$start.outerWidth();
+        
+        /* We check to see if the CSS has been applied, otherwise it will be 0 */
+        if ((innerWidth === 0) || (itemWidth === 0)) {
+            setTimeout(function() {
+                self._calculateOffsetAlign();
+            }, 100);
+
+            return;
+        }
+        
+        this._offsetAlign = (innerWidth - itemWidth) / 2;
+
+        self.update();
+    }
 
     Carousel.prototype._enableAnimation = function() {
         if (this.animating) {
             return;
         }
 
-        Utils.setTransitions(this.$inner[0], this.options['duration']);
+        Utils.setTransitions(this.$inner[0], true);
+        this.$inner.removeClass(this._getClass('dragging'));
         this.animating = true;
     }
 
@@ -172,11 +245,13 @@ Mobify.UI.Carousel = (function($, Utils) {
             return;
         }
         
-        Utils.setTransitions(this.$inner[0], '0');
+        Utils.setTransitions(this.$inner[0], false);
+        this.$inner.addClass(this._getClass('dragging'));
         this.animating = false;
     }
 
     Carousel.prototype.update = function() {
+        /* We throttle calls to the real `_update` for efficiency */
         if (this._needsUpdate) {
             return;
         }
@@ -193,7 +268,9 @@ Mobify.UI.Carousel = (function($, Utils) {
             return;
         }
 
-        Utils.translateX(this.$inner[0], this._offset - this._dragOffset);
+        var x = Math.round(this._offset + this._offsetDrag + this._offsetAlign);
+
+        Utils.translateX(this.$inner[0], x);
 
         this._needsUpdate = false;
     }
@@ -238,8 +315,7 @@ Mobify.UI.Carousel = (function($, Utils) {
                 dragThresholdMet = true;
                 e.preventDefault();
                 
-                //Utils.translateX($inner[0], self._offset - dx);
-                self._dragOffset = dx;
+                self._offsetDrag = -dx;
                 self.update();
             } else if ((abs(dy) > abs(dx)) && (abs(dy) > dragRadius)) {
                 canceled = true;
@@ -250,7 +326,7 @@ Mobify.UI.Carousel = (function($, Utils) {
             if (!dragging) {
                 return;
             }
-            
+
             dragging = false;
             
             self._enableAnimation();
@@ -263,10 +339,9 @@ Mobify.UI.Carousel = (function($, Utils) {
                     self.prev();
                 }
             } else {
-                self._dragOffset = 0;
-                self.update();
                 // Reset back to regular position
-                // Utils.translateX($inner[0], self._offset);
+                self._offsetDrag = 0;
+                self.update();
             }
 
         }
@@ -347,15 +422,13 @@ Mobify.UI.Carousel = (function($, Utils) {
         // Index must be decremented to convert between 1- and 0-based indexing.
         this.$current = $current = $items.eq(newIndex - 1);
 
-        var currentOffset = $current.offset().left
-            , startOffset = $start.offset().left; 
+        var currentOffset = $current.prop('offsetLeft') 
+            , startOffset = $start.prop('offsetLeft');
 
         var transitionOffset = -(currentOffset - startOffset);
 
-
-
         this._offset = transitionOffset;
-        this._dragOffset = 0;
+        this._offsetDrag = 0;
         this._index = newIndex;
         this.update();
         // Trigger afterSlide event
@@ -372,46 +445,52 @@ Mobify.UI.Carousel = (function($, Utils) {
 
     return Carousel;
 
-})($, Mobify.UI.Utils);
-
-/**
-    jQuery interface to set up a carousel
+})(Mobify.$, Mobify.UI.Utils);
 
 
-    @param {String} [action] Action to perform. When no action is passed, the carousel is simply initialized.
-    @param {Object} [options] Options passed to the action.
-*/
-$.fn.carousel = function (action, options) {
-    this.each(function () {
-        var $this = $(this)
-          , carousel = $this._carousel
-          , initOptions = $.extend({}, $.fn.carousel.defaults);
 
+(function($) {
+    /**
+        jQuery interface to set up a carousel
+
+
+        @param {String} [action] Action to perform. When no action is passed, the carousel is simply initialized.
+        @param {Object} [options] Options passed to the action.
+    */
+    $.fn.carousel = function (action, options) {
+        var initOptions = $.extend({}, $.fn.carousel.defaults);
 
         // Handle different calling conventions
         if (typeof action == 'object') {
-            initOptions = action;
+            initOptions = $(initOptions, action);
             options = null;
             action = null;
-        } 
-        
-        if (!carousel) {
-            carousel = new Mobify.UI.Carousel(this, initOptions);
         }
 
-        if (action) {
-            carousel[action](options);
+        this.each(function () {
+            var $this = $(this)
+              , carousel = this._carousel;
 
-            if (action === 'destroy') {
-                carousel = null;
+            
+            if (!carousel) {
+                carousel = new Mobify.UI.Carousel(this, initOptions);
             }
-        }
-        
-        $this._carousel = carousel;
-    })
 
-    return this;
-};
+            if (action) {
+                carousel[action](options);
 
-$.fn.carousel.defaults = {
-};
+                if (action === 'destroy') {
+                    carousel = null;
+                }
+            }
+            
+            this._carousel = carousel;
+        })
+
+        return this;
+    };
+
+    $.fn.carousel.defaults = {
+    };
+
+})(Mobify.$);
