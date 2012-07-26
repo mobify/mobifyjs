@@ -287,7 +287,10 @@ Mobify.UI.Carousel = (function($, Utils) {
             , self = this
             , $element = this.$element
             , $inner = this.$inner
-            , opts = this.options;
+            , opts = this.options
+            , dragLimit = this.$element.width()
+            , lockLeft = false
+            , lockRight = false;
 
         function start(e) {
             if (!has.touch) e.preventDefault();
@@ -302,6 +305,9 @@ Mobify.UI.Carousel = (function($, Utils) {
 
             // Disable smooth transitions
             self._disableAnimation();
+
+            lockLeft = self._index == 1;
+            lockRight = self._index == self._length;
         }
 
         function drag(e) {
@@ -315,6 +321,11 @@ Mobify.UI.Carousel = (function($, Utils) {
                 dragThresholdMet = true;
                 e.preventDefault();
                 
+                if (lockLeft && (dx < 0)) {
+                    dx = dx * (-dragLimit)/(dx - dragLimit);
+                } else if (lockRight && (dx > 0)) {
+                    dx = dx * (dragLimit)/(dx + dragLimit);
+                }
                 self._offsetDrag = -dx;
                 self.update();
             } else if ((abs(dy) > abs(dx)) && (abs(dy) > dragRadius)) {
