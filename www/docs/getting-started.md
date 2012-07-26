@@ -3,7 +3,7 @@ layout: doc
 title: Getting Started
 ---
 
-# Gettings Started
+# Getting Started
 
 You've downloaded the Mobify Client, created a project scaffold *myproject*,
 and put the tag on the page you'd like to adapt. You've completed the "Quick 
