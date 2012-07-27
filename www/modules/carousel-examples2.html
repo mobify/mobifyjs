@@ -4,6 +4,7 @@ title: Mobify.js Carousel Examples
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel-controls.css">
 <style>
 .m-carousel .m-item img {
     
@@ -14,27 +15,108 @@ title: Mobify.js Carousel Examples
 
 .m-fluid img { width: 100%; }
 
-/* styling the carousel for this page */
+/* styling for this page */
 .m-carousel {
-
+  padding-bottom: 30px;
+}
+.m-carousel .m-item {
+  height: 300px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 300px;
+}
+.m-carousel .m-item img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;  
 }
 </style>
 
 
 
-<h3>Basic Carousel with HUD Controls</h3>
-<p>Previous and next show up as heads-up controls on hover events on desktop. On mobile, simply swipe to advance.</p>
-<div id="carousel-example-1" class="m-carousel m-center">
+<h3>Basic Carousel with bulleted controls</h3>
+<p>Bulleted pagination controls for each item.</p>
+<div class="m-carousel m-carousel-example-1 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
-    <div class="m-item">
-        <img src="{{ site.baseurl }}/static/examples/img/aeropuerto.jpg">
-    </div>
     <div class="m-item">
         <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
     </div>
     <div class="m-item">
         <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/pods.jpg">
+    </div>
+  </div>
+  <!-- Carousel controls -->
+  <div class="m-carousel-controls m-carousel-bulleted">
+    <a class="carousel-control right" href="#myCarousel" data-slide="1">1</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="2">2</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="3">3</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="4">4</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="5">5</a>
+  </div>
+</div>
+
+
+<h3>Basic Carousel with numbered pagination-style controls</h3>
+<p>Numbered pagination controls for each item, with flanking Previous and Next controls.</p>
+<div class="m-carousel m-carousel-example-2 m-center m-fluid">
+  <!-- Carousel items -->
+  <div class="m-carousel-inner">
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/pods.jpg">
+    </div>
+  </div>
+  <!-- Carousel controls -->
+  <div class="m-carousel-controls m-carousel-pagination">
+    <a class="carousel-control left" href="#myCarousel" data-slide="prev">Previous</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="1">1</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="2">2</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="3">3</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="4">4</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="5">5</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="next">Next</a>  
+  </div>
+</div>
+
+
+<h3>Basic Carousel with HUD Controls</h3>
+<p>Previous and next display as heads-up controls on hover events on desktop. On mobile, simply swipe to advance.</p>
+<div class="m-carousel m-carousel-example-3 m-center m-fluid">
+  <!-- Carousel items -->
+  <div class="m-carousel-inner">
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/aeropuerto.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
     </div>
     <div class="m-item">
         <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
@@ -49,6 +131,9 @@ title: Mobify.js Carousel Examples
       <a class="m-carousel-control m-carousel-next" href="#myCarousel" data-slide="next">Next</a>
   </div>
 </div>
+
+
+
 
 
 

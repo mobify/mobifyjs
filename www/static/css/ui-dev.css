@@ -980,7 +980,7 @@ td {
 
 
 
-/* Page Layout: Widgets */
+/* Page Layout: Modules */
 .widget-gallery {
 	overflow: hidden;
 	clear: left;
@@ -1036,6 +1036,17 @@ td {
 	display: inline-block;
 	padding: 20px 0 20px 20px;
 }
+@media (max-width: 767px) {
+	.modules .span8 {
+		padding: 0;
+		width: 100%;
+	}
+	.modules .span4 {
+		width: 100%;
+	}
+}
+
+
 
 
 /* -- Retina tweaks -- */
