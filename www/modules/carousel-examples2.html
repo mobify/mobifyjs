@@ -1,0 +1,56 @@
+---
+layout: modules
+title: Mobify.js Carousel Examples
+---
+
+<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel.css">
+<style>
+.m-carousel .m-item img {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* styling the carousel for this page */
+.m-carousel {
+
+}
+</style>
+
+
+
+<h3>Basic Carousel with HUD Controls</h3>
+<p>Previous and next show up as heads-up controls on hover events on desktop. On mobile, simply swipe to advance.</p>
+<div id="carousel-example-1" class="m-carousel m-center">
+  <!-- Carousel items -->
+  <div class="m-carousel-inner">
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/aeropuerto.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/pods.jpg">
+    </div>
+  </div>
+  <!-- Carousel controls -->
+  <div class="m-carousel-controls m-carousel-hud">
+      <a class="m-carousel-control m-carousel-prev" href="#myCarousel" data-slide="prev">Previous</a>
+      <a class="m-carousel-control m-carousel-next" href="#myCarousel" data-slide="next">Next</a>
+  </div>
+</div>
+
+
+
+
+<script src="{{ site.baseurl }}/static/examples/js/carousel.js"></script>
+<script>
+    $(function() { $('.m-carousel').carousel(); });
+</script>

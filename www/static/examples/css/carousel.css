@@ -2,11 +2,8 @@
     position: relative;
     overflow-x: hidden;
 
-    border: 1px solid black;
-    
     /* Disable subpixel font smoothing which causes pop effect while transforming */
     -webkit-font-smoothing: antialiased;
-
 }
 
 .m-carousel-inner {
@@ -19,7 +16,6 @@
 
     /* Removes inline-block gaps due to whitespace */
     font-size: 0;
-
 
     /* Configure animations */
     -webkit-transition-property: -webkit-transform;
@@ -130,4 +126,56 @@
 
 .m-carousel.m-center .m-carousel-inner {
     left: 0;
+}
+
+
+
+/* carousel controls */
+.m-carousel-controls a, .m-carousel-controls a:visited {
+    display: block;
+    position: absolute;
+    top: 50%;
+}
+.m-carousel-hud a {
+    z-index: 2;
+    opacity: 0;
+    width: 40px;
+    height: 40px;
+    text-decoration: none;
+    text-indent: -999px;
+    color: rgba(255,255,255,0.8);
+    background: rgba(0,0,0,0.8);
+    -webkit-transition: opacity 0.1s ease-in;
+    -webkit-border-radius: 25px;
+    -webkit-user-drag: none;
+}
+.m-carousel:hover .m-carousel-hud a {
+    opacity: 0.3;
+}
+.m-carousel .m-carousel-hud a:hover, .m-carousel .m-carousel-hud a:focus {
+    opacity: 1;
+}
+.m-carousel-hud a:after {
+    color: #fff;
+    content: "\25c0";
+    font-size: 20px;
+    font-weight: bold;
+    text-indent: 0;
+    text-align: center;
+    display: block;
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    z-index: 9;
+}
+.m-carousel-hud .m-carousel-prev {
+    left: 10px;
+}
+.m-carousel-hud .m-carousel-next {
+    right: 10px;    
+}
+.m-carousel-hud .m-carousel-next:after {
+    content: "\25b6";
 }
