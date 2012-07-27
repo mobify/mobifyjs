@@ -110,20 +110,20 @@
   opacity: 1; }
 
 .m-carousel-hud a:after {
-  color: #fff;
-  content: "\25c0";
-  font-size: 20px;
-  font-weight: bold;
-  text-indent: 0;
-  text-align: center;
-  display: block;
-  position: absolute;
-  top: 5px;
-  left: 0;
-  width: 40px;
-  height: 40px;
-  z-index: 9; }
-
+    color: rgba(255,255,255,0.75);
+    content: "\25c0";
+    font-size: 20px;
+    font-weight: bold;
+    text-indent: 0;
+    text-align: center;
+    display: block;
+    position: absolute;
+    top: 5px;
+    left: 0;
+    width: 37px;
+    height: 40px;
+    z-index: 9;
+}
 .m-carousel-hud .m-carousel-prev {
   left: 10px; }
 
@@ -131,4 +131,7 @@
   right: 10px; }
 
 .m-carousel-hud .m-carousel-next:after {
-  content: "\25b6"; }
+    left: auto;
+    right: 0;
+    content: "\25b6";
+}
