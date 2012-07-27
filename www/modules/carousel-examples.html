@@ -18,6 +18,22 @@ title: Mobify.js Carousel Examples
 .m-carousel {
   padding-bottom: 30px;
 }
+.card {
+  background: rgba(0,0,0,0.5);
+  padding: 20px 30px;
+  border-radius: 20px;
+}
+  .card h3 {
+    margin-top: 0;
+  }
+.m-item {
+  margin-right: 20px;
+}
+  .m-item img {
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+  }
 
 </style>
 
@@ -25,7 +41,7 @@ title: Mobify.js Carousel Examples
 
 <h3>Previous/Next controls</h3>
 <p>Image carousel with simple Previous / Next controls to advance between items.</p>
-<div class="m-carousel m-carousel-example-2 m-center m-fluid">
+<div class="m-carousel m-carousel-example-1 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
@@ -53,7 +69,7 @@ title: Mobify.js Carousel Examples
 
 
 
-<h3>Image + caption</h3>
+<h3>Image + Caption</h3>
 <p>Image carousel containing textual captions with simple Previous / Next controls to advance between items.</p>
 <div class="m-carousel m-carousel-example-2 m-center m-fluid">
   <!-- Carousel items -->
@@ -97,10 +113,35 @@ title: Mobify.js Carousel Examples
 </div>
 
 
+<h3>Arbitrary Content</h3>
+<p>Arbitrary content carousel with simple Previous / Next controls to advance between items.</p>
+<div class="m-carousel m-carousel-example-3 m-center m-fluid">
+  <!-- Carousel items -->
+  <div class="m-carousel-inner">
+    <div class="m-item">
+        <div class="card">
+          <h3>Williamsburg letterpress</h3>
+          <p>Retro blog cliche, direct trade fingerstache keffiyeh twee. Bicycle rights blog mustache, williamsburg scenester flexitarian cred twee pour-over letterpress pork belly. Beard williamsburg authentic fanny pack bespoke helvetica.</p>
+        </div>
+    </div>
+    <div class="m-item">
+        <div class="card">
+          <h3>Bespoke fingerstache</h3>
+          <p>Brooklyn flexitarian street art bespoke wolf. Trust fund carles butcher pickled chillwave. Banksy 3 wolf moon seitan kale chips, cosby sweater butcher vice small batch raw denim post-ironic beard. Mcsweeney's thundercats brooklyn.</p>
+        </div>
+    </div>
+  </div>
+  <!-- Carousel controls -->
+  <div class="m-carousel-controls">
+    <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo; Previous</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="next">Next &rsaquo;</a>  
+  </div>
+</div>
+
 
 <h3>Bulleted controls</h3>
 <p>Bulleted indicators for number of items and currently-selected item. Click to advance between items.</p>
-<div class="m-carousel m-carousel-example-1 m-center m-fluid">
+<div class="m-carousel m-carousel-example-4 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
@@ -132,7 +173,7 @@ title: Mobify.js Carousel Examples
 
 <h3>Numbered pagination-style controls</h3>
 <p>Numbered pagination controls for each item, with flanking Previous / Next controls.</p>
-<div class="m-carousel m-carousel-example-2 m-center m-fluid">
+<div class="m-carousel m-carousel-example-5 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
@@ -165,7 +206,7 @@ title: Mobify.js Carousel Examples
 
 <h3>HUD-style Controls</h3>
 <p>Previous and Next render as heads-up controls that display on hover events. Since hover events don't work on mobile, simply swipe to advance.</p>
-<div class="m-carousel m-carousel-example-3 m-center m-fluid">
+<div class="m-carousel m-carousel-example-6 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">

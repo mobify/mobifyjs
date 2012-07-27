@@ -63,7 +63,7 @@
     padding: 3px 10px;
     margin: 1px 0;
     color: #333;
-    background-color: rgba(255,255,255,0.8);
+    background-color: rgba(255,255,255,0.3);
     -webkit-transition: background-color 0.1s ease-in;
     -moz-transition: background-color 0.1s ease-in;
     -o-transition: background-color 0.1s ease-in;
@@ -72,11 +72,13 @@
     -moz-border-radius: 2px;
     border-radius: 2px;
 }
-.m-carousel-pagination a:hover, .m-carousel-pagination a:focus, .m-carousel-pagination a.m-active {
+.m-carousel-pagination a:hover, .m-carousel-pagination a:focus {
     text-decoration: none;
+    background-color: rgba(255,255,255,0.6);
+}
+.m-carousel-pagination a.m-active {
     background-color: rgba(255,255,255,1);
 }
-
 
 /* Carousel controls: HUD */
 .m-carousel-hud {
