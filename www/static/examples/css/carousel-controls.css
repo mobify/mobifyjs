@@ -24,6 +24,8 @@
     overflow: hidden;
     display: inline-block;
     padding: 6px;
+    width: 0;
+    height: 0;
     margin: 0 3px;
     color: #333;
     background-color: rgba(255,255,255,0.3);
@@ -59,6 +61,7 @@
     text-decoration: none;
     display: inline-block;
     padding: 3px 10px;
+    margin: 1px 0;
     color: #333;
     background-color: rgba(255,255,255,0.8);
     -webkit-transition: background-color 0.1s ease-in;
@@ -143,12 +146,15 @@
 /* captions */
 .caption {
   margin: 0;
-  padding: 10px 5%;
-  width: 90%;
+  padding: 10px;
+  width: 100%;
   height: auto;
   background: rgba(0,0,0,0.7);
   text-align: center;
   bottom: 0;
   position: absolute;
   z-index: 9;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
