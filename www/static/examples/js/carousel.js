@@ -173,25 +173,13 @@ Mobify.UI.Carousel = (function($, Utils) {
         this.$current = this.$items.eq(this._index);
 
         this._length = this.$items.length;
-        this._center = this.$element.hasClass(this._getClass('center'));
+        this._alignment = this.$element.hasClass(this._getClass('center')) ? 0.5 : 0;
 
     };
 
     Carousel.prototype.initOffsets = function() {
         this._offset = 0;
         this._offsetDrag = 0;
-        this._offsetAlign = 0;
-
-        this._calculateOffsetAlign();
-
-        var self = this;
-        $(window).load(function() {
-            self._calculateOffsetAlign();
-        });
-
-        $(window).resize(function() {
-            self._calculateOffsetAlign();
-        });
     }
 
     Carousel.prototype.initAnimation = function() {
@@ -206,29 +194,6 @@ Mobify.UI.Carousel = (function($, Utils) {
         return this.options.classPrefix + this.options.classNames[id];
     };
 
-
-    Carousel.prototype._calculateOffsetAlign = function() {
-        if (!this._center) {
-            return;
-        }
-        
-        var self = this
-          , innerWidth = this.$inner.outerWidth()
-          , itemWidth = this.$start.outerWidth();
-        
-        /* We check to see if the CSS has been applied, otherwise it will be 0 */
-        if ((innerWidth === 0) || (itemWidth === 0)) {
-            setTimeout(function() {
-                self._calculateOffsetAlign();
-            }, 100);
-
-            return;
-        }
-        
-        this._offsetAlign = (innerWidth - itemWidth) / 2;
-
-        self.update();
-    }
 
     Carousel.prototype._enableAnimation = function() {
         if (this.animating) {
@@ -268,7 +233,7 @@ Mobify.UI.Carousel = (function($, Utils) {
             return;
         }
 
-        var x = Math.round(this._offset + this._offsetDrag + this._offsetAlign);
+        var x = Math.round(this._offset + this._offsetDrag);
 
         Utils.translateX(this.$inner[0], x);
 
@@ -433,8 +398,8 @@ Mobify.UI.Carousel = (function($, Utils) {
         // Index must be decremented to convert between 1- and 0-based indexing.
         this.$current = $current = $items.eq(newIndex - 1);
 
-        var currentOffset = $current.prop('offsetLeft') 
-            , startOffset = $start.prop('offsetLeft');
+        var currentOffset = $current.prop('offsetLeft') + $current.prop('clientWidth') * this._alignment
+            , startOffset = $start.prop('offsetLeft') + $start.prop('clientWidth') * this._alignment
 
         var transitionOffset = -(currentOffset - startOffset);
 
