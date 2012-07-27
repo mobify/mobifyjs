@@ -1,7 +1,11 @@
 /* 
   Carousel control base styling 
 */
+.m-carousel-controls {
+  padding-top: 10px;
+}
 .m-carousel-controls a {
+    padding: 5px;
     -webkit-user-select: none;
     -moz-user-select: -moz-none;
     user-select: none;
@@ -13,9 +17,6 @@
 
 
 /* Carousel controls: Bulleted */
-.m-carousel-bulleted {
-    padding-top: 10px;
-}
 .m-carousel-bulleted a {
     line-height: 0;
     text-decoration: none;
@@ -23,6 +24,7 @@
     overflow: hidden;
     display: inline-block;
     padding: 6px;
+    margin: 0 3px;
     color: #333;
     background-color: rgba(255,255,255,0.3);
     -webkit-transition: background-color 0.1s ease-in;
@@ -74,17 +76,22 @@
 
 
 /* Carousel controls: HUD */
+.m-carousel-hud {
+  padding-top: 0;
+}
 .m-carousel-hud a {
   z-index: 2;
   opacity: 0;
-  width: 50px;
-  height: 50px;
-  text-decoration: none;
-  text-indent: -999px;
-  overflow: hidden;
   display: block;
   position: absolute;
   top: 50%;
+  width: 50px;
+  height: 50px;
+  margin: -25px 0 0 0;
+  padding: 0;
+  text-decoration: none;
+  text-indent: -999px;
+  overflow: hidden;
   color: rgba(255, 255, 255, 0.8);
   background: rgba(0, 0, 0, 0.8);
   -webkit-transition: opacity 0.1s ease-in;
@@ -126,4 +133,22 @@
     left: auto;
     right: 0;
     content: "\25b6";
+}
+
+
+
+
+/* extra bits */
+
+/* captions */
+.caption {
+  margin: 0;
+  padding: 10px 5%;
+  width: 90%;
+  height: auto;
+  background: rgba(0,0,0,0.7);
+  text-align: center;
+  bottom: 0;
+  position: absolute;
+  z-index: 9;
 }
