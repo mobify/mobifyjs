@@ -4,6 +4,7 @@ title: Mobify.js Carousel Module
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion-controls.css">
 
 # Accordion
 
@@ -17,7 +18,7 @@ Try it out:
         <div class="content">
             <div class="inner-content">
                 <h2>Content 1</h2>
-                <h2>Lorem Ipsum</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui icia deserunt mollit anim id est laborum.</p>
             </div>
         </div>
     </li>
@@ -28,7 +29,7 @@ Try it out:
         <div class="content">
             <div class="inner-content">
                 <h2>Content 2</h2>
-                <p>Lorem Ipsum</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p> 
             </div>
         </div>
     </li>
@@ -39,16 +40,13 @@ Try it out:
         <div class="content">
             <div class="inner-content">
                 <h2>Content 3</h2>
-                <p>Lorem Ipsum</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui icia deserunt mollit anim id est laborum.</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui icia deserunt mollit anim id est laborum.</p>
             </div>
         </div>
     </li>
 </ul>
 
-<script>
-
-
-</script>
 
 [See more examples]({{ site.baseurl }}/modules/accordion-examples)
 
