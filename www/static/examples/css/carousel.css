@@ -1,14 +1,13 @@
 /* Classes on outer slideshow wrapper:
-    either NONE or 'fraction' or 'fraction' + one of 'fraction1'...'fraction10'.
-        fraction sets box-sizing: border-box, so that padding on the element is taken out ;
-    either NONE or 'center' or 'right'
+  either NONE or 'fraction' or 'fraction' + one of 'fraction1'...'fraction10'.
+    fraction sets box-sizing: border-box, so that padding on the element is taken out ;
+  either NONE or 'center' or 'right'
 
 */
 .m-carousel {
   position: relative;
   overflow: hidden;
   -webkit-font-smoothing: antialiased; }
-  .m-carousel img {-ms-interpolation-mode: bicubic;}
   .m-carousel.m-left {
     text-align: left; }
   .m-carousel.m-center {
@@ -37,6 +36,8 @@
     width: 16.667%; }
   .m-carousel.m-fluid-6.m-center > .m-carousel-inner > *:first-child {
     margin-left: 41.667%; }
+  .m-carousel img {
+    -ms-interpolation-mode: bicubic; }
 
 .m-carousel-inner {
   white-space: nowrap;
@@ -62,11 +63,10 @@
   transition-duration: 0.5s; }
   .m-carousel-inner > * {
     display: inline-block;
+    vertical-align: top;
     white-space: normal;
     /* We must reset the font-size here */
     font-size: 16px; }
-  .m-carousel-inner .m-fluid.m-center > *:first-child {
-    margin-left: 50%; }
   .m-fluid > .m-carousel-inner > * {
     box-sizing: border-box;
     -ms-box-sizing: border-box;
@@ -74,13 +74,17 @@
     -o-box-sizing: border-box;
     -webkit-box-sizing: border-box; }
   .m-center:not(.m-fluid) > .m-carousel-inner {
-    display: inline-block; }
+    display: inline-block;
+    margin-right: -20000px !important;
+    margin-left: 0 !important; }
+    .m-center:not(.m-fluid) > .m-carousel-inner > * {
+      position: relative;
+      left: -20000px; }
     .m-center:not(.m-fluid) > .m-carousel-inner > *:first-child {
-      display: block;
-      height: 0; }
+      float: left;
+      margin-right: 20000px;
+      left: 0; }
       .m-center:not(.m-fluid) > .m-carousel-inner > *:first-child:last-child {
         margin-right: 0; }
-    .m-center:not(.m-fluid) > .m-carousel-inner > *:nth-child(2) {
-      margin-left: 100%; }
     .m-center:not(.m-fluid) > .m-carousel-inner > *:last-child {
       margin-right: -30000px; }
