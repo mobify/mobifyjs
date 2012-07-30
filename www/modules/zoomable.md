@@ -1,3 +1,8 @@
+---
+layout: modules
+title: Mobify.js Zoomable Module
+---
+
 # Introducing Zoomable module
 
 ## Why is a new zoom widget required?
@@ -29,7 +34,9 @@ $.fn.zoomable() initialization call takes configuration parameters that are furt
 ## Initialization parameters
 
 Full parameter list is present in defaults variable, and is duplicated below:
-    var defaults = {
+
+
+	var defaults = {
         stage: undefined // Element inside which zoomed in content should be rendered. Defaults to document body.
       , classNames: { // Look for (or generate) elements with these class names.
             zooming : 'zooming'
@@ -72,6 +79,9 @@ Full parameter list is present in defaults variable, and is duplicated below:
 ## Limitations
 
 Zoomable relies on click event for activation and deactivation. This results in about ~300ms delay in iOS, as Mobile Safari waits to ensure that event in question is a single tap rather than built-in page zooming double tap. We do not bundle a quick tap implementation with zoomable, but you can attach a tap event manually. Here is an example of custom binding that uses [jQuery tappable](https://github.com/aanand/jquery.tappable.js/blob/master/jquery.tappable.js):
+
+
     var el = $('a.zoomable').zoomable();
     el.tappable(function() { $(this).zoomable('show'); });
+	
 Other quick touch implementations can be used in similar ways.
