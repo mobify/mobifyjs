@@ -1,6 +1,10 @@
 .m-accordion {
     list-style: none;
 }
+.m-accordion li {
+    list-style: none;
+    margin: 0;
+}
 
 .m-accordion .content {
     -webkit-transition: height 0.4s ease;
@@ -12,20 +16,14 @@
 }
 
 .m-accordion .header {
-    height: 54px;
     margin-top: -1px;
-    padding: 0 20px;
-    border-top: 1px solid #ededed;
-    border-bottom: 1px solid #ededed;
-    background: -webkit-linear-gradient(white, #F6F6F6);
-    line-height: 52px;
     pointer-events: cursor; //For iOS
+}
+
+.m-accordion h3 {
+    margin: 0;
 }
 
 .m-accordion .header > a {
     pointer-events: none;   
-}
-
-.m-accordion .inner-content {
-    padding: 15px 10px 10px;
 }

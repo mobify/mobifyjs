@@ -13,17 +13,29 @@ Mobify.UI.Accordion = (function($) {
 
     Accordion.prototype.bind = function() {
         var $element = this.$element;
-        
+      
+        // TODO: Determine event for vendor
+        $element.on('webkitTransitionEnd', function(e){
+            // recalculate proper height
+            var height = 0;
+            $('.item').each(function(index) {
+                height += $(this).height();
+            });
+            $element.css('height', height + 'px'); 
+        })
+
         function close($item) {
-            var content = $item.find('.content');
+            var $content = $item.find('.content');
+            contentHeight = $content.height();
             $item.toggleClass('active');
-            content.removeAttr('style');
+            $content.removeAttr('style');
         };
         
         function open($item) {
-            var content = $item.find('.content');
+            var $content = $item.find('.content');
             $item.toggleClass('active');
-            content.css('height', content.height()+'px');
+            $element.css('height', $element.height() + $content.height() + 'px');
+            $content.css('height', $content.height()+'px');
         };
 
         $element.find('.header').bind('click', function(e) {
@@ -68,7 +80,7 @@ Mobify.UI.Accordion = (function($) {
         this.each(function () {
             var $this = $(this)
               , accordion = $this._accordion
-        
+
             if (!accordion) {
                 accordion = new Mobify.UI.Accordion(this);
             }   
@@ -80,7 +92,7 @@ Mobify.UI.Accordion = (function($) {
                     accordion = null;
                 }   
             }   
-        
+
             $this._accordion = accordion;
         })  
 
