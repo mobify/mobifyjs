@@ -26,7 +26,7 @@ title: Mobify.js Carousel Module
 
 # Carousel
 
-Image carousel module for all your image rotating needs. Try it out:
+A configurable rotating content carousel module. Images and arbitrary content may be used.
 
 <div class="m-carousel m-carousel-example-4 m-center m-fluid">
   <!-- Carousel items -->
@@ -57,8 +57,10 @@ Image carousel module for all your image rotating needs. Try it out:
   </div>
 </div>
 
-
-[See more examples]({{ site.baseurl }}/modules/carousel-examples)
+<div class="btn-container">
+	<a href="{{ site.baseurl }}/modules/carousel-examples" class="btn btn-primary">Download Carousel</a>
+	<a href="{{ site.baseurl }}/modules/carousel-examples" class="see-examples">See more examples</a>
+</div>
 
 ## Using mobify-carousel.js
 
@@ -73,6 +75,7 @@ When you initialize the carousel, you can pass a variety of options
 as an object as the first argument.
 
 | Name          | Type      | Default   | Description                                                           |
+|---------------|-----------|-----------|-----------------------------------------------------------------------|
 | classPrefix   | string    | "m-"      | A prefix used to namespace all the class names used by the carousel.  |
 
 ## Markup
@@ -123,6 +126,7 @@ are applied to the viewport `.m-carousel`.
 
 
 | Class       | Description                                                                                       |           
+|-------------|---------------------------------------------------------------------------------------------------|
 | `.m-fluid`  | Causes the the width of the `.m-item` divs to resize to match the viewport `.m-carousel`'s width. |
 | `.m-center` | Causes the items to be center aligned, not left aligned (the default).                            |
 
@@ -181,6 +185,7 @@ Unbinds the events from the carousel, and removes it from the DOM.
 The viewport element, `.m-carousel`, emits the follow events.
 
 | Name          | Arguments                 | Description                               |   
+|---------------|---------------------------|-------------------------------------------|
 | beforeSlide   | previousIndex, newIndex   | Fired before the carousel moves.          |
 | afterSlide    | previousIndex, newIndex   | Fired after the carousel begins moving.   |
 
