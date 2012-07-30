@@ -32,13 +32,13 @@ A configurable rotating content carousel module. Images and arbitrary content ma
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
-        <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
-    </div>
-    <div class="m-item">
         <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
     </div>
     <div class="m-item">
         <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
+    </div>
+    <div class="m-item">
+        <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
     </div>
     <div class="m-item">
         <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
