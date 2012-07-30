@@ -7,7 +7,7 @@
 }
 
 .m-accordion .content {
-    -webkit-transition: height 0.4s ease;
+    -webkit-transition: height 0.8s ease;
     overflow: hidden;
 }
 

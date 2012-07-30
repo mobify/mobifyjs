@@ -2,33 +2,124 @@ var Mobify = window.Mobify = window.Mobify || {};
 Mobify.$ = Mobify.$ || window.Zepto || window.jQuery;
 Mobify.UI = Mobify.UI || {};
 
-Mobify.UI.Accordion = (function($) {
+(function($, document) {
+    $.support = $.support || {};
+
+    $.extend($.support, {
+        'touch': 'ontouchend' in document
+    });
+
+})($, document);
+
+
+
+/**
+    @module Holds common functions relating to UI.
+*/
+Mobify.UI.Utils = (function($) {
+    var exports = {}
+        , has = $.support;
+    /**
+        Events (either touch or mouse)
+    */
+    exports.events = (has.touch)
+        ? {down: 'touchstart', move: 'touchmove', up: 'touchend'}
+        : {down: 'mousedown', move: 'mousemove', up: 'mouseup'};
+
+    /**
+        Returns the position of a mouse or touch event in (x, y)
+        @function
+        @param {Event} touch or mouse event
+        @returns {Object} X and Y coordinates
+    */
+    exports.getCursorPosition = (has.touch)
+        ? function(e) {e = e.originalEvent || e; return {x: e.touches[0].clientX, y: e.touches[0].clientY}}
+        : function(e) {return {x: e.clientX, y: e.clientY}};
+
+
+    /**
+        Returns prefix property for current browser.
+        @param {String} CSS Property Name
+        @return {String} Detected CSS Property Name
+    */
+    exports.getProperty = function(name) {
+        var prefixes = ['Webkit', 'Moz', 'O', 'ms', '']
+          , testStyle = document.createElement('div').style;
+        
+        for (var i = 0; i < prefixes.length; ++i) {
+            if (testStyle[prefixes[i] + name] !== undefined) {
+                return prefixes[i] + name;
+            }
+        }
+
+        // Not Supported
+        return;
+    };
+
+    /**
+        Returns prefix event for current browser.
+        @param {String} Event Name
+        @return {String} Detected Event Name
+    */
+    exports.getEvent = function(name) {
+        var prefixes = ['webkit', 'moz', 'O', 'ms', ''];
+
+        for (var i = 0; i < prefixes.length; ++i) {
+            if (('on' + prefixes[i] + name.toLowerCase()) in window) {
+                return prefixes[i] + name;
+            }
+        }
+
+        // Not Supported
+        return;
+    };
+
+    $.extend(exports.events, {
+        'transitionend': exports.getEvent("TransitionEnd")
+    });
+
+    return exports;
+
+})(Mobify.$);
+
+
+Mobify.UI.Accordion = (function($, Utils) {
    
+    var has = $.support;
+
     // Constructor
     var Accordion = function(element) {
         this.element = element;
         this.$element = $(element);
-        this.bind();            
+        this.dragRadius = 10;
+        this.bind();
     };
 
     Accordion.prototype.bind = function() {
-        var $element = this.$element;
-      
-        // TODO: Determine event for vendor
-        $element.on('webkitTransitionEnd', function(e){
+        var $element = this.$element
+            , transitioning = false
+            , dragging = false
+            , canceled = false
+            , xy
+            , dxy
+            , dragRadius = this.dragRadius;
+
+        function endTransition(e){
             // recalculate proper height
+            transitioning = false;
             var height = 0;
             $('.item').each(function(index) {
-                height += $(this).height();
+                var $item = $(this);
+                height += $item.height();
             });
             $element.css('height', height + 'px'); 
-        })
+        };
 
         function close($item) {
             var $content = $item.find('.content');
             contentHeight = $content.height();
             $item.toggleClass('active');
-            $content.removeAttr('style');
+            $content.removeAttr('style')
         };
         
         function open($item) {
@@ -38,19 +129,42 @@ Mobify.UI.Accordion = (function($) {
             $content.css('height', $content.height()+'px');
         };
 
-        $element.find('.header').bind('click', function(e) {
-            e.preventDefault();
-            
-            var $item = $(this).parent();
+        function down(e) {
+            xy = Utils.getCursorPosition(e);
+        };
 
+        function move(e) {
+            dxy = Utils.getCursorPosition(e);
+        };
+
+        function up(e) {
+            // if there is dragging, do not close/open accordion
+            if (dxy) {
+                dx = xy.x - dxy.x;
+                dy = xy.y - dxy.y;
+                dxy = undefined;
+                if ((dx*dx) + (dy*dy) > dragRadius*dragRadius) return;
+            }
+
+            // prevent open/close when an item is transitioning
+            if (transitioning) return;
+            transitioning = true;
+
+            // toggle open/close on item tapped
+            var $item = $(this).parent();
             if ($item.hasClass('active')) {
                 close($item);
             }
             else {
                 open($item);
             }
-        });
-        
+        };
+
+        function click(e) {
+            e.preventDefault();
+        };
+
+
         // Open items that are hash linked
         var hash = location.hash;
         var $hashitem = $element.find('.header a[href="'+hash+'"]');
@@ -58,6 +172,14 @@ Mobify.UI.Accordion = (function($) {
         if ($hashitem.length) {
             open($hashitem.parent());
         }
+
+        // bind events
+        $element.find('.header')
+            .on(Utils.events.down, down)
+            .on(Utils.events.move, move)
+            .on(Utils.events.up, up)
+            .on('click', click);
+        $element.on(Utils.events.transitionend, endTransition);
         
     };
                  
@@ -73,7 +195,7 @@ Mobify.UI.Accordion = (function($) {
     
     return Accordion;
     
-})(Mobify.$);
+})(Mobify.$, Mobify.UI.Utils);
     
 (function($) {
     $.fn.accordion = function(action) {
