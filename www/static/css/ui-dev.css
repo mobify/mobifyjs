@@ -981,6 +981,15 @@ td {
 
 
 /* Page Layout: Modules */
+.modules h2 {
+	margin-top: 3em;
+}
+.modules h3 {
+	margin-bottom: 0;
+}
+	.modules h3 + pre {
+		margin-top: 0.5em;
+	}
 .widget-gallery {
 	overflow: hidden;
 	clear: left;
