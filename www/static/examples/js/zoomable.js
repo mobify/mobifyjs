@@ -3,13 +3,19 @@
 var Mobify = window.Mobify = window.Mobify || {}
   , $ = Mobify.$ = Mobify.$ || window.$ || window.Zepto || window.jQuery;
 
+// This prefix is inserted before all class references for conflict avoidance.
+// For example, default close class will be m-close. You can override this property
+// globally by setting it on Mobify.UI object. You can also override it per-invocation
+// by passing an alternate value inside options object:
+// $('...').zoomable({classPrefix: 'qb-'})
 Mobify.UI = Mobify.UI || { classPrefix: 'm-' };
 
 var $ = window.Mobify ? Mobify.$ : window.$;
 
 Mobify.UI.Zoomable = (function() {
     var defaults = {
-        classNames: {
+        stage: undefined // Element inside which zoomed in content should be rendered. Defaults to document body.
+      , classNames: { // Look for (or generate) elements with these class names.
             zooming : 'zooming'
           , close : 'close'
           , control: 'zoomableControl'
@@ -17,32 +23,35 @@ Mobify.UI.Zoomable = (function() {
           , thumb: 'zoomableThumb'
           , full: 'zoomableFull'
       }
-      , ratio: 2.0
-      , canvasStyle: {
+      , ratio: 2.0 // Viewport width is multiplied by this value to determine zoomed in width
+      , seekImage: true // Ascend DOM level from trigger element to find nearest image to use as thumbnail. If set to false, no ascent would take place, and only images within initial context will be considered.
+      , clickCloses: true // Whether clicking anywhere on zoomed in image will stop zooming   
+      , activationEvent: 'click' // Override to use alternate event for all zoomable control interactions
+      , canvasStyle: { // Default style applied to canvas. Overriding replaces the whole object.
           position: 'absolute'
         , width: '100%'
         , height: '100%'
         , overflow: 'auto'
       }
-      , imageStyle: {
+      , imageStyle: { // Default style applied to images within canvas. Overriding replaces the whole object.
           position: 'absolute'
         , top: '0'
         , left: '0'
         , maxWidth: 'none'
         , maxHeight: 'none'        
       }
-      , stageHTML: function() {
+      , stageHTML: function() { // Generator for HTML of zoomed in view. If overriding, you can call old function via Mobify.UI.Zoomable.defaults.stageHTML.call(this)
             return '<div class="' + this._getClass('canvas') + '"><img class="'
                 + this._getClass('thumb') + '"><img class="'
                 + this._getClass('full') + '"></div>';
       }
-      , globalStyle: function() {
+      , globalStyle: function() { // Generator for global CSS (ignored if zoomable content injected into non-body element). If overriding, you can call old function via Mobify.UI.Zoomable.defaults.globalStyle.call(this)
             var zooming = '.' + this._getClass('zooming');
             return zooming + ' { overflow: hidden; }'
               + zooming + ' > * { display: none !important; }'
               + zooming + ' > .' + this._getClass('control') + ' { display: block !important; }';
       }
-      , clickCloses: true
+
     };
 
     var Zoomable = function(element, options) {
@@ -108,20 +117,27 @@ Mobify.UI.Zoomable = (function() {
 
         if (!this.$stage) this.makeElems();
 
-        var leftRatio = 0.5, topRatio = 0.5, $img, src;
+        var leftRatio = 0.5, topRatio = 0.5, $img = $(ev.target), $link, $parent, src;
         if (ev.target.tagName !== "IMG") {
-            var $parents = this.$element.parents();
+            var $parents = this.$element;
+            if (this.options.seekImage) {
+                $parents = $parents.add(this.$element.parents());
+            }
+
             for (var i = 0; i < $parents.length; ++i) {
-                $img = $($parents[i]).find('img');
-                if ($img.length) break;  
+                $parent = $($parents[i]).find('img');
+                if ($parent.length) {
+                    $img = $parent;
+                    break;  
+                }
             }
         } else {
-            $img = $(ev.target);
             leftRatio = ev.offsetX / $img.prop('offsetWidth');
             topRatio = ev.offsetY / $img.prop('offsetHeight');
         }
 
-        src = $img.parent('[href]').attr('href') || $img.attr('src');
+        $link = $img.filter('[href]').add($img.parent('[href]'));
+        src = $link.attr('href') || $img.attr('src');
         this.$thumb.attr('src', $img.attr('src'));
         this.$full.attr('src', src);
         if (this.options.global) this.oldScrollTop = document.body.scrollTop;
@@ -143,7 +159,7 @@ Mobify.UI.Zoomable = (function() {
     };
 
     Zoomable.prototype.bindClose = function(op) {
-        if (this.$close) this.$close[op]('click', this.boundClose);
+        if (this.$close) this.$close[op](this.options.activationEvent, this.boundClose);
     }
 
     Zoomable.prototype.bind = function(undo) {
@@ -153,7 +169,7 @@ Mobify.UI.Zoomable = (function() {
         this.boundClose = this.boundClose || function(ev) { return self.close.apply(self, arguments); }
         this.boundOpen = this.boundOpen || function(ev) { return self.open.apply(self, arguments); }
 
-        this.$element[op]('click', this.boundOpen);
+        this.$element[op](this.options.activationEvent, this.boundOpen);
 
         this.bindClose(op);
     };
