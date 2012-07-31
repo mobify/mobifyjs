@@ -40,6 +40,7 @@
     -ms-interpolation-mode: bicubic; }
 
 .m-carousel-inner {
+  position: relative;
   white-space: nowrap;
   text-align: left;
   /* Removes inline-block gaps due to whitespace */
