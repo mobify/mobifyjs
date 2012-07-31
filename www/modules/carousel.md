@@ -69,14 +69,6 @@ and call the jQuery initializer:
 
     $('.m-carousel').carousel()
 
-## Options
-
-When you initialize the carousel, you can pass a variety of options
-as an object as the first argument.
-
-| Name          | Type      | Default   | Description                                                           |
-|---------------|-----------|-----------|-----------------------------------------------------------------------|
-| classPrefix   | string    | "m-"      | A prefix used to namespace all the class names used by the carousel.  |
 
 ## Markup
 
