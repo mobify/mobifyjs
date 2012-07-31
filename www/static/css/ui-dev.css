@@ -1085,6 +1085,7 @@ table td code {
 	}
 .see-examples {
 	padding-left: 20px;
+	white-space: nowrap;
 }
 .widget-single img {
 	/* temp throwaway styling */

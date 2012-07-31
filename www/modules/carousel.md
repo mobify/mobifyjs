@@ -119,7 +119,7 @@ Note: the currently active `.m-item` and any currently active `[data-slide=N]`
 gains the class `.m-active`.
 
 
-## Markup Options
+## Classes
 
 A few other classes are provided that give you additional control. These
 are applied to the viewport `.m-carousel`.
