@@ -7,7 +7,8 @@ title: Understanding Templates
     
 In Mobify.js, templates are text files that contain HTML markup, as
 well as variables that are replaced with the selections from the konf
-when the template is rendered.
+when the template is rendered. The konf decides which template should 
+be rendered based on the contents of the source DOM.
 
 ## Templates in Theory
 
