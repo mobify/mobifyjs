@@ -997,6 +997,13 @@ table td code {
 	.modules h3 + pre {
 		margin-top: 0.5em;
 	}
+.hide-inactive {
+    display: none;
+}
+
+.active + .hide-inactive {
+    display: block;
+}
 .widget-gallery {
 	overflow: hidden;
 	clear: left;

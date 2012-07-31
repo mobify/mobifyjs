@@ -1,10 +1,11 @@
-
+                    
+                    {% active_links prefix %}
                     <div class="nav-modules">
                         <ul>
 	                        <li><a href="{{ site.baseurl }}/modules/">Mobify.js Modules</a></li>
 	                        <li>
 	                        	<a href="{{ site.baseurl }}/modules/carousel">Carousel</a>
-		                        <ul>
+		                        <ul class="hide-inactive">
 			                        <li><a href="{{ site.baseurl }}/modules/carousel/#using-mobify-carouseljs">Initialize</a></li>
 			                        <li><a href="{{ site.baseurl }}/modules/carousel/#markup">Markup</a></li>
 			                        <li><a href="{{ site.baseurl }}/modules/carousel/#classes">Classes</a></li>
@@ -16,15 +17,16 @@
 		                    </li>
 	                        <li>
 	                        	<a href="{{ site.baseurl }}/modules/accordion">Accordion</a>
-		                        <ul>
+		                        <ul class="hide-inactive">
 			                        <li><a href="{{ site.baseurl }}/modules/accordion-examples">Examples</a></li>
 		                        </ul>
 		                </li>
 	                        <li>
 	                        	<a href="{{ site.baseurl }}/modules/zoomable">Zoomable</a>
-		                        <ul>
+		                        <ul class="hide-inactive">
 			                        <li><a href="{{ site.baseurl }}/modules/zoomable-examples">Examples</a></li>
 		                        </ul>
 		                </li>
 	                </ul>
                     </div>
+                    {% endactive_links %}
