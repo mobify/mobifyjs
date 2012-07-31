@@ -5,15 +5,23 @@ title: Going Responsive
 
 # Going Responsive with Mobify.js
 
-Mobify.js is a way of adapting a page's markup for mobile devices. [Responsive Web Design](http://en.wikipedia.org/wiki/Responsive_Web_Design) is similarly powerful technique for adapting a page for mobile.
+Mobify.js allows you to adapt a page's markup for mobile devices. 
+[Responsive Web Design](http://en.wikipedia.org/wiki/Responsive_Web_Design) 
+is similarly powerful technique for adapting a page for mobile.
 
-We believe there's a time and a place for both. Responsive is great on content-forward websites where you have full control over the original markup. Mobify.js excels in situations where the original markup isn't well-suited for mobile or can't be modified, and works well with web apps.
+We believe there's a time and a place for both. Responsive is great on 
+content-forward websites where you have full control over the original 
+markup. Mobify.js excels in situations where the original markup isn't 
+well-suited for mobile or can't be modified.
 
-But this doesn't need to be an either/or decision, you can use reponsive + Mobify.js side by side and take advantage of the strengths of each.
+But this doesn't need to be an either/or decision, you can use responsive 
++ Mobify.js side by side and take advantage of the strengths of each.
 
 ## Combining Mobify.js with Responsive
 
-If you're using the full Mobify.js adaptation, working with responsive is simple. In your mobile style sheet, simply add media queries as you normally would at your desired breakpoints:
+If you're Mobify.js, working with responsive is simple. In your mobile 
+style sheet, add media queries as you normally would at your desired 
+breakpoints:
 
 	@media (max-width: 320px) {
 	  .selector {
@@ -26,9 +34,13 @@ If you're using the full Mobify.js adaptation, working with responsive is simple
 	  }
 	}
 
-If you'd like to use Mobify.js to enhance an existing repsonsive site, you'll likely want to forego a full mobile site adaptation. Instead you can use the konf to cherry-pick more granular adaptations, and ignore Mobify.js templates completely.
+If you'd like to use Mobify.js to enhance an existing repsonsive site, 
+you'll likely want to forego a full mobile site adaptation. Instead 
+you can use the konf to cherry-pick more granular adaptations, and 
+ignore Mobify.js templates completely.
 
-The first thing you'd do is configure your konf to pass through your site's original DOM instead of adapting it:
+The first thing you'd do is configure your konf to pass through your 
+site's original DOM instead of adapting it:
  
 	'OUTPUTHTML': function(context) {
 	  return context.data('$html').prop('outerHTML')
@@ -66,22 +78,31 @@ So your final konf might look something like this:
 
 	} {/data}
 
-
-
-
-
 ## Responsive UI Modules
 
-We're also building a library of UI modules that will work with Mobify.js to help you create mobile sites faster. These modules will be fully responsive, and will easily integrate into new and existing sites alike.
+We're also building a library of UI modules that will work with 
+Mobify.js to help you create mobile sites faster. These modules will 
+be fully responsive, and will easily integrate into new and existing 
+sites alike.
 
 Stay tuned as we release the first handful of these during August 2012.
 
 
 ## Cloud Enhancements
 
-The Mobify Cloud offers additional services that can enhance any responsive site:
+The Mobify Cloud offers additional services that can enhance any 
+responsive site:
 
-* **Image Resizing** -- Our image resizing service automatically scales and resizes images, then serves only the most appropriate one for a user's device. It also enables the use of high-density (Retina) inline `img` elements without the performance hit of double-loading.
-* **Combo** -- our JavaScript optimization service. Combo improves your site's  JavaScript delivery for mobile and desktop alike. It combines HTTP requests for multiple scripts into a single request and caches the scripts client-side in HTML5 localStorage where available.
+  * **Image Resizing** -- Our image resizing service automatically 
+    scales and resizes images, then serves only the most appropriate 
+    one for a user's device. It also enables the use of high-density 
+    (Retina) inline `img` elements without the performance hit of 
+    double-loading.
+
+  * **Combo** -- our JavaScript optimization service. Combo improves 
+    your site's  JavaScript delivery for mobile and desktop alike. 
+    It combines HTTP requests for multiple scripts into a single request 
+    and caches the scripts client-side in HTML5 localStorage where 
+    available.
 
 The Mobify Cloud base plan is free, [give it a try it now](https://cloud.mobify.com/).
