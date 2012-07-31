@@ -70,5 +70,5 @@ INCLUDING, WITHOUT   LIMITATION, ANY WARRANTIES OR
 CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, OR
 FITNESS FOR A PARTICULAR PURPOSE.
 
-<iframe src="https://docs.google.com/a/mobify.me/spreadsheet/embeddedform?formkey=dGo2V3UzWThUUXp6b0hod2F1VXFRR1E6MQ" width="760" height="1058" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+<iframe id="cla" src="https://docs.google.com/a/mobify.me/spreadsheet/embeddedform?formkey=dGo2V3UzWThUUXp6b0hod2F1VXFRR1E6MQ" width="100%" height="1058" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
 
