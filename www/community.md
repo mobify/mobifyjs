@@ -1,6 +1,6 @@
 ---
 layout: page-community
-title: Community
+title: Mobify.js Community
 ---
 
 ## Where to get help?
@@ -38,4 +38,5 @@ Contributing changes is straightforward:
   3. Open a Pull Request from your fork
   4. Get feedback
   5. Update code
-  6. Get it merged back!
+  6. Agree to the [contributors license agreement]({{ site.baseurl }}/cla/)
+  7. Get it merged back!
