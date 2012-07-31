@@ -112,7 +112,7 @@ Mobify.UI.Accordion = (function($, Utils) {
                 var $item = $(this);
                 height += $item.height();
             });
-            $element.css('height', height + 'px'); 
+            $element.css('min-height', height + 'px'); 
         };
 
         function close($item) {
@@ -125,8 +125,9 @@ Mobify.UI.Accordion = (function($, Utils) {
         function open($item) {
             var $content = $item.find('.content');
             $item.toggleClass('active');
-            $element.css('height', $element.height() + $content.height() + 'px');
-            $content.css('height', $content.height()+'px');
+            var contentHeight = $content.children().outerHeight();
+            $element.css('min-height', $element.height() + contentHeight + 'px');
+            $content.css('max-height', contentHeight +'px');
         };
 
         function down(e) {
