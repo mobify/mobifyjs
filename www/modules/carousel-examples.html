@@ -18,7 +18,7 @@ title: Mobify.js Carousel Examples
 .m-carousel {
   padding-bottom: 30px;
 }
-.card {
+.card, .slide {
   background: rgba(0,0,0,0.5);
   padding: 20px 30px;
   border-radius: 20px;
@@ -29,13 +29,13 @@ title: Mobify.js Carousel Examples
 .m-fluid .m-item {
   margin-right: 20px;
 }
-  .m-item img, .m-item .card {
+  .m-item img, .m-item .card, .m-item .slide {
     -webkit-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
     -moz-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
     box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
   }
 
-  .m-item .card img {
+  .m-item .card img, .m-item .slide img {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
@@ -45,13 +45,16 @@ title: Mobify.js Carousel Examples
     height: auto;
   }
 
-
-.card.narrow {
+.slide {
+  color: #000;
+  background: rgba(255,255,255,0.9);
+  border-radius: 9px;
+}
+.slide.narrow {
     width: 200px;
     margin: 0 10px;
 }
-
-.card.wide {
+.slide.wide {
     width: 300px;
     margin: 0 10px;
 }
@@ -112,37 +115,38 @@ title: Mobify.js Carousel Examples
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>
 
+
 <h2>Fixed Width Items</h2>
 <p>The items can be stretched to fit the viewport, or they can be sized individually like in this example.</p>
 <div class="m-carousel m-carousel-example-7 m-center">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
-        <div class="card narrow">
+        <div class="slide narrow">
             <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
             <p>Blossoms</p>
         </div>
     </div>
     <div class="m-item">
-        <div class="card wide">
+        <div class="slide wide">
             <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
             <p>Glacier</p>
         </div>
     </div>
     <div class="m-item">
-        <div class="card narrow">
+        <div class="slide narrow">
             <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
             <p>Helmets</p>
         </div>
     </div>
     <div class="m-item">
-        <div class="card wide">
+        <div class="slide wide">
             <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
             <p>Parliament</p>
         </div>
     </div>
     <div class="m-item">
-        <div class="card narrow">
+        <div class="slide narrow">
             <img src="{{ site.baseurl }}/static/examples/img/pods.jpg">
             <p>Pods</p>
         </div>
