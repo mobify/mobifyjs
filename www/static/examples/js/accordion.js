@@ -125,13 +125,13 @@ Mobify.UI.Accordion = (function($, Utils) {
 
         function close($item) {
             var $content = $item.find('.content');
-            $item.toggleClass('active');
+            $item.toggleClass('m-active');
             $content.removeAttr('style')
         };
         
         function open($item) {
             var $content = $item.find('.content');
-            $item.toggleClass('active');
+            $item.toggleClass('m-active');
 
             // if transitions are supported, minimize browser reflow
             if (Utils.events.transitionend) {
@@ -168,7 +168,7 @@ Mobify.UI.Accordion = (function($, Utils) {
 
             // toggle open/close on item tapped
             var $item = $(this).parent();
-            if ($item.hasClass('active')) {
+            if ($item.hasClass('m-active')) {
                 close($item);
             }
             else {
