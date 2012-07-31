@@ -7,12 +7,12 @@
 }
 
 .m-accordion .content {
-    -webkit-transition: max-height 0.8s ease;
+    -webkit-transition: height 0.4s ease;
     overflow: hidden;
 }
 
 .m-accordion :not(.active) .content {
-    max-height: 0;
+    height: 0;
 }
 
 .m-accordion .header {
