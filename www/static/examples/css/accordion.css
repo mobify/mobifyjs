@@ -8,16 +8,20 @@
 
 .m-accordion .content {
     -webkit-transition: max-height 1s ease;
+    -moz-transition: max-height 1s ease;
+    -o-transition: height 1s ease;
+    transition: height 1s ease;
     overflow: hidden;
+    max-height: 0;
 }
 
-.m-accordion :not(.active) .content {
-    max-height: 0;
+.m-accordion .active .content {
+    max-height: 10000px; /* IE hack */
 }
 
 .m-accordion .header {
     margin-top: -1px;
-    pointer-events: cursor; //For iOS
+    pointer-events: cursor; /* For iOS */
 }
 
 .m-accordion h3 {

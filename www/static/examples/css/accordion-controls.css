@@ -7,10 +7,10 @@
     padding: 0 20px;
     border-top: 1px solid #ededed;
     border-bottom: 1px solid #ededed;
-    background: white;
-    background: -webkit-linear-gradient(white, #F6F6F6);
-    background: -ms-linear-gradient(white, #F6F6F6);
-    background: linear-gradient(white, #F6F6F6);
+    background: -webkit-linear-gradient(white, #F6F6F6), white;
+    background: -ms-linear-gradient(white, #F6F6F6), white;
+    background: -moz-linear-gradient(white, #F6F6F6), white;
+    background: linear-gradient(white, #F6F6F6), white;
     line-height: 52px;
 }
 

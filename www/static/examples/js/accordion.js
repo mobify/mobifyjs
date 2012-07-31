@@ -56,27 +56,30 @@ Mobify.UI.Utils = (function($) {
         return;
     };
 
-    /**
-        Returns prefix event for current browser.
-        @param {String} Event Name
-        @return {String} Detected Event Name
-    */
-    exports.getEvent = function(name) {
-        var prefixes = ['webkit', 'moz', 'O', 'ms', ''];
-
-        for (var i = 0; i < prefixes.length; ++i) {
-            if (('on' + prefixes[i] + name.toLowerCase()) in window) {
-                return prefixes[i] + name;
-            }
+    // http://stackoverflow.com/questions/5023514/how-do-i-normalize-css3-transition-functions-across-browsers
+    function whichTransitionEvent(){
+        var t;
+        var el = document.createElement('fakeelement');
+        var transitions = {
+            'transition':'transitionEnd',
+            'OTransition':'oTransitionEnd',
+            'MSTransition':'msTransitionEnd',
+            'MozTransition':'transitionend',
+            'WebkitTransition':'webkitTransitionEnd'
         }
 
-        // Not Supported
+        for(t in transitions){
+            if( el.style[t] !== undefined ){
+                return transitions[t];
+            }
+        }
         return;
     };
 
     $.extend(exports.events, {
-        'transitionend': exports.getEvent("TransitionEnd")
-    });
+        'transitionend': whichTransitionEvent()
+     });
+
 
     return exports;
 
