@@ -11,11 +11,17 @@ title: Mobify.js Carousel Examples
   padding: 10px;
   margin: -10px;
 }
-  /* but not this one */
+  /* but not this one, because we're doing something else instead */
   .m-carousel-example-2 {
     padding: 0;
     margin: 0;
+
+    /* it would be fantastic if other browsers did this too */
+    -webkit-mask-image: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%,
+    rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
   }
+
+
 
 .m-carousel .m-item img {
     margin: 0;
