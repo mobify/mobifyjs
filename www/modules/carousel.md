@@ -72,7 +72,7 @@ and call the jQuery initializer:
 
 ## Markup
 
-The basic markup is composed out a viewport div `.m-carousel`, a sliding div `m-carousel-inner`, and numerous item divs `.m-item`.
+The basic markup is composed out of a viewport div `.m-carousel`, a sliding div `m-carousel-inner`, and numerous item divs `.m-item`.
 Additionally, the any `data-slide` attributes within the viewport div, `.m-carousel`, can be bound to actions "next", "previous",
 or to move the slider to particular index.
 
@@ -161,7 +161,7 @@ Removes any tap, mouse, and other event handlers from the carousel.
 
 ### .carousel('bind')
 
-Restores the tap, mouse, and other event handlers for the carosel.
+Restores the tap, mouse, and other event handlers for the carousel.
 
     $('.m-carousel').carousel('bind');
 

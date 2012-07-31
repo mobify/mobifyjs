@@ -116,7 +116,7 @@ Mobify.UI.Accordion = (function($, Utils) {
             // recalculate proper height
             transitioning = false;
             var height = 0;
-            $('.item').each(function(index) {
+            $('.m-item').each(function(index) {
                 var $item = $(this);
                 height += $item.height();
             });
@@ -136,6 +136,7 @@ Mobify.UI.Accordion = (function($, Utils) {
             // if transitions are supported, minimize browser reflow
             if (Utils.events.transitionend) {
                 var contentChildren = $content.children();
+                // determine which height function to use (outerHeight not supported by zepto)
                 var contentHeight = ('outerHeight' in contentChildren) ? contentChildren['outerHeight']() : contentChildren['height']();
                 $element.css('min-height', $element.height() + contentHeight + 'px');
                 $content.css('max-height', contentHeight * 1.5 +'px');
