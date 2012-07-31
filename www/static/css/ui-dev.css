@@ -986,6 +986,14 @@ table td code {
 }
 
 
+/* Page Layout: License */
+.license {
+	line-height: 2;
+}
+.license p {
+	margin: 1em 0;
+}
+
 
 /* Page Layout: Modules */
 .modules h2 {
