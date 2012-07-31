@@ -101,7 +101,7 @@ Mobify.UI.Zoomable = (function() {
         if (!this.isOpen) return;
         this.isOpen = false;
 
-        this.$element.trigger('closing.zoomable');
+        this.$element.trigger('beforeClose.zoomable');
 
         this.$canvas.detach();
         this.$stage.removeClass(this._getClass('zooming'));
@@ -110,7 +110,7 @@ Mobify.UI.Zoomable = (function() {
             document.body.scrollTop = this.oldScrollTop;
         }
 
-        this.$element.trigger('close.zoomable');
+        this.$element.trigger('afterClose.zoomable');
     };
 
     Zoomable.prototype.open = function(ev) {
@@ -118,7 +118,7 @@ Mobify.UI.Zoomable = (function() {
         if (this.isOpen) return;
         this.isOpen = true;
 
-        this.$element.trigger('opening.zoomable');
+        this.$element.trigger('beforeOpen.zoomable');
 
         if (!this.$stage) this.makeElems();
 
@@ -163,7 +163,7 @@ Mobify.UI.Zoomable = (function() {
             this.$canvas.prop('scrollTop', Math.max(0, Math.min(bigHeight - smallHeight,
                 bigHeight * topRatio - smallHeight / 2)));
 
-            this.$element.trigger('open.zoomable');                 
+            this.$element.trigger('afterOpen.zoomable');                 
         }, this);
 
         if (this.$thumb.prop('complete')) {

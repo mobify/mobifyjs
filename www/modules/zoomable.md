@@ -3,7 +3,113 @@ layout: modules
 title: Mobify.js Zoomable Module
 ---
 
-# Introducing Zoomable module
+<style>
+.zoomable-notice {
+    position: absolute; left: 50%; top: 50%;
+    width: 200px; height: 36px; margin-left: -110px; margin-top: -28px; padding: 10px;
+    vertical-align: middle; text-align: center; font-weight: bold; font-size: 18px; line-height: 18px;
+    background: rgba(0,0,192,0.5); color: white; 
+    opacity: 1;
+}
+.zoomable-notice-fade {
+    -webkit-transition: opacity 4s ease-in; 
+    -o-transition: opacity 4s ease-in; 
+    -moz-transition: opacity 4s ease-in; 
+    -ms-transition: opacity 4s ease-in; 
+    transition: opacity 4s ease-in;
+    opacity: 0;
+ }
+</style>
+<script src="{{ site.baseurl }}/static/examples/js/zoomable.js"></script>
+
+# Zoomable
+
+A module for showing and panning through large images. Can be configured to use custom HTML and CSS in zoomed-in state.
+
+<p class="exit-notice-zoomable"><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
+</p>
+<script>$('.exit-notice-zoomable a').zoomable({ stageHTML: function() {
+  return Mobify.UI.Zoomable.defaults.stageHTML.call(this)
+      + '<div class="zoomable-notice m-close">Tap anywhere to close<br/>Drag to navigate</div>';
+}}).bind('afterOpen.zoomable', function() {
+  $('.zoomable-notice').addClass('zoomable-notice-fade');
+}).bind('beforeClose.zoomable', function() {
+  $('.zoomable-notice').removeClass('zoomable-notice-fade');
+})</script>
+
+<div class="btn-container">
+  <a href="{{ site.baseurl }}/static/downloads/zoomable.zip" class="btn btn-primary">Download Zoomable</a>
+  <a href="{{ site.baseurl }}/modules/zoomable-examples" class="see-examples">See more examples</a>
+</div>
+
+
+## Using Zoomable.js
+
+Zoomable generates its own HTML (unless asked not to). All you need to provide is references to your thumbnail and zoomed-in images:
+
+    <a class="zoomable" href="big.jpg"><img src="thumb.jpg"></a>
+    <script>$('a.zoomable').zoomable();</script>
+
+
+## Methods
+
+### .carousel(options)
+
+Initializes the carousel with the options (an `object`) given.
+
+    $('.m-carousel').carousel({
+        classPrefix: "m-"
+    });
+
+### .carousel('next')
+
+Moves the carousel one item to the right.
+
+    $('.m-carousel').carousel('next');
+
+### .carousel('prev')
+
+Moves the carousel one item to the left.
+
+    $('.m-carousel').carousel('prev');
+
+### .carousel('move', x)
+
+Moves the carousel to a specific index (1-based).
+
+    $('.m-carousel').carousel('move', 1);
+
+### .carousel('unbind')
+
+Removes any tap, mouse, and other event handlers from the carousel.
+
+    $('.m-carousel').carousel('unbind');
+
+### .carousel('bind')
+
+Restores the tap, mouse, and other event handlers for the carousel.
+
+    $('.m-carousel').carousel('bind');
+
+### .carousel('destroy')
+
+Unbinds the events from the carousel, and removes it from the DOM.
+
+    $('.m-carousel').carousel('destroy');
+
+
+## Events
+
+The viewport element, `.m-carousel`, emits the follow events.
+
+| Name          | Description                               |   
+|---------------|-------------------------------------------|
+| beforeOpen    | Fired before zoomable starts opening      |
+| afterOpen     | Fired when zoomable is fully open         |
+| beforeClose   | Fired before zoomable starts closing      |
+| afterClose    | Fired after zoomable finishes closing     |
+
+
 
 ## Why is a new zoom widget required?
 
@@ -19,9 +125,7 @@ Zoomable behavior can be extended by adding annotations/close buttons to zoomed 
 
 ## Implementing Zoomable
 
-The simplest implementation of zoomable looks like this:
-	HTML: <a class="zoomable" href="big.jpg"><img src="thumb.jpg"></a>
-	JS: $('a.zoomable').zoomable();
+
 
 The link specifies URL of high resolution image, and image thumbnail (if present). If image is not found inside the link, zoomable will ascend DOM tree until it finds one nearby.
 
@@ -82,6 +186,8 @@ Zoomable relies on click event for activation and deactivation. This results in 
 
 
     var el = $('a.zoomable').zoomable();
-    el.tappable(function() { $(this).zoomable('show'); });
+    el.tappable(function() {
+        $(this).zoomable('show');
+    });
 	
 Other quick touch implementations can be used in similar ways.
