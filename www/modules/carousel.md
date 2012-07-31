@@ -187,3 +187,27 @@ The viewport element, `.m-carousel`, emits the follow events.
 <script>
     $(function() { $('.m-carousel').carousel(); });
 </script>
+
+
+## Browser Compatability
+
+
+| Browser           | Version | Support               |
+|-------------------|---------|-----------------------|
+| Safari            | 4.0+    | Supported.            |
+| Firefox           | 3.5-3.6 | Degraded. No transitions between images. |
+| Firefox           | 4.0+    | Supported             |
+| Chrome            | 9.0+    | Supported             |
+| Opera             | 12.0+   | Supported. Some styles have visual errors. |
+| Internet Explorer | 6-7.0   | Not Supported         |
+| Internet Explorer | 8.0     | Degraded. No transitions. No dragging. Next/Previous must be provided. |
+| Internet Explorer | 9.0     | Degraded. No transitions. |
+| Internet Explorer | 10.0    | Supported             |
+| Mobile Safari     | 3.1.3+  | Supported             |
+| Android Browser   | 2.1+    | Supported             |
+| Chrome (Android)  | 1.0+    | Supported             |
+| Firefox (Android) | 1.0+    | Supported             |
+| Windows Phone     | 7.5     | Degraded. No transitions. No touch (dragging). Next/Previous must be provided. |
+
+
+ 

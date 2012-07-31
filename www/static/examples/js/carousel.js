@@ -353,8 +353,8 @@ Mobify.UI.Carousel = (function($, Utils) {
             self.$items.eq(previousSlide - 1).removeClass(self._getClass('active'));
             self.$items.eq(nextSlide - 1).addClass(self._getClass('active'));
 
-            self.$element.find('[data-slide=' + previousSlide + ']').removeClass(self._getClass('active'));
-            self.$element.find('[data-slide=' + nextSlide + ']').addClass(self._getClass('active'));
+            self.$element.find('[data-slide=\'' + previousSlide + '\']').removeClass(self._getClass('active'));
+            self.$element.find('[data-slide=\'' + nextSlide + '\']').addClass(self._getClass('active'));
         });
 
 
