@@ -165,6 +165,7 @@
 
 /* scaled slides */
 .m-scaled .m-item {
+  opacity: 0.7;
   -webkit-backface-visibility: hidden;
   -webkit-transform: scale(0.75);
   -moz-transform: scale(0.75);
@@ -177,12 +178,13 @@
       but fast swiping on a phone can result in odd timing. 
       Half-length durations for each transform is a reasonable 
       middle ground.) */
-  -webkit-transition: -webkit-transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s;
-  -moz-transition-timing-function: -moz-transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s;
-  -o-transition-timing-function: -o-transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s;
-  transition-timing-function: transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s;
+  -webkit-transition: -webkit-transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s, opacity ease-out 0.25s;
+  -moz-transition-timing-function: -moz-transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s, opacity ease-out 0.25s;
+  -o-transition-timing-function: -o-transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s, opacity ease-out 0.25s;
+  transition-timing-function: transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s, opacity ease-out 0.25s;
 }
 .m-scaled .m-active {
+  opacity: 1;
   -webkit-transform: scale(1);
   -moz-transform: scale(1);
   -ms-transform: scale(1);

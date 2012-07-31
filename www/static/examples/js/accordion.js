@@ -58,7 +58,11 @@ Mobify.UI.Utils = (function($) {
 
     // http://stackoverflow.com/questions/5023514/how-do-i-normalize-css3-transition-functions-across-browsers
     function whichTransitionEvent(){
-        var t;
+        // hack for ios 3.1.* because of poor transition support.
+        if (/iPhone\ OS\ 3_1/.test(navigator.userAgent)) {
+            return undefined;
+        }
+
         var el = document.createElement('fakeelement');
         var transitions = {
             'transition':'transitionEnd',
@@ -68,6 +72,7 @@ Mobify.UI.Utils = (function($) {
             'WebkitTransition':'webkitTransitionEnd'
         }
 
+        var t;
         for(t in transitions){
             if( el.style[t] !== undefined ){
                 return transitions[t];
@@ -107,11 +112,11 @@ Mobify.UI.Accordion = (function($, Utils) {
             , dxy
             , dragRadius = this.dragRadius;
 
-        function endTransition(e){
+        function endTransition(){
             // recalculate proper height
             transitioning = false;
             var height = 0;
-            $('.item').each(function(index) {
+            $('.m-item').each(function(index) {
                 var $item = $(this);
                 height += $item.height();
             });
@@ -131,6 +136,7 @@ Mobify.UI.Accordion = (function($, Utils) {
             // if transitions are supported, minimize browser reflow
             if (Utils.events.transitionend) {
                 var contentChildren = $content.children();
+                // determine which height function to use (outerHeight not supported by zepto)
                 var contentHeight = ('outerHeight' in contentChildren) ? contentChildren['outerHeight']() : contentChildren['height']();
                 $element.css('min-height', $element.height() + contentHeight + 'px');
                 $content.css('max-height', contentHeight * 1.5 +'px');

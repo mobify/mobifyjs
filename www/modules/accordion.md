@@ -11,7 +11,7 @@ title: Mobify.js Carousel Module
 Try it out:
 
 <ul class="m-accordion">
-    <li class="item">
+    <li class="m-item">
         <h3 class="header">
             <a>Tab1</a>
         </h3>
@@ -22,7 +22,7 @@ Try it out:
             </div>
         </div>
     </li>
-    <li class="item">
+    <li class="m-item">
         <h3 class="header">
             <a>Tab2</a>
         </h3>
@@ -33,7 +33,7 @@ Try it out:
             </div>
         </div>
     </li>
-    <li class="item">
+    <li class="m-item">
         <h3 class="header">
             <a>Tab3</a>
         </h3>
@@ -47,19 +47,25 @@ Try it out:
     </li>
 </ul>
 
-
-[See more examples]({{ site.baseurl }}/modules/accordion-examples)
+<div class="btn-container">
+	<a href="{{ site.baseurl }}/modules/accordion-examples" class="btn btn-primary">Download Accordion</a>
+	<a href="{{ site.baseurl }}/modules/accordion-examples" class="see-examples">See more examples</a>
+</div>
 
 ## Using mobify-accordion.js
 
-Call via JavaScript:
+To initialize an accordion, use the markup documented below, and call the jQuery/Zepto initializer.
 
 	$('.m-accordion').accordion()
 
 ## Markup
 
+The basic markup is composed out of a ul `.m-accordion`, and numerous lis `m-item`. Each `m-item` contains a
+h3 `header` where the title of the item goes, and a div `content`, which contains a div `inner-content` which
+must contain the content for the item.
+
 	<ul class="m-accordion">
-	    <li class="item">
+	    <li class="m-item">
 	        <h3 class="header">
 	            <a>Tab1</a>
 	        </h3>
@@ -70,7 +76,7 @@ Call via JavaScript:
 	            </div>
 	        </div>
 	    </li>
-	    <li class="item">
+	    <li class="m-item">
 	        <h3 class="header">
 	            <a>Tab2</a>
 	        </h3>
@@ -81,7 +87,7 @@ Call via JavaScript:
 	            </div>
 	        </div>
 	    </li>
-	    <li class="item">
+	    <li class="m-item">
 	        <h3 class="header">
 	            <a>Tab3</a>
 	        </h3>
@@ -96,17 +102,29 @@ Call via JavaScript:
 
 ## Methods
 
-### `.accordion()`
+### .accordion(options)
 
 Initializes the accordion.
 
-### `.accordion('unbind')`
+    $('.m-accordion').carousel();
 
-Unbind the events on the accordian object
+### .accordion('unbind')
 
-### `.accordion('destroy')`
+Removes any tap, mouse, and other event handlers from the accordion.
 
-Destroys the accordion.
+    $('.m-accordion').accordion('unbind');
+
+### .accordion('bind')
+
+Restores the tap, mouse, and other event handlers for the accordion.
+
+    $('.m-accordion').accordion('bind');
+
+### .accordion('destroy')
+
+Unbinds the events from the accordion, and removes it from the DOM.
+
+    $('.m-accordion').accordion('destroy');
 
 <script src="{{ site.baseurl }}/static/examples/js/accordion.js"></script>
 <script>
