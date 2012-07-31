@@ -12,7 +12,7 @@ title: Mobify.js Carousel Examples
   margin: -10px;
 }
   /* but not this one, because we're doing something else instead */
-  .m-carousel-example-2 {
+  .m-carousel-example-2, .m-carousel-example-2a {
     padding: 0;
     margin: 0;
 
@@ -20,8 +20,6 @@ title: Mobify.js Carousel Examples
     -webkit-mask-image: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%,
     rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
   }
-
-
 
 .m-carousel .m-item img {
     margin: 0;
@@ -80,6 +78,7 @@ title: Mobify.js Carousel Examples
     width: 300px;
     margin: 0 10px;
 }
+
 </style>
 
 
@@ -138,6 +137,7 @@ title: Mobify.js Carousel Examples
 &lt;/div&gt;</code></pre>
 
 
+
 <h2>Fixed Width Items</h2>
 <p>The items can be stretched to fit the viewport, or they can be sized individually like in this example.</p>
 <div class="m-carousel m-carousel-example-2 m-center">
@@ -182,37 +182,25 @@ title: Mobify.js Carousel Examples
 </div>
 
 <h3>Code for this example:</h3>
-<pre><code>&lt;div class=&quot;m-carousel m-carousel-example-7 m-center&quot;&gt;
+<pre><code>&lt;div class=&quot;m-carousel m-center&quot;&gt;
   &lt;!-- Carousel items --&gt;
   &lt;div class=&quot;m-carousel-inner&quot;&gt;
     &lt;div class=&quot;m-item&quot;&gt;
         &lt;div class=&quot;card narrow&quot;&gt;
-            &lt;img src=&quot;{{ site.baseurl }}/static/examples/img/blossoms.jpg&quot;&gt;
-            &lt;p&gt;Blossoms&lt;/p&gt;
+            &lt;img src=&quot;image1.jpg&quot;&gt;
+            &lt;p&gt;Caption #1&lt;/p&gt;
         &lt;/div&gt;
     &lt;/div&gt;
     &lt;div class=&quot;m-item&quot;&gt;
         &lt;div class=&quot;card wide&quot;&gt;
-            &lt;img src=&quot;{{ site.baseurl }}/static/examples/img/glacier.jpg&quot;&gt;
-            &lt;p&gt;Glacier&lt;/p&gt;
+            &lt;img src=&quot;image2.jpg&quot;&gt;
+            &lt;p&gt;Caption #2&lt;/p&gt;
         &lt;/div&gt;
     &lt;/div&gt;
     &lt;div class=&quot;m-item&quot;&gt;
         &lt;div class=&quot;card narrow&quot;&gt;
-            &lt;img src=&quot;{{ site.baseurl }}/static/examples/img/helmets.jpg&quot;&gt;
-            &lt;p&gt;Helmets&lt;/p&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;m-item&quot;&gt;
-        &lt;div class=&quot;card wide&quot;&gt;
-            &lt;img src=&quot;{{ site.baseurl }}/static/examples/img/parliament.jpg&quot;&gt;
-            &lt;p&gt;Parliament&lt;/p&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;m-item&quot;&gt;
-        &lt;div class=&quot;card narrow&quot;&gt;
-            &lt;img src=&quot;{{ site.baseurl }}/static/examples/img/pods.jpg&quot;&gt;
-            &lt;p&gt;Pods&lt;/p&gt;
+            &lt;img src=&quot;image3.jpg&quot;&gt;
+            &lt;p&gt;Caption #3&lt;/p&gt;
         &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
@@ -223,6 +211,53 @@ title: Mobify.js Carousel Examples
   &lt;/div&gt;
 &lt;/div&gt;
 </code></pre>
+
+
+
+
+<h2>Scaled Transitions</h2>
+<p>Display the current item larger than the rest, and animate the transition between each with the <code>m-scaled</code> class.</p>
+<div class="m-carousel m-carousel-example-2a m-scaled m-center">
+  <!-- Carousel items -->
+  <div class="m-carousel-inner">
+    <div class="m-item">
+        <div class="slide narrow">
+            <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
+            <p>Blossoms</p>
+        </div>
+    </div>
+    <div class="m-item">
+        <div class="slide narrow">
+            <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
+            <p>Glacier</p>
+        </div>
+    </div>
+    <div class="m-item">
+        <div class="slide narrow">
+            <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
+            <p>Helmets</p>
+        </div>
+    </div>
+    <div class="m-item">
+        <div class="slide narrow">
+            <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
+            <p>Parliament</p>
+        </div>
+    </div>
+    <div class="m-item">
+        <div class="slide narrow">
+            <img src="{{ site.baseurl }}/static/examples/img/pods.jpg">
+            <p>Pods</p>
+        </div>
+    </div>
+  </div>
+  <!-- Carousel controls -->
+  <div class="m-carousel-controls">
+    <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo; Previous</a>
+    <a class="carousel-control right" href="#myCarousel" data-slide="next">Next &rsaquo;</a>  
+  </div>
+</div>
+
 
 
 <h2>Image + Caption</h2>

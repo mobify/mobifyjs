@@ -160,3 +160,32 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+
+
+
+/* scaled slides */
+.m-scaled .m-item {
+  -webkit-backface-visibility: hidden;
+  -webkit-transform: scale(0.75);
+  -moz-transform: scale(0.75);
+  -ms-transform: scale(0.75);
+  -o-transform: scale(0.75);
+  transform: scale(0.75);
+
+  /* Configure animations */
+  /* (0.5s would match the transition length between each, 
+      but fast swiping on a phone can result in odd timing. 
+      Half-length durations for each transform is a reasonable 
+      middle ground.) */
+  -webkit-transition: -webkit-transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s;
+  -moz-transition-timing-function: -moz-transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s;
+  -o-transition-timing-function: -o-transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s;
+  transition-timing-function: transform cubic-bezier(0.33, 0.66, 0.66, 1) 0.25s;
+}
+.m-scaled .m-active {
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -ms-transform: scale(1);
+  -o-transform: scale(1);
+  transform: scale(1);
+}
