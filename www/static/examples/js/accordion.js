@@ -117,7 +117,6 @@ Mobify.UI.Accordion = (function($, Utils) {
 
         function close($item) {
             var $content = $item.find('.content');
-            contentHeight = $content.height();
             $item.toggleClass('active');
             $content.removeAttr('style')
         };
@@ -125,9 +124,14 @@ Mobify.UI.Accordion = (function($, Utils) {
         function open($item) {
             var $content = $item.find('.content');
             $item.toggleClass('active');
-            var contentHeight = $content.children().outerHeight();
-            $element.css('min-height', $element.height() + contentHeight + 'px');
-            $content.css('max-height', contentHeight +'px');
+
+            // if transitions are supported, minimize browser reflow
+            if (Utils.events.transitionend) {
+                var contentChildren = $content.children();
+                var contentHeight = ('outerHeight' in contentChildren) ? contentChildren['outerHeight']() : contentChildren['height']();
+                $element.css('min-height', $element.height() + contentHeight + 'px');
+                $content.css('max-height', contentHeight * 1.5 +'px');
+            }
         };
 
         function down(e) {
@@ -149,7 +153,9 @@ Mobify.UI.Accordion = (function($, Utils) {
 
             // prevent open/close when an item is transitioning
             if (transitioning) return;
-            transitioning = true;
+
+            // if transitions are supported, set lock when transitioning
+            if (Utils.events.transitionend) transitioning = true;
 
             // toggle open/close on item tapped
             var $item = $(this).parent();
@@ -180,7 +186,10 @@ Mobify.UI.Accordion = (function($, Utils) {
             .on(Utils.events.move, move)
             .on(Utils.events.up, up)
             .on('click', click);
-        $element.on(Utils.events.transitionend, endTransition);
+
+        if (Utils.events.transitionend) {
+            $element.on(Utils.events.transitionend, endTransition);
+        }
         
     };
                  
