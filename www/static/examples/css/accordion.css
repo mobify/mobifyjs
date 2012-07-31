@@ -9,8 +9,8 @@
 .m-accordion .content {
     -webkit-transition: max-height 1s ease;
     -moz-transition: max-height 1s ease;
-    -o-transition: height 1s ease;
-    transition: height 1s ease;
+    -o-transition: max-height 1s ease;
+    transition: max-height 1s ease;
     overflow: hidden;
     max-height: 0;
 }

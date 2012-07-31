@@ -10,6 +10,7 @@
     background: -webkit-linear-gradient(white, #F6F6F6), white;
     background: -ms-linear-gradient(white, #F6F6F6), white;
     background: -moz-linear-gradient(white, #F6F6F6), white;
+    background: -o-linear-gradient(white, #F6F6F6), white;
     background: linear-gradient(white, #F6F6F6), white;
     line-height: 52px;
 }
