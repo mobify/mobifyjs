@@ -106,7 +106,7 @@ must contain the content for the item.
 
 Initializes the accordion.
 
-    $('.m-accordion').carousel();
+    $('.m-accordion').accordion();
 
 ### .accordion('unbind')
 
