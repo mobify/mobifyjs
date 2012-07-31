@@ -1007,6 +1007,9 @@ table td code {
 	list-style: none;
 	float: left;
 }
+	.widget-gallery li:nth-child(3n+1) {
+		clear: left;
+	}
 	.widget-gallery a:before {
 		content: "";
 		display: block;
@@ -1095,6 +1098,15 @@ table td code {
 	}
 	.modules .span4 {
 		width: 100%;
+	}
+	.widget-gallery li {
+		margin: 0 0 5% 0;
+		width: 100%;
+		list-style: none;
+		float: left;
+	}
+	.widget-gallery li a, .widget-gallery li a:visited {
+		min-height: 0;
 	}
 }
 
