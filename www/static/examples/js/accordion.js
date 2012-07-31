@@ -58,7 +58,11 @@ Mobify.UI.Utils = (function($) {
 
     // http://stackoverflow.com/questions/5023514/how-do-i-normalize-css3-transition-functions-across-browsers
     function whichTransitionEvent(){
-        var t;
+        // hack for ios 3.1.* because of poor transition support.
+        if (/iPhone\ OS\ 3_1/.test(navigator.userAgent)) {
+            return undefined;
+        }
+
         var el = document.createElement('fakeelement');
         var transitions = {
             'transition':'transitionEnd',
@@ -68,6 +72,7 @@ Mobify.UI.Utils = (function($) {
             'WebkitTransition':'webkitTransitionEnd'
         }
 
+        var t;
         for(t in transitions){
             if( el.style[t] !== undefined ){
                 return transitions[t];
@@ -107,7 +112,7 @@ Mobify.UI.Accordion = (function($, Utils) {
             , dxy
             , dragRadius = this.dragRadius;
 
-        function endTransition(e){
+        function endTransition(){
             // recalculate proper height
             transitioning = false;
             var height = 0;
