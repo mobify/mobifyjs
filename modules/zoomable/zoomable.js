@@ -51,6 +51,7 @@ Mobify.UI.Zoomable = (function() {
               + zooming + ' > * { display: none !important; }'
               + zooming + ' > .' + this._getClass('control') + ' { display: block !important; }';
       }
+
     };
 
     var Zoomable = function(element, options) {
@@ -80,7 +81,7 @@ Mobify.UI.Zoomable = (function() {
         this.$thumb = this.$canvas.find('.' + this._getClass('thumb')).css(this.options.imageStyle);
         this.$full = this.$canvas.find('.' + this._getClass('full')).css(this.options.imageStyle);
 
-        if (this.options.clickCloses) this.$canvas.first().addClass(this._getClass('close'));
+        if (this.options.clickCloses) this.$canvas.addClass(this._getClass('close'));
 
         if (this.options.global) {
             if (!$('style[data-zoomable="' + this._getClass('zooming') + '"]').length) {
@@ -101,24 +102,18 @@ Mobify.UI.Zoomable = (function() {
         if (!this.isOpen) return;
         this.isOpen = false;
 
-        this.$element.trigger('closing.zoomable');
-
         this.$canvas.detach();
         this.$stage.removeClass(this._getClass('zooming'));
 
         if (this.options.global) {
             document.body.scrollTop = this.oldScrollTop;
         }
-
-        this.$element.trigger('close.zoomable');
     };
 
     Zoomable.prototype.open = function(ev) {
         ev.preventDefault();
         if (this.isOpen) return;
         this.isOpen = true;
-
-        this.$element.trigger('opening.zoomable');
 
         if (!this.$stage) this.makeElems();
 
@@ -155,19 +150,12 @@ Mobify.UI.Zoomable = (function() {
           , smallWidth = this.$canvas.prop('offsetWidth')
           , bigWidth = thumbWidth
           , smallHeight = this.$canvas.prop('offsetHeight')
-          , bigHeight = thumbWidth * imgAspect
-          , thus = this;
+          , bigHeight = thumbWidth * imgAspect;
 
-        this.$thumb.one('load', function() {
-            thus.$canvas.prop('scrollLeft', Math.max(0, Math.min(bigWidth - smallWidth,
-                bigWidth * leftRatio - smallWidth / 2)));
-            thus.$canvas.prop('scrollTop', Math.max(0, Math.min(bigHeight - smallHeight,
-                bigHeight * topRatio - smallHeight / 2)));
-
-            thus.$element.trigger('open.zoomable');                 
-        })
-               
-
+        this.$canvas.prop('scrollLeft', Math.max(0, Math.min(bigWidth - smallWidth,
+            bigWidth * leftRatio - smallWidth / 2)));
+        this.$canvas.prop('scrollTop', Math.max(0, Math.min(bigHeight - smallHeight,
+            bigHeight * topRatio - smallHeight / 2)));
     };
 
     Zoomable.prototype.bindClose = function(op) {
