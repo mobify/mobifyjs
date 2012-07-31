@@ -6,6 +6,17 @@ title: Mobify.js Carousel Examples
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel.css">
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel-controls.css">
 <style>
+/* have drop shadow extend outside of parent for some examples */
+.m-carousel {
+  padding: 10px;
+  margin: -10px;
+}
+  /* but not this one */
+  .m-carousel-example-2 {
+    padding: 0;
+    margin: 0;
+  }
+
 .m-carousel .m-item img {
     margin: 0;
     padding: 0;
@@ -123,7 +134,7 @@ title: Mobify.js Carousel Examples
 
 <h2>Fixed Width Items</h2>
 <p>The items can be stretched to fit the viewport, or they can be sized individually like in this example.</p>
-<div class="m-carousel m-carousel-example-7 m-center">
+<div class="m-carousel m-carousel-example-2 m-center">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
@@ -210,7 +221,7 @@ title: Mobify.js Carousel Examples
 
 <h2>Image + Caption</h2>
 <p>Image carousel containing textual captions with simple Previous / Next controls to advance between items.</p>
-<div class="m-carousel m-carousel-example-2 m-center m-fluid">
+<div class="m-carousel m-carousel-example-3 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
@@ -285,7 +296,7 @@ title: Mobify.js Carousel Examples
 
 <h2>Arbitrary Content</h2>
 <p>Arbitrary content carousel with simple Previous / Next controls to advance between items.</p>
-<div class="m-carousel m-carousel-example-3 m-center m-fluid">
+<div class="m-carousel m-carousel-example-4 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
@@ -336,7 +347,7 @@ title: Mobify.js Carousel Examples
 
 <h2>Bulleted controls</h2>
 <p>Bulleted indicators for number of items and currently-selected item. Click to advance between items.</p>
-<div class="m-carousel m-carousel-example-4 m-center m-fluid">
+<div class="m-carousel m-carousel-example-5 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
@@ -391,7 +402,7 @@ title: Mobify.js Carousel Examples
 
 <h2>Numbered pagination-style controls</h2>
 <p>Numbered pagination controls for each item, with flanking Previous / Next controls.</p>
-<div class="m-carousel m-carousel-example-5 m-center m-fluid">
+<div class="m-carousel m-carousel-example-6 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
@@ -450,7 +461,7 @@ title: Mobify.js Carousel Examples
 
 <h2>HUD-style Controls</h2>
 <p>Previous and Next render as heads-up controls that display on hover events. Since hover events don't work on mobile, simply swipe to advance.</p>
-<div class="m-carousel m-carousel-example-6 m-center m-fluid">
+<div class="m-carousel m-carousel-example-7 m-center m-fluid">
   <!-- Carousel items -->
   <div class="m-carousel-inner">
     <div class="m-item">
