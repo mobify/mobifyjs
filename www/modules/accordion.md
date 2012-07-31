@@ -52,6 +52,12 @@ Try it out:
 	<a href="{{ site.baseurl }}/modules/accordion-examples" class="see-examples">See more examples</a>
 </div>
 
+
+
+## Check it out on jsFiddle
+
+[http://jsfiddle.net/fPQma/](http://jsfiddle.net/fPQma/)
+
 ## Using mobify-accordion.js
 
 To initialize an accordion, use the markup documented below, and call the jQuery/Zepto initializer.
