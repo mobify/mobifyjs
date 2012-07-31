@@ -155,17 +155,22 @@ Mobify.UI.Zoomable = (function() {
           , smallWidth = this.$canvas.prop('offsetWidth')
           , bigWidth = thumbWidth
           , smallHeight = this.$canvas.prop('offsetHeight')
-          , bigHeight = thumbWidth * imgAspect
-          , thus = this;
+          , bigHeight = thumbWidth * imgAspect;
 
-        this.$thumb.one('load', function() {
-            thus.$canvas.prop('scrollLeft', Math.max(0, Math.min(bigWidth - smallWidth,
+        var complete = $.proxy(function() {
+            this.$canvas.prop('scrollLeft', Math.max(0, Math.min(bigWidth - smallWidth,
                 bigWidth * leftRatio - smallWidth / 2)));
-            thus.$canvas.prop('scrollTop', Math.max(0, Math.min(bigHeight - smallHeight,
+            this.$canvas.prop('scrollTop', Math.max(0, Math.min(bigHeight - smallHeight,
                 bigHeight * topRatio - smallHeight / 2)));
 
-            thus.$element.trigger('open.zoomable');                 
-        })
+            this.$element.trigger('open.zoomable');                 
+        }, this);
+
+        if (this.$thumb.prop('complete')) {
+            complete();
+        } else {
+            this.$thumb.one('load', complete);
+        }
                
 
     };
