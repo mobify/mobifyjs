@@ -189,7 +189,7 @@ The viewport element, `.m-carousel`, emits the follow events.
 </script>
 
 
-## Compatability
+## Browser Compatability
 
 
 | Browser           | Version | Support               |
@@ -197,7 +197,7 @@ The viewport element, `.m-carousel`, emits the follow events.
 | Safari            | 4.0+    | Supported.            |
 | Firefox           | 3.5-3.6 | Degraded. No transitions between images. |
 | Firefox           | 4.0+    | Supported             |
-| Chrome            | 12.0+   | Supported             |
+| Chrome            | 9.0+    | Supported             |
 | Opera             | 12.0+   | Supported. Some styles have visual errors. |
 | Internet Explorer | 6-7.0   | Not Supported         |
 | Internet Explorer | 8.0     | Degraded. No transitions. No dragging. Next/Previous must be provided. |
