@@ -5,12 +5,24 @@ title: Mobify.js Zoomable Module
 
 <style>
 .zoomable-notice {
-    position: absolute; left: 50%; top: 50%;
-    width: 300px; height: 36px; margin-left: -160px; margin-top: -28px; padding: 10px;
-    vertical-align: middle; text-align: center; font-weight: bold; font-size: 16px; line-height: 18px;
-    background: rgba(0,0,192,0.5); color: white; 
+    position: absolute; 
+    left: 50%; 
+    top: 50%;
+    width: 300px; 
+    height: 36px; 
+    margin-left: -160px; 
+    margin-top: -28px; 
+    padding: 10px;
+    vertical-align: middle; 
+    text-align: center; 
+    font-weight: bold; 
+    font-size: 16px; 
+    line-height: 18px;
+    background: rgba(0,0,192,0.5); 
+    color: white; 
     opacity: 1;
 }
+
 .zoomable-notice-fade {
     -webkit-transition: opacity 4s ease-in; 
     -o-transition: opacity 4s ease-in; 
@@ -20,39 +32,61 @@ title: Mobify.js Zoomable Module
     opacity: 0;
  }
 </style>
-<script src="{{ site.baseurl }}/static/examples/js/zoomable.js"></script>
 
 # Zoomable
 
-A module for showing and panning through large images in a touchscreen-friendly way. Can be configured to use custom HTML and CSS in zoomed-in state.
+A module for showing and panning through large images in a 
+touchscreen-friendly way.
 
-<p class="exit-notice-zoomable"><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
+<p class="exit-notice-zoomable">
+    <a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg">
+    <img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
 </p>
-<script>$('.exit-notice-zoomable a').zoomable({ stageHTML: function() {
-  return Mobify.UI.Zoomable.defaults.stageHTML.call(this)
-      + '<div class="zoomable-notice m-close">Tap anywhere to close. On touchscreen device, drag to navigate</div>';
-}}).bind('afterOpen.zoomable', function() {
-  $('.zoomable-notice').addClass('zoomable-notice-fade');
-}).bind('beforeClose.zoomable', function() {
-  $('.zoomable-notice').removeClass('zoomable-notice-fade');
-})</script>
+<script src="{{ site.baseurl }}/static/examples/js/zoomable.js"></script>
+<script>
+    var $zoomable = $('.exit-notice-zoomable a');
+    $zoomable.zoomable({
+        stageHTML: function() {
+            return Mobify.UI.Zoomable.defaults.stageHTML.call(this)
+                 + '<div class="zoomable-notice m-close">Tap anywhere to close. On touchscreen device, drag to navigate</div>';
+        }
+    });
+
+    $zoomable.bind('afterOpen.zoomable', function() {
+        $('.zoomable-notice').addClass('zoomable-notice-fade');
+    });
+
+    $zoomable.bind('beforeClose.zoomable', function() {
+        $('.zoomable-notice').removeClass('zoomable-notice-fade');
+    });
+</script>
 
 <div class="btn-container">
-  <a href="{{ site.baseurl }}/static/downloads/zoomable.zip" class="btn btn-primary">Download Zoomable</a>
-  <a href="{{ site.baseurl }}/modules/zoomable-examples" class="see-examples">See more examples</a>
+    <a href="{{ site.baseurl }}/static/downloads/zoomable.zip" class="btn btn-primary">Download Zoomable</a>
+    <a href="{{ site.baseurl }}/modules/zoomable-examples/" class="see-examples">See more examples</a>
 </div>
 
 
-## Using Zoomable.js
+## Usage
 
-Zoomable generates its own HTML. All you need to provide is references to your thumbnail and zoomed-in images:
+    <!-- the zoomable -->
+    <a class="zoomable" href="big.jpg">
+        <!-- the thumbnail -->
+        <img src="thumbnail.jpg">
+    </a>
 
-    <a class="zoomable" href="big.jpg"><img src="thumb.jpg"></a>
-    <script>$('a.zoomable').zoomable();</script>
+    <!-- include zepto.js or jquery.js -->
+    <script src="zepto.js"></script>
+    <!-- include zoomable.js -->
+    <script src="zoomable.js"></script>
+    <!-- construct the zoomable -->
+    <script>$('a.m-zoomable').zoomable()</script>
 
-The &lt;a&gt; element that is passed to zoomable should reference the high resolution image that you are trying to show. The image inside provides thumbnail URL. If image is not found inside the link, zoomable will ascend DOM tree until it finds one nearby.
+The element passed to `.zoomable()` should reference a high resolution
+image.
 
-Once thumbnail image is clicked, thumbnail will be magnified and shown to the user. High resolution image will replace the thumbnail upon load. User can navigate around by dragging the scaled up image, and leave zoomed in view by tapping the image. If user arrived at zoomed in view by clicking on image thumbnail, initial view will center on part of the image corresponding to tapped section. For example, tapping bottom left corner of thumbnail will start zoomable focusing at bottom left part of high resolution image.
+When the thumbnail is clicked, the high resolution image will be shown.
+Clicking on image again will dimiss it.
 
 ## Methods
 
@@ -97,7 +131,7 @@ Unbinds the events from the zoomable context, and removes it from the DOM.
 
 ## Configuration
 
-Below are the options available in the configuration object
+Below are the options available in the configuration object:
 
 | Name          | Default        | Description                               |   
 |---------------|------------------------------------------------------------|
@@ -147,7 +181,7 @@ These are the default styles applied to magnified image(s) and their container.
 
 ## Events
 
-The element that `.zoomable()` call used as a context emits the following events:
+The zoomable emits the following events:
 
 | Name          | Description                               |   
 |---------------|-------------------------------------------|
@@ -156,9 +190,16 @@ The element that `.zoomable()` call used as a context emits the following events
 | beforeClose   | Fired before zoomable starts closing      |
 | afterClose    | Fired after zoomable finishes closing     |
 
+<!--
+
 ## Limitations
 
-Zoomable relies on click event for activation and deactivation. This results in about ~300ms delay in iOS, as Mobile Safari waits to ensure that event in question is a single tap rather than built-in page zooming double tap. We do not bundle a quick tap implementation with zoomable, but you can attach a tap event manually. Here is an example of custom binding that uses [jQuery tappable](https://github.com/aanand/jquery.tappable.js/blob/master/jquery.tappable.js):
+Zoomable relies on click event for activation and deactivation. This results 
+in about ~300ms delay in iOS, as Mobile Safari waits to ensure that event 
+in question is a single tap rather than built-in page zooming double tap. 
+We do not bundle a quick tap implementation with zoomable, but you can 
+attach a tap event manually. Here is an example of custom binding that 
+uses [jQuery tappable](https://github.com/aanand/jquery.tappable.js/blob/master/jquery.tappable.js):
 
     var el = $('a.zoomable').zoomable();
     el.tappable(function() {
@@ -166,3 +207,5 @@ Zoomable relies on click event for activation and deactivation. This results in 
     });
 	
 Other quick touch implementations can be used in similar ways.
+
+-->
