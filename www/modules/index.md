@@ -12,7 +12,7 @@ Mobify.js-powered site.
 
 All modules require either the [Zepto](http://zeptojs.com/) or [jQuery](http://jquery.com/) library.
 
-All modules available on GitHub and published under an [MIT license]({{ site.baseurl }}/license/):
+All modules available on [GitHub](https://github.com/mobify/mobifyjs/modules) and published under an [MIT license]({{ site.baseurl }}/license/):
 
-[github.com/mobify/mobifyjs/modules](https://github.com/mobify/mobifyjs/modules)
+
 

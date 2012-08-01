@@ -65,7 +65,7 @@
 
 
 /* Accordion with Images */
-.m-accordion-images .m-header:after {
+.m-indicators-images .m-header:after {
     content : "";
     display: block;
     position: absolute;
@@ -77,16 +77,35 @@
     height: 22px;
     background: url(../img/accordion.png) 0 -20px no-repeat;
 }
-    .m-accordion-images .m-active .m-header:after {
+    .m-indicators-images .m-active .m-header:after {
         background-position: 0 -43px;
     }
 /* -- Retina version -- */
 @media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
-    .m-accordion-images .m-header:after {
+    .m-indicators-images .m-header:after {
         background-position: -11px 0;
         background-size: 33px 43px;
     }
-    .m-accordion-images .m-active .m-header:after {
+    .m-indicators-images .m-active .m-header:after {
         background-position: -11px -22px;
     }
 }
+
+/* Accordion with CSS indicators */
+.m-indicators-css .m-header:after {
+    content : "+";
+    color: #999;
+    text-shadow: #fff 0 1px 0;
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    margin-top: -13px;
+    z-index: 9;
+    font-size: 26px;
+    line-height: 22px;
+    font-weight: bold;
+}
+    .m-indicators-css .m-active .m-header:after {
+        content: "\2212"; /* Unicode minus sign */
+    }

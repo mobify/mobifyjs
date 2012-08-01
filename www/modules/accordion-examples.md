@@ -10,6 +10,7 @@ title: Mobify.js Accordion Examples
 
 
 <h2>Basic Accordion</h2>
+<p>The basic accordion control with default styling.</p>
 <ul class="m-accordion">
     <li class="m-item">
         <h3 class="m-header">
@@ -49,8 +50,9 @@ title: Mobify.js Accordion Examples
 
 
 
-<h2>Basic Accordion with Images</h2>
-<ul class="m-accordion m-accordion-images">
+<h2>Image Indicators</h2>
+<p>The basic accordion control with images to reveal when a header is expanded or collapsed.</p>
+<ul class="m-accordion m-indicators-images">
     <li class="m-item">
         <h3 class="m-header">
             <a>Portland</a>
@@ -82,6 +84,43 @@ title: Mobify.js Accordion Examples
         </div>
     </li>
 </ul>
+
+
+<h2>CSS Indicators</h2>
+<p>The basic accordion control with image-less CSS indicators that reveal when a header is expanded or collapsed.</p>
+<ul class="m-accordion m-indicators-css">
+    <li class="m-item">
+        <h3 class="m-header">
+            <a>Portland</a>
+        </h3>
+        <div class="m-content">
+            <div class="m-inner-content">
+                <p>Pickled keytar ethnic flexitarian, vegan ethical sartorial 8-bit yr williamsburg. Flexitarian typewriter viral, wolf banh mi gastropub letterpress street art mcsweeney's raw denim kogi semiotics blog.</p>
+            </div>
+        </div>
+    </li>
+    <li class="m-item">
+        <h3 class="m-header">
+            <a>Willamsburg</a>
+        </h3>
+        <div class="m-content">
+            <div class="m-inner-content">
+                <p> Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p> 
+            </div>
+        </div>
+    </li>
+    <li class="m-item">
+        <h3 class="m-header">
+            <a>Austin</a>
+        </h3>
+        <div class="m-content">
+            <div class="m-inner-content">
+                <p>Trust fund mustache typewriter, portland artisan irony seitan master cleanse biodiesel ethnic banh mi bushwick squid semiotics truffaut. Marfa vinyl mumblecore, selvage beard kale chips gentrify four loko gluten-free messenger bag cliche vice forage.</p>
+            </div>
+        </div>
+    </li>
+</ul>
+
 
 
 
