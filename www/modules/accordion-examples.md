@@ -5,6 +5,7 @@ title: Mobify.js Accordion Examples
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion.css">
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion-style.css">
+<style type="text/css">
 
 .m-indicators-css .m-header {
     border-color: #f6dada;
