@@ -56,27 +56,24 @@ Try it out:
 
 ## Check it out on jsFiddle
 
-[http://jsfiddle.net/fPQma/](http://jsfiddle.net/fPQma/)
+[http://jsfiddle.net/fPQma/1/](http://jsfiddle.net/fPQma/1/)
 
-## Using mobify-accordion.js
+## Usage
 
-To initialize an accordion, use the markup documented below, and call the jQuery/Zepto initializer.
+    <!-- include accordion.css -->
+    <link rel="stylesheet" href="accordion.css">
 
-	$('.m-accordion').accordion()
-
-## Markup
-
-The basic markup is composed out of a ul `.m-accordion`, and numerous lis `m-item`. Each `m-item` contains a
-h3 `header` where the title of the item goes, and a div `content`, which contains a div `inner-content` which
-must contain the content for the item.
-
+    <!-- the markup -->
 	<ul class="m-accordion">
+		<!-- the items -->
 	    <li class="m-item">
 	        <h3 class="header">
+	        	<!-- header title -->
 	            <a>Tab1</a>
 	        </h3>
 	        <div class="content">
 	            <div class="inner-content">
+	            	<!-- content for item -->
 	                <h2>Content 1</h2>
 	                <h2>Lorem Ipsum</h2>
 	            </div>
@@ -105,6 +102,11 @@ must contain the content for the item.
 	        </div>
 	    </li>
 	</ul>
+
+    <!-- include the JavaScript -->
+    <script src="accordion.js"></script>
+    <!-- construct the accordion -->
+    <script>$('.m-accordion').accordion()</script>
 
 ## Methods
 
@@ -135,24 +137,23 @@ Unbinds the events from the accordion, and removes it from the DOM.
 ## Browser Compatibility
 
 
-| Browser           | Version | Support               |
-|-------------------|---------|-----------------------|
-| Safari            | 4.0+    | Supported.            |
-| Firefox           | 3.5-3.6 | Degraded. No transitions. |
-| Firefox           | 4.0+    | Supported             |
-| Chrome            | 9.0+    | Supported             |
-| Opera             | 12.0+   | Supported.            |
-| Internet Explorer | 6-7.0   | Not Supported         |
-| Internet Explorer | 8.0     | Degraded. No transitions. |
-| Internet Explorer | 9.0     | Degraded. No transitions. |
-| Internet Explorer | 10.0    | Supported             |
-| Mobile Safari     | 3.1.*   | Degraded. No transitions             |
-| Mobile Safari     | 4.0+    | Supported             |
-| Android Browser   | 2.1     | Not Supported         |
-| Android Browser   | 2.2+    | Supported         |
-| Chrome (Android)  | 1.0+    | Supported             |
-| Firefox (Android) | 1.0+    | Supported             |
-| Windows Phone     | 7.5     | Degraded. No transitions. |
+| Browser           | Version | Support                    |
+|-------------------|---------|----------------------------|
+| Safari            | 4.0+    | Supported.                 |
+| Firefox           | 3.5-3.6 | Degraded. No transitions.  |
+| Firefox           | 4.0+    | Supported                  |
+| Chrome            | 9.0+    | Supported                  |
+| Opera             | 12.0+   | Supported.                 |
+| Internet Explorer | 6-7.0   | Not Supported              |
+| Internet Explorer | 8.0     | Degraded. No transitions.  |
+| Internet Explorer | 9.0     | Degraded. No transitions.  |
+| Internet Explorer | 10.0    | Supported                  |
+| Mobile Safari     | 3.1.*   | Degraded. No transitions   |
+| Mobile Safari     | 4.0+    | Supported                  |
+| Android Browser   | 2.1+    | Supported                  |
+| Chrome (Android)  | 1.0+    | Supported                  |
+| Firefox (Android) | 1.0+    | Supported                  |
+| Windows Phone     | 7.5     | Degraded. No transitions.  |
 
 <script src="{{ site.baseurl }}/static/examples/js/accordion.js"></script>
 <script>

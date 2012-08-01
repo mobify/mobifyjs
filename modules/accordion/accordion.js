@@ -56,27 +56,35 @@ Mobify.UI.Utils = (function($) {
         return;
     };
 
-    /**
-        Returns prefix event for current browser.
-        @param {String} Event Name
-        @return {String} Detected Event Name
-    */
-    exports.getEvent = function(name) {
-        var prefixes = ['webkit', 'moz', 'O', 'ms', ''];
-
-        for (var i = 0; i < prefixes.length; ++i) {
-            if (('on' + prefixes[i] + name.toLowerCase()) in window) {
-                return prefixes[i] + name;
-            }
+    // http://stackoverflow.com/questions/5023514/how-do-i-normalize-css3-transition-functions-across-browsers
+    function whichTransitionEvent(){
+        // hack for ios 3.1.* because of poor transition support.
+        if (/iPhone\ OS\ 3_1/.test(navigator.userAgent)) {
+            return undefined;
         }
 
-        // Not Supported
+        var el = document.createElement('fakeelement');
+        var transitions = {
+            'transition':'transitionEnd',
+            'OTransition':'oTransitionEnd',
+            'MSTransition':'msTransitionEnd',
+            'MozTransition':'transitionend',
+            'WebkitTransition':'webkitTransitionEnd'
+        }
+
+        var t;
+        for(t in transitions){
+            if( el.style[t] !== undefined ){
+                return transitions[t];
+            }
+        }
         return;
     };
 
     $.extend(exports.events, {
-        'transitionend': exports.getEvent("TransitionEnd")
-    });
+        'transitionend': whichTransitionEvent()
+     });
+
 
     return exports;
 
@@ -97,18 +105,16 @@ Mobify.UI.Accordion = (function($, Utils) {
 
     Accordion.prototype.bind = function() {
         var $element = this.$element
-            , transitioning = false
-            , dragging = false
-            , canceled = false
             , xy
             , dxy
             , dragRadius = this.dragRadius;
 
-        function endTransition(e){
+        function endTransition(){
             // recalculate proper height
-            transitioning = false;
             var height = 0;
-            $('.item').each(function(index) {
+            var $item = $(this).parent();
+            if ($item.hasClass('m-closed')) $(this).parent().removeClass('m-active');
+            $('.m-item', $element).each(function(index) {
                 var $item = $(this);
                 height += $item.height();
             });
@@ -116,18 +122,28 @@ Mobify.UI.Accordion = (function($, Utils) {
         };
 
         function close($item) {
+            $item.removeClass('m-opened');
+            $item.addClass('m-closed')
             var $content = $item.find('.content');
-            contentHeight = $content.height();
-            $item.toggleClass('active');
-            $content.removeAttr('style')
+            if(!Utils.events.transitionend) $item.toggleClass('m-active');
+            $content.css('max-height', 0)
         };
         
         function open($item) {
             var $content = $item.find('.content');
-            $item.toggleClass('active');
-            var contentHeight = $content.children().outerHeight();
-            $element.css('min-height', $element.height() + contentHeight + 'px');
-            $content.css('max-height', contentHeight +'px');
+            $item.toggleClass('m-active');
+            $item.removeClass('m-closed');
+            $item.addClass('m-opened')
+
+            var contentChildren = $content.children();
+            // determine which height function to use (outerHeight not supported by zepto)
+            var contentHeight = ('outerHeight' in contentChildren) ? contentChildren['outerHeight']() : contentChildren['height']();
+            $content.css('max-height', contentHeight * 1.5 +'px'); 
+
+            // if transitions are supported, minimize browser reflow
+            if (Utils.events.transitionend) {
+                $element.css('min-height', $element.height() + contentHeight + 'px');
+            }
         };
 
         function down(e) {
@@ -147,13 +163,9 @@ Mobify.UI.Accordion = (function($, Utils) {
                 if ((dx*dx) + (dy*dy) > dragRadius*dragRadius) return;
             }
 
-            // prevent open/close when an item is transitioning
-            if (transitioning) return;
-            transitioning = true;
-
             // toggle open/close on item tapped
             var $item = $(this).parent();
-            if ($item.hasClass('active')) {
+            if ($item.hasClass('m-active')) {
                 close($item);
             }
             else {
@@ -180,7 +192,10 @@ Mobify.UI.Accordion = (function($, Utils) {
             .on(Utils.events.move, move)
             .on(Utils.events.up, up)
             .on('click', click);
-        $element.on(Utils.events.transitionend, endTransition);
+
+        if (Utils.events.transitionend) {
+            $element.find('.content').on(Utils.events.transitionend, endTransition);
+        }
         
     };
                  
