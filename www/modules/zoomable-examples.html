@@ -6,36 +6,98 @@ title: Mobify.js Zoomable Example
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <script src="{{ site.baseurl }}/static/examples/js/zoomable.js"></script>
 <style>
-	.corner.m-close { color: white; background: black; position: absolute; right: 0; top: 0;
-		font-weight: bold; font-size: 18px; padding: 10px;
-	}
-	.zoomable-notice { position: absolute; width: 200px; height: 36px; left: 50%; top: 50%; margin-left: -110px; margin-top: -28px; vertical-align: middle; text-align: center; font-size: 18px; line-height: 18px; background: rgba(0,0,192,0.5); color: white; padding: 10px; opacity: 1;}
-	.zoomable-notice-fade {
-		-webkit-transition: opacity 4s linear; opacity: 0;
-	}
+.corner.m-close { color: white; background: black; position: absolute; right: 0; top: 0;
+	font-weight: bold; font-size: 18px; padding: 10px;
+}
+.zoomable-notice {
+    position: absolute; left: 50%; top: 50%;
+    width: 300px; height: 36px; margin-left: -160px; margin-top: -28px; padding: 10px;
+    vertical-align: middle; text-align: center; font-weight: bold; font-size: 16px; line-height: 18px;
+    background: rgba(0,0,192,0.5); color: white; 
+    opacity: 1;
+}
+.zoomable-notice-fade {
+    -webkit-transition: opacity 4s ease-in; 
+    -o-transition: opacity 4s ease-in; 
+    -moz-transition: opacity 4s ease-in; 
+    -ms-transition: opacity 4s ease-in; 
+    transition: opacity 4s ease-in;
+    opacity: 0;
+ }
+a img { width: 100%; }
+.z4-wrap { height: 300px; border: 3px solid black; }
 </style>
 
-<h2>Basic zoomable, click to close</h2>
-<p class="z1"><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg">Zoom in to center</a><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
-</p>
-<script>$('.z1 a[href$="jpg"]').zoomable();</script>
+<h2>Basic zoomable</h2>
+<a class="z1" href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg"></a>
+<script>$('a.z1').zoomable();</script>
 
-<h2>Explicit close button, clicking does not close</h2>
-<p class="z2"><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg">Zoom in to center</a><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
-</p>
-<script>$('.z2 a[href$="jpg"]').zoomable({ clickCloses: false, stageHTML: function() {
-	return Mobify.UI.Zoomable.defaults.stageHTML.call(this) + '<div class="m-close corner">Close</div>';
-}});</script>
+<h3>Code for this example:</h3>
+<pre><code>&lt;a class=&quot;z1&quot; href=&quot;{{ site.baseurl }}/static/examples/img/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg&quot;&gt;&lt;/a&gt;
+&lt;script&gt;$('a.z1').zoomable();&lt;/script&gt;</code></pre>
 
-<h2>Explicit close button, clicking does not close, messaging upon opening</h2>
-<p class="z3"><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg">Zoom in to center</a><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
-</p>
-<script>$('.z3 a[href$="jpg"]').zoomable({ stageHTML: function() {
-	return Mobify.UI.Zoomable.defaults.stageHTML.call(this) + '<div class="zoomable-notice">Tap anywhere to close<br/>Drag to navigate</div>';
-}}).bind('open.zoomable', function() {
-	$('.zoomable-notice').addClass('zoomable-notice-fade');
-}).bind('closing.zoomable', function() {
-	$('.zoomable-notice').removeClass('zoomable-notice-fade');
-})
+<h2>With a textual 'zoom in' link and closing only via Close button</h2>
+<a class="z2" href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg">Zoom in</a>
+<script>
+$('a.z2').zoomable({
+	clickCloses: false,
+	stageHTML: function() {
+		return Mobify.UI.Zoomable.defaults.stageHTML.call(this) + '<div class="m-close corner">Close</div>';
+	}
+});
+</script>
 
-;</script>
+<h3>Code for this example:</h3>
+<pre><code>&lt;a class=&quot;z2&quot; href=&quot;{{ site.baseurl }}/static/examples/img/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg&quot;&gt;Zoom in&lt;/a&gt;
+&lt;script&gt;
+$('a.z2').zoomable({
+	clickCloses: false,
+	stageHTML: function() {
+		return Mobify.UI.Zoomable.defaults.stageHTML.call(this) + '&lt;div class=&quot;m-close corner&quot;&gt;Close&lt;/div&gt;';
+	}
+});
+&lt;/script&gt;</code></pre>
+
+<h2>Messaging upon opening</h2>
+<a class="z3" href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg"></a>
+<script>
+$('a.z3').zoomable({
+	stageHTML: function() {
+	  return Mobify.UI.Zoomable.defaults.stageHTML.call(this)
+	      + '<div class="zoomable-notice m-close">Tap anywhere to close. On touchscreen device, drag to navigate</div>';
+	}
+}).bind('afterOpen.zoomable', function() {
+  $('.zoomable-notice').addClass('zoomable-notice-fade');
+}).bind('beforeClose.zoomable', function() {
+  $('.zoomable-notice').removeClass('zoomable-notice-fade');
+});
+</script>
+
+<h3>Code for this example:</h3>
+<pre><code>&lt;a class=&quot;z3&quot; href=&quot;{{ site.baseurl }}/static/examples/img/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg&quot;&gt;&lt;/a&gt;
+&lt;script&gt;
+$('a.z3').zoomable({
+	stageHTML: function() {
+	  return Mobify.UI.Zoomable.defaults.stageHTML.call(this)
+	      + '&lt;div class=&quot;zoomable-notice m-close&quot;&gt;Tap anywhere to close. On touchscreen device, drag to navigate&lt;/div&gt;';
+	}
+}).bind('afterOpen.zoomable', function() {
+  $('.zoomable-notice').addClass('zoomable-notice-fade');
+}).bind('beforeClose.zoomable', function() {
+  $('.zoomable-notice').removeClass('zoomable-notice-fade');
+});
+&lt;/script&gt;</code></pre>
+
+<h2>Limiting zoomable to a container</h2>
+<a class="z4" href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg"></a>
+<div class="z4-wrap"></div>
+<script>
+	$('a.z4').zoomable({stage: '.z4-wrap'});
+</script>
+
+<h3>Code for this example:</h3>
+<pre><code>&lt;a class=&quot;z4&quot; href=&quot;{{ site.baseurl }}/static/examples/img/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg&quot;&gt;&lt;/a&gt;
+&lt;div class=&quot;z4-wrap&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+	$('a.z4').zoomable({stage: '.z4-wrap'});
+&lt;/script&gt;</code></pre>

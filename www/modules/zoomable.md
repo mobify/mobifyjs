@@ -6,8 +6,8 @@ title: Mobify.js Zoomable Module
 <style>
 .zoomable-notice {
     position: absolute; left: 50%; top: 50%;
-    width: 200px; height: 36px; margin-left: -110px; margin-top: -28px; padding: 10px;
-    vertical-align: middle; text-align: center; font-weight: bold; font-size: 18px; line-height: 18px;
+    width: 300px; height: 36px; margin-left: -160px; margin-top: -28px; padding: 10px;
+    vertical-align: middle; text-align: center; font-weight: bold; font-size: 16px; line-height: 18px;
     background: rgba(0,0,192,0.5); color: white; 
     opacity: 1;
 }
@@ -24,13 +24,13 @@ title: Mobify.js Zoomable Module
 
 # Zoomable
 
-A module for showing and panning through large images. Can be configured to use custom HTML and CSS in zoomed-in state.
+A module for showing and panning through large images in a touchscreen-friendly way. Can be configured to use custom HTML and CSS in zoomed-in state.
 
 <p class="exit-notice-zoomable"><a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
 </p>
 <script>$('.exit-notice-zoomable a').zoomable({ stageHTML: function() {
   return Mobify.UI.Zoomable.defaults.stageHTML.call(this)
-      + '<div class="zoomable-notice m-close">Tap anywhere to close<br/>Drag to navigate</div>';
+      + '<div class="zoomable-notice m-close">Tap anywhere to close. On touchscreen device, drag to navigate</div>';
 }}).bind('afterOpen.zoomable', function() {
   $('.zoomable-notice').addClass('zoomable-notice-fade');
 }).bind('beforeClose.zoomable', function() {
@@ -45,62 +45,109 @@ A module for showing and panning through large images. Can be configured to use 
 
 ## Using Zoomable.js
 
-Zoomable generates its own HTML (unless asked not to). All you need to provide is references to your thumbnail and zoomed-in images:
+Zoomable generates its own HTML. All you need to provide is references to your thumbnail and zoomed-in images:
 
     <a class="zoomable" href="big.jpg"><img src="thumb.jpg"></a>
     <script>$('a.zoomable').zoomable();</script>
 
+The &lt;a&gt; element that is passed to zoomable should reference the high resolution image that you are trying to show. The image inside provides thumbnail URL. If image is not found inside the link, zoomable will ascend DOM tree until it finds one nearby.
+
+Once thumbnail image is clicked, thumbnail will be magnified and shown to the user. High resolution image will replace the thumbnail upon load. User can navigate around by dragging the scaled up image, and leave zoomed in view by tapping the image. If user arrived at zoomed in view by clicking on image thumbnail, initial view will center on part of the image corresponding to tapped section. For example, tapping bottom left corner of thumbnail will start zoomable focusing at bottom left part of high resolution image.
 
 ## Methods
 
-### .carousel(options)
+### .zoomable(options)
 
-Initializes the carousel with the options (an `object`) given.
+Initializes the zoomable with the options (an `object`) given.
 
-    $('.m-carousel').carousel({
+    $('.zoomable').zoomable({
         classPrefix: "m-"
     });
 
-### .carousel('next')
+### .zoomable('open')
 
-Moves the carousel one item to the right.
+Opens zoomable.
 
-    $('.m-carousel').carousel('next');
+    $('.zoomable').zoomable('open');
 
-### .carousel('prev')
+### .zoomable('close')
 
-Moves the carousel one item to the left.
+Closes zoomable.
 
-    $('.m-carousel').carousel('prev');
+    $('.zoomable').zoomable('close');
 
-### .carousel('move', x)
+### .zoomable('unbind')
 
-Moves the carousel to a specific index (1-based).
+Removes event handlers from the zoomable context.
 
-    $('.m-carousel').carousel('move', 1);
+    $('.zoomable').zoomable('unbind');
 
-### .carousel('unbind')
+### .zoomable('bind')
 
-Removes any tap, mouse, and other event handlers from the carousel.
+Restores event handlers for the zoomable context.
 
-    $('.m-carousel').carousel('unbind');
+    $('.zoomable').zoomable('bind');
 
-### .carousel('bind')
+### .zoomable('destroy')
 
-Restores the tap, mouse, and other event handlers for the carousel.
+Unbinds the events from the zoomable context, and removes it from the DOM.
 
-    $('.m-carousel').carousel('bind');
+    $('.zoomable').zoomable('destroy');
 
-### .carousel('destroy')
 
-Unbinds the events from the carousel, and removes it from the DOM.
+## Configuration
 
-    $('.m-carousel').carousel('destroy');
+Below are the options available in the configuration object
 
+| Name          | Default        | Description                               |   
+|---------------|------------------------------------------------------------|
+| classPrefix   | `"m-"`         |This prefix is inserted before all class references for conflict avoidance. For example, default close class will be `m-close`. |
+| stage         | <body> element | DOM node that will receive generated zoomable markup. |
+| classNames    | Object, see below | Contains class names for various parts of zoomable. Classes can be overriden individually. |
+| ratio         | `2`            | Zoomed in image is magified to be `ratio` times bigger than the stage. |
+| seekImage     | `true`         | If thumbnail image is not found in the anchor element used as context, Zoomable will go up in DOM tree until it finds nearby image. Set to `false` to restrict image lookups to stay within context 
+| clickCloses   | `true`         | Specifies if clicking or tapping in place on the magnified image should close magnified view |
+| activationEvent | `"click"` | Override to use alternate event for all zoomable control interactions |
+| canvasStyle  | Object, see below | Extra CSS properties to be applied to canvas. You can delete default properties by setting their value to `undefined`. | 
+| imageStyle   | Object, see below | Extra CSS properties to be applied to low-res and high-res magnified image. You can delete default properties by setting their value to `undefined`. |
+| stageHTML | Function | Generates HTML of magnified state of zoomable module. See examples to see how to change it |
+| globalStyle | Function | Generates CSS for zoomable acting upon <body>. Typically should be left as-is.
+
+## Classes
+
+| Name        | Class       | Description                                                                                       |           
+|-------------|---------------------------------------------------------------------------------------------------|
+| zooming| m-`zooming` | Applied to stage (usually body element) when zoomable is active |
+| close| m-`close` | Should be added to custom close buttons within zoomable markup |
+| control| m-`zoomableControl` | Internal, added to all top-level elements injected by zoomable |
+| canvas| m-`zoomableCanvas` | Applied to div wrapper that contains both low and high resolution images |
+| thumb| m-`zoomableThumb` | Applied to low resolution (thumbnail) image |
+| full| m-`zoomableFull` | Applied to high resolution image |
+
+## Default styles
+
+These are the default styles applied to magnified image(s) and their container.
+
+### canvasStyle
+    { 
+        position: 'absolute'
+      , width: '100%'
+      , height: '100%'
+      , overflow: 'auto'
+    }
+
+### imageStyle
+    { 
+        position: 'absolute'
+      , top: '0'
+      , left: '0'
+      , maxWidth: 'none'
+      , maxHeight: 'none'        
+    }
 
 ## Events
 
-The viewport element, `.m-carousel`, emits the follow events.
+The element that `.zoomable()` call used as a context emits the following events:
 
 | Name          | Description                               |   
 |---------------|-------------------------------------------|
@@ -109,81 +156,9 @@ The viewport element, `.m-carousel`, emits the follow events.
 | beforeClose   | Fired before zoomable starts closing      |
 | afterClose    | Fired after zoomable finishes closing     |
 
-
-
-## Why is a new zoom widget required?
-
-Current 'zoom in a photo' controls are designed for devices with a mouse or touchpad. Typically, they show zoomed in section of an image as a pointer is hovered over different parts of thumbnail. This behavior does not work on mobile devices that have no concept of hover ([example](http://www.511tactical.com/All-Products/Pants/Tactical-Pants/Taclite-Pro-Pants.html)). To solve this problem, we have implemented a zoom widget that relies on dragging to navigate through zoomed-in image.
-
-## User interface
-
-We start with a minimal user interface that contains only the source image, scaled up. If the user specifies a higher resolution version of the image, we attempt to render low resolution variant first and overlay it with high resolution one once it becomes available. 
-
-User can navigate around by dragging the scaled up image, and leave zoomed in view by tapping the image. If user arrived at zoomed in view by clicking on image thumbnail, we would center their view on part of the image corresponding to tapped section. For example, tapping bottom left corner will start zoomable pointing at bottom left part of high resolution image.
-
-Zoomable behavior can be extended by adding annotations/close buttons to zoomed in state. You can also disable tap-image-to-exit and image seeking behavior.
-
-## Implementing Zoomable
-
-
-
-The link specifies URL of high resolution image, and image thumbnail (if present). If image is not found inside the link, zoomable will ascend DOM tree until it finds one nearby.
-
-$.fn.zoomable() initialization call takes configuration parameters that are further described in next section. Alternatively, if your zoomable is already initialized, you can pass names of commands to execute:
-	$('a.zoomable').zoomable("show");
-	$('a.zoomable').zoomable("hide");
-	$('a.zoomable').zoomable("destroy");
-
-
-## Initialization parameters
-
-Full parameter list is present in defaults variable, and is duplicated below:
-
-
-	var defaults = {
-        stage: undefined // Element inside which zoomed in content should be rendered. Defaults to document body.
-      , classNames: { // Look for (or generate) elements with these class names.
-            zooming : 'zooming'
-          , close : 'close'
-          , control: 'zoomableControl'
-          , canvas: 'zoomableCanvas'
-          , thumb: 'zoomableThumb'
-          , full: 'zoomableFull'
-      }
-      , ratio: 2.0 // Viewport width is multiplied by this value to determine zoomed in width
-      , seekImage: true // Ascend DOM level from trigger element to find nearest image to use as thumbnail. If set to false, no ascent would take place, and only images within initial context will be considered.
-      , clickCloses: true // Whether clicking anywhere on zoomed in image will stop zooming   
-      , activationEvent: 'click' // Override to use alternate event for all zoomable control interactions
-      , canvasStyle: { // Default style applied to canvas. Overriding replaces the whole object.
-          position: 'absolute'
-        , width: '100%'
-        , height: '100%'
-        , overflow: 'auto'
-      }
-      , imageStyle: { // Default style applied to images within canvas. Overriding replaces the whole object.
-          position: 'absolute'
-        , top: '0'
-        , left: '0'
-        , maxWidth: 'none'
-        , maxHeight: 'none'        
-      }
-      , stageHTML: function() { // Generator for HTML of zoomed in view. If overriding, you can call old function via Mobify.UI.Zoomable.defaults.stageHTML.call(this)
-            return '<div class="' + this._getClass('canvas') + '"><img class="'
-                + this._getClass('thumb') + '"><img class="'
-                + this._getClass('full') + '"></div>';
-      }
-      , globalStyle: function() { // Generator for global CSS (ignored if zoomable content injected into non-body element). If overriding, you can call old function via Mobify.UI.Zoomable.defaults.globalStyle.call(this)
-            var zooming = '.' + this._getClass('zooming');
-            return zooming + ' { overflow: hidden; }'
-              + zooming + ' > * { display: none !important; }'
-              + zooming + ' > .' + this._getClass('control') + ' { display: block !important; }';
-      }
-    };
-
 ## Limitations
 
 Zoomable relies on click event for activation and deactivation. This results in about ~300ms delay in iOS, as Mobile Safari waits to ensure that event in question is a single tap rather than built-in page zooming double tap. We do not bundle a quick tap implementation with zoomable, but you can attach a tap event manually. Here is an example of custom binding that uses [jQuery tappable](https://github.com/aanand/jquery.tappable.js/blob/master/jquery.tappable.js):
-
 
     var el = $('a.zoomable').zoomable();
     el.tappable(function() {

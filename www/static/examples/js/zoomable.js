@@ -56,6 +56,9 @@ Mobify.UI.Zoomable = (function() {
     var Zoomable = function(element, options) {
         this.options = $.extend({}, Zoomable.defaults, options);
         this.options.classNames = $.extend(defaults.classNames, this.options.classNames);
+        this.options.canvasStyle = $.extend(defaults.canvasStyle, this.options.canvasStyle);
+        this.options.imageStyle = $.extend(defaults.imageStyle, this.options.imageStyle);
+
         this.options.imageStyle.width = 100 * this.options.ratio + '%';
         if (!this.options.stage) {
             this.options.stage = $('body');
@@ -73,7 +76,7 @@ Mobify.UI.Zoomable = (function() {
     };
 
     Zoomable.prototype.makeElems = function() {
-        this.$stage = this.options.stage;
+        this.$stage = $(this.options.stage);
         this.$canvas = $(this.options.stageHTML.call(this)).addClass(this._getClass('control'));
         this.$canvas.first().css(this.options.canvasStyle);
 
