@@ -1175,6 +1175,16 @@ table td code {
 	padding-left: 20px;
 	white-space: nowrap;
 }
+.actions ul {
+	display: inline-block;
+	margin: 10px 0 0 20px;
+}
+.actions li {
+	margin: 0 0 0 1em;
+}
+.actions .btn {
+	margin-top: -1.5em;
+}
 .widget-single img {
 	/* temp throwaway styling */
 	display: inline-block;
