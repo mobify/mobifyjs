@@ -389,6 +389,9 @@ table td code {
 		background: linear-gradient(to bottom,  #f2a75c 0%,#f39a51 90.3%,#df8d4a 100%); /* W3C */
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2a75c', endColorstr='#df8d4a',GradientType=0 ); /* IE6-9 */
 	}
+	.navbar .nav > li:last-child > a.active {
+		margin-right: 0;
+	}
 	.navbar .nav > li > a:hover {
 		color: #eb804c;
 	}
@@ -403,9 +406,16 @@ table td code {
 		background: linear-gradient(to bottom,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* W3C */
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffba54', endColorstr='#ff9c3f',GradientType=0 ); /* IE6-9 */
 	}
-@media (max-width: 767px) {
+@media (max-width: 999px) {
 	.navbar {
 		padding: 2em 0 3em 0;
+	}
+	.navbar .nav li {
+		text-align: center;
+		float: left;
+		width: 50%;
+		padding: 0;
+		margin: 0;
 	}
 	.navbar-inner {
 		text-align: center;
@@ -421,7 +431,7 @@ table td code {
 	}
 	.navbar ul.nav {
 		float: none;
-		display: inline-block;
+		display: block;
 	}
 	.navbar .nav > li > a {
 		background: rgba(0,0,0,0.1);
@@ -435,24 +445,9 @@ table td code {
 		background: rgba(0,0,0,0.2);
 	}
 }
-@media (max-width: 480px) {
-	.navbar ul.nav {
-		display: block;
-	}
-	.navbar .nav li {
-		text-align: center;
-		float: left;
-		width: 50%;
-		padding: 0;
-		margin: 0;
-	}
-	.navbar .nav .nav-about {
-		display: none;
-	}
-}
-@media (min-width: 768px) and (max-width: 999px) {
-	.navbar .nav > li > a {
-		padding: 14px 14px 13px 14px;
+@media (min-width: 999px) {
+	.navbar .nav > li:last-child > a {
+		padding-right: 0;
 	}
 }
 
@@ -467,12 +462,17 @@ table td code {
 	background: rgba(255,255,255,0.15);
 	padding: 2em;
 	margin-bottom: 1em;
+	overflow: hidden;
 }
 	.lead-in h1 {
 		float: left;
 		color: #fff;
 		font-size: 2em;
 		width: 32.5%;
+	}
+	.lead-in p {
+		width: 67.5%;
+		float: right;
 	}
 .illustration {
 	display: block;
@@ -611,14 +611,18 @@ table td code {
 }
 .lead {
 	font-size: 1.4444em;
-	line-height: 2.153846em;
+	line-height: 1.6153845em;
 	text-align: center;
 	text-shadow: rgba(0,0,0,0.15) 0 2px 0;
+	margin: 1em 0 0.5em 0;
 }
 	.lead strong {
 		padding: 0;
 		background: none;
 	}
+.lead-mini {
+	line-height: 1.75em;
+}
 .well .row-fluid {
 	width: 100%;
 }
@@ -685,18 +689,70 @@ table td code {
 		width: 100%;
 		height: 100%;
 	}
+.social-proof {
+	background: #1e7e8b;
+	background: rgba(255,255,255,0.1);
+	margin: 0;
+	padding: 3em 0;
+}
+	.social-proof p.quote {
+		font-family: georgia, serif;
+		font-style: italic;
+		font-size: 1.2em;
+		line-height: 2;
+		color: #97c7d0;
+		margin: 0 0 0.5em 0;
+	}
+	.social-proof .clients h3 {
+		text-align: center;
+		font-size: 0.833333em;
+		color: #97c7d0;
+		margin-top: 0;
+	}
+	.social-proof .clients .well {
+		text-align: center;
+		background: #7bb3bb;
+		padding: 20px 10px;
+	}
+	.social-proof .clients span {
+		display: inline-block;
+		width: 262px;
+		height: 110px;
+		max-width: 100%;
+		font-size: 0;
+		text-indent: -999px;
+		overflow: hidden;
+		background-image: url(../img/logos.min.png);
+		background-repeat: no-repeat;
+		background-position: 50% 50%;
+		background-size: contain;
+	}
+
 .install-client {
-	padding-top: 2.5em;
+	padding: 4em 0 3em 0;
 }
 .install-container {
 	padding: 5px;
 }
 .install-summary {
-	padding: 2em 3.5em;
+	padding: 1em 3.5em;
 }
+	.install-summary h2 {
+		font-size: 1.4444em;
+		line-height: 1.076923em;
+		color: #032c32;
+		text-shadow: none;
+		text-align: left;
+		padding: 0;
+		margin: 0.5em 0;
+	}
+	.install-summary .actions {
+		display: block;
+		clear: left;
+		padding-top: 0.5em;
+	}
 	.install-summary a {
-		padding: 1em 0 0 0;
-		padding-right: 1em;
+		padding: 0 1em 0 0;
 		white-space: nowrap;
 	}
 	.install-summary a:last-child {
@@ -761,28 +817,43 @@ table td code {
 	.installing-tag strong {
 		color: #7a9fa5;
 	}
-.remix-site {
+.how-it-works {
 	padding: 2em 0 3.5em 0;
 }
-	.remix-site .clients h3 {
-		text-align: center;
-		font-size: 0.833333em;
-		color: #97c7d0;
+	.how-it-works .more {
+		display: block;
 	}
-	.remix-site .clients .well {
-		text-align: center;
-		background: #7bb3bb;
-		padding: 20px 10px;
+	.how-it-works .span4 {
+		padding-top: 180px;
+		position: relative;
 	}
-	.remix-site .clients span {
-		display: inline-block;
-		width: 262px;
-		height: 110px;
-		max-width: 100%;
-		font-size: 0;
-		text-indent: -999px;
-		overflow: hidden;
-		background: url(../img/logos.min.png) 0 0 no-repeat;
+	.how-it-works .span4:before {
+		content: "";
+		display: block;
+		position: absolute;
+		top: 10px;
+		left: 0;
+		width: 100%;
+		height: 146px;
+		background-repeat: no-repeat;
+		background-position: 50% 50%;
+		background-size: contain;
+	}
+	.how-it-works .manipulate-dom:before {
+		top: 21px;
+		width: 80%;
+		height: 125px;
+		background-image: url(../img/illustration-dom.min.png);
+	}
+	.how-it-works .desktop-content:before {
+		width: 90%;
+		height: 146px;
+		background-image: url(../img/illustration-content.min.png);
+	}
+	.how-it-works .responsive:before {
+		top: 43px;
+		height: 80px;
+		background-image: url(../img/illustration-responsive.min.png);
 	}
 .next-level {
 	background: #1e7e8b;
@@ -805,16 +876,16 @@ table td code {
 	}
 	.next-level .btn {
 		margin-top: 1em;
-		padding: 18px 20px;
+		padding: 18px 18px;
+	}
+	.next-level .btn span {
+		color: #f6d9bf;
+		display: block;
+		text-shadow: none;
 	}
 @media (max-width: 320px) {
 	.video .play i {
 		top: 40%;
-	}
-}
-@media (min-width: 480px) {
-	.lead {
-		text-align: left;
 	}
 }
 @media (max-width: 767px) {
@@ -833,11 +904,17 @@ table td code {
 		-moz-box-shadow: #ebf0f1 0 9px 12px 0;
 		box-shadow: #ebf0f1 0 9px 12px 0;		
 	}
-	.remix-site .clients h3 {
+	.how-it-works .clients h3 {
 		padding-top: 2em;
 	}
 }
 @media (min-width: 768px) {
+	.lead {
+		text-align: left;
+	}
+	.how-it-works p {
+		padding-right: 20px;
+	}
 	.next-level .graphic img {
 		margin: 0.5em 0 0 0;
 	}
@@ -846,9 +923,6 @@ table td code {
 	}
 	.row-fluid .video-container {
 		float: right;
-	}
-	.install-summary {
-		padding-top: 4em;
 	}
 	.install-instructions {
 		-webkit-box-shadow: inset #ebf0f1 12px 0 12px 0;
@@ -873,7 +947,7 @@ table td code {
 }
 
 
-/* Home Page Variation: show tag info */
+
 
 
 /* Home Page Variation: Display Video */
@@ -1138,10 +1212,20 @@ table td code {
 		background-image: url(../img/sprites@2x.min.png);
 		background-size: 237px 189px;
 	}
-	.remix-site .clients span {
+	.social-proof .clients span {
 		background-image: url(../img/logos@2x.min.png);
-		background-size: 100% auto;
 	}
+
+	.how-it-works .manipulate-dom:before {
+		background-image: url(../img/illustration-dom@2x.min.png);
+	}
+	.how-it-works .desktop-content:before {
+		background-image: url(../img/illustration-content@2x.min.png);
+	}
+	.how-it-works .responsive:before {
+		background-image: url(../img/illustration-responsive@2x.min.png);
+	}
+
 	.shaded {
 		-webkit-box-shadow: rgba(0,0,0,0.15) 0 1.5px 0;
 		-moz-box-shadow: rgba(0,0,0,0.15) 0 1.5px 0;

@@ -109,5 +109,77 @@ This happens because `document.getElementById` returns `null`.
 
 If you might exclude elements that a script rely on from your mobified
 site, and it is possible to alter the contents of the script, we
-recommend TRUNCATED! Please download pandoc if you want to convert large
-files.
+recommend you update your scripts to fail gracefully in the event of
+unexpected conditions. For example we could update our counter script to
+the following:
+
+    var counterEl = document.getElementById('counter');
+    if (counterEl) {
+        counterEl.innerHTML = parseInt(counterEl.innerHTML) + 1;
+    }
+
+If it is not possible to alter the script, we recommend adding the
+required elements into your template before the script executes:
+
+    <div style="display: none">
+        <div id="counter"></div>
+    </div>
+
+Now the script won't cause an error!
+
+Note that it may be possible to ignore script errors if their
+functionality does not affect your transformation.
+
+Advanced techniques for handling scripts
+----------------------------------------
+
+### Including mobile specific scripts in your template
+
+By default the Dust.js templating engine doesn't preserve whitespace.
+This is great for most HTML but problematic for things like scripts
+where whitespace is significant, for example, with single line comments.
+To avoid the issue, use the `{{ '{%' }}script}...{/script} ... {/script}` template pragma
+instead of the `<script>` tag when working with inline scripts:
+
+    <!-- BAD -->
+    <script></script>
+
+    <!-- GOOD -->
+    {{ '{%' }}script}{/script}
+
+Whitespace is correctly preserved inside the `{{ '{%' }}script}...{/script}` pragma and as a
+bonus, the JavaScript is minified during deployment!
+
+External scripts can be written in templates as normal:
+
+    <script src="/path/to/script.js"></script>
+
+Paths used inside your templates are resolved relative to the document's
+domain, so if you'd like to reference a script from your Mobify project
+use:
+
+    <script src="{config.configDir}path/to/script.js"></script>
+
+### Removing specific scripts
+
+Sometimes it may be necessary to remove a specific script from the
+mobified page. For example, you may want to remove a chat room script
+provided by `chat.js` from your mobile website. To remove `chat.js`
+script:
+
+    'script': function() {
+        var $script = $('script').remove();
+        return $script.not('[x-src*="chat.js"]);
+    }
+
+We select all scripts from the source DOM and then store all scripts but
+`chat.js` in the key `script`.
+
+### Removing all scripts
+
+To remove all scripts, remove them from the source DOM but do not render
+them in the template:
+
+    'script': function(cont) {
+        return $('script').remove()
+    }
