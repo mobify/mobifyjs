@@ -5,21 +5,58 @@
 .m-accordion .header {
     height: 54px;
     padding: 0 20px;
-    border-top: 1px solid #ededed;
-    border-bottom: 1px solid #ededed;
-    background: white;
-    background: -webkit-linear-gradient(white, #F6F6F6);
-    background: -ms-linear-gradient(white, #F6F6F6);
-    background: linear-gradient(white, #F6F6F6);
+    border: solid 1px #ededed;
+    border-width: 1px 0;
+    background: #ffffff; /* Old browsers */
+    background: -moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f6f6f6)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #ffffff 0%,#f6f6f6 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #ffffff 0%,#f6f6f6 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #ffffff 0%,#f6f6f6 100%); /* W3C */
     line-height: 52px;
+    cursor: pointer;
 }
+    .m-accordion .header:hover, .m-accordion .header:focus {    
+        z-index: 2;
+        background: #ffffff; /* Old browsers */
+        background: -moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f6f6f6)); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  #f6f6f6 0%,#e6e6e6 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  #ffffff 0%,#f6f6f6 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  #ffffff 0%,#f6f6f6 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  #f6f6f6 0%,#f0f0f0 100%); /* W3C */
+        border-bottom-color: #d6d6d6;
+    }
+    .m-accordion .m-item:first-child .header {
+        -webkit-border-top-left-radius: 9px;
+        -webkit-border-top-right-radius: 9px;
+        -moz-border-radius-topleft: 9px;
+        -moz-border-radius-topright: 9px;
+        border-top-left-radius: 9px;
+        border-top-right-radius: 9px;
+    }
+    .m-accordion .m-item:last-child .header, .m-accordion .m-active:last-child .inner-content {
+        -webkit-border-bottom-left-radius: 9px;
+        -webkit-border-bottom-right-radius: 9px;
+        -moz-border-radius-bottomleft: 9px;
+        -moz-border-radius-bottomright: 9px;
+        border-bottom-left-radius: 9px;
+        border-bottom-right-radius: 9px;
+    }
+    .m-accordion .m-active:last-child .header {
+        -webkit-border-radius: 0;
+        -moz-border-radius: 0;
+        border-radius: 0;
+    }
+
 
 .m-accordion .header a {
     color: black;
 }
 
 .m-accordion .inner-content {
-    padding: 15px 10px 10px;
+    padding: 10px 20px;
     background: white;
 }
 
