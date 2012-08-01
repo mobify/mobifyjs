@@ -131,8 +131,8 @@ title: Mobify.js Accordion Examples
 </ul>
 
 
-<h2>Basic CSS Indicators</h2>
-<p>The basic accordion control with image-less CSS indicators that reveal when a header is expanded or collapsed.</p>
+<h2>Textual Indicators</h2>
+<p>The basic accordion control with +/- CSS indicators that reveal when a header is expanded or collapsed.</p>
 <ul class="m-accordion m-indicators-css">
     <li class="m-item">
         <h3 class="m-header">
@@ -167,8 +167,8 @@ title: Mobify.js Accordion Examples
 </ul>
 
 
-<h2>Advanced CSS Indicators</h2>
-<p>The basic accordion control with more advanced CSS-only indicators in the same style as the image indicators.</p>
+<h2>CSS-only Indicators</h2>
+<p>The same style as the image indicators above, but built with CSS-only instead of images.</p>
 <ul class="m-accordion m-indicators-css m-css-advanced">
     <li class="m-item">
         <h3 class="m-header">
