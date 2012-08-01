@@ -106,7 +106,6 @@ Mobify.UI.Accordion = (function($, Utils) {
     Accordion.prototype.bind = function() {
         var $element = this.$element
             , transitioning = false
-            , isopen = false
             , xy
             , dxy
             , dragRadius = this.dragRadius;
@@ -115,7 +114,8 @@ Mobify.UI.Accordion = (function($, Utils) {
             // recalculate proper height
             transitioning = false;
             var height = 0;
-            if (!isopen) $('.m-item.m-active', $element).removeClass('m-active');
+            var $item = $(this).parent();
+            if ($item.hasClass('m-closed')) $(this).parent().removeClass('m-active');
             $('.m-item', $element).each(function(index) {
                 var $item = $(this);
                 height += $item.height();
@@ -124,24 +124,27 @@ Mobify.UI.Accordion = (function($, Utils) {
         };
 
         function close($item) {
-            isopen = false;
+            $item.removeClass('m-opened');
+            $item.addClass('m-closed')
             var $content = $item.find('.content');
             if(!Utils.events.transitionend) $item.toggleClass('m-active');
             $content.css('max-height', 0)
         };
         
         function open($item) {
-            isopen = true;
             var $content = $item.find('.content');
             $item.toggleClass('m-active');
+            $item.removeClass('m-closed');
+            $item.addClass('m-opened')
+
+            var contentChildren = $content.children();
+            // determine which height function to use (outerHeight not supported by zepto)
+            var contentHeight = ('outerHeight' in contentChildren) ? contentChildren['outerHeight']() : contentChildren['height']();
+            $content.css('max-height', contentHeight * 1.5 +'px'); 
 
             // if transitions are supported, minimize browser reflow
             if (Utils.events.transitionend) {
-                var contentChildren = $content.children();
-                // determine which height function to use (outerHeight not supported by zepto)
-                var contentHeight = ('outerHeight' in contentChildren) ? contentChildren['outerHeight']() : contentChildren['height']();
                 $element.css('min-height', $element.height() + contentHeight + 'px');
-                $content.css('max-height', contentHeight * 1.5 +'px');
             }
         };
 
@@ -199,7 +202,7 @@ Mobify.UI.Accordion = (function($, Utils) {
             .on('click', click);
 
         if (Utils.events.transitionend) {
-            $element.on(Utils.events.transitionend, endTransition);
+            $element.find('.content').on(Utils.events.transitionend, endTransition);
         }
         
     };
