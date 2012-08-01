@@ -1118,6 +1118,7 @@ table td code {
 		background-image: url(../img/illustration-modules-carousel.min.png);
 	}
 	.widget-gallery .accordion a:before {
+		top: 25px;
 		height: 115px;
 		background-image: url(../img/illustration-modules-accordion.min.png);
 	}
@@ -1127,7 +1128,7 @@ table td code {
 		background-image: url(../img/illustration-modules-zoomable.min.png);
 	}
 	.widget-gallery .coming-soon a:before {
-		top: 40px;
+		top: 50px;
 		height: 70px;
 		background-image: url(../img/illustration-modules-comingsoon.min.png);
 	}
@@ -1155,9 +1156,6 @@ table td code {
 		background-color: rgba(0,0,0,0.2);
 		border: solid 1px rgba(255,255,255,0.025);
 		box-shadow: rgba(255, 255, 255, 0.1) 0 0 7px;
-	}
-	.widget-gallery li.coming-soon a, .widget-gallery li.coming-soon a:visited {
-		padding-top: 130px;
 	}
 	.widget-gallery h3 {
 		text-align: left;
