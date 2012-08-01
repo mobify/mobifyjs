@@ -1,0 +1,33 @@
+.m-accordion {
+    list-style: none;
+}
+.m-accordion li {
+    list-style: none;
+    margin: 0;
+}
+.m-accordion .m-content {
+    -webkit-transition: max-height 0.5s ease;
+    -moz-transition: max-height 0.5s ease;
+    -o-transition: max-height 0.5s ease;
+    transition: max-height 0.5s ease;
+    overflow: hidden;
+    max-height: 0;
+}
+.m-accordion .m-active .m-content {
+    max-height: 10000px; /* IE hack */
+}
+
+.m-accordion .m-header {
+    z-index: 1;
+    position: relative;
+    margin-top: -1px;
+    pointer-events: cursor; /* For iOS */
+}
+
+.m-accordion h3 {
+    margin: 0;
+}
+
+.m-accordion .m-header > a {
+    pointer-events: none;   
+}
