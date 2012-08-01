@@ -5,21 +5,19 @@
     list-style: none;
     margin: 0;
 }
-
-.m-accordion .content {
-    -webkit-transition: max-height 1s ease;
-    -moz-transition: max-height 1s ease;
-    -o-transition: max-height 1s ease;
-    transition: max-height 1s ease;
+.m-accordion .m-content {
+    -webkit-transition: max-height 0.5s ease;
+    -moz-transition: max-height 0.5s ease;
+    -o-transition: max-height 0.5s ease;
+    transition: max-height 0.5s ease;
     overflow: hidden;
     max-height: 0;
 }
-
-.m-accordion .m-active .content {
+.m-accordion .m-active .cm-ontent {
     max-height: 10000px; /* IE hack */
 }
 
-.m-accordion .header {
+.m-accordion .m-header {
     z-index: 1;
     position: relative;
     margin-top: -1px;
@@ -30,6 +28,6 @@
     margin: 0;
 }
 
-.m-accordion .header > a {
+.m-accordion .m-header > a {
     pointer-events: none;   
 }

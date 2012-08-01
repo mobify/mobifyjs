@@ -124,13 +124,13 @@ Mobify.UI.Accordion = (function($, Utils) {
         function close($item) {
             $item.removeClass('m-opened');
             $item.addClass('m-closed')
-            var $content = $item.find('.content');
+            var $content = $item.find('.m-content');
             if(!Utils.events.transitionend) $item.toggleClass('m-active');
             $content.css('max-height', 0)
         };
         
         function open($item) {
-            var $content = $item.find('.content');
+            var $content = $item.find('.m-content');
             $item.toggleClass('m-active');
             $item.removeClass('m-closed');
             $item.addClass('m-opened')
@@ -180,21 +180,21 @@ Mobify.UI.Accordion = (function($, Utils) {
 
         // Open items that are hash linked
         var hash = location.hash;
-        var $hashitem = $element.find('.header a[href="'+hash+'"]');
+        var $hashitem = $element.find('.m-header a[href="'+hash+'"]');
   
         if ($hashitem.length) {
             open($hashitem.parent());
         }
 
         // bind events
-        $element.find('.header')
+        $element.find('.m-header')
             .on(Utils.events.down, down)
             .on(Utils.events.move, move)
             .on(Utils.events.up, up)
             .on('click', click);
 
         if (Utils.events.transitionend) {
-            $element.find('.content').on(Utils.events.transitionend, endTransition);
+            $element.find('.m-content').on(Utils.events.transitionend, endTransition);
         }
         
     };

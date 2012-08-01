@@ -4,41 +4,41 @@ title: Mobify.js Accordion Module
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion.css">
-<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion-controls.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion-style.css">
 
 # Accordion
 
-Try it out:
+An expanding accordion menu for two-level nav systems.
 
 <ul class="m-accordion">
     <li class="m-item">
-        <h3 class="header">
+        <h3 class="m-header">
             <a>Tab1</a>
         </h3>
-        <div class="content">
-            <div class="inner-content">
+        <div class="m-content">
+            <div class="m-inner-content">
                 <h2>Content 1</h2>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui icia deserunt mollit anim id est laborum.</p>
             </div>
         </div>
     </li>
     <li class="m-item">
-        <h3 class="header">
+        <h3 class="m-header">
             <a>Tab2</a>
         </h3>
-        <div class="content">
-            <div class="inner-content">
+        <div class="m-content">
+            <div class="m-inner-content">
                 <h2>Content 2</h2>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p> 
             </div>
         </div>
     </li>
     <li class="m-item">
-        <h3 class="header">
+        <h3 class="m-header">
             <a>Tab3</a>
         </h3>
-        <div class="content">
-            <div class="inner-content">
+        <div class="m-content">
+            <div class="m-inner-content">
                 <h2>Content 3</h2>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui icia deserunt mollit anim id est laborum.</p>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui icia deserunt mollit anim id est laborum.</p>
@@ -49,14 +49,12 @@ Try it out:
 
 <div class="btn-container">
 	<a href="{{ site.baseurl }}/modules/accordion-examples" class="btn btn-primary">Download Accordion</a>
-	<a href="{{ site.baseurl }}/modules/accordion-examples" class="see-examples">See more examples</a>
+	<p><a href="{{ site.baseurl }}/modules/accordion-examples" class="see-examples">See more examples</a>
+	or
+	<a href="http://jsfiddle.net/fPQma/2/">Check it out on jsFiddle</a>
+	</p>
 </div>
 
-
-
-## Check it out on jsFiddle
-
-[http://jsfiddle.net/fPQma/1/](http://jsfiddle.net/fPQma/1/)
 
 ## Usage
 
@@ -65,45 +63,47 @@ Try it out:
 
     <!-- the markup -->
 	<ul class="m-accordion">
-		<!-- the items -->
-	    <li class="m-item">
-	        <h3 class="header">
-	        	<!-- header title -->
-	            <a>Tab1</a>
-	        </h3>
-	        <div class="content">
-	            <div class="inner-content">
-	            	<!-- content for item -->
-	                <h2>Content 1</h2>
-	                <h2>Lorem Ipsum</h2>
-	            </div>
-	        </div>
-	    </li>
-	    <li class="m-item">
-	        <h3 class="header">
-	            <a>Tab2</a>
-	        </h3>
-	        <div class="content">
-	            <div class="inner-content">
-	                <h2>Content 2</h2>
-	                <p>Lorem Ipsum</p>
-	            </div>
-	        </div>
-	    </li>
-	    <li class="m-item">
-	        <h3 class="header">
-	            <a>Tab3</a>
-	        </h3>
-	        <div class="content">
-	            <div class="inner-content">
-	                <h2>Content 3</h2>
-	                <p>Lorem Ipsum</p>
-	            </div>
-	        </div>
-	    </li>
+	  <!-- the items -->
+	  <li class="m-item">
+	    <h3 class="header">
+	      <!-- header title -->
+	      <a>Tab1</a>
+	    </h3>
+        <div class="content">
+          <div class="inner-content">
+            <!-- content for item -->
+            <h2>Content 1</h2>
+            <h2>Lorem Ipsum</h2>
+          </div>
+        </div>
+	  </li>
+      <li class="m-item">
+        <h3 class="header">
+          <a>Tab2</a>
+        </h3>
+        <div class="content">
+          <div class="inner-content">
+            <h2>Content 2</h2>
+            <p>Lorem Ipsum</p>
+          </div>
+        </div>
+      </li>
+	  <li class="m-item">
+	    <h3 class="header">
+	      <a>Tab3</a>
+	    </h3>
+	    <div class="content">
+	      <div class="inner-content">
+	        <h2>Content 3</h2>
+	        <p>Lorem Ipsum</p>
+	      </div>
+	    </div>
+	  </li>
 	</ul>
 
-    <!-- include the JavaScript -->
+    <!-- include zepto.js or jquery.js -->
+    <script src="zepto.js"></script>
+    <!-- include accordion.js -->
     <script src="accordion.js"></script>
     <!-- construct the accordion -->
     <script>$('.m-accordion').accordion()</script>

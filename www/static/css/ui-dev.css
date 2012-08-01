@@ -1089,6 +1089,7 @@ table td code {
 .widget-gallery {
 	overflow: hidden;
 	clear: left;
+	padding-top: 2em;
 }
 .widget-gallery li {
 	margin: 0 2% 2% 0;
