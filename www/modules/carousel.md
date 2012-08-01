@@ -4,24 +4,12 @@ title: Mobify.js Carousel Module
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel.css">
-<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel-controls.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel-style.css">
 <style type="text/css">
 
 /* styling for this page */
 .m-carousel {
   padding-bottom: 30px;
-}
-.m-item {
-  margin-right: 20px;
-}
-.m-carousel .m-item img {
-    margin: 0;
-    padding: 0;
-    max-width: none;
-	width: 100%;
-    -webkit-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
-    -moz-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
-    box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
 }
 </style>
 
@@ -30,7 +18,7 @@ title: Mobify.js Carousel Module
 A configurable rotating content carousel for displaying images or
 arbitrary content.
 
-<div class="m-carousel m-carousel-example-4 m-center m-fluid">
+<div class="m-carousel m-fluid m-carousel-photos" id="m-carousel-example-4">
     <div class="m-carousel-inner">
         <div class="m-item">
             <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
@@ -66,9 +54,10 @@ arbitrary content.
 
     <!-- include carousel.css -->
     <link rel="stylesheet" href="carousel.css">
+    <link rel="stylesheet" href="carousel-style.css">
 
     <!-- the viewport -->
-    <div class="m-carousel">
+    <div class="m-carousel m-fluid m-carousel-photos">
       <!-- the slider -->
       <div class="m-carousel-inner">
         <!-- the items -->
@@ -108,10 +97,13 @@ their content width and/or any styling that restricts their width.
 To change the styling of the items, add the following classes to the 
 viewport:
 
+
 | Class       | Description                                            |
 |-------------|---------------------------------------------------------
 | `.m-fluid`  | Causes the width of items to resize to match the viewport width. |
-| `.m-center` | Causes the items to be center aligned, not left aligned (the default). | 
+| `.m-center` | Causes the items to be center aligned, not left aligned (the default). |
+
+
 
 
 ## Methods
