@@ -56,8 +56,9 @@ Mobify.UI.Utils = (function($) {
         return;
     };
 
-    // http://stackoverflow.com/questions/5023514/how-do-i-normalize-css3-transition-functions-across-browsers
+    // determine which transition event to use
     function whichTransitionEvent(){
+        // http://stackoverflow.com/questions/5023514/how-do-i-normalize-css3-transition-functions-across-browsers
         // hack for ios 3.1.* because of poor transition support.
         if (/iPhone\ OS\ 3_1/.test(navigator.userAgent)) {
             return undefined;
@@ -110,10 +111,14 @@ Mobify.UI.Accordion = (function($, Utils) {
             , dragRadius = this.dragRadius;
 
         function endTransition(){
+            // transition attached to .content elements, use parent to grab .item
+            var $item = $(this).parent();
+
+            // if the transition is ending
+            if ($item.hasClass('m-closed')) $(this).parent().removeClass('m-active');
+
             // recalculate proper height
             var height = 0;
-            var $item = $(this).parent();
-            if ($item.hasClass('m-closed')) $(this).parent().removeClass('m-active');
             $('.m-item', $element).each(function(index) {
                 var $item = $(this);
                 height += $item.height();
@@ -122,35 +127,42 @@ Mobify.UI.Accordion = (function($, Utils) {
         };
 
         function close($item) {
+            // toggle opened and closed classes
             $item.removeClass('m-opened');
-            $item.addClass('m-closed')
-            var $content = $item.find('.content');
-            if(!Utils.events.transitionend) $item.toggleClass('m-active');
-            $content.css('max-height', 0)
+            $item.addClass('m-closed');
+
+            // toggle active class on close only if there is no transition support
+            if(!Utils.events.transitionend) $item.removeClass('m-active');
+
+            // set max-height to 0 upon close
+            $item.find('.m-content').css('max-height', 0)
         };
         
         function open($item) {
-            var $content = $item.find('.content');
-            $item.toggleClass('m-active');
+            var $content = $item.find('.m-content');
+            $item.addClass('m-active');
             $item.removeClass('m-closed');
             $item.addClass('m-opened')
 
-            var contentChildren = $content.children();
             // determine which height function to use (outerHeight not supported by zepto)
+            var contentChildren = $content.children();
             var contentHeight = ('outerHeight' in contentChildren) ? contentChildren['outerHeight']() : contentChildren['height']();
             $content.css('max-height', contentHeight * 1.5 +'px'); 
 
-            // if transitions are supported, minimize browser reflow
+            // if transitions are supported, minimize browser reflow by adding the height
+            // of the to-be expanded content element to the height of the entire accordion
             if (Utils.events.transitionend) {
                 $element.css('min-height', $element.height() + contentHeight + 'px');
             }
         };
 
         function down(e) {
+            // get initial position on mouse/touch start
             xy = Utils.getCursorPosition(e);
         };
 
         function move(e) {
+            // update position upon move
             dxy = Utils.getCursorPosition(e);
         };
 
@@ -163,7 +175,7 @@ Mobify.UI.Accordion = (function($, Utils) {
                 if ((dx*dx) + (dy*dy) > dragRadius*dragRadius) return;
             }
 
-            // toggle open/close on item tapped
+            // close or open item depending on active class
             var $item = $(this).parent();
             if ($item.hasClass('m-active')) {
                 close($item);
@@ -178,23 +190,22 @@ Mobify.UI.Accordion = (function($, Utils) {
         };
 
 
-        // Open items that are hash linked
+        // Auto-open items that are hash linked
         var hash = location.hash;
-        var $hashitem = $element.find('.header a[href="'+hash+'"]');
+        var $hashitem = $element.find('.m-header a[href="'+hash+'"]');
   
         if ($hashitem.length) {
             open($hashitem.parent());
         }
 
         // bind events
-        $element.find('.header')
+        $element.find('.m-header')
             .on(Utils.events.down, down)
             .on(Utils.events.move, move)
             .on(Utils.events.up, up)
             .on('click', click);
-
         if (Utils.events.transitionend) {
-            $element.find('.content').on(Utils.events.transitionend, endTransition);
+            $element.find('.m-content').on(Utils.events.transitionend, endTransition);
         }
         
     };

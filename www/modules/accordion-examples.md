@@ -5,7 +5,6 @@ title: Mobify.js Accordion Examples
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion.css">
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion-style.css">
-<style type="text/css">
 
 .m-indicators-css .m-header {
     border-color: #f6dada;
@@ -138,6 +137,32 @@ title: Mobify.js Accordion Examples
     </li>
 </ul>
 
+### Code for this example:
+
+    <ul class="m-accordion">
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab1</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <h2>Content 1</h2>
+            <h2>Lorem Ipsum</h2>
+          </div>
+        </div>
+      </li>
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab2</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <h2>Content 2</h2>
+            <p>Lorem Ipsum</p>
+          </div>
+        </div>
+      </li>
+    </ul>
 
 
 <h2>Image Indicators</h2>
@@ -175,6 +200,34 @@ title: Mobify.js Accordion Examples
     </li>
 </ul>
 
+### Code for this example:
+
+    <ul class="m-accordion m-indicators-images">
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab1</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <h2>Content 1</h2>
+            <h2>Lorem Ipsum</h2>
+          </div>
+        </div>
+      </li>
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab2</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <h2>Content 2</h2>
+            <p>Lorem Ipsum</p>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+
 
 <h2>Textual Indicators</h2>
 <p>The basic accordion control with +/- CSS indicators that reveal when a header is expanded or collapsed.</p>
@@ -210,6 +263,33 @@ title: Mobify.js Accordion Examples
         </div>
     </li>
 </ul>
+
+### Code for this example:
+
+    <ul class="m-accordion m-indicators-css">
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab1</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <h2>Content 1</h2>
+            <h2>Lorem Ipsum</h2>
+          </div>
+        </div>
+      </li>
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab2</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <h2>Content 2</h2>
+            <p>Lorem Ipsum</p>
+          </div>
+        </div>
+      </li>
+    </ul>
 
 
 <h2>CSS-only Indicators</h2>
@@ -247,6 +327,33 @@ title: Mobify.js Accordion Examples
     </li>
 </ul>
 
+
+### Code for this example:
+
+    <ul class="m-accordion m-indicators-css m-css-advanced">
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab1</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <h2>Content 1</h2>
+            <h2>Lorem Ipsum</h2>
+          </div>
+        </div>
+      </li>
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab2</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <h2>Content 2</h2>
+            <p>Lorem Ipsum</p>
+          </div>
+        </div>
+      </li>
+    </ul>
 
 
 
