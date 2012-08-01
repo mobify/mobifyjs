@@ -406,9 +406,16 @@ table td code {
 		background: linear-gradient(to bottom,  #ffba54 0%,#ffaa47 90.3%,#ff9c3f 100%); /* W3C */
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffba54', endColorstr='#ff9c3f',GradientType=0 ); /* IE6-9 */
 	}
-@media (max-width: 767px) {
+@media (max-width: 999px) {
 	.navbar {
 		padding: 2em 0 3em 0;
+	}
+	.navbar .nav li {
+		text-align: center;
+		float: left;
+		width: 50%;
+		padding: 0;
+		margin: 0;
 	}
 	.navbar-inner {
 		text-align: center;
@@ -424,7 +431,7 @@ table td code {
 	}
 	.navbar ul.nav {
 		float: none;
-		display: inline-block;
+		display: block;
 	}
 	.navbar .nav > li > a {
 		background: rgba(0,0,0,0.1);
@@ -438,34 +445,9 @@ table td code {
 		background: rgba(0,0,0,0.2);
 	}
 }
-@media (max-width: 480px) {
-	.navbar ul.nav {
-		display: block;
-	}
-	.navbar .nav li {
-		text-align: center;
-		float: left;
-		width: 50%;
-		padding: 0;
-		margin: 0;
-	}
-	.navbar .nav .nav-about {
-		display: none;
-	}
-}
-@media (min-width: 768px) {
+@media (min-width: 999px) {
 	.navbar .nav > li:last-child > a {
 		padding-right: 0;
-	}
-}
-@media (min-width: 768px) and (max-width: 999px) {
-	.navbar .nav > li > a {
-		padding: 14px 14px 13px 14px;
-	}
-}
-@media (max-width: 999px) {
-	.navbar .nav > li > a.about {
-		display: none;
 	}
 }
 
