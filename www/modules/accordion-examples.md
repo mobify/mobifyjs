@@ -75,7 +75,7 @@ title: Mobify.js Accordion Examples
         <div class="m-content">
             <div class="m-inner-content">
                 <h2>Helvetica</h2>
-                <p> Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p> 
+                <p>Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p> 
             </div>
         </div>
     </li>
@@ -104,7 +104,7 @@ title: Mobify.js Accordion Examples
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Pickled keytar ethnic flexitarian, vegan ethical sartorial 8-bit yr williamsburg. Flexitarian typewriter viral, wolf banh mi gastropub letterpress street art mcsweeney's raw denim kogi semiotics blog.</p>
+                <p>Twee lo-fi Austin iphone, PBR farm-to-table small batch brunch food truck. Beard +1 chillwave, ennui Austin portland blog chambray 3 wolf moon fingerstache farm-to-table. Four loko pork belly lomo shoreditch biodiesel authentic. </p>
             </div>
         </div>
     </li>
@@ -114,7 +114,7 @@ title: Mobify.js Accordion Examples
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p> Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p> 
+                <p>Fixie retro photo booth portland. Pop-up PBR hella, fingerstache photo booth beard tumblr aesthetic craft beer. Lo-fi banh mi cred, VHS squid sartorial helvetica pork belly high life brooklyn carles. Sustainable shoreditch bicycle rights fixie butcher street art.</p> 
             </div>
         </div>
     </li>
@@ -124,7 +124,7 @@ title: Mobify.js Accordion Examples
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Trust fund mustache typewriter, portland artisan irony seitan master cleanse biodiesel ethnic banh mi bushwick squid semiotics truffaut. Marfa vinyl mumblecore, selvage beard kale chips gentrify four loko gluten-free messenger bag cliche vice forage.</p>
+                <p>Williamsburg skateboard raw denim typewriter brooklyn 8-bit. Direct trade raw denim pitchfork gastropub umami. Mumblecore +1 pinterest, ethical terry richardson skateboard mcsweeney's trust fund shoreditch cliche chambray. Gluten-free portland organic cray carles vice.</p>
             </div>
         </div>
     </li>
@@ -136,31 +136,31 @@ title: Mobify.js Accordion Examples
 <ul class="m-accordion m-indicators-css">
     <li class="m-item">
         <h3 class="m-header">
-            <a>Portland</a>
+            <a>8-bit</a>
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Pickled keytar ethnic flexitarian, vegan ethical sartorial 8-bit yr williamsburg. Flexitarian typewriter viral, wolf banh mi gastropub letterpress street art mcsweeney's raw denim kogi semiotics blog.</p>
+                <p>Truffaut bicycle rights mlkshk freegan williamsburg fingerstache. Kale chips before they sold out single-origin coffee, typewriter scenester craft beer +1. </p>
             </div>
         </div>
     </li>
     <li class="m-item">
         <h3 class="m-header">
-            <a>Willamsburg</a>
+            <a>Photo Booth</a>
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p> Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p> 
+                <p>Twee skateboard butcher wolf sriracha. Wes anderson wolf ennui tattooed, marfa raw denim craft beer carles locavore bushwick synth pinterest biodiesel pour-over. Raw denim scenester keytar, bespoke mixtape VHS mlkshk banh mi before they sold out fixie.</p> 
             </div>
         </div>
     </li>
     <li class="m-item">
         <h3 class="m-header">
-            <a>Austin</a>
+            <a>Messenger Bag</a>
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Trust fund mustache typewriter, portland artisan irony seitan master cleanse biodiesel ethnic banh mi bushwick squid semiotics truffaut. Marfa vinyl mumblecore, selvage beard kale chips gentrify four loko gluten-free messenger bag cliche vice forage.</p>
+                <p>Authentic food truck jean shorts, viral 3 wolf moon kale chips synth leggings bushwick. Beard sriracha iphone jean shorts, banksy whatever biodiesel.</p>
             </div>
         </div>
     </li>
@@ -172,31 +172,31 @@ title: Mobify.js Accordion Examples
 <ul class="m-accordion m-indicators-css m-css-advanced">
     <li class="m-item">
         <h3 class="m-header">
-            <a>Portland</a>
+            <a>Kale Chips</a>
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Pickled keytar ethnic flexitarian, vegan ethical sartorial 8-bit yr williamsburg. Flexitarian typewriter viral, wolf banh mi gastropub letterpress street art mcsweeney's raw denim kogi semiotics blog.</p>
+                <p>Iphone banksy fanny pack, portland pitchfork readymade messenger bag bushwick wes anderson mustache cardigan bespoke butcher mumblecore.</p>
             </div>
         </div>
     </li>
     <li class="m-item">
         <h3 class="m-header">
-            <a>Willamsburg</a>
+            <a>Pork Belly</a>
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p> Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p> 
+                <p>Gentrify vinyl wayfarers yr mumblecore, hoodie pop-up PBR VHS 3 wolf moon bushwick leggings ethical. Salvia put a bird on it squid retro before they sold out chillwave, street art lomo selvage keytar cardigan.</p> 
             </div>
         </div>
     </li>
     <li class="m-item">
         <h3 class="m-header">
-            <a>Austin</a>
+            <a>Raw Vegan Organic</a>
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Trust fund mustache typewriter, portland artisan irony seitan master cleanse biodiesel ethnic banh mi bushwick squid semiotics truffaut. Marfa vinyl mumblecore, selvage beard kale chips gentrify four loko gluten-free messenger bag cliche vice forage.</p>
+                <p>Locavore brooklyn next level american apparel. Banksy 3 wolf moon readymade, fanny pack kale chips farm-to-table fap letterpress. Four loko photo booth single-origin coffee art party, seitan Austin direct trade mixtape.</p>
             </div>
         </div>
     </li>
