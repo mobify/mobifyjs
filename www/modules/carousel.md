@@ -27,8 +27,8 @@ title: Mobify.js Carousel Module
 
 # Carousel
 
-A configurable rotating content carousel module. Images and arbitrary 
-content may be used.
+A configurable rotating content carousel for displaying images or
+arbitrary content.
 
 <div class="m-carousel m-carousel-example-4 m-center m-fluid">
   <div class="m-carousel-inner">
@@ -58,7 +58,7 @@ content may be used.
 </div>
 
 <div class="btn-container">
-	<a href="{{ site.baseurl }}/modules/carousel-examples" class="btn btn-primary">Download Carousel</a>
+	<a href="{{ site.baseurl }}/static/downloads/carousel.zip" class="btn btn-primary">Download Carousel</a>
 	<a href="{{ site.baseurl }}/modules/carousel-examples" class="see-examples">See more examples</a>
 </div>
 
@@ -69,30 +69,32 @@ content may be used.
 
     <!-- the viewport -->
     <div class="m-carousel">
-        <!-- the slider -->
-        <div class="m-carousel-inner">
-            <!-- the items -->
-            <div class="m-item m-active">
-                <img src="1.jpg">
-            </div>
-            <div class="m-item">
-                <img src="2.jpg">
-            </div>
-            <div class="m-item">
-                <img src="3.jpg">
-            </div>
+      <!-- the slider -->
+      <div class="m-carousel-inner">
+        <!-- the items -->
+        <div class="m-item m-active">
+          <img src="image1.jpg">
         </div>
-        <div>
-            <!-- use the `data-slide` attribute to create controls -->
-            <a href="#" data-slide="prev">Previous</a>
-            <a href="#" data-slide="1" class="m-active">1</a>
-            <a href="#" data-slide="2">2</a>
-            <a href="#" data-slide="3">3</a>
-            <a href="#" data-slide="next">Next</a>
+        <div class="m-item">
+          <img src="image2.jpg">
         </div>
+        <div class="m-item">
+          <img src="image3.jpg">
+        </div>
+      </div>
+      <div>
+        <!-- use the `data-slide` attribute to create controls -->
+        <a href="#" data-slide="prev">Previous</a>
+        <a href="#" data-slide="1" class="m-active">1</a>
+        <a href="#" data-slide="2">2</a>
+        <a href="#" data-slide="3">3</a>
+        <a href="#" data-slide="next">Next</a>
+      </div>
     </div>
 
-    <!-- include the JavaScript -->
+    <!-- include zepto.js or jquery.js -->
+    <script src="zepto.js"></script>
+    <!-- include carousel.js -->
     <script src="carousel.js"></script>
     <!-- construct the carousel -->
     <script>$('.m-carousel').carousel()</script>
@@ -100,7 +102,10 @@ content may be used.
 
 ## Classes
 
-To control the styling of the carousel add the following classes to the
+By default, items are center aligned and their width is determined by
+their content width and/or any styling that restricts their width.
+
+To change the styling of the items, add the following classes to the 
 viewport:
 
 | Class       | Description                                            |
@@ -108,8 +113,6 @@ viewport:
 | `.m-fluid`  | Causes the width of items to resize to match the viewport width. |
 | `.m-center` | Causes the items to be center aligned, not left aligned (the default). | 
 
-By default, the width of the items is determined by the content width
-and/or by any styling that restricts its width.
 
 ## Methods
 
@@ -146,7 +149,7 @@ Moves the carousel one item to the left.
 
 ### .carousel('move', x)
 
-Moves the carousel to a specific index (1-based).
+Moves the carousel to a index `x` (1-based).
 
     $('.m-carousel').carousel('move', 1);
 
@@ -178,7 +181,46 @@ The viewport emits the following events:
 | beforeSlide   | previousIndex, newIndex   | Fired before the carousel moves.          |
 | afterSlide    | previousIndex, newIndex   | Fired after the carousel begins moving.   |
 
-## Compatability
+## Browser Compatability
+
+### Mobile Browsers
+
+The following mobile browsers are fully supported:
+
+| Browser           | Version |
+|-------------------|---------|
+| Mobile Safari     | 3.1.3+  |
+| Android Browser   | 2.1+    |
+| Android Chrome    | 1.0+    |
+| Android Firefox   | 1.0+    |
+
+The following mobile browsers have degraded support:
+
+| Browser           | Version |
+|-------------------|---------|
+| Windows Phone     | 7.5     |
+
+### Desktop Browsers
+
+The follow desktop browsers are fully supported:
+
+| Browser           | Version |
+|-------------------|---------|
+| Safari            | 4.0+    |
+| Firefox           | 4.0+    |
+| Chrome            | 12.0+   |
+| Opera             | 12.0+   |
+| Internet Explorer | 10.0+   |
+
+The following desktop browsers have degraded support:
+
+| Browser           | Version |
+|-------------------|---------|
+| Internet Explorer | 8.0,9.0 |
+| Firefox           | 3.5,3.6 |
+
+
+<!--
 
 | Browser           | Version | Support               |
 |-------------------|---------|-----------------------|
@@ -196,6 +238,8 @@ The viewport emits the following events:
 | Chrome (Android)  | 1.0+    | Supported             |
 | Firefox (Android) | 1.0+    | Supported             |
 | Windows Phone     | 7.5     | Degraded. No transitions. No touch (dragging). Next/Previous must be provided. |
+
+-->
 
 <script src="{{ site.baseurl }}/static/examples/js/carousel.js"></script>
 <script>$('.m-carousel').carousel();</script>
