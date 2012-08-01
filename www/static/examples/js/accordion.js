@@ -106,8 +106,7 @@ Mobify.UI.Accordion = (function($, Utils) {
     Accordion.prototype.bind = function() {
         var $element = this.$element
             , transitioning = false
-            , dragging = false
-            , canceled = false
+            , isopen = false
             , xy
             , dxy
             , dragRadius = this.dragRadius;
@@ -116,7 +115,8 @@ Mobify.UI.Accordion = (function($, Utils) {
             // recalculate proper height
             transitioning = false;
             var height = 0;
-            $('.m-item').each(function(index) {
+            if (!isopen) $('.m-item.m-active', $element).removeClass('m-active');
+            $('.m-item', $element).each(function(index) {
                 var $item = $(this);
                 height += $item.height();
             });
@@ -124,14 +124,16 @@ Mobify.UI.Accordion = (function($, Utils) {
         };
 
         function close($item) {
+            isopen = false;
             var $content = $item.find('.content');
-            $item.toggleClass('active');
-            $content.removeAttr('style')
+            if(!Utils.events.transitionend) $item.toggleClass('m-active');
+            $content.css('max-height', 0)
         };
         
         function open($item) {
+            isopen = true;
             var $content = $item.find('.content');
-            $item.toggleClass('active');
+            $item.toggleClass('m-active');
 
             // if transitions are supported, minimize browser reflow
             if (Utils.events.transitionend) {
@@ -168,7 +170,7 @@ Mobify.UI.Accordion = (function($, Utils) {
 
             // toggle open/close on item tapped
             var $item = $(this).parent();
-            if ($item.hasClass('active')) {
+            if ($item.hasClass('m-active')) {
                 close($item);
             }
             else {

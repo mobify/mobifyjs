@@ -1,6 +1,6 @@
 ---
 layout: modules
-title: Mobify.js Carousel Module
+title: Mobify.js Accordion Module
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion.css">
@@ -51,6 +51,12 @@ Try it out:
 	<a href="{{ site.baseurl }}/modules/accordion-examples" class="btn btn-primary">Download Accordion</a>
 	<a href="{{ site.baseurl }}/modules/accordion-examples" class="see-examples">See more examples</a>
 </div>
+
+
+
+## Check it out on jsFiddle
+
+[http://jsfiddle.net/fPQma/](http://jsfiddle.net/fPQma/)
 
 ## Using mobify-accordion.js
 
@@ -125,6 +131,28 @@ Restores the tap, mouse, and other event handlers for the accordion.
 Unbinds the events from the accordion, and removes it from the DOM.
 
     $('.m-accordion').accordion('destroy');
+
+## Browser Compatibility
+
+
+| Browser           | Version | Support               |
+|-------------------|---------|-----------------------|
+| Safari            | 4.0+    | Supported.            |
+| Firefox           | 3.5-3.6 | Degraded. No transitions. |
+| Firefox           | 4.0+    | Supported             |
+| Chrome            | 9.0+    | Supported             |
+| Opera             | 12.0+   | Supported.            |
+| Internet Explorer | 6-7.0   | Not Supported         |
+| Internet Explorer | 8.0     | Degraded. No transitions. |
+| Internet Explorer | 9.0     | Degraded. No transitions. |
+| Internet Explorer | 10.0    | Supported             |
+| Mobile Safari     | 3.1.*   | Degraded. No transitions             |
+| Mobile Safari     | 4.0+    | Supported             |
+| Android Browser   | 2.1     | Not Supported         |
+| Android Browser   | 2.2+    | Supported         |
+| Chrome (Android)  | 1.0+    | Supported             |
+| Firefox (Android) | 1.0+    | Supported             |
+| Windows Phone     | 7.5     | Degraded. No transitions. |
 
 <script src="{{ site.baseurl }}/static/examples/js/accordion.js"></script>
 <script>
