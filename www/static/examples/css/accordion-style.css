@@ -94,7 +94,7 @@
 /* Accordion with CSS indicators */
 .m-indicators-css .m-header:after {
     content : "+";
-    color: #999;
+    color: #900;
     text-shadow: #fff 0 1px 0;
     display: block;
     position: absolute;

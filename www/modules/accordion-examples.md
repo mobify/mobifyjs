@@ -7,19 +7,58 @@ title: Mobify.js Accordion Examples
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion-style.css">
 <style type="text/css">
 
+.m-indicators-css .m-header {
+    border-color: #f6dada;
+    background: #fdf7f7; /* Old browsers */
+    background: -moz-linear-gradient(top,  #fdf7f7 0%, #fae9e9 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fdf7f7), color-stop(100%,#fae9e9)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #fdf7f7 0%,#fae9e9 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #fdf7f7 0%,#fae9e9 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #fdf7f7 0%,#fae9e9 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #fdf7f7 0%,#fae9e9 100%); /* W3C */
+}
+.m-indicators-css .m-header a {
+    color: #600;
+}
+.m-indicators-css .m-header:hover {
+    background: #fae9e9;
+    border-color: #f3cece;
+}
+.m-indicators-css .m-header:after {
+    color: #900;
+}
+
+
+
+.m-css-advanced .m-header {
+    border-color: #d3e2e7;
+    background: #e9f0f3; /* Old browsers */
+    background: -moz-linear-gradient(top,  #e9f0f3 0%, #dfeaed 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e9f0f3), color-stop(100%,#dfeaed)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #e9f0f3 0%,#dfeaed 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #e9f0f3 0%,#dfeaed 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #e9f0f3 0%,#dfeaed 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #e9f0f3 0%,#dfeaed 100%); /* W3C */
+}
+.m-css-advanced .m-header:hover {
+    background: #dfeaed;
+    border-color: #c4d8df;
+}
+.m-css-advanced .m-header a {
+    color: #32525c;
+}
 .m-css-advanced .m-header:after {
     color: rgba(255,255,255,0.9);
     font-weight: normal;
     text-align: center;
     text-shadow: none;
-    background: #bfbfbf;
-    background: #c5c5c5; /* Old browsers */
-    background: -moz-linear-gradient(top,  #c5c5c5 1%, #acacac 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#c5c5c5), color-stop(100%,#acacac)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #c5c5c5 1%,#acacac 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #c5c5c5 1%,#acacac 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #c5c5c5 1%,#acacac 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #c5c5c5 1%,#acacac 100%); /* W3C */
+    background: #1984b2; /* Old browsers */
+    background: -moz-linear-gradient(top,  #1984b2 0%, #006b99 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1984b2), color-stop(100%,#006b99)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #1984b2 0%,#006b99 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #1984b2 0%,#006b99 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #1984b2 0%,#006b99 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #1984b2 0%,#006b99 100%); /* W3C */
     font-size: 22px;
     line-height: 16px;
     width: 20px;
@@ -34,16 +73,22 @@ title: Mobify.js Accordion Examples
 }
 .m-css-advanced .m-header:hover:after {
     color: #fff;
-    background: #909090;
+    background: #198ebf; /* Old browsers */
+    background: -moz-linear-gradient(top,  #198ebf 0%, #0075a6 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#198ebf), color-stop(100%,#0075a6)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #198ebf 0%,#0075a6 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #198ebf 0%,#0075a6 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #198ebf 0%,#0075a6 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #198ebf 0%,#0075a6 100%); /* W3C */
 }
 .m-css-advanced .m-active .m-header:after {
-    background: #999;
-    background: -moz-linear-gradient(top,  #8a8a8a 0%, #a3a3a3 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#8a8a8a), color-stop(100%,#a3a3a3)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #8a8a8a 0%,#a3a3a3 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #8a8a8a 0%,#a3a3a3 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #8a8a8a 0%,#a3a3a3 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #8a8a8a 0%,#a3a3a3 100%); /* W3C */
+    background: #015c8a; /* Old browsers */
+    background: -moz-linear-gradient(top,  #015c8a 0%, #1a75a3 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#015c8a), color-stop(100%,#1a75a3)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #015c8a 0%,#1a75a3 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #015c8a 0%,#1a75a3 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #015c8a 0%,#1a75a3 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #015c8a 0%,#1a75a3 100%); /* W3C */
     -webkit-box-shadow: #fff 0 -1px 0;
     -moz-box-shadow: #fff 0 -1px 0;
     box-shadow: #fff 0 -1px 0;
