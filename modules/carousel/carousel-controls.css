@@ -18,7 +18,7 @@
 }
 
 
-
+   
 /* Carousel controls: Bulleted */
 .m-carousel-bulleted a {
     line-height: 0;
@@ -149,20 +149,14 @@
 /* extra bits */
 
 /* captions */
-.caption {
+.m-caption {
   margin: 0;
   padding: 10px;
-  width: 100%;
   height: auto;
-  background: rgba(0,0,0,0.7);
   text-align: center;
-  bottom: 0;
-  position: absolute;
-  z-index: 9;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
 }
+
+
 
 
 
@@ -193,4 +187,73 @@
   -ms-transform: scale(1);
   -o-transform: scale(1);
   transform: scale(1);
+}
+
+/* Default Themes/Sytles for Slider */
+
+.m-fluid .m-item {
+    margin-right: 20px;
+}
+
+/* Fluid Width Photo Carousel
+ * .m-carousel.m-fluid.m-carousel-photos
+ */
+
+.m-carousel-photos {
+    margin: 0 -10px;
+    padding: 0 10px;
+}
+
+.m-carousel-photos .m-item  > img {
+    margin: 0;
+    padding: 0;
+    max-width: none;
+    width: 100%;
+    height: auto;
+
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    -o-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    -ms-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+}
+
+.m-carousel-photos .m-caption {
+  background: rgba(0,0,0,0.7);
+  bottom: 0;
+  position: absolute;
+  z-index: 9;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+
+/* Inner Cards for Carousel */
+.m-card, .m-card-light {
+    padding: 20px 30px;
+    border-radius: 20px;
+
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    -o-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    -ms-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+    
+}
+
+.m-card {
+  background: rgba(0,0,0,0.5);
+  color: #FFF;
+}
+
+.m-card-light {
+  background: rgba(255,255,255,0.9);
+  color: #000;
+}
+
+.m-fade-out {
+    -webkit-mask-image: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%,
+    rgba(0,0,0,1) 5%, rgba(0,0,0,1) 95%, rgba(0,0,0,0) 100%);
 }
