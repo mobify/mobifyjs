@@ -1,11 +1,11 @@
 ---
-layout: page
+layout: page-license
 title: License
 ---
 
 # License
 
-The Mobify.js framework and tools are licensed under an [MIT license](https://github.com/mobify/mobifyjs/blob/master/LICENSE).
+The Mobify.js framework, tools and modules are licensed under an [MIT license](https://github.com/mobify/mobifyjs/blob/master/LICENSE).
 
 Some other dependencies, tools, and assets are used under their respective licenses.
     
