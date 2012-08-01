@@ -91,10 +91,11 @@
     }
 }
 
+
 /* Accordion with CSS indicators */
 .m-indicators-css .m-header:after {
     content : "+";
-    color: #900;
+    color: #999;
     text-shadow: #fff 0 1px 0;
     display: block;
     position: absolute;
@@ -109,3 +110,53 @@
     .m-indicators-css .m-active .m-header:after {
         content: "\2212"; /* Unicode minus sign */
     }
+
+
+
+/* Accordion with CSS indicators */
+.m-css-advanced .m-header:after {
+    color: rgba(255,255,255,0.9);
+    font-weight: normal;
+    text-align: center;
+    text-shadow: none;
+    background: #c5c5c5; /* Old browsers */
+    background: -moz-linear-gradient(top,  #c5c5c5 0%, #acacac 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#c5c5c5), color-stop(100%,#acacac)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #c5c5c5 0%,#acacac 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #c5c5c5 0%,#acacac 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #c5c5c5 0%,#acacac 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #c5c5c5 0%,#acacac 100%); /* W3C */
+    font-size: 22px;
+    line-height: 16px;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+    border-radius: 25px;
+    -webkit-box-shadow: #fff 0 1px 0;
+    -moz-box-shadow: #fff 0 1px 0;
+    box-shadow: #fff 0 1px 0;
+}
+.m-css-advanced .m-header:hover:after {
+    color: #fff;
+    background: #b4b4b4; /* Old browsers */
+    background: -moz-linear-gradient(top,  #b4b4b4 0%, #a3a3a3 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#b4b4b4), color-stop(100%,#a3a3a3)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #b4b4b4 0%,#a3a3a3 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #b4b4b4 0%,#a3a3a3 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #b4b4b4 0%,#a3a3a3 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #b4b4b4 0%,#a3a3a3 100%); /* W3C */
+}
+.m-css-advanced .m-active .m-header:after {
+    background: #8a8a8a; /* Old browsers */
+    background: -moz-linear-gradient(top,  #8a8a8a 0%, #a3a3a3 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#8a8a8a), color-stop(100%,#a3a3a3)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #8a8a8a 0%,#a3a3a3 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #8a8a8a 0%,#a3a3a3 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #8a8a8a 0%,#a3a3a3 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #8a8a8a 0%,#a3a3a3 100%); /* W3C */
+    -webkit-box-shadow: #fff 0 -1px 0;
+    -moz-box-shadow: #fff 0 -1px 0;
+    box-shadow: #fff 0 -1px 0;
+}
