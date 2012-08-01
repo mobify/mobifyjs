@@ -105,14 +105,12 @@ Mobify.UI.Accordion = (function($, Utils) {
 
     Accordion.prototype.bind = function() {
         var $element = this.$element
-            , transitioning = false
             , xy
             , dxy
             , dragRadius = this.dragRadius;
 
         function endTransition(){
             // recalculate proper height
-            transitioning = false;
             var height = 0;
             var $item = $(this).parent();
             if ($item.hasClass('m-closed')) $(this).parent().removeClass('m-active');
@@ -164,12 +162,6 @@ Mobify.UI.Accordion = (function($, Utils) {
                 dxy = undefined;
                 if ((dx*dx) + (dy*dy) > dragRadius*dragRadius) return;
             }
-
-            // prevent open/close when an item is transitioning
-            if (transitioning) return;
-
-            // if transitions are supported, set lock when transitioning
-            if (Utils.events.transitionend) transitioning = true;
 
             // toggle open/close on item tapped
             var $item = $(this).parent();
