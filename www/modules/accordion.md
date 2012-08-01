@@ -56,7 +56,7 @@ Try it out:
 
 ## Check it out on jsFiddle
 
-[http://jsfiddle.net/fPQma/](http://jsfiddle.net/fPQma/)
+[http://jsfiddle.net/fPQma/1/](http://jsfiddle.net/fPQma/1/)
 
 ## Using mobify-accordion.js
 
