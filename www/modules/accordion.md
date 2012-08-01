@@ -8,11 +8,8 @@ title: Mobify.js Accordion Module
 
 # Accordion
 
-<<<<<<< HEAD
 An expanding accordion menu for two-level nav systems.
 
-=======
->>>>>>> Code/comment cleanup
 <ul class="m-accordion">
     <li class="m-item">
         <h3 class="m-header">
