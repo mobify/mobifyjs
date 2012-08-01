@@ -31,30 +31,30 @@ A configurable rotating content carousel for displaying images or
 arbitrary content.
 
 <div class="m-carousel m-carousel-example-4 m-center m-fluid">
-  <div class="m-carousel-inner">
-    <div class="m-item">
-        <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
+    <div class="m-carousel-inner">
+        <div class="m-item">
+            <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
+        </div>
+        <div class="m-item">
+            <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
+        </div>
+        <div class="m-item">
+            <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
+        </div>
+        <div class="m-item">
+            <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
+        </div>
+        <div class="m-item">
+            <img src="{{ site.baseurl }}/static/examples/img/pods.jpg">
+        </div>
     </div>
-    <div class="m-item">
-        <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
+    <div class="m-carousel-controls m-carousel-bulleted">
+        <a href="#" data-slide="1">1</a>
+        <a href="#" data-slide="2">2</a>
+        <a href="#" data-slide="3">3</a>
+        <a href="#" data-slide="4">4</a>
+        <a href="#" data-slide="5">5</a>
     </div>
-    <div class="m-item">
-        <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
-    </div>
-    <div class="m-item">
-        <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
-    </div>
-    <div class="m-item">
-        <img src="{{ site.baseurl }}/static/examples/img/pods.jpg">
-    </div>
-  </div>
-  <div class="m-carousel-controls m-carousel-bulleted">
-    <a class="carousel-control right" href="#myCarousel" data-slide="1">1</a>
-    <a class="carousel-control right" href="#myCarousel" data-slide="2">2</a>
-    <a class="carousel-control right" href="#myCarousel" data-slide="3">3</a>
-    <a class="carousel-control right" href="#myCarousel" data-slide="4">4</a>
-    <a class="carousel-control right" href="#myCarousel" data-slide="5">5</a>
-  </div>
 </div>
 
 <div class="btn-container">
