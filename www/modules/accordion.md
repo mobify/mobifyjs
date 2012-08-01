@@ -48,7 +48,7 @@ An expanding accordion menu for two-level nav systems.
 </ul>
 
 <div class="btn-container actions">
-	<a href="{{ site.baseurl }}/modules/accordion-examples" class="btn btn-primary">Download Accordion</a>
+	<a href="{{ site.baseurl }}/static/downloads/accordion.zip" class="btn btn-primary">Download Accordion</a>
 	<ul>
         <li><a href="{{ site.baseurl }}/modules/accordion-examples">See more examples</a></li>
 	    <li><a href="http://jsfiddle.net/fPQma/3/">View it on jsFiddle</a></li>
