@@ -13,7 +13,7 @@
     overflow: hidden;
     max-height: 0;
 }
-.m-accordion .m-active .cm-ontent {
+.m-accordion .m-active .m-content {
     max-height: 10000px; /* IE hack */
 }
 

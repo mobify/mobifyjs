@@ -65,12 +65,12 @@ An expanding accordion menu for two-level nav systems.
 	<ul class="m-accordion">
 	  <!-- the items -->
 	  <li class="m-item">
-	    <h3 class="header">
+	    <h3 class="m-header">
 	      <!-- header title -->
 	      <a>Tab1</a>
 	    </h3>
-        <div class="content">
-          <div class="inner-content">
+        <div class="m-content">
+          <div class="m-inner-content">
             <!-- content for item -->
             <h2>Content 1</h2>
             <h2>Lorem Ipsum</h2>
@@ -78,22 +78,22 @@ An expanding accordion menu for two-level nav systems.
         </div>
 	  </li>
       <li class="m-item">
-        <h3 class="header">
+        <h3 class="m-header">
           <a>Tab2</a>
         </h3>
-        <div class="content">
-          <div class="inner-content">
+        <div class="m-content">
+          <div class="m-inner-content">
             <h2>Content 2</h2>
             <p>Lorem Ipsum</p>
           </div>
         </div>
       </li>
 	  <li class="m-item">
-	    <h3 class="header">
+	    <h3 class="m-header">
 	      <a>Tab3</a>
 	    </h3>
-	    <div class="content">
-	      <div class="inner-content">
+	    <div class="m-content">
+	      <div class="m-inner-content">
 	        <h2>Content 3</h2>
 	        <p>Lorem Ipsum</p>
 	      </div>
