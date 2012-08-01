@@ -73,21 +73,21 @@ arbitrary content.
       <div class="m-carousel-inner">
         <!-- the items -->
         <div class="m-item m-active">
-          <img src="earth.jpg">
+          <img src="image1.jpg">
         </div>
         <div class="m-item">
-          <img src="wind.jpg">
+          <img src="image2.jpg">
         </div>
         <div class="m-item">
-          <img src="fire.jpg">
+          <img src="image3.jpg">
         </div>
       </div>
       <div>
         <!-- use the `data-slide` attribute to create controls -->
         <a href="#" data-slide="prev">Previous</a>
-        <a href="#" data-slide="1" class="m-active">earth</a>
-        <a href="#" data-slide="2">wind</a>
-        <a href="#" data-slide="3">fire</a>
+        <a href="#" data-slide="1" class="m-active">1</a>
+        <a href="#" data-slide="2">2</a>
+        <a href="#" data-slide="3">3</a>
         <a href="#" data-slide="next">Next</a>
       </div>
     </div>

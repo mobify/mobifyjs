@@ -1,9 +1,12 @@
 /* 
   Carousel control base styling 
 */
+
 .m-carousel-controls {
   padding-top: 10px;
+  text-align: center;
 }
+
 .m-carousel-controls a {
     padding: 5px;
     -webkit-user-select: none;
