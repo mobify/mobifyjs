@@ -1,6 +1,6 @@
 ---
 layout: modules
-title: Mobify.js Carousel Module
+title: Mobify.js Accordion Module
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion.css">
