@@ -5,15 +5,14 @@ title: Mobify.js Modules
 
 # Mobify.js Modules
 
-A growing library of customizable user interface modules. Mobify.js 
-modules were built mobile-first and tested across a wide range of 
-devices, while also providing a seamless desktop experience. They can 
-be used with Mobify.js-powered mobile sites or as standalone components 
-on any site.
+A library of customizable user interface modules built for mobile-first 
+and tested across a wide range of devices, while also providing a seamless 
+desktop experience. They can be used as standalone components or with any
+Mobify.js-powered site.
 
-All modules available on GitHub and published under an <a href="{{ site.baseurl }}/license/">MIT license</a>:
+All modules require either the [Zepto](http://zeptojs.com/) or [jQuery](http://jquery.com/) library.
+
+All modules available on GitHub and published under an [MIT license]({{ site.baseurl }}/license/):
 
 [github.com/mobify/mobifyjs/modules](https://github.com/mobify/mobifyjs/modules)
-
-----
 
