@@ -76,8 +76,11 @@ template and renders it. The result is then output ot the browser!
 ##  `context.choose(obj1[, obj2[, ...]])` {#context-choose}
 
 Accepts a variable number of objects as arguments and executes the
-first one that matches. An argument is said to match if its keys 
-starting with `!` all evaluate to a truthy values:
+first one that matches. It is useful for making specific selections based
+on the page being currently rendered.
+
+An argument is said to match if all required keys, that is keys that 
+start with `!`, evaluate to truthy values:
 
     'content': function(context) {
         return context.choose({
@@ -92,9 +95,8 @@ starting with `!` all evaluate to a truthy values:
     }
 
 In this example, the first argument matches if the function assigned 
-to the key `!home` evalutes to a truthy value. If it doesn't, it would
-be considered to not matching and the next argument would be tested.
-Only the first matching argument is executed.
+to the _!home_ evalutes to a truthy value. If it doesn't, the next
+argument would be tested.
 
 An argument with no required keys always matches:
 
@@ -108,7 +110,7 @@ An argument with no required keys always matches:
 
 If no matching arguments are found `context.choose` returns `undefined`.
 
-Multiple keys may be prefixed with `!` to create "and" conditions: 
+Multiple required keys can be used to create "and" conditions:
 
     'home': function(context) {
         return context.choose({
@@ -122,12 +124,12 @@ Multiple keys may be prefixed with `!` to create "and" conditions:
         },
     }
 
-In this case only if both _productCarousel_ and _saleItems_ evaluate
-to truthy values will the argument match and _templateName_ be assigned.
+In this case the argument will only match if both _productCarousel_ and 
+_saleItems_ are truthy.
 
 A common pattern in the konf is to use `context.choose` to select 
-template specific content and assign a key which will be used as the
-template name:
+template specific content and assign a key which will later be used as 
+the template name:
 
     'content': function(context) {
         return context.choose({
@@ -152,8 +154,8 @@ template name:
 
 ### Truthiness Of Required Selections, Keys Prefixed With `!`
 
-`context.choose` considers a value to be truthy if it matches 
-one of the following conditions:
+`context.choose` considers a value to be truthy if it matches one of
+the following conditions:
 
     obj.length && obj.length > 0
     obj == true
@@ -163,12 +165,11 @@ falsey.
 
 ### Do not change the DOM in required selections {#do-not-modify-dom-in-required}
 
-All required keys in any block may be evaluated, while non-required
-keys are only evaluated if the argument is matched. If you make modifications
-to the DOM in a required key, you may adversely affect evaluation further 
-down the konf. This often leads to hard to find bugs. It is recommended 
-you select for elements in required keys, but execute DOM modification in
-non-required keys.
+All required keys in any argument may be evaluated. Non-required keys 
+are only evaluated if the argument is matched. If the DOM is altered in
+a required key, it may affect evaluation later in the konf leading to
+difficult to debug errors. Do not alter the DOM in required keys. Move 
+DOM altering operations to non-required keys.
 
 ##  Reserved Keys
 

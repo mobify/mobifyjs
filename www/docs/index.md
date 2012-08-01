@@ -23,30 +23,30 @@ Mobify.js is a JavaScript framework for adapting websites for tablet and mobile.
 
 Insert the Mobify.js tag **immediately** after the opening _<head>_ tag on the website you want to adapt:
 
-        <script>
-        (function(window, document, mjs) {
+    <script>
+    (function(window, document, mjs) {
 
-        window.Mobify = {points: [+new Date], tagVersion: [1, 0]};
+    window.Mobify = {points: [+new Date], tagVersion: [1, 0]};
 
-        var isMobile = /ip(hone|od|ad)|android|blackberry.*applewebkit/i.test(navigator.userAgent)
-          , optedOut = /mobify-path=($|;)/.test(document.cookie);
+    var isMobile = /ip(hone|od|ad)|android|blackberry.*applewebkit/i.test(navigator.userAgent)
+      , optedOut = /mobify-path=($|;)/.test(document.cookie);
 
-        if (!isMobile || optedOut) {
-            return;
-        }
+    if (!isMobile || optedOut) {
+        return;
+    }
 
-        document.write('<plaintext style="display:none">');
+    document.write('<plaintext style="display:none">');
 
-        setTimeout(function() {
-            var mobifyjs = document.createElement('script')
-              , script = document.getElementsByTagName('script')[0];
+    setTimeout(function() {
+        var mobifyjs = document.createElement('script')
+          , script = document.getElementsByTagName('script')[0];
 
-            mobifyjs.src = mjs;
-            script.parentNode.insertBefore(mobifyjs, script);
-        });
+        mobifyjs.src = mjs;
+        script.parentNode.insertBefore(mobifyjs, script);
+    });
 
-        })(this, document, 'http://127.0.0.1:8080/mobify.js');
-        </script>
+    })(this, document, 'http://127.0.0.1:8080/mobify.js');
+    </script>
 
 ## Preview your mobile site
 
