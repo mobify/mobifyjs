@@ -58,38 +58,39 @@ Mobify.UI.Utils = (function($) {
     };
 
     $.extend(has, {
-        'transform': !! (exports.getProperty("Transform"))
+        'transform': !! (exports.getProperty('Transform'))
       , 'transform3d': !! (window.WebKitCSSMatrix && 'm11' in new WebKitCSSMatrix()) 
     });
 
     // translateX(element, delta)
     // Moves the element by delta (px)
-    var transformProperty = exports.getProperty("Transform");
+    var transformProperty = exports.getProperty('Transform');
     if (has.transform3d) {
         exports.translateX = function(element, delta) {
-             if (typeof delta == "number") delta = delta + 'px';
-             element.style[transformProperty] = "translate3d(" + delta  + ",0,0)";
+             if (typeof delta == 'number') delta = delta + 'px';
+             element.style[transformProperty] = 'translate3d(' + delta  + ',0,0)';
         };
     } else if (has.transform) {
         exports.translateX = function(element, delta) {
-             if (typeof delta == "number") delta = delta + 'px';
-             element.style[transformProperty] = "translate(" + delta  + ",0)";
+             if (typeof delta == 'number') delta = delta + 'px';
+             element.style[transformProperty] = 'translate(' + delta  + ',0)';
         };
     } else {
         exports.translateX = function(element, delta) {
-            if (typeof delta == "number") delta = delta + 'px';
-            element.style['left'] = delta;
+            if (typeof delta == 'number') delta = delta + 'px';
+            element.style.left = delta;
         };
     }
 
     // setTransitions
-    var transitionProperty = exports.getProperty("Transition");
-    var durationProperty = exports.getProperty("TransitionDuration");
+    var transitionProperty = exports.getProperty('Transition')
+      , durationProperty = exports.getProperty('TransitionDuration');
+
     exports.setTransitions = function(element, enable) {
         if (enable) {
-            element.style[durationProperty] = "";
+            element.style[durationProperty] = '';
         } else {
-            element.style[durationProperty] = "0s";
+            element.style[durationProperty] = '0s';
         }
     }
 
@@ -119,22 +120,20 @@ Mobify.UI.Utils = (function($) {
 
 Mobify.UI.Carousel = (function($, Utils) {
     var defaults = {
-          dragRadius: 10
-        , moveRadius: 20
-        , classPrefix: undefined
-        , center: undefined
-        , classNames: {
-            outer: "carousel"
-          , inner: "carousel-inner"
-          , item: "item"
-          , center: "center"
-          , touch: "has-touch"
-          , dragging: "dragging"
-          , active: "active"
+            dragRadius: 10
+          , moveRadius: 20
+          , classPrefix: undefined
+          , classNames: {
+                outer: 'carousel'
+              , inner: 'carousel-inner'
+              , item: 'item'
+              , center: 'center'
+              , touch: 'has-touch'
+              , dragging: 'dragging'
+              , active: 'active'
+            }
         }
-    };
-
-    var has = $.support;
+       , has = $.support;
 
     // Constructor
     var Carousel = function(element, options) {
@@ -245,7 +244,7 @@ Mobify.UI.Carousel = (function($, Utils) {
         var abs = Math.abs
             , dragging = false
             , canceled = false
-            , dragRadius = this.options['dragRadius']
+            , dragRadius = this.options.dragRadius
             , xy
             , dx
             , dy
@@ -328,26 +327,23 @@ Mobify.UI.Carousel = (function($, Utils) {
         }
 
         $inner
-            .on(Utils.events.down + ".carousel", start)
-            .on(Utils.events.move + ".carousel", drag)
-            .on(Utils.events.up + ".carousel", end)
-            .on("click.carousel", click)
-            .on("mouseout.carousel", end);
+            .on(Utils.events.down + '.carousel', start)
+            .on(Utils.events.move + '.carousel', drag)
+            .on(Utils.events.up + '.carousel', end)
+            .on('click.carousel', click)
+            .on('mouseout.carousel', end);
 
-        $element.find('[data-slide]').each(function(){
-            var $this = $(this);
+        $element.on('click', '[data-slide]', function(e){
+            e.preventDefault();
+            var action = $(this).attr('data-slide')
+              , index = parseInt(action, 10);
 
-            $this.click(function(){
-                var action = $this.attr('data-slide')
-                  , index = parseInt(action, 10);
-
-                if (isNaN(index)) {
-                    self[action]();
-                } else {
-                    self.move(index);
-                }
-            });
-        })
+            if (isNaN(index)) {
+                self[action]();
+            } else {
+                self.move(index);
+            }
+        });
 
         $element.on('afterSlide', function(e, previousSlide, nextSlide) {
             self.$items.eq(previousSlide - 1).removeClass(self._getClass('active'));
@@ -479,7 +475,6 @@ Mobify.UI.Carousel = (function($, Utils) {
         return this;
     };
 
-    $.fn.carousel.defaults = {
-    };
+    $.fn.carousel.defaults = {};
 
 })(Mobify.$);

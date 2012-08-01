@@ -333,20 +333,17 @@ Mobify.UI.Carousel = (function($, Utils) {
             .on('click.carousel', click)
             .on('mouseout.carousel', end);
 
-        $element.find('[data-slide]').each(function(){
-            var $this = $(this);
+        $element.on('click', '[data-slide]', function(e){
+            e.preventDefault();
+            var action = $(this).attr('data-slide')
+              , index = parseInt(action, 10);
 
-            $this.click(function(){
-                var action = $this.attr('data-slide')
-                  , index = parseInt(action, 10);
-
-                if (isNaN(index)) {
-                    self[action]();
-                } else {
-                    self.move(index);
-                }
-            });
-        })
+            if (isNaN(index)) {
+                self[action]();
+            } else {
+                self.move(index);
+            }
+        });
 
         $element.on('afterSlide', function(e, previousSlide, nextSlide) {
             self.$items.eq(previousSlide - 1).removeClass(self._getClass('active'));
