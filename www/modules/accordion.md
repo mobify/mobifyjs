@@ -58,25 +58,22 @@ Try it out:
 
 [http://jsfiddle.net/fPQma/1/](http://jsfiddle.net/fPQma/1/)
 
-## Using mobify-accordion.js
+## Usage
 
-To initialize an accordion, use the markup documented below, and call the jQuery/Zepto initializer.
+    <!-- include accordion.css -->
+    <link rel="stylesheet" href="accordion.css">
 
-	$('.m-accordion').accordion()
-
-## Markup
-
-The basic markup is composed out of a ul `.m-accordion`, and numerous lis `m-item`. Each `m-item` contains a
-h3 `header` where the title of the item goes, and a div `content`, which contains a div `inner-content` which
-must contain the content for the item.
-
+    <!-- the markup -->
 	<ul class="m-accordion">
+		<!-- the items -->
 	    <li class="m-item">
 	        <h3 class="header">
+	        	<!-- header title -->
 	            <a>Tab1</a>
 	        </h3>
 	        <div class="content">
 	            <div class="inner-content">
+	            	<!-- content for item -->
 	                <h2>Content 1</h2>
 	                <h2>Lorem Ipsum</h2>
 	            </div>
@@ -105,6 +102,11 @@ must contain the content for the item.
 	        </div>
 	    </li>
 	</ul>
+
+    <!-- include the JavaScript -->
+    <script src="accordion.js"></script>
+    <!-- construct the accordion -->
+    <script>$('.m-accordion').accordion()</script>
 
 ## Methods
 
