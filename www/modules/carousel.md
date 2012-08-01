@@ -5,7 +5,7 @@ title: Mobify.js Carousel Module
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel.css">
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel-controls.css">
-<style>
+<style type="text/css">
 
 /* styling for this page */
 .m-carousel {
