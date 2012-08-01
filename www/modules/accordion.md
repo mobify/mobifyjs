@@ -1,6 +1,6 @@
 ---
 layout: modules
-title: Mobify.js Carousel Module
+title: Mobify.js Accordion Module
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion.css">
@@ -51,6 +51,12 @@ Try it out:
 	<a href="{{ site.baseurl }}/modules/accordion-examples" class="btn btn-primary">Download Accordion</a>
 	<a href="{{ site.baseurl }}/modules/accordion-examples" class="see-examples">See more examples</a>
 </div>
+
+
+
+## Check it out on jsFiddle
+
+[http://jsfiddle.net/fPQma/](http://jsfiddle.net/fPQma/)
 
 ## Using mobify-accordion.js
 
