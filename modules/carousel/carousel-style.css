@@ -247,10 +247,19 @@
     background: rgba(0,0,0,0.5);
     color: #FFF;
 }
-
 .m-card-light {
     background: rgba(255,255,255,0.9);
     color: #000;
+}
+.m-slide {
+    padding: 20px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+}
+.m-slide .m-caption {
+    margin: 0;
+    padding: 10px 0 0 0;
 }
 
 .m-fade-out {
