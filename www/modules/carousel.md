@@ -3,8 +3,8 @@ layout: modules
 title: Mobify.js Carousel Module
 ---
 
-<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel.css">
-<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/carousel-style.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/modules/carousel/carousel.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/modules/carousel/carousel-style.css">
 <style type="text/css">
 
 /* styling for this page */
@@ -21,19 +21,19 @@ arbitrary content.
 <div class="m-carousel m-fluid m-carousel-photos" id="m-carousel-example-4">
     <div class="m-carousel-inner">
         <div class="m-item">
-            <img src="{{ site.baseurl }}/static/examples/img/blossoms.jpg">
+            <img src="{{ site.baseurl }}/static/img/modules/blossoms.jpg">
         </div>
         <div class="m-item">
-            <img src="{{ site.baseurl }}/static/examples/img/glacier.jpg">
+            <img src="{{ site.baseurl }}/static/img/modules/glacier.jpg">
         </div>
         <div class="m-item">
-            <img src="{{ site.baseurl }}/static/examples/img/helmets.jpg">
+            <img src="{{ site.baseurl }}/static/img/modules/helmets.jpg">
         </div>
         <div class="m-item">
-            <img src="{{ site.baseurl }}/static/examples/img/parliament.jpg">
+            <img src="{{ site.baseurl }}/static/img/modules/parliament.jpg">
         </div>
         <div class="m-item">
-            <img src="{{ site.baseurl }}/static/examples/img/pods.jpg">
+            <img src="{{ site.baseurl }}/static/img/modules/pods.jpg">
         </div>
     </div>
     <div class="m-carousel-controls m-carousel-bulleted">
@@ -233,5 +233,5 @@ The following desktop browsers have degraded support:
 
 -->
 
-<script src="{{ site.baseurl }}/static/examples/js/carousel.js"></script>
+<script src="{{ site.baseurl }}/static/modules/carousel/carousel.js"></script>
 <script>$('.m-carousel').carousel();</script>

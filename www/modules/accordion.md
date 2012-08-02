@@ -3,8 +3,8 @@ layout: modules
 title: Mobify.js Accordion Module
 ---
 
-<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion.css">
-<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion-style.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/accordion.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/css/accordion-style.css">
 
 # Accordion
 
@@ -155,7 +155,7 @@ Unbinds the events from the accordion, and removes it from the DOM.
 | Firefox (Android) | 1.0+    | Supported                  |
 | Windows Phone     | 7.5     | Degraded. No transitions.  |
 
-<script src="{{ site.baseurl }}/static/examples/js/accordion.js"></script>
+<script src="{{ site.baseurl }}/static/modules/accordion/accordion.js"></script>
 <script>
     $(function() { $('.m-accordion').accordion(); });
 </script>

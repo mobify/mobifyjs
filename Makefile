@@ -13,9 +13,7 @@ all:
 
 
 module:
-	zip -r www/static/downloads/modules.zip modules
-	zip -r www/static/downloads/accordion.zip modules/accordion
-	zip -r www/static/downloads/carousel.zip modules/carousel
-	zip -r www/static/downloads/zoomable.zip modules/zoomable
-	cp modules/**/*.js www/static/examples/js/
-	cp modules/**/*.css www/static/examples/css/
+	cd modules; zip -r ../../../modules.zip carousel accordion zoomable; \
+	zip -r ../../../carousel.zip carousel; \
+	zip -r ../../../accordion.zip accordion; \
+	zip -r ../../../zoomable.zip zoomable

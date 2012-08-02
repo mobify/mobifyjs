@@ -39,10 +39,10 @@ A module for showing and panning through large images in a
 touchscreen-friendly way.
 
 <p class="exit-notice-zoomable">
-    <a href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg">
-    <img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg" style="width: 100%"></a>
+    <a href="{{ site.baseurl }}/static/img/modules/zoom_big.jpg">
+    <img src="{{ site.baseurl }}/static/img/modules/zoom_thumb.jpg" style="width: 100%"></a>
 </p>
-<script src="{{ site.baseurl }}/static/examples/js/zoomable.js"></script>
+<script src="{{ site.baseurl }}/static/modules/zoomable/zoomable.js"></script>
 <script>
     var $zoomable = $('.exit-notice-zoomable a');
     $zoomable.zoomable({
