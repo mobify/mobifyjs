@@ -231,31 +231,27 @@
 
 
 /* Inner Cards for Carousel */
-.m-card, .m-card-light {
-    padding: 20px 30px;
-    border-radius: 20px;
+.m-card-dark, .m-card-light {
+    padding: 20px;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
 
     -webkit-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
     -moz-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
     -o-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
     -ms-box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
-    box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
-    
+    box-shadow: rgba(0,0,0,0.5) 0 5px 10px;    
 }
-
-.m-card {
+.m-card-dark {
     background: rgba(0,0,0,0.5);
     color: #FFF;
 }
-.m-slide {
+.m-card-light {
     background: rgba(255,255,255,0.9);
     color: #000;
-    padding: 20px;
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
 }
-.m-slide .m-caption {
+.m-card-dark .m-caption, .m-card-light .m-caption {
     margin: 0;
     padding: 10px 0 0 0;
 }
