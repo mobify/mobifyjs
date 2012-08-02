@@ -3,8 +3,8 @@ layout: modules
 title: Mobify.js Accordion Examples
 ---
 
-<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion.css">
-<link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion-style.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/accordion.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/accordion-style.css">
 <style type="text/css">
 
 .m-arrows .m-inner-content {
@@ -430,7 +430,7 @@ The basic accordion control with CSS arrows to indicate open headers.
     </ul>
 
 
-<script src="{{ site.baseurl }}/static/examples/js/accordion.js"></script>
+<script src="{{ site.baseurl }}/static/modules/accordion/accordion.js"></script>
 <script>
     $(function() { $('.m-accordion').accordion(); });
 </script>

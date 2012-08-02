@@ -4,7 +4,7 @@ title: Mobify.js Zoomable Example
 ---
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<script src="{{ site.baseurl }}/static/examples/js/zoomable.js"></script>
+<script src="{{ site.baseurl }}/static/modules/zoomable/zoomable.js"></script>
 <style>
 .corner.m-close { color: white; background: black; position: absolute; right: 0; top: 0;
 	font-weight: bold; font-size: 18px; padding: 10px;
@@ -29,15 +29,15 @@ a img { width: 100%; }
 </style>
 
 <h2>Basic zoomable</h2>
-<a class="z1" href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg"></a>
+<a class="z1" href="{{ site.baseurl }}/static/img/modules/zoom_big.jpg"><img src="{{ site.baseurl }}/static/img/modules/zoom_thumb.jpg"></a>
 <script>$('a.z1').zoomable();</script>
 
 <h3>Code for this example:</h3>
-<pre><code>&lt;a class=&quot;z1&quot; href=&quot;{{ site.baseurl }}/static/examples/img/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg&quot;&gt;&lt;/a&gt;
+<pre><code>&lt;a class=&quot;z1&quot; href=&quot;{{ site.baseurl }}/static/img/modules/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/img/modules/zoom_thumb.jpg&quot;&gt;&lt;/a&gt;
 &lt;script&gt;$('a.z1').zoomable();&lt;/script&gt;</code></pre>
 
 <h2>With a textual 'zoom in' link and closing only via Close button</h2>
-<a class="z2" href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg">Zoom in</a>
+<a class="z2" href="{{ site.baseurl }}/static/img/modules/zoom_big.jpg"><img src="{{ site.baseurl }}/static/img/modules/zoom_thumb.jpg">Zoom in</a>
 <script>
 $('a.z2').zoomable({
 	clickCloses: false,
@@ -48,7 +48,7 @@ $('a.z2').zoomable({
 </script>
 
 <h3>Code for this example:</h3>
-<pre><code>&lt;a class=&quot;z2&quot; href=&quot;{{ site.baseurl }}/static/examples/img/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg&quot;&gt;Zoom in&lt;/a&gt;
+<pre><code>&lt;a class=&quot;z2&quot; href=&quot;{{ site.baseurl }}/static/img/modules/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/img/modules/zoom_thumb.jpg&quot;&gt;Zoom in&lt;/a&gt;
 &lt;script&gt;
 $('a.z2').zoomable({
 	clickCloses: false,
@@ -59,7 +59,7 @@ $('a.z2').zoomable({
 &lt;/script&gt;</code></pre>
 
 <h2>Messaging upon opening</h2>
-<a class="z3" href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg"></a>
+<a class="z3" href="{{ site.baseurl }}/static/img/modules/zoom_big.jpg"><img src="{{ site.baseurl }}/static/img/modules/zoom_thumb.jpg"></a>
 <script>
 $('a.z3').zoomable({
 	stageHTML: function() {
@@ -74,7 +74,7 @@ $('a.z3').zoomable({
 </script>
 
 <h3>Code for this example:</h3>
-<pre><code>&lt;a class=&quot;z3&quot; href=&quot;{{ site.baseurl }}/static/examples/img/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg&quot;&gt;&lt;/a&gt;
+<pre><code>&lt;a class=&quot;z3&quot; href=&quot;{{ site.baseurl }}/static/img/modules/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/img/modules/zoom_thumb.jpg&quot;&gt;&lt;/a&gt;
 &lt;script&gt;
 $('a.z3').zoomable({
 	stageHTML: function() {
@@ -89,14 +89,14 @@ $('a.z3').zoomable({
 &lt;/script&gt;</code></pre>
 
 <h2>Limiting zoomable to a container</h2>
-<a class="z4" href="{{ site.baseurl }}/static/examples/img/zoom_big.jpg"><img src="{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg"></a>
+<a class="z4" href="{{ site.baseurl }}/static/img/modules/zoom_big.jpg"><img src="{{ site.baseurl }}/static/img/modules/zoom_thumb.jpg"></a>
 <div class="z4-wrap"></div>
 <script>
 	$('a.z4').zoomable({stage: '.z4-wrap'});
 </script>
 
 <h3>Code for this example:</h3>
-<pre><code>&lt;a class=&quot;z4&quot; href=&quot;{{ site.baseurl }}/static/examples/img/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/examples/img/zoom_thumb.jpg&quot;&gt;&lt;/a&gt;
+<pre><code>&lt;a class=&quot;z4&quot; href=&quot;{{ site.baseurl }}/static/img/modules/zoom_big.jpg&quot;&gt;&lt;img src=&quot;{{ site.baseurl }}/static/img/modules/zoom_thumb.jpg&quot;&gt;&lt;/a&gt;
 &lt;div class=&quot;z4-wrap&quot;&gt;&lt;/div&gt;
 &lt;script&gt;
 	$('a.z4').zoomable({stage: '.z4-wrap'});

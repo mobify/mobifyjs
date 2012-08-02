@@ -30,3 +30,12 @@ and run it from `www` folder:
     jekyll --server --auto
     
 Then navigate to http://localhost:4000/mobifyjs/docs/.
+
+## Modules
+
+Mobify.js includes a library customizable user interface modules in the
+`modules` folder.
+
+To package the modules for download use this command:
+
+    make modules
