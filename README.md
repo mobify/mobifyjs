@@ -33,8 +33,9 @@ Then navigate to http://localhost:4000/mobifyjs/docs/.
 
 ## Modules
 
-The UI modules can be found in the mobifyjs/modules folder.
+Mobify.js includes a library customizable user interface modules in the
+`modules` folder.
 
-Run this command to create new zip files for each module:
+To package the modules for download use this command:
 
-    make module
+    make modules

@@ -11,8 +11,11 @@ jenkins:
 all:
 	install
 
-module:
-	cd modules; zip -r ../../../modules.zip carousel accordion zoomable; \
-	zip -r ../../../carousel.zip carousel; \
-	zip -r ../../../accordion.zip accordion; \
-	zip -r ../../../zoomable.zip zoomable
+modules:
+	cd www/static/modules ; \
+	zip -r ../downloads/modules.zip carousel accordion zoomable ; \
+	zip -r ../downloads/carousel.zip carousel; \
+	zip -r ../downloads/accordion.zip accordion; \
+	zip -r ../downloads/zoomable.zip zoomable
+
+.PHONY: modules

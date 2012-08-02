@@ -71,8 +71,8 @@ arbitrary content.
           <img src="image3.jpg">
         </div>
       </div>
-      <div>
-        <!-- use the `data-slide` attribute to create controls -->
+      <!-- the controls -->
+      <div class="m-carousel-controls m-carousel-bulleted">
         <a href="#" data-slide="prev">Previous</a>
         <a href="#" data-slide="1" class="m-active">1</a>
         <a href="#" data-slide="2">2</a>
