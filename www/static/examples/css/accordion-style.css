@@ -10,6 +10,7 @@
     border-width: 1px 0;
     position: relative;
     cursor: pointer;
+    z-index: 5;
     background: #ffffff; /* Old browsers */
     background: -moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f6f6f6)); /* Chrome,Safari4+ */
@@ -72,7 +73,7 @@
     top: 50%;
     right: 10px;
     margin-top: -11px;
-    z-index: 9;
+    z-index: 4;
     width: 22px;
     height: 22px;
     background: url(../img/accordion.png) 0 -20px no-repeat;
@@ -91,6 +92,26 @@
     }
 }
 
+
+
+/* Accordion with CSS arrow indicators */
+.m-arrows .m-active .m-header:after {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-top-color: #f6f6f6;
+    border-width: 20px;
+    left: 50%;
+    margin-left: -20px;
+    z-index: 9;
+}
+    .m-arrows .m-active .m-header:hover:after {
+        border-top-color: #e6e6e6;
+    }
 
 /* Accordion with CSS indicators */
 .m-indicators-css .m-header:after {
@@ -113,7 +134,7 @@
 
 
 
-/* Accordion with CSS indicators */
+/* Accordion with advanced CSS indicators */
 .m-css-advanced .m-header:after {
     color: rgba(255,255,255,0.9);
     font-weight: normal;
