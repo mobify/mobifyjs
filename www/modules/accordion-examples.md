@@ -7,6 +7,13 @@ title: Mobify.js Accordion Examples
 <link rel="stylesheet" href="{{ site.baseurl }}/static/examples/css/accordion-style.css">
 <style type="text/css">
 
+.m-arrows .m-inner-content {
+    color: #fff;
+    background: #666;
+    padding-top: 20px;
+}
+
+
 .m-indicators-css .m-header {
     border-color: #f6dada;
     background: #fdf7f7; /* Old browsers */
@@ -99,8 +106,10 @@ title: Mobify.js Accordion Examples
 # Accordion Examples
 
 
-<h2>Basic Accordion</h2>
-<p>The basic accordion control with default styling.</p>
+## Basic Accordion
+
+The basic accordion control with default styling.
+
 <ul class="m-accordion">
     <li class="m-item">
         <h3 class="m-header">
@@ -148,7 +157,7 @@ title: Mobify.js Accordion Examples
         <div class="m-content">
           <div class="m-inner-content">
             <h2>Content 1</h2>
-            <h2>Lorem Ipsum</h2>
+            <p>Lorem ipsum</p>
           </div>
         </div>
       </li>
@@ -159,15 +168,17 @@ title: Mobify.js Accordion Examples
         <div class="m-content">
           <div class="m-inner-content">
             <h2>Content 2</h2>
-            <p>Lorem Ipsum</p>
+            <p>Lorem ipsum</p>
           </div>
         </div>
       </li>
     </ul>
 
 
-<h2>Image Indicators</h2>
-<p>The basic accordion control with images to reveal when a header is expanded or collapsed.</p>
+## Image Indicators
+
+The basic accordion control with images to reveal when a header is expanded or collapsed.
+
 <ul class="m-accordion m-indicators-images">
     <li class="m-item">
         <h3 class="m-header">
@@ -210,8 +221,7 @@ title: Mobify.js Accordion Examples
         </h3>
         <div class="m-content">
           <div class="m-inner-content">
-            <h2>Content 1</h2>
-            <h2>Lorem Ipsum</h2>
+            <p>Lorem ipsum</p>
           </div>
         </div>
       </li>
@@ -221,8 +231,7 @@ title: Mobify.js Accordion Examples
         </h3>
         <div class="m-content">
           <div class="m-inner-content">
-            <h2>Content 2</h2>
-            <p>Lorem Ipsum</p>
+            <p>Lorem ipsum</p>
           </div>
         </div>
       </li>
@@ -230,8 +239,10 @@ title: Mobify.js Accordion Examples
 
 
 
-<h2>Textual Indicators</h2>
-<p>The basic accordion control with +/- CSS indicators that reveal when a header is expanded or collapsed.</p>
+## Textual Indicators
+
+The basic accordion control with +/- CSS indicators that reveal when a header is expanded or collapsed.
+
 <ul class="m-accordion m-indicators-css">
     <li class="m-item">
         <h3 class="m-header">
@@ -274,8 +285,7 @@ title: Mobify.js Accordion Examples
         </h3>
         <div class="m-content">
           <div class="m-inner-content">
-            <h2>Content 1</h2>
-            <h2>Lorem Ipsum</h2>
+            <p>Lorem ipsum</p>
           </div>
         </div>
       </li>
@@ -285,16 +295,17 @@ title: Mobify.js Accordion Examples
         </h3>
         <div class="m-content">
           <div class="m-inner-content">
-            <h2>Content 2</h2>
-            <p>Lorem Ipsum</p>
+            <p>Lorem ipsum</p>
           </div>
         </div>
       </li>
     </ul>
 
 
-<h2>CSS-only Indicators</h2>
-<p>The same style as the image indicators above, but built with CSS-only instead of images.</p>
+## CSS-only Indicators
+
+The same style as the image indicators above, but CSS-only instead of images.
+
 <ul class="m-accordion m-indicators-css m-css-advanced">
     <li class="m-item">
         <h3 class="m-header">
@@ -328,7 +339,6 @@ title: Mobify.js Accordion Examples
     </li>
 </ul>
 
-
 ### Code for this example:
 
     <ul class="m-accordion m-indicators-css m-css-advanced">
@@ -338,8 +348,7 @@ title: Mobify.js Accordion Examples
         </h3>
         <div class="m-content">
           <div class="m-inner-content">
-            <h2>Content 1</h2>
-            <h2>Lorem Ipsum</h2>
+            <p>Lorem ipsum</p>
           </div>
         </div>
       </li>
@@ -349,14 +358,76 @@ title: Mobify.js Accordion Examples
         </h3>
         <div class="m-content">
           <div class="m-inner-content">
-            <h2>Content 2</h2>
-            <p>Lorem Ipsum</p>
+            <p>Lorem ipsum</p>
           </div>
         </div>
       </li>
     </ul>
 
 
+
+## Arrow Indicators
+
+The basic accordion control with CSS arrows to indicate open headers.
+
+<ul class="m-accordion m-arrows">
+    <li class="m-item">
+        <h3 class="m-header">
+            <a>Food Trucks</a>
+        </h3>
+        <div class="m-content">
+            <div class="m-inner-content">
+                <p>Pickled keytar ethnic flexitarian, vegan ethical sartorial 8-bit yr williamsburg. Flexitarian typewriter viral, wolf banh mi gastropub letterpress street art mcsweeney's raw denim kogi semiotics blog.</p>
+            </div>
+        </div>
+    </li>
+    <li class="m-item">
+        <h3 class="m-header">
+            <a>PBR</a>
+        </h3>
+        <div class="m-content">
+            <div class="m-inner-content">
+                <p>Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p> 
+            </div>
+        </div>
+    </li>
+    <li class="m-item">
+        <h3 class="m-header">
+            <a>Fixies</a>
+        </h3>
+        <div class="m-content">
+            <div class="m-inner-content">
+                <p>Fanny pack seitan PBR synth, kale chips master cleanse helvetica high life artisan you probably haven't heard of them. Craft beer salvia high life, art party small batch retro pickled butcher scenester kale chips brooklyn 8-bit vinyl.</p>
+                <p>Trust fund mustache typewriter, portland artisan irony seitan master cleanse biodiesel ethnic banh mi bushwick squid semiotics truffaut. Marfa vinyl mumblecore, selvage beard kale chips gentrify four loko gluten-free messenger bag cliche vice forage.</p>
+            </div>
+        </div>
+    </li>
+</ul>
+
+### Code for this example:
+
+    <ul class="m-accordion m-arrows">
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab1</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <p>Lorem ipsum</p>
+          </div>
+        </div>
+      </li>
+      <li class="m-item">
+        <h3 class="m-header">
+          <a>Tab2</a>
+        </h3>
+        <div class="m-content">
+          <div class="m-inner-content">
+            <p>Lorem ipsum</p>
+          </div>
+        </div>
+      </li>
+    </ul>
 
 
 <script src="{{ site.baseurl }}/static/examples/js/accordion.js"></script>
