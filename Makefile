@@ -11,7 +11,6 @@ jenkins:
 all:
 	install
 
-
 module:
 	cd modules; zip -r ../../../modules.zip carousel accordion zoomable; \
 	zip -r ../../../carousel.zip carousel; \

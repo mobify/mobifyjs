@@ -30,3 +30,11 @@ and run it from `www` folder:
     jekyll --server --auto
     
 Then navigate to http://localhost:4000/mobifyjs/docs/.
+
+## Modules
+
+The UI modules can be found in the mobifyjs/modules folder.
+
+Run this command to create new zip files for each module:
+
+    make module
