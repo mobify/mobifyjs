@@ -9,7 +9,7 @@ Mobify.UI = Mobify.UI || { classPrefix: 'm-' };
         'touch': 'ontouchend' in document
     });
 
-})($, document);
+})(Mobify.$, document);
 
 
 
