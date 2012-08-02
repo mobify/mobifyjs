@@ -10,6 +10,7 @@
     border-width: 1px 0;
     position: relative;
     cursor: pointer;
+    z-index: 5;
     background: #ffffff; /* Old browsers */
     background: -moz-linear-gradient(top,  #ffffff 0%, #f6f6f6 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f6f6f6)); /* Chrome,Safari4+ */
@@ -72,7 +73,7 @@
     top: 50%;
     right: 10px;
     margin-top: -11px;
-    z-index: 9;
+    z-index: 4;
     width: 22px;
     height: 22px;
     background: url(../img/accordion.png) 0 -20px no-repeat;
