@@ -217,6 +217,23 @@ Mobify.UI.Zoomable = (function() {
 
     Zoomable.prototype.bindClose = function(op) {
         if (this.$close) this.$close[op](this.options.activationEvent, this.boundClose);
+        if ('ontouchend' in document) {
+            this.$canvas[op]("touchstart", this.boundTouchStart);
+            this.$canvas[op]("touchmove", this.boundTouchMove);
+        }
+    };
+
+    Zoomable.prototype.touchstart = function(ev) {
+        this.scrollStartPosY = this.$canvas.prop('scrollTop') + ev.originalEvent.touches[0].pageY;
+        this.scrollStartPosX = this.$canvas.prop('scrollLeft') + ev.originalEvent.touches[0].pageX;
+    };
+
+    Zoomable.prototype.touchmove = function(ev) {
+        ev.preventDefault();
+        var canvas = this.$canvas[0];
+
+        canvas.scrollTop = this.scrollStartPosY - ev.originalEvent.touches[0].pageY;
+        canvas.scrollLeft = this.scrollStartPosX - ev.originalEvent.touches[0].pageX;
     }
 
     Zoomable.prototype.bind = function(undo) {
@@ -227,6 +244,10 @@ Mobify.UI.Zoomable = (function() {
         this.boundOpen = this.boundOpen || function(ev) { return self.open.apply(self, arguments); }
 
         this.$element[op](this.options.activationEvent, this.boundOpen);
+        if ('ontouchend' in document) {
+            this.boundTouchStart = this.boundTouchStart || function(ev) { return self.touchstart.apply(self, arguments); }
+            this.boundTouchMove = this.boundTouchMove || function(ev) { return self.touchmove.apply(self, arguments); }
+        }
 
         this.bindClose(op);
     };
