@@ -1,5 +1,9 @@
 Mobify.points.push(new Date);
 
+{>"/base/vendor/advice.js"/}
+Mobify.advice = window.advice;
+delete window.advice;
+
 {>"/base/api/ark.js"/}
 
 {#lib_export name="jquery"}
