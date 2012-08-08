@@ -4,7 +4,7 @@ title: Mobify.js Accordion Module
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/accordion.css">
-<link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/css/accordion-style.css">
+<link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/accordion-style.css">
 
 # Accordion
 
