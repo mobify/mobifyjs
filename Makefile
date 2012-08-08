@@ -18,10 +18,9 @@ modules:
 	zip -r ../downloads/accordion.zip accordion; \
 	zip -r ../downloads/zoomable.zip zoomable
 
-buildstatic:
-	modules ; \
-    cd www ; \
-    jekyll ; \
-    rm static/downloads/*
+buildstatic: modules ; \
+	cd www ; \
+	jekyll ; \
+	rm static/downloads/*
 
 .PHONY: modules
