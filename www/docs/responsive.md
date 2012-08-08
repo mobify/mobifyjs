@@ -80,12 +80,10 @@ So your final konf might look something like this:
 
 ## Responsive UI Modules
 
-We're also building a library of UI modules that will work with 
-Mobify.js to help you create mobile sites faster. These modules will 
-be fully responsive, and will easily integrate into new and existing 
-sites alike.
-
-Stay tuned as we release the first handful of these during August 2012.
+We've begun a library of UI modules that work with Mobify.js to help you 
+create mobile sites faster. These modules are fully responsive, and will 
+easily integrate into new and existing sites alike. 
+[Check out the first few]("/mobifyjs/modules"), more are on the way.
 
 
 ## Cloud Enhancements
