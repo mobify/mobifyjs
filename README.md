@@ -36,6 +36,14 @@ Then navigate to http://localhost:4000/mobifyjs/docs/.
 Mobify.js includes a library customizable user interface modules in the
 `modules` folder.
 
-To package the modules for download use this command:
+To package the modules for download use this command (they will be stored in /static/downloads):
 
     make modules
+
+## Build mobifyjs.com
+
+When creating a build of mobifyjs.com for release, execute this command:
+
+    make buildstatic
+
+And then copy the generated "\_site" folder to where the site will be hosted.
