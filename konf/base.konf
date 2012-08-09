@@ -41,7 +41,6 @@
     {>"/base/api/stack.js"/}
     {>"/base/api/cont.js"/}
     {>"/base/api/tmpl.js"/}
-    {>"/base/api/studioJS.js"/}    
 {/dust}
 
 {>"/base/konf/build_config.konf"/}
@@ -53,6 +52,7 @@
 {/enhance}{/lib_export}
 
 {>"/base/api/main.js"/}
+{>"/base/api/studioJS.js"/}    
 {>"/base/api/resizeImages.js"/}
 
 {+tmpl}
