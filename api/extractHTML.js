@@ -51,7 +51,7 @@ var nodeName = function(node) {
     }
 
     /**
-     * Returns a string of the unesacped content from a plaintext escaped `container`.
+     * Returns a string of the unesacped content from plaintext escaped `container`.
      */
   , extractHTMLFromElement = function(container) {
         if (!container) return '';
@@ -65,12 +65,14 @@ var nodeName = function(node) {
         }).join('');
     }
 
-    // Memoize result of extract
+    /**
+     * Memoized result of `extractHTML`.
+     */
   , extractedHTML
 
     /**
-     * Returns an object containing the state of the original page. Caches the object
-     * in `extractedHTML` for later use.
+     * Returns an object containing the state of the original page. 
+     * Memoize the result in `extractedHTML` for reuse.
      */
   , extractHTML = function(doc) {
         if (extractedHTML) return extractedHTML;
@@ -79,23 +81,17 @@ var nodeName = function(node) {
           , headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head')
           , bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body')
           , htmlEl = doc.getElementsByTagName('html')[0];
-
+        
         extractedHTML = {
-            doctype: doctype(doc),
-            htmlTag: openTag(htmlEl),
-            headTag: openTag(headEl),
-            bodyTag: openTag(bodyEl),
-            headContent: extractHTMLFromElement(headEl),
-            bodyContent: extractHTMLFromElement(bodyEl)
-        };
-
-        /**
-         * RR: I assume that Mobify escaping tag is placed in <head>. If so, the <plaintext>
-         * it emits would capture the </head><body> boundary, as well as closing </body></html>
-         * Therefore, bodyContent will have these tags, and they do not need to be added to .all()
-         */
-        extractedHTML.all = function(inject) {
-            return this.doctype + this.htmlTag + this.headTag + (inject || '') + this.headContent + this.bodyContent;
+            doctype: doctype(doc)
+          , htmlTag: openTag(htmlEl)
+          , headTag: openTag(headEl)
+          , bodyTag: openTag(bodyEl)
+          , headContent: extractHTMLFromElement(headEl)
+          , bodyContent: extractHTMLFromElement(bodyEl)
+          , all: function(inject) {
+                return this.doctype + this.htmlTag + this.headTag + (inject || '') + this.headContent + this.bodyContent;
+            }
         }
 
         return extractedHTML;

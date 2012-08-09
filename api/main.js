@@ -61,11 +61,11 @@ $.extend(Mobify.transform, {
             timing.addSelector('Start');
             cont.eval();
         }
-    },
+    }
 
     // `acceptData` is exposed on `Mobify` so it can be overridden for server-side adaptation.
     // Called when the `konf` has been evaluated.
-    acceptData: function(data, cont) {     
+  , acceptData: function(data, cont) {     
         if (!Mobify.evaluatedData) {
             Mobify.evaluatedData = data;
             Mobify.evaluatedCont = cont;
@@ -76,9 +76,12 @@ $.extend(Mobify.transform, {
         var enabled = Mobify.html.enable(outputHTML || '');
         timing.addPoint('Enabled Markup');
         transform.emitMarkup(enabled);
-    },
+    }
 
-    emitMarkup: function(markup) {
+    /**
+     * Write `markup` out to the document.
+     */
+  , emitMarkup: function(markup) {
         timing.addPoint('DOMContentLoaded');
 
         if (!markup) {
@@ -94,19 +97,18 @@ $.extend(Mobify.transform, {
 
         // We'll write markup a tick later, as Firefox logging is async
         // and gets interrupted if followed by synchronous document.open
-        window.setTimeout(function(){
+        setTimeout(function() {
             // `document.open` clears events bound to `document`.
             document.open();
-
             // In Webkit, `document.write` immediately executes inline scripts 
             // not preceded by an external resource.
             document.write(markup);
             document.close();
         });
-    },
+    }
 
     // Kickstart processing. Guard against beginning before the document is ready.
-    run: function(conf) {
+  , run: function(conf) {
         var prepareConf = function() {
             // Do NOT proceed unless we're ready.
             if (!/complete|loaded/.test(document.readyState)) {
