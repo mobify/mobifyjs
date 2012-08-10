@@ -71,13 +71,51 @@ if (mode == Modes.Source) {
      * In `Source` mode, we render the `source` markup with our special choosey 
      * JavaScript and send the `result` to the App.
      */
+
+    var evalDataToJson = function(data) {
+        var json = {};
+
+        for (var key in data) {
+            if (!data.hasOwnProperty(key)) return;
+
+            var value = data[key];
+            var type = typeof value;
+
+            if (type == undefined || type == "undefined") {
+                console.log('undefined')
+            } else if (type == "string") {
+                json[key] = value;
+            } else if (value.__proto__ == Array.prototype) {
+                json[key] = evalDataToJson(value);
+            } else if( Object.prototype.toString.call( value ) === '[object Object]' ) {
+                json[key] = evalDataToJson(value);
+            } else if (value instanceof Mobify.$.fn.constructor) {
+                console.log('jquery')
+                json[key] = "" + value;
+            } else {
+                json[key] = "" + value;
+            }   
+        }
+
+        return json
+    }
+
     var oldEmitMarkup = Mobify.transform.emitMarkup;
-    Mobify.transform.emitMarkup = function(markup) {    
-      var original = Mobify.html.extractHTML().all();
-      var index = original.indexOf("</body>");
-      original = original.substring(0, index) + "<link rel='stylesheet' href='http://cloud-dev.mobify.com:8000/static/choose/assets/css/index.css'><script data-main='http://cloud-dev.mobify.com:8000/static/choose/app/config' src='http://cloud-dev.mobify.com:8000/static/choose/assets/js/libs/require.js'></script>" + original.substring(index)
-      set('result', markup);
-      oldEmitMarkup(original);
+    Mobify.transform.emitMarkup = function(adaptedHtml) {
+        var data = Mobify.evaluatedData;
+        debugger;
+        var json = evalDataToJson(data);
+
+        console.log('SourceFrame: Ready to message - ', json);
+
+        var sourceHtml = Mobify.html.extractHTML().all();
+        var index = sourceHtml.indexOf("</body>");
+        sourceHtml = sourceHtml.substring(0, index) + "<link rel='stylesheet' href='http://cloud-dev.mobify.com:8000/static/choose/assets/css/index.css'><script data-main='http://cloud-dev.mobify.com:8000/static/choose/app/config' src='http://cloud-dev.mobify.com:8000/static/choose/assets/js/libs/require.js'></script>" + sourceHtml.substring(index)
+        
+        // We could get rid of some things here.
+        set('result', {html: adaptedHtml, data: json});
+        
+        oldEmitMarkup(sourceHtml);
     };
 
     /**
