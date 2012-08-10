@@ -139,21 +139,30 @@ if (mode == Modes.Source) {
 
 } else {
     /**
-     * In `Preview` mode, the frame waits for the `result` HTML from the
-     * app. We render it when it comes in. 
+     * In `Preview` mode, this window awaits `result` HTML from the App.
+     * We render it using `document.write` when it comes in and then setup
+     * to recieve more messages.
      */
     Mobify.transform.run = function() {
-        var onMessage = function(event) {
+        var onMessage = function onMessage(event) {
                 // console.log('PreviewFrame: Got Message:', event);
                 var data = event.data;
                 if (data.action !== 'result') return;
+
+                var html = data.value
+                var index = html.indexOf('</body')
+                // Rebind to receive the next message.
+                html = html.substring(0, index)
+                     + "<script>window.addEventListener('message', " + onMessage.toString() + ", '*');<\/script>" 
+                     + html.substring(index);
+
                 document.open();
-                document.write(data.value);
+                document.write(html);
                 document.close();
             }
 
         window.addEventListener('message', onMessage, false);
-        // console.log('PreviewFrame: Waiting for result from App.')'
+        // console.log('PreviewFrame: Waiting for result from App.');
     }
 }
 

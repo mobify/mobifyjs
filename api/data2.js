@@ -1,6 +1,11 @@
-(function($) { 
+/**
+ * Data utilities!
+ */
+(function(Mobify) { 
     
-var console = Mobify.console
+var $ = Mobify.$
+
+  , console = Mobify.console
 
   , gatherEmpties = function(assignment, ref, value) {
         var root = this.root
@@ -80,6 +85,9 @@ var console = Mobify.console
         return done ? result : async;
     }
 
+    /**
+     * Lock the context to the source DOM.
+     */
   , anchor = function($root) {
         var rootedQuery = function(selector, context, rootQuery) {
                 $root = $root || (Mobify.conf.data && Mobify.conf.data.$html);
@@ -90,7 +98,8 @@ var console = Mobify.console
           , anchored = $.sub(rootedQuery); 
 
         anchored.context = function() {
-            return $root || (Mobify.conf.data ? Mobify.conf.data.$html : '<div>');
+            var context = $root || (Mobify.conf.data ? Mobify.conf.data.$html : '<div>');
+            return context;
         }
 
         if (!anchored.zepto)  {
@@ -101,6 +110,7 @@ var console = Mobify.console
         return anchored;
     };
 
+// Zepto doesn't define sub.
 $.sub = $.sub || function(rootedQuery) {
     $.extend(rootedQuery, $);
     rootedQuery.zepto = $.extend({}, $.zepto);
@@ -114,8 +124,8 @@ $.fn.anchor = function() {
 Mobify.data2 = {
     gatherEmpties: gatherEmpties
 
-  , makeCont: function(opts) {
-        var cont = new Mobify.data2.cont($.extend({}, {laziness: -1 }, opts));
+  , makeCont: function(options) {
+        var cont = new Mobify.data2.cont($.extend({}, {laziness: -1 }, options));
         if (Mobify.config.isDebug) {
             cont
                 .on('assignReference', gatherEmpties)
@@ -126,10 +136,14 @@ Mobify.data2 = {
 
   , Async: Async
 
-  , M: {
-        $ : anchor(), 
-        async: Async
+    // Mobify.data2.M
+    // Passed as the context to `Mobify.transform.run`.
+  , M: function() {
+        return {
+            $: anchor()
+          , async: Async
+        }
     }
 };
     
-})(Mobify.$);
+})(Mobify);

@@ -36,29 +36,32 @@ var $ = Mobify.$
   , config = Mobify.config
 
 $.extend(transform, {
-    // Read the conf, extract the Source DOM and begin the evaluation.
-    prepareConf : function(rawConf) {
+    /**
+     * Read the conf, extract the Source DOM and begin the evaluation.
+     */
+    prepareConf: function(rawConf) {
         var capturedState = html.extractDOM();
         capturedState.config = config;
-        
         // If conf is using data2 evaluation in a {+conf} or {+konf}, this call would provide
         // an interpretable source data object. 
         // If conf is using just a function(), the return value is not useful,
         // as result HTML would be provided as sole argument of a callback.
         var conf = Mobify.conf = rawConf.call(
-            Mobify.data2 && Mobify.data2.M,
-            capturedState,
-            transform.acceptData // This is escape path for function-based confs
-        );
+                Mobify.data2 && Mobify.data2.M(),
+                capturedState,
+                // This is escape path for function-based confs
+                transform.acceptData);
 
         // And this is the normal data evaluation
         if (conf && conf.data) {
             timing.addPoint('Setup Conf');
+
             conf.data = $.extend(capturedState, conf.data);
+
             Mobify.evaluatedData = undefined;
 
             var cont = Mobify.data2.makeCont({source: capturedState})
-                .on('complete', transform.acceptData);
+                        .on('complete', transform.acceptData);
 
             timing.addPoint('Prepared conf for evaluation');
             timing.addSelector('Start');
@@ -66,8 +69,9 @@ $.extend(transform, {
         }
     }
 
-    // `acceptData` is exposed on `Mobify` so it can be overridden for server-side adaptation.
-    // Called when the `konf` has been evaluated.
+    /**
+     * Called after the `konf` has been evaluated.
+     */
   , acceptData: function(data, cont) {     
         if (!Mobify.evaluatedData) {
             Mobify.evaluatedData = data;
@@ -75,8 +79,9 @@ $.extend(transform, {
             timing.addPoint('Evaluated Conf');
         }
         
-        var outputHTML = (typeof data == "string") ? data : data.OUTPUTHTML;
-        var enabled = html.enable(outputHTML || '');
+        var outputHTML = (typeof data == "string") ? data : data.OUTPUTHTML
+          , enabled = html.enable(outputHTML || '');
+
         timing.addPoint('Enabled Markup');
         transform.emitMarkup(enabled);
     }

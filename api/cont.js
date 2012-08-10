@@ -1,4 +1,8 @@
+/**
+ * `cont` datastructure API.
+ */
 (function($, Mobify, undefined) {
+
     var decodeAssignmentRe = /^([?!]?)(.*)$/
         ,Location = window.Location
         ,Stack = Mobify.data2.stack
