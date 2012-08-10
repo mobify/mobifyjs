@@ -27,16 +27,19 @@ The current document is replaced by using document.open/write/close. This makes
 the browser behave as if the templated HTML was the regular source.
 
 */
-(function(document, $, Mobify) {
+(function(document, Mobify) {
 
-var timing = Mobify.timing
-  , transform = Mobify.transform = Mobify.transform || {};
+var $ = Mobify.$
+  , timing = Mobify.timing
+  , transform = Mobify.transform = Mobify.transform || {}
+  , html = Mobify.html
+  , config = Mobify.config
 
-$.extend(Mobify.transform, {
+$.extend(transform, {
     // Read the conf, extract the Source DOM and begin the evaluation.
     prepareConf : function(rawConf) {
-        var capturedState = Mobify.html.extractDOM();
-        capturedState.config = Mobify.config;
+        var capturedState = html.extractDOM();
+        capturedState.config = config;
         
         // If conf is using data2 evaluation in a {+conf} or {+konf}, this call would provide
         // an interpretable source data object. 
@@ -73,7 +76,7 @@ $.extend(Mobify.transform, {
         }
         
         var outputHTML = (typeof data == "string") ? data : data.OUTPUTHTML;
-        var enabled = Mobify.html.enable(outputHTML || '');
+        var enabled = html.enable(outputHTML || '');
         timing.addPoint('Enabled Markup');
         transform.emitMarkup(enabled);
     }
@@ -91,7 +94,7 @@ $.extend(Mobify.transform, {
 
         timing.addPoint('Writing Document');
 
-        if (Mobify.config.isDebug) {
+        if (config.isDebug) {
             timing.logPoints();
         }
 
@@ -107,20 +110,22 @@ $.extend(Mobify.transform, {
         });
     }
 
-    // Kickstart processing. Guard against beginning before the document is ready.
+    /**
+     * Begin the adaptation.
+     */
   , run: function(conf) {
         var prepareConf = function() {
-            // Do NOT proceed unless we're ready.
-            if (!/complete|loaded/.test(document.readyState)) {
-                return setTimeout(prepareConf, 15);
-            }
-            Mobify.transform.prepareConf(conf);
-        };
+                // Do not pass go until ready.
+                if (!/complete|loaded/.test(document.readyState)) {
+                    return setTimeout(prepareConf, 15);
+                }
+                transform.prepareConf(conf);
+            };
 
         prepareConf();
     }
 });
 
-})(document, Mobify.$, Mobify);
+timing.addPoint('Walked Mobify.js');
 
-Mobify.timing.addPoint('Walked Mobify.js');
+})(document, Mobify);

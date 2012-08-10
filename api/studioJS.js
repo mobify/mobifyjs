@@ -10,7 +10,6 @@
 // if (!window.enableStudioJS) return;
 
 // if you are in an iframe... and its studio.. then load.
-
 var Modes = {
         Source: "source"
       , Preview: "preview"
@@ -59,7 +58,7 @@ var $ = Mobify.$
     }
 
     /**
-     * Send a message to the app.
+     * Send a message to Studio.
      */
   , set = function(key, value) {
         parent.postMessage({action: key, value: value}, '*');
@@ -67,50 +66,55 @@ var $ = Mobify.$
 
 
 if (mode == Modes.Source) {
+
+
     /**
      * In `Source` mode, we render the `source` markup with our special choosey 
      * JavaScript and send the `result` to the App.
      */
+    var dataToJson = function(data) {
+            var json = {};
 
-    var evalDataToJson = function(data) {
-        var json = {};
+            for (var key in data) {
+                if (!data.hasOwnProperty(key)) return;
 
-        for (var key in data) {
-            if (!data.hasOwnProperty(key)) return;
+                var value = data[key];
+                var type = typeof value;
 
-            var value = data[key];
-            var type = typeof value;
+                if (type == undefined || type == "undefined") {
+                    // console.log('undefined')
+                } else if (type == "string") {
+                    json[key] = value;
+                } else if (value.__proto__ == Array.prototype) {
+                    json[key] = dataToJson(value);
+                } else if (Object.prototype.toString.call(value) === '[object Object]') {
+                    json[key] = dataToJson(value);
+                } else if (value instanceof Mobify.$.fn.constructor) {
+                    json[key] = "" + value;
+                } else {
+                    json[key] = "" + value;
+                }   
+            }
 
-            if (type == undefined || type == "undefined") {
-                console.log('undefined')
-            } else if (type == "string") {
-                json[key] = value;
-            } else if (value.__proto__ == Array.prototype) {
-                json[key] = evalDataToJson(value);
-            } else if( Object.prototype.toString.call( value ) === '[object Object]' ) {
-                json[key] = evalDataToJson(value);
-            } else if (value instanceof Mobify.$.fn.constructor) {
-                console.log('jquery')
-                json[key] = "" + value;
-            } else {
-                json[key] = "" + value;
-            }   
+            return json
         }
-
-        return json
-    }
 
     var oldEmitMarkup = Mobify.transform.emitMarkup;
     Mobify.transform.emitMarkup = function(adaptedHtml) {
         var data = Mobify.evaluatedData;
-        debugger;
-        var json = evalDataToJson(data);
 
-        console.log('SourceFrame: Ready to message - ', json);
+        var json = dataToJson(data);
+
+        // console.log('SourceViewIframe: Ready to message - ', json);
 
         var sourceHtml = Mobify.html.extractHTML().all();
         var index = sourceHtml.indexOf("</body>");
-        sourceHtml = sourceHtml.substring(0, index) + "<link rel='stylesheet' href='http://cloud-dev.mobify.com:8000/static/choose/assets/css/index.css'><script data-main='http://cloud-dev.mobify.com:8000/static/choose/app/config' src='http://cloud-dev.mobify.com:8000/static/choose/assets/js/libs/require.js'></script>" + sourceHtml.substring(index)
+        // These scripts will also be responsible for binding 'after docwrite'
+        // listeners.
+        sourceHtml = sourceHtml.substring(0, index) 
+                   + "<link rel='stylesheet' href='http://cloud-dev.mobify.com:8000/static/choose/assets/css/index.css'>"
+                   + "<script data-main='http://cloud-dev.mobify.com:8000/static/choose/app/config' src='http://cloud-dev.mobify.com:8000/static/choose/assets/js/libs/require.js'></script>" 
+                   + sourceHtml.substring(index);
         
         // We could get rid of some things here.
         set('result', {html: adaptedHtml, data: json});
