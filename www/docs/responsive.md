@@ -12,7 +12,9 @@ is similarly powerful technique for adapting a page for mobile.
 We believe there's a time and a place for both. Responsive is great on 
 content-forward websites where you have full control over the original 
 markup. Mobify.js excels in situations where the original markup isn't 
-well-suited for mobile or can't be modified.
+well-suited for mobile or can't be modified. Mobify.js also offers more 
+fine-grained control over UX and allows per-device performance 
+optimization.
 
 But this doesn't need to be an either/or decision, you can use responsive 
 + Mobify.js side by side and take advantage of the strengths of each.
