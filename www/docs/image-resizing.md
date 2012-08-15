@@ -3,11 +3,15 @@ layout: doc
 title: Resizing Images with Mobify.js
 ---
 
+**This is a [Mobify Cloud](https://cloud.mobify.com/) feature, you must be a 
+Mobify Cloud user to use image resizing with Mobify.js**
+
+# Resizing Images with Mobify.js
 
 Mobify provides an image resizing web-service. Serving images of
 appropriate size and quality to mobile users can drastically improve
 load and rendering time for image heavy pages. Images retrieved through
-the service are automatically cached in the Mobile Cloud's Content
+the service are automatically cached in the Mobify Cloud's Content
 Distribution Network, for speedy retrieval around the globe.
 
 For basic usage, simply prepend the host `ir0.mobify.com` to existing

@@ -3,6 +3,8 @@ layout: doc
 title: Using Combo for Intelligent Script Loading
 ---
 
+**This is a [Mobify Cloud](https://cloud.mobify.com/) feature, you must be a 
+Mobify Cloud user to use Combo with Mobify.js**
 
 # Using Combo for Intelligent Script Loading
  
