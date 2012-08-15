@@ -35,38 +35,43 @@ var $ = Mobify.$
  * JavaScript and send the `result` to the App.
  */
 if (mode == Modes.Source) {
-    var dataToJson = function(data) {
-            var json = {};
+    var toString = Object.prototype.toString
 
-            for (var key in data) {
-                if (!data.hasOwnProperty(key)) return;
+      , keyify = function(target, source, prefix) {
+            var value, key, type;
 
-                var value = data[key];
-                var type = typeof value;
+            for (key in source) {
+                value = source[key];
 
-                if (type == undefined || type == "undefined") {
-                    // console.log('undefined')
-                } else if (type == "string") {
-                    json[key] = value;
-                } else if (value.__proto__ == Array.prototype) {
-                    json[key] = dataToJson(value);
-                } else if (Object.prototype.toString.call(value) === '[object Object]') {
-                    json[key] = dataToJson(value);
-                } else if (value instanceof Mobify.$.fn.constructor) {
-                    json[key] = "" + value;
+                if (prefix) {
+                    key = prefix + '.' + key;
+                }
+
+                // null, undefined etc?
+                if (value === undefined) {
+                    continue;
+                }
+
+                type = toString.call(value);
+
+                if (type == 'string') {
+                    target[key] = value;
+                } else if (type == '[object Array]') {
+                    target[key] =  'Array (' + value.length + ')';
+                } else if (type == '[object Function]') {
+                    target[key] = 'Function (' + value.toString().substr(0, 25) + ')';
+                } else if (value === Object(value)) {
+                    keyify(target, value, key);
                 } else {
-                    json[key] = "" + value;
-                }   
+                    target[key] =  ('' + value).substr(0, 25);
+                }
             }
-
-            return json
+            return target;
         }
 
-    var oldEmitMarkup = Mobify.transform.emitMarkup;
+      , oldEmitMarkup = Mobify.transform.emitMarkup;
+
     Mobify.transform.emitMarkup = function(adaptedHtml) {
-        // console.log('SourceViewIframe: All ready to go!');
-        var data = Mobify.evaluatedData;
-        var json = dataToJson(data);
         var sourceHtml = Mobify.html.extractHTML().all();
         var index = sourceHtml.indexOf("</body>");
         if (!index) return console.error('Cannot find </body>.')
@@ -79,7 +84,9 @@ if (mode == Modes.Source) {
                    + "<script data-main='http://cloud-dev.mobify.com:8000/static/choose/app/config' src='http://cloud-dev.mobify.com:8000/static/choose/assets/js/libs/require.js'></script>"
                    + sourceHtml.substring(index);
 
-        postMessage('result', {html: adaptedHtml, data: json});
+        var data = keyify({}, Mobify.evaluatedData);
+
+        postMessage('result', {html: adaptedHtml, data: data});
         
         oldEmitMarkup(sourceHtml);
     };
