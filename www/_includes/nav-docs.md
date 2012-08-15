@@ -7,6 +7,8 @@
   - [Handling JavaScript]({{ site.baseurl }}/docs/handling-javascript/)
   - [Mobify.js in Production]({{ site.baseurl }}/docs/mobifyjs-in-production/)
   - [Going Responsive]({{ site.baseurl }}/docs/responsive/)
+  - [Resizing Images]({{ site.baseurl }}/docs/image-resizing/)
+  - [Combined Script Loading]({{ site.baseurl }}/docs/combo/)
   - [Konf Reference]({{ site.baseurl }}/docs/konf-reference/)
     - [`OUTPUTHTML`]({{ site.baseurl }}/docs/konf-reference/#outputhtml)
     - [`context.data`]({{ site.baseurl }}/docs/konf-reference/#contextdatakey)
