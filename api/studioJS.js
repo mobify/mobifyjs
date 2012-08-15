@@ -92,34 +92,21 @@ if (mode == Modes.Source) {
     };
 
 /**
- * In `Preview` mode, await `result` message from the App for rendering.
- * We render it using `document.write` when it comes in and then setup
- * to recieve more messages.
+ * In `Preview` mode, await and eval messages from the App.
  */
 } else {
-    Mobify.transform.run = function() {
-        var onMessage = function onMessage(event) {
-                // console.log('PreviewFrame: Got Message:', event);
-                var data = event.data;
-                if (data.action !== 'result') return;
-
-                var html = data.value
-                var index = html.indexOf('</body>')
-                if (!index) return console.error('Cannot find </body>.')
-
-                // Rebind to receive the next message.
-                html = html.substring(0, index)
-                     + "<script>window.addEventListener('message', " + onMessage.toString() + ", '*');<\/script>" 
-                     + html.substring(index);
-
-                document.open();
-                document.write(html);
-                document.close();
+    var onMessage = Mobify.onMessage = function(event) {
+            // console.log('PreviewIframe: Got Message - ', event)
+            var data = event.data;
+            if (data.action == 'eval') {
+                window.eval.call(window, data.value);
             }
+        };
 
-        window.addEventListener('message', onMessage, false);
-        // console.log('PreviewFrame: Waiting for result from App.');
-    }
+    window.addEventListener('message', onMessage, false);
+
+    // Transforming is a noop!
+    Mobify.transform.run = function(){};
 }
 
 })(this, Mobify);
