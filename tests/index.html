@@ -407,12 +407,12 @@
             expect(2);
 
             var got = Mobify.getImageURL('http://test/image.jpg')
-              , vow = '//ir2.mobify.com/http://test/image.jpg';
+              , vow = '//ir0.mobify.com/http://test/image.jpg';
 
             equal(got, vow);
 
             got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
-            vow = '//ir2.mobify.com/320/http://test/image.jpg';
+            vow = '//ir0.mobify.com/320/http://test/image.jpg';
 
             equal(got, vow);
         });
@@ -423,7 +423,7 @@
             Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
 
             got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
-            vow = "//ir2.mobify.com/project-testing/320/http://test/image.jpg";
+            vow = "//ir0.mobify.com/project-testing/320/http://test/image.jpg";
 
             equal(got, vow);
 
