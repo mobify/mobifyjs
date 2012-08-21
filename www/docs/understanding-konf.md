@@ -46,8 +46,8 @@ to it:
     } {/konf}
 
 Here we have added the key _body-element_ which queries the source DOM
-by calling `$('body')` and returning the result. Inside the konf, `$` 
-references the [Zepto](http://zeptojs.com/) object and is the primary
+by calling `$('body')` and returning the result. Inside the konf block, 
+`$` references the [Zepto](http://zeptojs.com/) object and is the primary
 method for selecting elements.
 
 In this case it will return the source DOM's _&lt;body&gt;_ element.

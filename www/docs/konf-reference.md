@@ -8,6 +8,39 @@ title: Konf Reference
  - TOC
 {:toc}
 
+##  `$(selector)`
+
+Inside the `{<konf} ... {/konf}` block, `$` references the [Zepto](http://zeptojs.com/) 
+object. Its context is bound to the source DOM document.
+
+**Differences from the Regular DOM**
+
+Inside the source DOM, attributes on elements that would cause resource
+fetching are prefixed with `x-`. 
+
+| Tag     | Prefixed Attributes |
+|---------|---------------------|
+| img     | src, width, height  |
+| iframe  | src                 |
+| script  | src, type           |
+| link    | href                |
+| style   | media               |
+
+
+    // WRONG!!! No results in the source DOM.
+    $('img[src]')
+
+    // RIGHT!!! Search using the prefixed attribute.
+    $('img[x-src]')
+
+    // WRONG!!! Undefined in the source DOM.
+    $('img').attr('src')
+
+    // RIGHT!!! Retrieve the prefixed attribute.
+    $('img').attr('x-src')
+
+For rendering, all prefixes are removed except for `img[x-width]` and 
+`img[x-height]`.
 
 ##  `OUTPUTHTML`
     
