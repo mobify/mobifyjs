@@ -1,7 +1,20 @@
-(function($, Mobify) {
+/**
+ * Functions for disabling or enabling external resource loading attributes
+ * in HTML strings.
+ */
+(function(Mobify) {
 
-var keys = function(obj) { return $.map(obj, function(val, key) { return key }) }
-  , values = function(obj) { return $.map(obj, function(val, key) { return val }) }
+var $ = Mobify.$
+  , keys = function(obj) { 
+        return $.map(obj, function(val, key) {
+            return key 
+        }) 
+    }
+  , values = function(obj) { 
+        return $.map(obj, function(val, key) { 
+            return val 
+        }) 
+    }
 
   , openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
 
@@ -52,9 +65,11 @@ function disableAttributes(whole, tagName, tail) {
 }
 
 $.extend(HTML, {       
-    // Returns a string with all external attributes disabled.
-    // Includes special handling for resources referenced in scripts and inside
-    // comments.
+    /**
+     * Returns a string with all external attributes disabled.
+     * Includes special handling for resources referenced in scripts and inside
+     * comments.
+     */
     disable: function(htmlStr) {            
         var splitRe = /(<!--[\s\S]*?-->)|(?=<\/script)/i
           , tokens = htmlStr.split(splitRe)
@@ -76,10 +91,12 @@ $.extend(HTML, {
         return [].concat.apply([], ret).join('');
     },
 
-    // Returns a string with all disabled external attributes enabled.
+    /**
+     * Returns a string with all disabled external attributes enabled.
+     */
     enable: function(htmlStr) {
         return htmlStr.replace(attributeEnablingRe, ' $1').replace(tagEnablingRe, '');
     }
 });
     
-})(Mobify.$, Mobify);
+})(Mobify);
