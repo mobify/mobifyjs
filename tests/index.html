@@ -120,6 +120,10 @@
         <script x-src="script.js" type="text/mobify-script" x-type="text/javascript"><\/script>
     </script>    
 
+    <script id="test-enable-double-src" type="text/test">
+        <img x-src="x-src" src="src" />
+    </script>    
+
     <script id="test-extractHTMLFromElement" type="text/test">
         <div>
             <!-- comment -->
@@ -484,6 +488,14 @@
                     + '<iframe src="iframe.html"></iframe> '
                     + '<style></style> '
                     + '<script src="script.js" type="text/javascript"><\/script>'
+
+            equal(got, vow);
+        });
+
+        // Document existing double src behaviour.
+        test('Mobify.html.enable - double source', function() {
+            var got = Mobify.html.enable(getText('#test-enable-double-src'))
+              , vow = '<img src="x-src" src="src" />'
 
             equal(got, vow);
         });

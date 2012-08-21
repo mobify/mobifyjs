@@ -8,6 +8,7 @@
   - [Mobify.js in Production]({{ site.baseurl }}/docs/mobifyjs-in-production/)
   - [Going Responsive]({{ site.baseurl }}/docs/responsive/)
   - [Konf Reference]({{ site.baseurl }}/docs/konf-reference/)
+    - [`$(selector)`]({{ site.baseurl }}/docs/konf-reference/#selector)
     - [`OUTPUTHTML`]({{ site.baseurl }}/docs/konf-reference/#outputhtml)
     - [`context.data`]({{ site.baseurl }}/docs/konf-reference/#contextdatakey)
     - [`context.tmpl`]({{ site.baseurl }}/docs/konf-reference/#contexttmpltemplate)
