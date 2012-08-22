@@ -29,6 +29,10 @@ Konf
 : A JavaScript file that enables content selection and template 
 rendering from a source DOM.
 
+[Jazzcat]({{ site.baseurl }}/docs/jazzcat/)
+
+: A Mobify Cloud feature that improves script loading performance.
+
 Rendered DOM
 
 : The mobile site's post-adaptation DOM, the output of Mobify.js.
