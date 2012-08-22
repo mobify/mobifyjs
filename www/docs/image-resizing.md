@@ -1,39 +1,54 @@
 ---
 layout: doc
-title: Resizing Images with Mobify.js
+title: Image Resizing with Mobify.js
 ---
 
-**This is a [Mobify Cloud](https://cloud.mobify.com/) feature, you must be a 
-Mobify Cloud user to use image resizing with Mobify.js**
+The image resizing service is a [Mobify Cloud](https://cloud.mobify.com/) 
+feature. You must be a Mobify Cloud user to use it with Mobify.js.
 
-# Resizing Images with Mobify.js
+<a href="//cloud.mobify.com/" class="btn btn-primary rounded">Try Mobify Cloud for Free</a>
 
-Mobify provides an image resizing web-service. Serving images of
-appropriate size and quality to mobile users can drastically improve
-load and rendering time for image heavy pages. Images retrieved through
-the service are automatically cached in the Mobify Cloud's Content
-Distribution Network, for speedy retrieval around the globe.
+----
 
-For basic usage, simply prepend the host `ir0.mobify.com` to existing
-images:
+# Image Resizing with Mobify.js
 
-    <img src="//www.mobify.com/i/logo-mobify-sm.png" />
-    <img src="//ir0.mobify.com/http://www.mobify.com/i/logo-mobify-sm.png" />
+Mobify provides an image resizing service to improve load and rendering
+time for image heavy pages.
 
-Mobify.js provides `$.fn.resizeImages()` to help use the image resizer.
+Imagine you are loading a page with a very large image on an iPhone:
 
-### `.resizeImages ( )`
+    <img src="2000px_by_2000px.jpg" />
 
-*Changes the `src` of matched elements to be loaded through the Mobile
-Cloud.*
+On most pages, there is no point in loading the image at such a high
+resolution as it will look similiar to a smaller image after it is
+scaled by the browser to fit its container.
 
--   `.resizeImages ( )`
--   `.resizeImages ( width )`
--   `.resizeImages ( options )`
+The resizing service can be used to scale images to an appropriate size
+for mobile devices, reducing their weight!
 
-### Usage
+    <img src="//ir0.mobify.com/640/2000px_by_2000px.jpg" />
 
-`$.fn.resizeImages` is used to change images in the konf.
+----
+
+## Usage
+
+Mobify.js provides an API to format images for use with the image 
+resizing service. Inside your konf, use `$` to select the images you 
+would like to resize and then format them using `resizeImages`:
+
+    'img': function() {
+        var $imgs = $('img').resizeImages();
+        return $imgs;    
+    }
+
+----
+
+## Reference
+
+### `$.fn.resizeImages`
+
+Searches the collection for image elements and modifies images to use
+the image resize service.
 
 Passing no arguments loads matched images through the Mobile Cloud:
 
@@ -64,10 +79,12 @@ Pass an object to further customize behaviour:
 
 Note that the quality parameter will only be honoured for JPEG images.
 
-### Styling
+----
 
-Use CSS to style image elements by setting max-width to your desired
-width and max-height to auto. This way the image will be layed out
+## Styling
+
+Use CSS to style image elements by setting `max-width` to your desired
+width and `max-height` to auto. This way the image will be layed out
 correctly regardless of the pixel dimensions of the returned image. Be
 sure that your desired width is not greater than the original image
 dimensions.
@@ -84,20 +101,19 @@ dimensions.
     <!-- Output -->
     <img src="http://ir0.mobify.com/200/http://www.mobify.com/wp-content/uploads/2011/12/home-mobile-transformation.png" />
 
-Notes
-=====
+----
 
--   If the resized file is larger than than the original file, and no
-    change format has been specified, the original image will be served.
+##  Notes
 
--   All pixel sizing arguments should be given in CSS pixels. Scaling to
-    device pixels is handled automatically.
+- If the resized file is larger than than the original file, and no
+  change format has been specified, the original image will be served.
 
--   Requests are automatically sharded across several domains to
-    minimize blocking.
+- All pixel sizing arguments should be given in CSS pixels. Scaling to
+  device pixels is handled automatically.
 
--   Resized GIFs will be output as 24-bit PNGs.
+- Requests are automatically sharded across several domains to
+  minimize blocking.
 
--   Images are cached indefinitely.
+- Resized GIFs will be output as 24-bit PNGs.
 
-
+- Images are cached indefinitely.
