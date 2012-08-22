@@ -399,24 +399,23 @@
         test('$.fn.resizeImages non-http-url', function() {
             expect(1);
 
-            $('#resizeImages-non-http').resizeImages();
-            var i = $('#resizeImages-non-http img');
-            var url = i.attr('x-src');
+            var $imgs = $('#resizeImages-non-http').resizeImages()
+              , got = $imgs.attr('x-src')
+              , vow = "gopher://archie.ftp.mailto/somanyprotocols"
 
-            equal(url, "gopher://archie.ftp.mailto/somanyprotocols", 
-                "Non-http url unchanged");
+            equal(got, vow, "Non-http url unchanged");
         });
 
         test('Mobify.getImageURL', function() {
             expect(2);
 
             var got = Mobify.getImageURL('http://test/image.jpg')
-              , vow = '//ir2.mobify.com/http://test/image.jpg';
+              , vow = '//ir0.mobify.com/http://test/image.jpg';
 
             equal(got, vow);
 
             got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
-            vow = '//ir2.mobify.com/320/http://test/image.jpg';
+            vow = '//ir0.mobify.com/320/http://test/image.jpg';
 
             equal(got, vow);
         });
@@ -424,14 +423,16 @@
         test('Mobify.getImageURL - projectName set on Mobify.conf.data', function() {
             expect(1);
             
-            Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
+            try {
+                Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
 
-            got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
-            vow = "//ir2.mobify.com/project-testing/320/http://test/image.jpg";
+                got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
+                vow = "//ir0.mobify.com/project-testing/320/http://test/image.jpg";
 
-            equal(got, vow);
-
-            delete Mobify.$.fn.resizeImages.defaults.projectName;
+                equal(got, vow);
+            } finally {
+                delete Mobify.$.fn.resizeImages.defaults.projectName;
+            }
         });
 
 
