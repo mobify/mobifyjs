@@ -273,7 +273,7 @@ var $ = Mobify.$
   , defaults = combineScripts.defaults = {
         selector: 'script'
       , attribute: 'x-src'
-      , endpoint: '//combo.mobify.com/jsonp/'
+      , endpoint: '//jazzcat.mobify.com/jsonp/'
       , execCallback: 'Mobify.combo.exec'
       , loadCallback: 'Mobify.combo.load'
     }
