@@ -9,11 +9,12 @@ var nodeName = function(node) {
         // nodeType check is here to ignore things like form elements (which do have length)
         if (element && !element.nodeType && (typeof element.length == "number")) return element[0];
         return element;
-  }
+  };  
 
+var html = Mobify.html = {
     // Return a string for the opening tag of DOMElement `element`.
     // This function can be reused by templating, so it unwraps jQuery/Zepto objects if given
-  , openTag = function(el) {
+    openTag : function(el) {
         var element = peel(el);
         if (!element) return '';
 
@@ -28,7 +29,7 @@ var nodeName = function(node) {
 
     // Return a string for the closing tag of DOMElement `element`.
     // This function can be reused by templating, so it unwraps jQuery/Zepto objects if given
-  , closeTag = function(el) {
+  , closeTag : function(el) {
         var element = peel(el);
         if (!element) return '';
 
@@ -36,7 +37,9 @@ var nodeName = function(node) {
     }
 
     // Return a string for the doctype of the current document.
-  , doctype = function() {
+  , doctype : function(doc) {
+        doc = doc || document;
+
         var doctypeEl = document.doctype || [].filter.call(document.childNodes, function(el) {
                 return el.nodeType == Node.DOCUMENT_TYPE_NODE
             })[0];
@@ -50,7 +53,7 @@ var nodeName = function(node) {
     }
 
     // Returns a string of the unesacped content from a plaintext escaped `container`.
-  , extractHTMLFromElement = function(container) {
+  , extractFromElement : function(container) {
         if (!container || !container.childNodes) return '';
 
         return [].map.call(container.childNodes, function(el) {
@@ -63,17 +66,13 @@ var nodeName = function(node) {
             }
             return el.outerHTML || el.nodeValue;
         }).join('');
-    };  
+    }
 
-var html = Mobify.html = {
-    'openTag' : openTag
-  , 'closeTag' : closeTag
-  , 'extractHTMLFromElement' : extractHTMLFromElement
-  , 'memo' : {}
+  , memo : {}
 
     // Returns an object containing the state of the original page. Caches the object
     // in `extractedHTML` for later use.
-  , 'extractHTML' : function() {
+  , extract : function() {
         if (html.memo.extracted) return html.memo.extracted;
 
         var headEl = document.getElementsByTagName('head')[0] || document.createElement('head')
@@ -81,13 +80,13 @@ var html = Mobify.html = {
           , htmlEl = document.getElementsByTagName('html')[0];
 
         return html.memo.extracted = {
-            doctype: doctype()
-          , htmlTag: openTag(htmlEl)
-          , headTag: openTag(headEl)
-          , bodyTag: openTag(bodyEl)
-          , headContent: extractHTMLFromElement(headEl)
-          , bodyContent: extractHTMLFromElement(bodyEl)
-          , all : function(inject) {
+            doctype: html.doctype()
+          , htmlTag: html.openTag(htmlEl)
+          , headTag: html.openTag(headEl)
+          , bodyTag: html.openTag(bodyEl)
+          , headContent: html.extractFromElement(headEl)
+          , bodyContent: html.extractFromElement(bodyEl)
+          , html : function(inject) {
                 // RR: I assume that Mobify escaping tag is placed in <head>. If so, the <plaintext>
                 // it emits would capture the </head><body> boundary, as well as closing </body></html>
                 return this.doctype + this.htmlTag + this.headTag + (inject || '') + this.headContent + this.bodyContent;
@@ -97,10 +96,10 @@ var html = Mobify.html = {
 
     // Rewrite document contents with provided markup via document.write() replacement.
     // If provided string is empty, capture the source markup from escaping tags.   
-  , 'writeHTML' : function(markup) {
+  , writeHTML : function(markup) {
         if (!markup) {
             var inject = Mobify.ajs && ('<script defer src="' + Mobify.ajs + '"></script>');
-            markup = html.extractHTML().all(inject);
+            markup = html.extract().html(inject);
         }
 
         if (html.memo) html.memo.written = markup;
@@ -119,7 +118,7 @@ var html = Mobify.html = {
         });
     }
 
-  , 'unmobify' : function() {
+  , unmobify : function() {
         var unmobifier = function() {
             document.removeEventListener('DOMContentLoaded', unmobifier, false);
             html.writeHTML();

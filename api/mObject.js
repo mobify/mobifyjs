@@ -46,7 +46,7 @@ var emitDust = function(elem, context, bodies, extras) {
 MObject.all = [];
 MObject.prototype = {
     done: function() { return !this._outstanding.length }
-  , _iterate: function(isChoose, source) {
+  , _iterate: function(isChoose, source, importance) {
         var source = $.isArray(source[0]) ? source[0] : source
           , mobject = this;
 
@@ -58,7 +58,7 @@ MObject.prototype = {
                     addition.call(mobject, mobject);                    
                 } else {
                     $.each(addition, function(key, value) {
-                        mobject.set(key, value);
+                        mobject.set(key, value, importance);
                     });
                 }
                 if (isChoose) break;
@@ -70,10 +70,6 @@ MObject.prototype = {
     }
   , choose: function() {
         this._iterate.call(this, true, arguments);
-        return this;
-    }
-  , add: function() {
-        this._iterate.call(this, false, arguments);
         return this;
     }
   , addTo: function(obj, key) {
@@ -92,22 +88,30 @@ MObject.prototype = {
         }
         return walk;
     }
-  , set: function(key, value) {
-        var importance = this._setImportance || 0;
-        this._setImportance = 0;
-
-        if (typeof value === "function") {
-            try {
-                value = value.call(this, this);
-            } catch(e) {
-                if (e === mobject._M.stopper) throw e;
-                value = e;
-            }
+  , set: function(key, value, importance) {
+        var imp = importance;
+        if ((typeof imp === "undefined") || (typeof key === "object")) {
+            imp = this._setImportance || 0;
+            this._setImportance = 0;
         }
-        this._record(importance, key, value);
+
+        if (typeof key === "object") {
+            this._iterate.call(this, false, arguments, imp);
+        } else if (key !== undefined) {
+
+            if (typeof value === "function") {
+                try {
+                    value = value.call(this, this);
+                } catch(e) {
+                    if (e === mobject._M.stopper) throw e;
+                    value = e;
+                }
+            }
+            this._record(key, value, imp);
+        }
         return this;        
     }
-  , _record: function(importance, key, value) {
+  , _record: function(key, value, importance) {
         if ((importance === 1) && (isEmpty(value) || !value)) {
             throw new Error("Missed key " + key);
         }
@@ -154,13 +158,9 @@ MObject.prototype = {
         init();
         return mobject;
     }
-  , end: function(htmlStr) {
-        this.outerHTML = htmlStr;
-        return this._M.end(this);
-    }
   , tmpl: function(template, callback) {
         var M = this._M;
-        callback = callback || M._emitTemplatingResult;
+        callback = callback || function() { return M._emitTemplatingResult.apply(M, arguments); }
 
         return this.async(function(data, done) {
             return M.tmpl(template, data, function(err, result) {

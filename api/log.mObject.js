@@ -53,31 +53,31 @@
     var timing = Mobify.timing;
 
     var override = function(name, fn) {
-        fn.superb = MObject.prototype[name];
+        fn.wrapped = MObject.prototype[name];
         MObject.prototype[name] = fn;
     };
 
-    override('add', function add() {
-        timing.lazyGroup('Add');
-        var result = add.superb.apply(this, arguments);
-        timing.groupEnd();
-        return result;
+    override('set', function set(key, value) {
+        if (typeof key === "string") {
+            timing.group('Set "' + key + '"');
+            return set.wrapped.apply(this, arguments);
+        } else {
+            timing.lazyGroup('Set');
+            var result = set.wrapped.apply(this, arguments);
+            timing.groupEnd();
+            return result;
+        }
     });
 
     override('choose', function choose() {
         timing.lazyGroup('Choose');
-        var result = choose.superb.apply(this, arguments);
+        var result = choose.wrapped.apply(this, arguments);
         this._choice = true;
         timing.groupEnd();
         return result;
     });
 
-    override('set', function set(key, value) {
-        timing.group('Set "' + key + '"');
-        return set.superb.apply(this, arguments);
-    });
-
-    override('_record', function _record(importance, key, value) {
+    override('_record', function _record(key, value, importance) {
         if (importance === 0) {
             if (MObject.isEmpty(value)) {
                 this._empties[key] = value;
@@ -86,9 +86,13 @@
             } 
         }
         
+        debugger;
         timing.groupEnd();
-        _record.superb.apply(this, arguments);
-        if (value instanceof MObject) value._subMObjects.push({parent: this, key: key});
+        _record.wrapped.apply(this, arguments);
+        if (value instanceof MObject) {
+
+            value._subMObjects.push({parent: this, key: key});
+        }
     });
 
 })(Mobify, Mobify.$);

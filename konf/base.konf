@@ -1,13 +1,8 @@
 Mobify.points.push(new Date);
 
-{>"/base/vendor/advice.js"/}
-Mobify.advice = window.advice;
-delete window.advice;
-
 {>"/base/api/ark.js"/}
 
 {#lib_export name="jquery"}
-    window.Mobify = window.Mobify || {};
     {+jquery}
         {>"/base/vendor/zepto/src/polyfill.js"/}
         {>"/base/vendor/zepto/src/zepto.js"/}
@@ -66,10 +61,10 @@ Mobify.$.extend(Mobify.config, {
 {/tmpl}
 
 {+main}
-Mobify.transform.run({+rawconf}function(sourceHTML, complete) {
+Mobify.transform.run(function(sourceHTML, complete) {
     var $ = this.$, M = this;
     complete();
-    )}{/rawconf}
+    )}
 );
 {/main}
 

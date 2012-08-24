@@ -33,40 +33,73 @@ replacement HTML was originally sent down the pipe.
 (function(document, $, Mobify) {
 
 var timing = Mobify.timing;
-
-Mobify.transform = {
-    // Read the conf, extract the Source DOM and begin the evaluation.
-    prepareConf : function(rawConf) {
-        var capturedState = Mobify.html.extractDOM();
+var transform = Mobify.transform = {
+    prepareSource : function() {
+        var capturedState = Mobify.html.extract();
         capturedState.config = Mobify.config;
-        Mobify.MObject.evalConf(rawConf, capturedState, Mobify.transform.acceptHTML);
-    },
+        return capturedState;
+    }
+  , stringifyResult: function(obj) {
+        obj = obj || "";
 
-    // `acceptHTML` is exposed on `Mobify` so it can be overridden for server-side adaptation.
-    // Called when the `konf` has been evaluated.
-    acceptHTML: function(markup) {
+        if (obj.outerHTML) obj = obj.outerHTML;
+        if (obj.appendTo) obj = obj.map(function(el) { return el.outerHTML || "" }).join("");
+        if (obj.document) obj = obj.document;
+        if (obj.nodeType === Node.DOCUMENT_NODE) {
+            obj = Mobify.html.doctype(doc) + document.documentElement.outerHTML;
+        }
+
+        return obj;
+    }
+  , writeResult: function(markup) {
         markup = markup || "";
         Mobify.html.memo.accepted = markup;
         timing.addPoint('Adapted passive document');
+            
+        Mobify.html.writeHTML(markup);
+    }
+  , setup: function(fn, source, callback) {
+        var called = false;
+        var callbackOnce = function(result) {
+            if (called) return;
+            called = true;
 
-        var enabledMarkup = Mobify.html.enable(markup);
-        timing.addPoint('Re-enabled external resources');    
-        Mobify.html.writeHTML(enabledMarkup);
-    },
+            if (result instanceof Error) result = result.payload;
+            callback(result);
+        }
 
-    // Kickstart processing. Guard against beginning before the document is ready.
-    run: function(conf) {
-        timing.addPoint('Started adaptation');
-        var prepareConf = function() {
-            // Do NOT proceed unless we're ready.
+        try {
+            Mobify.timing.addPoint('Starting extraction');
+            fn.call(this, source, callbackOnce);
+        } catch (e) {
+            callbackOnce(e);
+        }
+    }
+  , adaptHTML: function(adaptFn) {
+        var runWhenReady = function() {
             if (!/complete|loaded/.test(document.readyState)) {
-                return setTimeout(prepareConf, 15);
+                return setTimeout(runWhenReady, 15);
             }
             timing.addPoint('Document ready for extraction');
-            Mobify.transform.prepareConf(conf);
+            transform.setup(adaptFn, transform.prepareSource(), transform.writeResult);
         };
 
-        prepareConf();
+        timing.addPoint('Started adaptation');
+        runWhenReady();
+    }
+  , adaptDOM: function(adaptFn) {
+        this.adaptHTML(function(source, callback) {
+            var dom = Mobify.html.extractDOM(source);
+            adaptFn.call(this, dom, function(result) {
+                return callback(Mobify.html.enable(Mobify.transform.stringifyResult(result)));
+            });
+        });
+    }
+  , adapt: function(adaptFn) {
+        this.adaptDOM(function(source, callback) {            
+            var M = Mobify.MObject.bindM(source, callback);
+            adaptFn.call(M, source, callback);
+        });
     }
 };
 

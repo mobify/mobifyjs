@@ -1,3 +1,5 @@
+window.Mobify = window.Mobify || {};
+
 if ($.noConflict) {
 	Mobify.$ = $.noConflict(true)
 } else {

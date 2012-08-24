@@ -38,11 +38,18 @@
         throw args;
     }
 
-    var oldAcceptHTML = Mobify.transform.acceptHTML;
-    Mobify.transform.acceptHTML = function() {
-        oldAcceptHTML.apply(this, arguments);
-        console.logTiming();
-        console.logMObjects();
+    var oldAdaptHTML = Mobify.transform.adaptHTML;
+
+    Mobify.transform.adaptHTML = function(adaptFn) {
+        oldAdaptHTML.call(this, function(source, callback) {
+            adaptFn.call(this, source, function(result) {
+                callback(result);
+                console.logTiming();
+                console.logMObjects();                
+            });
+        });
+
+        
     };
 
 })(Mobify, Mobify.$);

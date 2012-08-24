@@ -9,7 +9,6 @@ var guillotine = function(captured) {
         // <body> inside a comment, common with IE conditional comments.
         var bodySnatcher = /<!--(?:[\s\S]*?)-->|(<\/head\s*>|<body[\s\S]*$)/gi;
 
-        captured = $.extend({}, captured);
         //Fallback for absence of </head> and <body>
         var rawHTML = captured.bodyContent = captured.headContent + captured.bodyContent;
         captured.headContent = '';
@@ -64,9 +63,9 @@ var guillotine = function(captured) {
 // 1. Get the original markup from the document.
 // 2. Disable the markup.
 // 3. Construct the source pseudoDOM.    
-Mobify.html.extractDOM = function() {
+Mobify.html.extractDOM = function(markup) {
     // Extract escaped markup out of the DOM
-    var captured = guillotine(Mobify.html.extractHTML());
+    var captured = guillotine($.extend({}, markup));
     
     Mobify.timing.addPoint('Extracted source HTML');
     
@@ -81,13 +80,12 @@ Mobify.html.extractDOM = function() {
     
     Mobify.timing.addPoint('Disabled external resources');
 
-    var result = {
-        'doctype' : captured.doctype
-      , 'document' : document
+    $.extend(captured, {
+        'document' : document
       , '$head' : $(cloneAttrs(captured.headTag, headEl))
       , '$body' : $(cloneAttrs(captured.bodyTag, bodyEl))
       , '$html' : $(cloneAttrs(captured.htmlTag, htmlEl))
-    };
+    });
 
     bodyEl.innerHTML = disabledBody;
 
@@ -97,7 +95,7 @@ Mobify.html.extractDOM = function() {
 
     Mobify.timing.addPoint('Created passive document');
     
-    return result;
+    return captured;
 };
 
 })(Mobify.$, Mobify);

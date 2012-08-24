@@ -1,10 +1,10 @@
 (function(Mobify, $) {
     var MObject = Mobify.MObject;
-    var M = {
+    var staticMethods = {
         make: function() {
             var result = new MObject();
             result._M = this;
-            return result.add.apply(result, arguments);
+            return result.set.apply(result, arguments);
         }
       , require: function(value, reenter) {
             var M = this;
@@ -37,49 +37,32 @@
         }
       , stopper: new Error("END")
       , tmpl: function(template, data, callback) {
-            callback = callback || this._emitTemplatingResult;
+            callback = callback || function() { return M._emitTemplatingResult.apply(M, arguments); }
             if (template instanceof Array) template = template[0];
             if (!template) return callback("No template name provided to .tmpl() call");
 
-            var base = dust.makeBase({ lib_import: Mobify.ark.dustSection })
+            var base = dust.makeBase({ lib_import: Mobify.ark.dustSection });
             base = base.push(this._sourceHTML).push(this._sourceHTML.config).push(data);
             dust.render(template, base, callback);
         }
+      , _emitTemplatingResult: function(err, out) {
+            this.end(out);
+            err && Mobify.die(err);
+        }
     };
 
-    var bindM = function(sourceHTML, completionCallback) {
+    MObject.bindM = function(sourceHTML, completionCallback) {
         var boundM = function() {
-            return M.make.apply(boundM, arguments);
+            return staticMethods.make.apply(boundM, arguments);
         }
-        boundM._sourceHTML = sourceHTML;
-        boundM.$ = $(sourceHTML.document).anchor();
-        boundM.end = completionCallback;
-        boundM._emitTemplatingResult = function(err, out) {
-            boundM.end(out);
-            err && Mobify.die(err);
-        };
 
-        $.extend(boundM, M);
+        boundM._sourceHTML = sourceHTML;
+        boundM.end = completionCallback;
+
+        boundM.$ = $ && $(sourceHTML.document).anchor();
+        for (var key in staticMethods) boundM[key] = staticMethods[key];
+
         return boundM;
     };
-
-    MObject.evalConf = function(fn, source, callback) {
-        var called = false;
-        var callbackOnce = function(result) {
-            if (called) return;
-            called = true;
-
-            if (result instanceof Error) result = result.payload;
-            callback(result);
-        }
-
-        try {
-            var boundM = bindM(source, callbackOnce);
-            Mobify.timing.addPoint('Starting extraction');
-            fn.call(boundM, source, callbackOnce);
-        } catch (e) {
-            callbackOnce(e);
-        }
-    };
-    
+   
 })(Mobify, Mobify.$);

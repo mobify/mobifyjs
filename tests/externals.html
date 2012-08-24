@@ -54,7 +54,7 @@
     </script>    
 
 
-    <script id="test-extractHTMLFromElement" type="text/test">
+    <script id="test-extractFromElement" type="text/test">
         <div>
             <!-- comment -->
             <script>window.Mobify<\/script>
@@ -191,7 +191,7 @@ function createDocument() {
 
     test('Mobify.html.extractHTML', function() {
         var doc = createDocument()
-        doc.documentElement.innerHTML = getText('#test-extractHTMLFromElement')
+        doc.documentElement.innerHTML = getText('#test-extractFromElement')
 
         var got = HTML.extractHTML(doc);
 
@@ -201,13 +201,13 @@ function createDocument() {
         equal(got.bodyTag, '<body>')
         equal(got.headContent, '')
         equal(got.bodyContent, '')
-        equal(got.all(), '<html><head></head></body></html>')
+        equal(got.html(), '<html><head></head></body></html>')
 
     });
 
-    test('Mobify.html.extractHTMLFromElement', function() {
-        var el = $(getText('#test-extractHTMLFromElement'))[0]
-          , got = HTML.extractHTMLFromElement(el)
+    test('Mobify.html.extractFromElement', function() {
+        var el = $(getText('#test-extractFromElement'))[0]
+          , got = HTML.extractFromElement(el)
           , vow = '<!--comment--><title>title</title>plaintext</plaintext></div>'
 
         equal(got.replace(/\s/g, ''), vow);

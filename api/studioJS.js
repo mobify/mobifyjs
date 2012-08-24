@@ -44,14 +44,14 @@ Mobify.emitMarkup = function(markup) {
     Mobify.studioJS.set('resultHTML', markup);
 };
 
-var oldExtractHTML = Mobify.html.extractHTML;
-Mobify.html.extractHTML = function() {
-    var captured = oldExtractHTML.call(Mobify.html, markup);
+var oldExtract = Mobify.html.extract;
+Mobify.html.extract = function() {
+    var captured = oldExtract.call(Mobify.html, markup);
     $.each(captured, function(key, value) {
         captured[key] = indexTags(value);
     });
 
-    Mobify.studioJS.set('sourceHTML', captured.all());
+    Mobify.studioJS.set('sourceHTML', captured.html());
     return result;
 };
 
