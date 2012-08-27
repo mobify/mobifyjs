@@ -24,8 +24,8 @@ Here is a minimal _mobify.konf_:
 
     } {/konf}
 
-Inside the `{<konf} ... {/konf}` block, we declare an object
-called the konf object. We give the konf object a key _[OUTPUTHTML]({{ site.baseurl }}/docs/konf-reference/#outputhtml)_ 
+Inside the `{<konf} ... {/konf}` block, we declare the konf object. 
+We give the konf object a key _[OUTPUTHTML]({{ site.baseurl }}/docs/konf-reference/#outputhtml)_ 
 and assign that to a function that returns an HTML string. When the konf 
 object is evaluated, the function assigned to _OUTPUTHTML_ is called.
 The value assigned to _OUTPUTHTML_ is immediately rendered to the browser.
@@ -67,8 +67,8 @@ Konf key values _must_ be functions that return their selections:
         return $('body');
     }
 
-All konf key values are passed an argument called [`context`]({{ site.baseurl }}/docs/konf-reference/). 
-The argument is optional, but it enables additional functionality:
+All konf key functions are passed an argument called [`context`]({{ site.baseurl }}/docs/konf-reference/). 
+The argument is optional, and enables additional functionality:
 
     'body-element': function() {
         return $('body');
@@ -85,10 +85,8 @@ It then finds all of its child _<img>_ elements using Zepto's
 
 ##  Konf in Practice
 
-Inside the konf, it is common to have a number of selections that are
-made on every page. For example, elements in the header may appear on
-every page of the adapted site. These global selections can be made by
-adding additional keys to konf.
+Often you will want elements like the header to appear on every page
+of your site. Global selections can be made by adding more keys to konf:
 
     // Keys on the konf object are added to the context
     'header': function() {
@@ -104,39 +102,48 @@ adding additional keys to konf.
         }
     }
 
-Often the konf will contain selections that should only be used on certain 
-pages. For example, an image carousel may only appear on the homepage.
-To manage selections that should only be made on certain pages we use
-[`context.choose`]({{ site.baseurl }}/docs/konf-reference/#context-choose):
+Often you will want to use different templates to adapt different pages
+of you site. For example, you may use the template _home_ to adapt the
+homepage of your site while using the template _products_ on the product
+listing page.
+
+Inside the konf, this can be handled by using `context.choose` to select
+a template and then passing that template name to `context.tmpl`:
 
     'content': function(context) {
-        // `context.choose` is used to conditionally
-        // add keys to the context
         return context.choose({
-            'templateName': 'home'
-          , '!carousel': function() {
-                return $('#main .pics')
+            'templateName': 'home',
+            '!home': function() {
+                return $('#home');
             }
         }, {
-            'templateName': 'products'
-          , '!products': function() {
-                return $('#products')
+            'template': 'item',
+            '!item': function() {
+                return $('#item');
             }
-        })
+        });
+    },
+    'OUTPUTHTML': function(context) {
+        var template = context.data('content.templateName');
+        if (template) {
+            return context.tmpl(template);
+        }
     }
 
 `context.choose` accepts a variable number of objects as arguments and
 evaluates the first one that matches. An argument is said to match if
-its keys starting with `!` all evaluate to truthy values.
+all keys starting with `!` evaluate to truthy values.
 
-In the example above, when _content_ is evaluted, `context.choose` will
-be called. It inspects the first argument and finds one required key 
-_carousel_. If `$('#main .pics')` is found on the page then the first 
+In the example above, when _content_ is evaluted, `context.choose` is
+be called. It checks the first argument and finds one required key, 
+_home_. If `$('#home')` is found in the source DOM then the first
 argument will match. `context.choose` will then add the keys 
-_templateName_ and _carousel_ under the group _content_.
+_templateName_ and _home_ under the group _content_. If `$('#home')` 
+is not found, it would move to the next argument and repeat the process.
 
-If `$('#main .pics')` was not found, it would move to the next argument
-and repeat the process.
+Later, when _OUTPUTHTML_ is evaluted, the value of _content.templateName_
+will be used to decide which template to render.
+
 
 ---
 

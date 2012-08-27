@@ -34,7 +34,7 @@
       - [Template File Naming Conventions]({{ site.baseurl }}/docs/template-reference/#template-file-naming-conventions)
       - [Use A Base Template]({{ site.baseurl }}/docs/template-reference/#use-a-base-template)
       - [Prefix Introduced Styling Attributes With `x-`]({{ site.baseurl }}/docs/template-reference/#prefix-introduced-styling-attributes-with-x-)
-  - [Images Resizing]({{ site.baseurl }}/docs/image-resizing/)
+  - [Image Resizing]({{ site.baseurl }}/docs/image-resizing/)
   - [Jazzcat]({{ site.baseurl }}/docs/jazzcat/)
   - [Glossary]({{ site.baseurl }}/docs/glossary/)
   - [Appendix]({{ site.baseurl }}/docs/appendix/)
@@ -48,4 +48,3 @@
       - [Page is blank, doesn't render at all]({{ site.baseurl }}/docs/appendix/#page-is-blank-doesnt-render-at-all)
       - ["{some-key}" displayed on the page]({{ site.baseurl }}/docs/appendix/#some-key-displayed-on-the-page)
     - [Dust.js Documentation]({{ site.baseurl }}/docs/appendix/#dustjs-documentation)
-        
