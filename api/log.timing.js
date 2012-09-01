@@ -1,4 +1,4 @@
-(function(Mobify, $) {
+(function(Mobify) {
 
     var indent
       , totalIndent
@@ -15,12 +15,12 @@
             indent[level] = Math.max(indent[level] || 0, str.length);
         };
 
-    $.extend(Mobify.timing, {
+    Mobify.iter.extend(Mobify.timing, {
         level: 0
       , addPoint: function(str, date, level, groupStart) {
             var date = date || new Date;
             var entry = [date, str];
-            $.extend(entry, {
+            Mobify.iter.extend(entry, {
                 'date': date
               , 'str': str
               , 'level': level || 0
@@ -88,4 +88,4 @@
 
         console.logGroup('log', 'Timing', indentedTiming);
     }
-})(Mobify, Mobify.$);
+})(Mobify);

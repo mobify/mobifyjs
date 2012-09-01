@@ -1,4 +1,4 @@
-(function(Mobify, $) {
+(function(Mobify) {
 
 var emitDust = function(elem, context, bodies, extras) {
         if (extras === "exists")
@@ -47,7 +47,7 @@ MObject.all = [];
 MObject.prototype = {
     done: function() { return !this._outstanding.length }
   , _iterate: function(isChoose, source, importance) {
-        var source = $.isArray(source[0]) ? source[0] : source
+        var source = dust.isArray(source[0]) ? source[0] : source
           , mobject = this;
 
           
@@ -57,9 +57,9 @@ MObject.prototype = {
                 if (typeof addition == "function") {
                     addition.call(mobject, mobject);                    
                 } else {
-                    $.each(addition, function(key, value) {
-                        mobject.set(key, value, importance);
-                    });
+                    for (var key in addition)
+                        if (addition.hasOwnProperty(key))
+                            mobject.set(key, addition[key], importance);    
                 }
                 if (isChoose) break;
             } catch (e) {
@@ -77,7 +77,7 @@ MObject.prototype = {
         return this;
     }
   , get: function(what) {
-        var source = $.isArray(what) ? what
+        var source = dust.isArray(what) ? what
             : typeof what === "string" ? what.split('.')
             : arguments;
 
@@ -178,4 +178,4 @@ MObject.prototype = {
     }    
 };
 
-})(Mobify, Mobify.$);
+})(Mobify);

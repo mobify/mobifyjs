@@ -1,17 +1,17 @@
-(function(Mobify, $) {
+(function(Mobify) {
 
     if (!console.group) {
         console.group = console.log;
         console.groupEnd = function(){};
     }
 
-    $.extend(console, {
+    Mobify.iter.extend(console, {
         logCollapsedGroup : function(fn, title, obj) {
             return this.logGroup(fn, title, obj, !!console.groupCollapsed);
         }
       , logGroup : function(fn, title, obj, _collapse) {
             var justStarted = true;
-            $.each(obj, function(key, value) {
+            obj.forEach(function(value, key) {
                 if (justStarted) {
                     _collapse ? console.groupCollapsed(title) : console.group(title);
                 }
@@ -52,4 +52,4 @@
         
     };
 
-})(Mobify, Mobify.$);
+})(Mobify);

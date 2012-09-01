@@ -1,10 +1,10 @@
-(function($, Mobify) {
+(function(Mobify) {
 
 var Context = dust.makeBase({}).constructor
   , Chunk = dust.stream('', {}).head.constructor
   , oldBlock = Chunk.prototype.block;
 
-$.each(["exists", "notexists", "reference", "section"], function(i, name) {
+["exists", "notexists", "reference", "section"].forEach(function(name) {
     var oldFn = Chunk.prototype[name];
     var needsExecutionWrapper = name.match("exists");
 
@@ -27,7 +27,7 @@ Chunk.prototype.block = function(elem, context, bodies) {
     if (topElem) {          
         context = new context.constructor(
             context.stack
-          , $.extend(context.global || {}, {
+          , Mobify.iter.extend(context.global || {}, {
                 '_SUPER_': function(_elem, context, _bodies) {
                     return _elem.block(elem, context, bodies);
                 }})
@@ -65,13 +65,14 @@ Context.prototype.getBlock = function(key) {
 
     if (!blocks) return [];
 
-    blocks = $.map(blocks, function(block) {
+    blocks = blocks.map(function(block) {
         return block[key];
     });
     return blocks;
 }
     
-var likeArray = function(candidate) {
+var array = []
+  , likeArray = function(candidate) {
         return (typeof candidate != 'string') 
             && (typeof candidate.length == 'number')
             && (!candidate.tagName);
@@ -81,11 +82,11 @@ var likeArray = function(candidate) {
 // html returns node outerHTML
 // innerHTML returns node innerHTML
 // openTag and closeTag return first opening and last closing tags from a string
-$.extend(dust.filters, {
+Mobify.iter.extend(dust.filters, {
     h: function(node) {
         if (!node) return '';
         if (likeArray(node)) {
-            return $.map(node, dust.filters.h).join('');
+            return array.map.call(node, dust.filters.h).join('');
         }
 
         return (typeof node.outerHTML !== 'undefined')
@@ -96,11 +97,11 @@ $.extend(dust.filters, {
   , innerHTML: function(node) {
         if (!node) return '';
         if (likeArray(node)) {
-            return $.map(node, function(el) {
+            return array.map.call(node, function(el) {
                 return el.innerHTML || el.nodeValue;
             }).join('')
         } else {
-            return $(node).html();
+            return node.innerHTML || node.nodeValue;
         }
     }
   , openTag: Mobify.html.openTag
@@ -118,7 +119,7 @@ var conditionalHelper = function(chunk, context, bodies, accept) {
     }
 }
 
-$.extend(dust.helpers, {
+Mobify.iter.extend(dust.helpers, {
     first: function(chunk, context, bodies) {
         var accept = context.stack.index === 0;
         return conditionalHelper(chunk, context, bodies, accept);
@@ -139,4 +140,4 @@ dust.load = function(name, chunk, context) {
     return name ? oldLoad.apply(this, arguments) : chunk;
 }
                 
-})(Mobify.$, Mobify);
+})(Mobify);

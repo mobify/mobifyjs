@@ -1,16 +1,13 @@
-(function($, Mobify) {
+(function(Mobify) {
 
-var keys = function(obj) { return $.map(obj, function(val, key) { return key }) }
-  , values = function(obj) { return $.map(obj, function(val, key) { return val }) }
-
-  , openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
+var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
 
     // Inline styles are scripts are disabled using a unkonwn type.
   , tagDisablers = {
         style: ' media="mobify-media"'
       , script: ' type="text/mobify-script"'
     }
-  , tagEnablingRe = new RegExp(values(tagDisablers).join('|'), 'g')
+  , tagEnablingRe = new RegExp(Mobify.iter.values(tagDisablers).join('|'), 'g')
   , disablingMap = { 
         img:    ['src']
       , iframe: ['src']
@@ -18,17 +15,21 @@ var keys = function(obj) { return $.map(obj, function(val, key) { return key }) 
       , link:   ['href']
       , style:  ['media']
     }
+  , affectedTagList = Mobify.iter.keys(disablingMap).join('|').replace('|script', '')
   , affectedTagRe = new RegExp('/<!--[\\s\\S]*?-->'
       + '|<(script)([\\s\\S]*?)>([\\s\\S]*?<\\/script)'
-      + '|<(img|iframe|link|style)([\\s\\S]*?)>()'
+      + '|<(' + affectedTagList + ')([\\s\\S]*?)>()'
     , "gi")
   , attributeDisablingRes = {}
   , attributesToEnable = {}
   , attributeEnablingRe;
 
 // Populate `attributesToEnable` and `attributesToEnable`.
-$.each(disablingMap, function(tagName, targetAttributes) {
-    $.each(targetAttributes, function(key, value) {
+for (var tagName in disablingMap) {
+    if (!disablingMap.hasOwnProperty(tagName)) continue;
+    var targetAttributes = disablingMap[tagName];
+
+    targetAttributes.forEach(function(value) {
         attributesToEnable[value] = true;
     });
 
@@ -37,9 +38,9 @@ $.each(disablingMap, function(tagName, targetAttributes) {
         '\\s+((?:'
         + targetAttributes.join('|')
         + ")\\s*=\\s*(?:'([\\s\\S])+?'|\"([\\s\\S])+?\"))", 'gi');
-})
+}
 
-attributeEnablingRe = new RegExp('\\sx-(' + keys(attributesToEnable).join('|') + ')', 'gi');
+attributeEnablingRe = new RegExp('\\sx-(' + Mobify.iter.keys(attributesToEnable).join('|') + ')', 'gi');
 
 function disableAttributes(whole, tagName, openingTag, rest) {
     if (!tagName) return whole;
@@ -49,16 +50,27 @@ function disableAttributes(whole, tagName, openingTag, rest) {
         + openingTag.replace(attributeDisablingRes[tagName], ' x-$1') + '>' + rest;
 }
     
+// Returns a string with all disabled external attributes enabled.
+Mobify.html.enable = function(htmlStr) {    
+    return htmlStr.replace(attributeEnablingRe, ' $1').replace(tagEnablingRe, '');
+};
+
 // Returns a string with all external attributes disabled.
 // Includes special handling for resources referenced in scripts and inside
 // comments.
-Mobify.html.disable = function(htmlStr) {    
+Mobify.html.disableString = function(htmlStr) {
     return htmlStr.replace(affectedTagRe, disableAttributes);
-};
+}
 
-// Returns a string with all disabled external attributes enabled.
-Mobify.html.enable = function(htmlStr) {
-    return htmlStr.replace(attributeEnablingRe, ' $1').replace(tagEnablingRe, '');
+Mobify.html.disable = function(htmlObj) {
+    if (!htmlObj.htmlTag) {
+        return Mobify.html.disableString(htmlObj);
+    }
+
+    var disabled = Mobify.iter.extend({}, htmlObj);
+    disabled.headContent = Mobify.html.disableString(disabled.headContent);
+    disabled.bodyContent = Mobify.html.disableString(disabled.bodyContent);
+    return disabled;
 };
     
-})(Mobify.$, Mobify);
+})(Mobify);

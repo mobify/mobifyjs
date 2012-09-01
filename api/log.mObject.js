@@ -1,4 +1,4 @@
-(function(Mobify,$ ) {
+(function(Mobify) {
     var MObject = Mobify.MObject
       , serviceProperties = ["_M", "_callable", "_empties", "_setImportance", "_on",
             "_choice", "_outstanding", "_subMObjects"]
@@ -7,20 +7,23 @@
             var goInto = fn(root, breadcrumbs);
             if (!goInto || !goInto.length) return;
 
-            $.each(goInto, function(i, key) {
+            goInto.forEach(function(key) {
                 descend(root[key], fn, breadcrumbs + '.' + key);
-            })
+            });
         };
 
     console.logMObjects = function() {
-        var results = $.map(MObject.all, function(root) {
+        var results = MObject.all.map(function(root) {
             if (root._subMObjects.length) return;
 
             var empties = [], choices = [];
             descend(root, function(current, parentCrumbs) {
                 var goInto = [];
-                $.each(current, function(key, value) {
-                    if (key[0] == "_") return;
+                for (var key in current) {
+                    if (!current.hasOwnProperty(key)) continue;
+                    if (key[0] == "_") continue;
+
+                    var value = current[key];
                     var breadcrumbs = parentCrumbs + '.' + key;
 
                     if (value instanceof MObject) {
@@ -28,19 +31,19 @@
                         if (value._choice) choices.push([breadcrumbs, value]);
                     }
                     if (MObject.isEmpty(value)) empties.push([breadcrumbs, value]);
-                });
+                }
                 return goInto;
             });
             return {'root': root, 'empties': empties, 'choices': choices};
         });
 
-        $.each(MObject.all, function(j, current) {
-            $.each(serviceProperties, function(i, property) {
+        [].forEach.call(MObject.all, function(current) {
+            serviceProperties.forEach(function(property) {
                 delete current[property];
             });
         });
 
-        $.map(results, function(result) {
+        results.forEach(function(result) {
             console.group('Whole object');
             console.log(result.root);
             console.groupEnd();  
@@ -86,7 +89,6 @@
             } 
         }
         
-        debugger;
         timing.groupEnd();
         _record.wrapped.apply(this, arguments);
         if (value instanceof MObject) {
@@ -95,4 +97,4 @@
         }
     });
 
-})(Mobify, Mobify.$);
+})(Mobify);

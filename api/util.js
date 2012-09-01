@@ -1,4 +1,4 @@
-(function($, Mobify) {
+(function(Mobify) {
 
 // Set optout cookie and reload to goto desktop.
 // V6.X: mobify-path=
@@ -32,4 +32,4 @@ Mobify.i18n = function(list, data) {
     return i18nlookup;
 };
 
-})(Mobify.$, Mobify);
+})(Mobify);

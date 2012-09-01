@@ -30,12 +30,14 @@ via document.open/write/close. This makes the browser behave almost as if the
 replacement HTML was originally sent down the pipe.
 
 */
-(function(document, $, Mobify) {
+(function(Mobify) {
 
 var timing = Mobify.timing;
 var transform = Mobify.transform = {
     prepareSource : function() {
         var capturedState = Mobify.html.extract();
+        Mobify.timing.addPoint('Extracted source HTML');
+
         capturedState.config = Mobify.config;
         return capturedState;
     }
@@ -46,7 +48,7 @@ var transform = Mobify.transform = {
         if (obj.appendTo) obj = obj.map(function(el) { return el.outerHTML || "" }).join("");
         if (obj.document) obj = obj.document;
         if (obj.nodeType === Node.DOCUMENT_NODE) {
-            obj = Mobify.html.doctype(doc) + document.documentElement.outerHTML;
+            obj = Mobify.html.doctype(doc) + obj.document.documentElement.outerHTML;
         }
 
         return obj;
@@ -69,7 +71,7 @@ var transform = Mobify.transform = {
         }
 
         try {
-            Mobify.timing.addPoint('Starting extraction');
+            Mobify.timing.addPoint('Starting processing');
             fn.call(this, source, callbackOnce);
         } catch (e) {
             callbackOnce(e);
@@ -89,9 +91,16 @@ var transform = Mobify.transform = {
     }
   , adaptDOM: function(adaptFn) {
         this.adaptHTML(function(source, callback) {
-            var dom = Mobify.html.extractDOM(source);
+            var disabledSource = Mobify.html.disable(source);
+            Mobify.timing.addPoint('Disabled external resources');
+
+            var dom = Mobify.html.extractDOM(disabledSource);
+            Mobify.timing.addPoint('Created passive document');
+
             adaptFn.call(this, dom, function(result) {
-                return callback(Mobify.html.enable(Mobify.transform.stringifyResult(result)));
+                var flattenedResult = Mobify.transform.stringifyResult(result);
+                var enabledResult = Mobify.html.enable(flattenedResult);
+                return callback(enabledResult);
             });
         });
     }
@@ -103,4 +112,4 @@ var transform = Mobify.transform = {
     }
 };
 
-})(document, Mobify.$, Mobify);
+})(Mobify);

@@ -1,6 +1,7 @@
 Mobify.points.push(new Date);
 
 {>"/base/api/ark.js"/}
+{>"/base/api/iter.js"/}
 
 {#lib_export name="jquery"}
     {+jquery}
@@ -24,7 +25,7 @@ Mobify.points.push(new Date);
 {>"/base/api/timing.js"/}
 {>"/base/api/config.js"/}
 
-Mobify.$.extend(Mobify.config, {
+Mobify.iter.extend(Mobify.config, {
     siteConfig: {site_config|s}
   , buildDate: {build_dt}
 });
@@ -64,8 +65,7 @@ Mobify.$.extend(Mobify.config, {
 Mobify.transform.run(function(sourceHTML, complete) {
     var $ = this.$, M = this;
     complete();
-    )}
-);
+});
 {/main}
 
 // Version control tag, use an array with version numbers.  Examples:

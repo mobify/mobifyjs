@@ -1,4 +1,4 @@
-(function($, Mobify) {
+(function(Mobify) {
 
 // During capturing, we will usually end up hiding our </head>/<body ... > boundary
 // within <plaintext> capturing element. To construct shadow DOM, we need to rejoin
@@ -52,8 +52,10 @@ var guillotine = function(captured) {
     // Unlike $('<tag>'), correctly handles <head>, <body> and <html>
   , cloneAttrs = function(source, dest) {
         var match = source.match(/^<(\w+)([\s\S]*)$/i);
+        var div = document.createElement('div');
+        div.innerHTML = '<div' + match[2];
 
-        $.each($('<div' + match[2])[0].attributes, function(i, attr) {
+        [].forEach.call(div.firstChild.attributes, function(attr) {
             dest.setAttribute(attr.nodeName, attr.nodeValue);
         });
 
@@ -65,37 +67,30 @@ var guillotine = function(captured) {
 // 3. Construct the source pseudoDOM.    
 Mobify.html.extractDOM = function(markup) {
     // Extract escaped markup out of the DOM
-    var captured = guillotine($.extend({}, markup));
-    
-    Mobify.timing.addPoint('Extracted source HTML');
+    var captured = guillotine(Mobify.iter.extend({}, markup));
+    var wrap = Mobify.$ || function(x) { return x };
     
     // Disable attributes that can cause loading of external resources
-    var disabledHead = Mobify.html.disable(captured.headContent)
-      , disabledBody = Mobify.html.disable(captured.bodyContent)
-      , document = window.document.implementation.createHTMLDocument()
-      , htmlEl = document.documentElement
+    var doc = document.implementation.createHTMLDocument()
+      , htmlEl = doc.documentElement
       , headEl = htmlEl.firstChild
       , bodyEl = htmlEl.lastChild
       , div = document.createElement('div');
-    
-    Mobify.timing.addPoint('Disabled external resources');
 
-    $.extend(captured, {
-        'document' : document
-      , '$head' : $(cloneAttrs(captured.headTag, headEl))
-      , '$body' : $(cloneAttrs(captured.bodyTag, bodyEl))
-      , '$html' : $(cloneAttrs(captured.htmlTag, htmlEl))
+    Mobify.iter.extend(captured, {
+        'document' : doc
+      , '$head' : wrap(cloneAttrs(captured.headTag, headEl))
+      , '$body' : wrap(cloneAttrs(captured.bodyTag, bodyEl))
+      , '$html' : wrap(cloneAttrs(captured.htmlTag, htmlEl))
     });
 
-    bodyEl.innerHTML = disabledBody;
+    bodyEl.innerHTML = captured.bodyContent;
 
     var title = headEl.getElementsByTagName('title')[0];
     title && headEl.removeChild(title);
-    for (div.innerHTML = disabledHead; div.firstChild; headEl.appendChild(div.firstChild));
-
-    Mobify.timing.addPoint('Created passive document');
+    for (div.innerHTML = captured.headContent; div.firstChild; headEl.appendChild(div.firstChild));
     
     return captured;
 };
 
-})(Mobify.$, Mobify);
+})(Mobify);

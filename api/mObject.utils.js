@@ -1,4 +1,4 @@
-(function(Mobify, $) {
+(function(Mobify) {
     var MObject = Mobify.MObject;
     var staticMethods = {
         make: function() {
@@ -59,10 +59,14 @@
         boundM._sourceHTML = sourceHTML;
         boundM.end = completionCallback;
 
-        boundM.$ = $ && $(sourceHTML.document).anchor();
+        boundM.$ = Mobify.$
+            ? Mobify.$(sourceHTML.document).anchor()
+            : function(selector) {
+                return sourceHTML.document.querySelectorAll(selector);
+            }
         for (var key in staticMethods) boundM[key] = staticMethods[key];
 
         return boundM;
     };
    
-})(Mobify, Mobify.$);
+})(Mobify);

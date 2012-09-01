@@ -5,7 +5,7 @@
     // if configFile is undefined.
     // V6 moved mobify.js to the first script.
     if (!config.configFile) {
-        config.configFile = Mobify.$('script[src*="mobify.js"]').first().attr('src') || '';
+        config.configFile = (document.querySelectorAll('script[src*="mobify.js"]')[0] || {}).src || '';
     }
     
     config.configDir = config.cssDir = config.configFile.replace(/\/[^\/]*$/, '/');
