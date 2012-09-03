@@ -280,6 +280,28 @@
             }
         });
 
+        asyncTest('Mobify.combo.load - Encoded Urls are cached', 1, function() {
+            var url = "http://127.0.0.1:3000/space invaders.js"
+                resources = [{
+                    "url": url,
+                    "headers": {"expires": UTC_TWO_WEEKS_FROM_NOW},
+                    "status": "ready",
+                    "statusCode": 200,
+                    "text": true,
+                    "body": "console.log('Pew!');"
+                }];
+
+
+            httpCache.reset();
+            httpCache.save(function(err) {
+                if (err) throw err;
+
+                Mobify.combo.load(resources);
+                ok(httpCache.get(encodeURI(url)) != undefined, "Missing resource.");
+                start();
+            });
+        });
+
         asyncTest('httpCache - Eviction on an unused resource', 2, function() {
             httpCache.reset();
             httpCache.save();
