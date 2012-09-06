@@ -28,6 +28,10 @@ var iter = Mobify.iter = {
         }
         return result;
     }
+
+  , identity: function(x) {
+        return x;
+    }
 };
 
 })(Mobify);

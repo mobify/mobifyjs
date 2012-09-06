@@ -67,7 +67,7 @@ Context.prototype.getBlock = function(key) {
 
     blocks = blocks.map(function(block) {
         return block[key];
-    });
+    }).filter(Mobify.iter.identity);
     return blocks;
 }
     

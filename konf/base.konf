@@ -50,6 +50,7 @@ Mobify.iter.extend(Mobify.config, {
 
 {>"/base/api/main.js"/}
 {>"/base/api/resizeImages.js"/}
+{>"/base/api/combo.js"/}
 
 {^production}
     {>"/base/api/log.js"/}
