@@ -226,13 +226,7 @@ var $ = Mobify.$
 
   , absolutify = document.createElement('a')
 
-  , combineScripts = function($els) {
-        var $scripts = $els.filter(defaults.selector).add($els.find(defaults.selector)).remove()
-          , uncached = []
-          , combo = false
-          , bootstrap
-          , url;
-
+  , combineScripts = function($scripts) {
         // Fastfail if there are no scripts or if required modules are missing.
         if (!$scripts.length || !window.localStorage || !window.JSON) {
             return $scripts;
@@ -240,33 +234,19 @@ var $ = Mobify.$
 
         httpCache.load();
 
-        $scripts.filter('[' + defaults.attribute + ']').each(function() {
-            combo = true
-            absolutify.href = this.getAttribute(defaults.attribute);
+        [].forEach.call($scripts, function(script) {
+            var isCached,
+                url = script.getAttribute(defaults.attribute);
+            if (!url || (script.tagName !== "SCRIPT")) return;
+            
+            absolutify.href = url;
             url = absolutify.href;
 
-            if (!httpCache.get(url)) {
-                uncached.push(url);
-            }
-
-            this.removeAttribute(defaults.attribute);
-            this.className += ' x-combo';
-            this.innerHTML = defaults.execCallback + "('" + url + "');";
+            script.removeAttribute(defaults.attribute);
+            isCached = !!httpCache.get(url);
+            script.innerHTML = isCached + ',' + defaults.execCallback + "('" + url + "');";
         });
 
-        if (!combo) {
-            return $scripts;
-        }
-
-        bootstrap = document.createElement('script')
-
-        if (uncached.length) {
-            bootstrap.src = getURL(uncached, defaults.loadCallback);
-        } else {
-            bootstrap.innerHTML = defaults.loadCallback + '();';
-        }
-
-        $scripts = $(bootstrap).add($scripts);
         return $scripts;
     }
 
@@ -329,6 +309,35 @@ var $ = Mobify.$
   , JSONURIencode = Mobify.JSONURIencode = function(obj) {
         return encodeURIComponent(JSON.stringify(obj));
     };
+
+
+var oldEnable = Mobify.html.enable;
+var enablingRe = new RegExp("<script[\\s\\S]*?>false,"
+  + defaults.execCallback.replace('.', '\\.')
+  + "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
+
+Mobify.html.enable = function() {
+    var match
+      , bootstrap
+      , firstIndex = -1
+      , uncached = []
+      , htmlStr = oldEnable.apply(Mobify.html, arguments);
+
+    while (match = enablingRe.exec(htmlStr)) {
+        if (!~firstIndex) firstIndex = match.index;
+        uncached.push(match[1]);
+    }
+    if (!~firstIndex) return htmlStr;
+    
+    bootstrap = document.createElement('script')
+    if (uncached.length) {
+        bootstrap.src = getURL(uncached, defaults.loadCallback);
+    } else {
+        bootstrap.innerHTML = defaults.loadCallback + '();';
+    }
+
+    return htmlStr.substr(0, firstIndex) + bootstrap.outerHTML + htmlStr.substr(firstIndex);
+};
 
 $.fn.combineScripts = function() {
     return combineScripts.call(window, this)
