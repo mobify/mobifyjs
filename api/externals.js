@@ -15,10 +15,10 @@ var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
       , link:   ['href']
       , style:  ['media']
     }
-  , affectedTagList = Mobify.iter.keys(disablingMap).join('|').replace('|script', '')
-  , affectedTagRe = new RegExp('/<!--[\\s\\S]*?-->'
-      + '|<(script)([\\s\\S]*?)>([\\s\\S]*?<\\/script)'
-      + '|<(' + affectedTagList + ')([\\s\\S]*?)>()'
+  , affectedTagList = Mobify.iter.keys(disablingMap)
+  , affectedTagRe = new RegExp('<!--[\\s\\S]*?-->'
+      + '|<(?=(' + affectedTagList.join('|')
+          + ')([\\s\\S]*?)>)(?:script\\2>([\\s\\S]*?<\\/script)|\\1\\2>)'
     , "gi")
   , attributeDisablingRes = {}
   , attributesToEnable = {}
@@ -37,7 +37,7 @@ for (var tagName in disablingMap) {
     attributeDisablingRes[tagName] = new RegExp(
         '\\s+((?:'
         + targetAttributes.join('|')
-        + ")\\s*=\\s*(?:'([\\s\\S])+?'|\"([\\s\\S])+?\"))", 'gi');
+        + ")\\s*=\\s*(?:('|\")[\\s\\S]+?\\2))", 'gi');
 }
 
 attributeEnablingRe = new RegExp('\\sx-(' + Mobify.iter.keys(attributesToEnable).join('|') + ')', 'gi');
@@ -46,8 +46,8 @@ function disableAttributes(whole, tagName, openingTag, rest) {
     if (!tagName) return whole;
 
     tagName = tagName.toLowerCase();
-    return result = '<' + tagName + (tagDisablers[tagName] || '')
-        + openingTag.replace(attributeDisablingRes[tagName], ' x-$1') + '>' + rest;
+    return '<' + tagName + (tagDisablers[tagName] || '')
+        + openingTag.replace(attributeDisablingRes[tagName], ' x-$1') + '>' + (rest || '');
 }
     
 // Returns a string with all disabled external attributes enabled.
