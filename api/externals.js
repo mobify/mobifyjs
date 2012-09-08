@@ -1,6 +1,6 @@
 (function(Mobify) {
 
-var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
+var openingScriptRe = /(<script[\s\S]*?>)/gi
 
     // Inline styles are scripts are disabled using a unkonwn type.
   , tagDisablers = {
@@ -16,10 +16,7 @@ var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
       , style:  ['media']
     }
   , affectedTagList = Mobify.iter.keys(disablingMap)
-  , affectedTagRe = new RegExp('<!--[\\s\\S]*?-->'
-      + '|<(?=(' + affectedTagList.join('|')
-          + ')([\\s\\S]*?)>)(?:script\\2>([\\s\\S]*?<\\/script)|\\1\\2>)'
-    , "gi")
+  , affectedTagRe = new RegExp('<(' + affectedTagList.join('|') + ')([\\s\\S]*?)>', 'gi')
   , attributeDisablingRes = {}
   , attributesToEnable = {}
   , attributeEnablingRe;
@@ -47,7 +44,7 @@ function disableAttributes(whole, tagName, openingTag, rest) {
 
     tagName = tagName.toLowerCase();
     return '<' + tagName + (tagDisablers[tagName] || '')
-        + openingTag.replace(attributeDisablingRes[tagName], ' x-$1') + '>' + (rest || '');
+        + openingTag.replace(attributeDisablingRes[tagName], ' x-$1') + '>';
 }
     
 // Returns a string with all disabled external attributes enabled.
@@ -59,7 +56,23 @@ Mobify.html.enable = function(htmlStr) {
 // Includes special handling for resources referenced in scripts and inside
 // comments.
 Mobify.html.disableString = function(htmlStr) {
-    return htmlStr.replace(affectedTagRe, disableAttributes);
+    var splitRe = /(<!--[\s\S]*?-->)|(?=<\/script)/i
+      , tokens = htmlStr.split(splitRe)
+      , ret = tokens.map(function(fragment) {
+            var parsed;
+ 
+            // Fragment may be empty or just a comment, no need to escape those.
+            if (!fragment) return '';
+            if (/^<!--/.test(fragment)) return fragment;
+ 
+            // Disable before and the <script> itself.
+            // parsed = [before, <script>, script contents]
+            parsed = fragment.split(openingScriptRe);
+            parsed[0] = parsed[0].replace(affectedTagRe, disableAttributes);
+            if (parsed[1]) parsed[1] = parsed[1].replace(affectedTagRe, disableAttributes);
+            return parsed;
+        });
+    return [].concat.apply([], ret).join('');
 }
 
 Mobify.html.disable = function(htmlObj) {
@@ -70,6 +83,7 @@ Mobify.html.disable = function(htmlObj) {
     var disabled = Mobify.iter.extend({}, htmlObj);
     disabled.headContent = Mobify.html.disableString(disabled.headContent);
     disabled.bodyContent = Mobify.html.disableString(disabled.bodyContent);
+
     return disabled;
 };
     
