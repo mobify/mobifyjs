@@ -35,6 +35,9 @@
 {>"/base/api/extractHTML.js"/}
 {>"/base/api/extractDOM.js"/}
 
+{>"/base/api/urlpattern.js"/}
+{>"/base/api/urlmatch.js"/}
+
 {+dust}
     {>"/base/vendor/dust-core.js"/}
     {>"/base/api/data2.js"/}
