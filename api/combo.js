@@ -310,7 +310,7 @@ var $ = Mobify.$
                 resource = resources[i];
                 if (resource.status == 'ready') {
                     save = true;
-                    httpCache.set(resource.url, resource)
+                    httpCache.set(encodeURI(resource.url), resource)
                 }
             }
 
