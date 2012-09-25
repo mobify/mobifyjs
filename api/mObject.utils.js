@@ -1,5 +1,5 @@
-(function(Mobify) {
-    var MObject = Mobify.MObject;
+define(["./mObject", "./mobifyjs"], function(MObject, Mobify) {
+
     var staticMethods = {
         make: function() {
             var result = new MObject();
@@ -41,8 +41,8 @@
             if (template instanceof Array) template = template[0];
             if (!template) return callback("No template name provided to .tmpl() call");
 
-            var base = dust.makeBase({ lib_import: Mobify.ark.dustSection });
-            base = base.push(this._sourceHTML).push(this._sourceHTML.config).push(data);
+            var base = dust.makeBase({});
+            base = base.push(this._sourceData).push(this._sourceData.config).push(data);
             dust.render(template, base, callback);
         }
       , _emitTemplatingResult: function(err, out) {
@@ -51,22 +51,17 @@
         }
     };
 
-    MObject.bindM = function(sourceHTML, completionCallback) {
+    return MObject.bindM = function(sourceData, completionCallback) {
         var boundM = function() {
             return staticMethods.make.apply(boundM, arguments);
         }
 
-        boundM._sourceHTML = sourceHTML;
+        boundM._sourceData = sourceData;
         boundM.end = completionCallback;
 
-        boundM.$ = Mobify.$
-            ? Mobify.$(sourceHTML.document).anchor()
-            : function(selector) {
-                return sourceHTML.document.querySelectorAll(selector);
-            }
         for (var key in staticMethods) boundM[key] = staticMethods[key];
 
         return boundM;
     };
    
-})(Mobify);
+});

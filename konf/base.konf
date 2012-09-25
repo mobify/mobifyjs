@@ -1,46 +1,14 @@
-Mobify.points.push(new Date);
 
 {>"/base/api/ark.js"/}
-{>"/base/api/iter.js"/}
-
-{#lib_export name="jquery"}
-    {+jquery}
-        {>"/base/vendor/zepto/src/polyfill.js"/}
-        {>"/base/vendor/zepto/src/zepto.js"/}
-        {>"/base/vendor/zepto/src/detect.js"/}
-        {>"/base/vendor/zepto/src/event.js"/}
-        {>"/base/vendor/zepto/src/fx.js"/}
-        {>"/base/vendor/zepto/src/ajax.js"/}
-        {>"/base/vendor/zepto/src/form.js"/}
-        {>"/base/vendor/zepto/src/selector.js"/}
-        {>"/base/vendor/zepto/src/stack.js"/}
-    {/jquery}
-    {>"/base/api/noconflict.js"/}
-{/lib_export}
 
 {#lib_export name="lib" passive="true"}{+lib}
     {>"/base/vendor/slide.js"/}
 {/lib}{/lib_export}
 
-{>"/base/api/timing.js"/}
-{>"/base/api/config.js"/}
-
 Mobify.iter.extend(Mobify.config, {
     siteConfig: {site_config|s}
   , buildDate: {build_dt}
 });
-
-{>"/base/api/extractHTML.js"/}
-{>"/base/api/extractDOM.js"/}
-{>"/base/api/externals.js"/}
-
-{+dust}
-    {>"/base/vendor/dust-core.js"/}
-    {>"/base/api/anchorQuery.js"/}
-    {>"/base/api/mObject.js"/}
-    {>"/base/api/mObject.utils.js"/}
-    {>"/base/api/tmpl.js"/}
-{/dust}
 
 {#lib_export name="enhance"}{+enhance}
     {>"/base/api/orientation.js"/}
@@ -48,8 +16,6 @@ Mobify.iter.extend(Mobify.config, {
     {>"/base/api/util.js"/}
 {/enhance}{/lib_export}
 
-{>"/base/api/main.js"/}
-{>"/base/api/resizeImages.js"/}
 {>"/base/api/combo.js"/}
 
 {^production}
@@ -57,19 +23,3 @@ Mobify.iter.extend(Mobify.config, {
     {>"/base/api/log.timing.js"/}
     {>"/base/api/log.mObject.js"/}
 {/production}
-
-{+tmpl}
-    {>"tmpl/*.tmpl"/}
-{/tmpl}
-
-{+main}
-Mobify.transform.run(function(sourceHTML, complete) {
-    var $ = this.$, M = this;
-    complete();
-});
-{/main}
-
-// Version control tag, use an array with version numbers.  Examples:
-// V 1.1: [1,1].  V1.2.3: [1,2,3]
-
-Mobify.api = [1, 2, 2];

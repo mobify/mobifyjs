@@ -2,7 +2,9 @@
 // 2) Set a border or outline on the body
 // 3) get document.body.clientWidth
 // 4) Give me a goddamn prize
-(function($) {
+define(["./iter"], function(iter) {
+
+var $ = Mobify.$ || window.$ || { fn: {}};
 
 var absolutify = document.createElement('a')
   , hosts = [
@@ -56,7 +58,7 @@ var absolutify = document.createElement('a')
     // Alter the `src` of child images to pass through 
     // irX.mobify.com. Return the set of altered elements.
   , resizeImages = $.fn.resizeImages = function(options) {
-        var opts = $.extend(resizeImages.defaults, typeof options == 'object' && options)
+        var opts = iter.extend(resizeImages.defaults, typeof options == 'object' && options)
           , dpr = window.devicePixelRatio;
 
         if (typeof options == 'number') {
@@ -92,4 +94,6 @@ resizeImages.defaults = {
     attribute: 'x-src'
 };
 
-})(Mobify.$);
+return resizeImages;
+
+});

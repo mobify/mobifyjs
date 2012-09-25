@@ -1,10 +1,10 @@
-(function(Mobify) {
+define(["./mobifyjs", "./extractHTML"], function(Mobify, html) {
 
-// During capturing, we will usually end up hiding our </head>/<body ... > boundary
-// within <plaintext> capturing element. To construct shadow DOM, we need to rejoin
-// head and body content, iterate through it to find head/body boundary and expose
-// opening <body ... > tag as a string.
-var guillotine = function(captured) {
+    // During capturing, we will usually end up hiding our </head>/<body ... > boundary
+    // within <plaintext> capturing element. To construct shadow DOM, we need to rejoin
+    // head and body content, iterate through it to find head/body boundary and expose
+    // opening <body ... > tag as a string.
+    var guillotine = function(captured) {
         // Consume comments without grouping to avoid catching
         // <body> inside a comment, common with IE conditional comments.
         var bodySnatcher = /<!--(?:[\s\S]*?)-->|(<\/head\s*>|<body[\s\S]*$)/gi;
@@ -62,35 +62,35 @@ var guillotine = function(captured) {
         return dest;
     };
 
-// 1. Get the original markup from the document.
-// 2. Disable the markup.
-// 3. Construct the source pseudoDOM.    
-Mobify.html.extractDOM = function(markup) {
-    // Extract escaped markup out of the DOM
-    var captured = guillotine(Mobify.iter.extend({}, markup));
-    var wrap = Mobify.$ || function(x) { return x };
-    
-    // Disable attributes that can cause loading of external resources
-    var doc = document.implementation.createHTMLDocument()
-      , htmlEl = doc.documentElement
-      , headEl = htmlEl.firstChild
-      , bodyEl = htmlEl.lastChild
-      , div = document.createElement('div');
+    // 1. Get the original markup from the document.
+    // 2. Disable the markup.
+    // 3. Construct the source pseudoDOM.    
+    return Mobify.html.extractDOM = function(markup) {
+        // Extract escaped markup out of the DOM
+        var captured = guillotine(Mobify.iter.extend({}, markup));
+        var wrap = Mobify.$ || function(x) { return x };
+        
+        // Disable attributes that can cause loading of external resources
+        var doc = document.implementation.createHTMLDocument()
+          , htmlEl = doc.documentElement
+          , headEl = htmlEl.firstChild
+          , bodyEl = htmlEl.lastChild
+          , div = document.createElement('div');
 
-    Mobify.iter.extend(captured, {
-        'document' : doc
-      , '$head' : wrap(cloneAttrs(captured.headTag, headEl))
-      , '$body' : wrap(cloneAttrs(captured.bodyTag, bodyEl))
-      , '$html' : wrap(cloneAttrs(captured.htmlTag, htmlEl))
-    });
+        Mobify.iter.extend(captured, {
+            'document' : doc
+          , '$head' : wrap(cloneAttrs(captured.headTag, headEl))
+          , '$body' : wrap(cloneAttrs(captured.bodyTag, bodyEl))
+          , '$html' : wrap(cloneAttrs(captured.htmlTag, htmlEl))
+        });
 
-    bodyEl.innerHTML = captured.bodyContent;
+        bodyEl.innerHTML = captured.bodyContent;
 
-    var title = headEl.getElementsByTagName('title')[0];
-    title && headEl.removeChild(title);
-    for (div.innerHTML = captured.headContent; div.firstChild; headEl.appendChild(div.firstChild));
-    
-    return captured;
-};
+        var title = headEl.getElementsByTagName('title')[0];
+        title && headEl.removeChild(title);
+        for (div.innerHTML = captured.headContent; div.firstChild; headEl.appendChild(div.firstChild));
+        
+        return captured;
+    };
 
-})(Mobify);
+});

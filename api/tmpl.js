@@ -1,4 +1,4 @@
-(function(Mobify) {
+define(["./mobifyjs", "./extractHTML", "./iter", "dust"], function(Mobify, html, iter, dust) {
 
 var Context = dust.makeBase({}).constructor
   , Chunk = dust.stream('', {}).head.constructor
@@ -38,7 +38,16 @@ Chunk.prototype.block = function(elem, context, bodies) {
     return oldBlock.call(this, topElem, context, bodies);
 };
 
-var descend = function(ctx, down, i) {
+Context.prototype.getPath = function(cur, down) {
+    var ctx = this.stack
+      , len = down.length;
+
+    if (cur && len === 0) return ctx.head;
+    if (!ctx.isObject) return undefined;
+
+    ctx = this.get(down[0]);
+
+    var i = 1;
     while (ctx && i < down.length) {
         if (typeof ctx.done === "function" && !ctx.done()) {
             return ctx._delayInspection();
@@ -47,17 +56,6 @@ var descend = function(ctx, down, i) {
         }
     }        
     return ctx;
-};
-
-Context.prototype.getAscendablePath = function(cur, down) {
-    var ctx = this.stack;
-
-    if (cur) return this.getPath(cur, down);
-    if (!ctx.isObject) return undefined;
-
-    ctx = this.get(down[0]);
-
-    return descend(ctx, down, 1);
 };    
 
 Context.prototype.getBlock = function(key) {
@@ -130,14 +128,11 @@ Mobify.iter.extend(dust.helpers, {
     }
 })
     
-var oldIsArray = dust.isArray;
-dust.isArray = function(arr) {
-    return (arr && arr.appendTo) || oldIsArray(arr);
-}
+dust.isArray = iter.isArray;
 
 var oldLoad = dust.load;
 dust.load = function(name, chunk, context) {
     return name ? oldLoad.apply(this, arguments) : chunk;
 }
                 
-})(Mobify);
+});

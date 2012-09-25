@@ -1,4 +1,4 @@
-(function(Mobify) {
+define(["./extractHTML", "mobifyjs"], function(html, Mobify) {
 
 // Set optout cookie and reload to goto desktop.
 // V6.X: mobify-path=
@@ -15,7 +15,7 @@ Mobify.desktop = function(url) {
 };
 
 Mobify.die = function() {
-    Mobify.html.unmobify();
+    html.unmobify();
 };
 
 // i18n function converts in a list of language types and data and returns
@@ -32,4 +32,6 @@ Mobify.i18n = function(list, data) {
     return i18nlookup;
 };
 
-})(Mobify);
+return Mobify;
+
+});

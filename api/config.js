@@ -1,4 +1,4 @@
-(function() {
+define(["./mobifyjs"], function(Mobify) {
     var config = Mobify.config = Mobify.config || {};
 
     // configFile my already exists if rendering server side, so only grab mobify.js script tag 
@@ -11,4 +11,6 @@
     config.configDir = config.cssDir = config.configFile.replace(/\/[^\/]*$/, '/');
     config.imageDir = config.configDir + 'i/';
     config.ajs = Mobify.ajs;
-})();
+
+    return config;
+});
