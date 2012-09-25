@@ -406,6 +406,14 @@
             equal(got, vow, "Non-http url unchanged");
         });
 
+        test('$.fn.resizeImages defaults', function(assert) {
+            var defaults = $.fn.resizeImages.defaults
+              , oMaxWidth = defaults.maxWidth
+
+            $('#resizeImages-defaults').resizeImages({maxWidth: 1});
+            assert.equal(defaults.maxWidth, oMaxWidth);
+        });
+
         test('Mobify.getImageURL', function() {
             expect(2);
 

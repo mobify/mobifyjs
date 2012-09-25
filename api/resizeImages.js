@@ -48,7 +48,7 @@ var $ = Mobify.$
      * resized.
      */
   , resizeImages = $.fn.resizeImages = function(options) {
-        var opts = $.extend(defaults, typeof options == 'object' && options)
+        var opts = $.extend({}, defaults, typeof options == 'object' && options)
           , dpr = window.devicePixelRatio
           , $imgs = this.filter(opts.selector).add(this.find(opts.selector))
           , attr;
