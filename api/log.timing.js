@@ -1,4 +1,4 @@
-(function(Mobify) {
+define(["mobifyjs/mobifyjs", "mobifyjs/timing", "mobifyjs/iter", "mobifyjs/log"], function(Mobify, timing, iter) {
 
     var indent
       , totalIndent
@@ -15,7 +15,7 @@
             indent[level] = Math.max(indent[level] || 0, str.length);
         };
 
-    Mobify.iter.extend(Mobify.timing, {
+    iter.extend(timing, {
         level: 0
       , addPoint: function(str, date, level, groupStart) {
             var date = date || new Date;
@@ -48,8 +48,7 @@
             --this.level;
         }
     });
-    var timing = Mobify.timing
-      , oldPoints = Mobify.timing.points;
+    var oldPoints = timing.points;
 
     timing.reset();
     oldPoints.forEach(function(entry) {
@@ -60,7 +59,7 @@
         indent = [];
         totalIndent = [];
 
-        Mobify.timing.points.forEach(function (entry, i, points) {
+        timing.points.forEach(function (entry, i, points) {
             var j = 0;
 
             entry.timeFromStart = (entry.date - points[0].date) + suffix;
@@ -80,7 +79,7 @@
         }
         totalIndent[-1] = indent[-1];
 
-        var indentedTiming = Mobify.timing.points.map(function(entry) {
+        var indentedTiming = timing.points.map(function(entry) {
             return padMillis(-1, entry.timeFromStart)
                  + padMillis(entry.level, entry.timeFromPrev)
                  + entry.str;
@@ -88,4 +87,4 @@
 
         console.logGroup('log', 'Timing', indentedTiming);
     }
-})(Mobify);
+});

@@ -1,6 +1,5 @@
-(function(Mobify) {
-    var MObject = Mobify.MObject
-      , serviceProperties = ["_M", "_callable", "_empties", "_setImportance", "_on",
+define(["mobifyjs/mobifyjs", "mobifyjs/timing", "mobifyjs/iter", "mobifyjs/mObject"], function(Mobify, timing, iter, MObject) {
+    var serviceProperties = ["_M", "_callable", "_empties", "_setImportance", "_on",
             "_choice", "_outstanding", "_subMObjects"]
       , descend = function(root, fn, breadcrumbs) {
             breadcrumbs = breadcrumbs || '';
@@ -21,7 +20,7 @@
                 var goInto = [];
                 for (var key in current) {
                     if (!current.hasOwnProperty(key)) continue;
-                    if (key[0] == "_") continue;
+                    if (key[0].match(/^[_$]/)) continue;
 
                     var value = current[key];
                     var breadcrumbs = parentCrumbs + '.' + key;
@@ -35,7 +34,7 @@
                 return goInto;
             });
             return {'root': root, 'empties': empties, 'choices': choices};
-        });
+        }).filter(iter.identity);
 
         [].forEach.call(MObject.all, function(current) {
             serviceProperties.forEach(function(property) {
@@ -52,8 +51,6 @@
             console.logGroup('log', 'Choices', result.choices);
         });
     };
-
-    var timing = Mobify.timing;
 
     var override = function(name, fn) {
         fn.wrapped = MObject.prototype[name];
@@ -97,4 +94,5 @@
         }
     });
 
-})(Mobify);
+    return MObject;
+});

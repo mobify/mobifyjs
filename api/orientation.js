@@ -1,8 +1,13 @@
-(function(window, $) {
+define(["./mobifyjs", "./phoenix"], function(Mobify, phoenix) { 
+
+var $ = Mobify.$;
+if (!$) return;
+
+phoenix.register('orientation');
 
 // Android `orientation` support is broken.
-var supportsOrientation = $.support.orientation
-    = 'orientation' in window && 'onorientationchange' in window
+var supportsOrientation = $.support.orientation =
+    'orientation' in window && 'onorientationchange' in window
         && !/android/i.test(navigator.userAgent)
 
     // Returns 'landscape' or 'portrait' based on the current orientation.
@@ -54,7 +59,7 @@ var supportsOrientation = $.support.orientation
   , handler = supportsOrientation ? dispatchListeners : ersatzOrientation
   , ensureOrientationHandler = function() {
         $(window).unbind(evName, handler).bind(evName, handler);
-    }
+    };
 
 Mobify.orientation = function(fn) {
     if (!fn) return getOrientation();
@@ -62,4 +67,4 @@ Mobify.orientation = function(fn) {
     listeners.push(fn);
 }  
 
-})(this, Mobify.$);
+});

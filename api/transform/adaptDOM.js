@@ -1,4 +1,6 @@
-define(["./adaptHTML", "../extractDOM", "../anchorQuery", "../transform", "../externals", "../timing", "../mobifyjs"], function(adaptDOM, extractDOM, anchorQuery, transform, externals, timing, Mobify) {
+define(["../noconflict", "./adaptHTML", "../extractDOM", "../anchorQuery", "../transform", "../externals", "../timing", "../mobifyjs", "../phoenix"],
+
+function($, adaptDOM, extractDOM, anchorQuery, transform, externals, timing, Mobify) {
     function stringifyResult(obj) {
         obj = obj || "";
 
@@ -12,25 +14,6 @@ define(["./adaptHTML", "../extractDOM", "../anchorQuery", "../transform", "../ex
         return obj;
     };
 
-    function noConflict(source) {
-        var $ = window.$ || Mobify.$;
-        if (!$) return;
-
-        if ($.noConflict) {
-            Mobify.$ = $.noConflict(true);
-            delete window.jQuery;
-        } else if ($.zepto) {
-            Mobify.$ = $;
-            Mobify.$.support = Mobify.$.support || {};
-            if (window.Zepto === window.$) delete window.$;
-            delete window.Zepto;
-        } else return function(selector) {
-            return source.document.querySelectorAll(selector);
-        }
-
-        return anchorQuery(source);
-    }
-
     return transform.adaptDOM = function(adaptFn) {
         transform.adaptHTML(function(source, callback) {
             var disabledSource = externals.disable(source);
@@ -39,7 +22,7 @@ define(["./adaptHTML", "../extractDOM", "../anchorQuery", "../transform", "../ex
             var dom = extractDOM(disabledSource);
             timing.addPoint('Created passive document');
 
-            this.$ = noConflict(dom.document);
+            this.$ = anchorQuery(dom.document);
 
             adaptFn.call(this, dom, function(result) {
                 var flattenedResult = stringifyResult(result);

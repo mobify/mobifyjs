@@ -71,7 +71,7 @@ define(["./mobifyjs", "./extractHTML"], function(Mobify, html) {
         var wrap = Mobify.$ || function(x) { return x };
         
         // Disable attributes that can cause loading of external resources
-        var doc = document.implementation.createHTMLDocument()
+        var doc = document.implementation.createHTMLDocument("")
           , htmlEl = doc.documentElement
           , headEl = htmlEl.firstChild
           , bodyEl = htmlEl.lastChild

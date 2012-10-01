@@ -8,7 +8,6 @@
 /*jslint sloppy: true */
 /*global setTimeout: false */
 
-var requirejs, require, define;
 (function (undef) {
     var main, req,
         defined = {},

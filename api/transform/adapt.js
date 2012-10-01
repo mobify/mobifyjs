@@ -1,4 +1,4 @@
-define(["../mObject.utils", "../transform", "./adaptDOM"], function(bindM, transform, adaptDOM) {
+define(["../mObject.utils", "../transform", "./adaptDOM", "../i18n"], function(bindM, transform, adaptDOM) {
 	return transform.adapt = function(adaptFn, callback, $) {
         transform.adaptDOM(function(source, callback) {            
             var M = bindM(source, callback);

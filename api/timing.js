@@ -9,6 +9,7 @@ define(["./mobifyjs"], function(Mobify) {
 	  , reset: function() {
 	        this.points = [];
 	    }
+	  , emit: function() {}
 	};
 
 	timing.addPoint('Wrote Mobify bootstrap tag', Mobify.points[0]);

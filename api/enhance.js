@@ -7,7 +7,12 @@
 //
 // TODO: Windows Phone
 // http://windowsteamblog.com/windows_phone/b/wpdev/archive/2011/03/22/targeting-mobile-optimized-css-at-windows-phone-7.aspx
-(function(window, document, $) {
+define(["./mobifyjs", "./phoenix", "./orientation"], function(Mobify, phoenix) {
+
+var $ = Mobify.$;
+if (!$) return;
+
+phoenix.register('enhance');
 
 // ###
 // # Device Properties
@@ -94,7 +99,7 @@ if (dpr > 1) {
 // ???
 // .sd or .hd .hd15 .hd2
 // .dpr1 .dpr15 .dpr2
-Mobify.enhance = function() {
+return Mobify.enhance = function() {
     
     var classes = [os, (!touch ? 'no' : '') + 'touch', Mobify.orientation()];
 
@@ -111,4 +116,4 @@ Mobify.enhance = function() {
     });
 };
 
-})(this, document, Mobify.$);
+});

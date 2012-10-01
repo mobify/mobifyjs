@@ -1,22 +1,4 @@
-define(["./extractHTML", "mobifyjs"], function(html, Mobify) {
-
-// Set optout cookie and reload to goto desktop.
-// V6.X: mobify-path=
-//
-// `url`: Optional url to redirect to after opting out.
-Mobify.desktop = function(url) {
-    document.cookie = 'mobify-path; path=/;';
-
-    if (url) {
-        location = url;
-    } else {
-        location.reload();
-    }
-};
-
-Mobify.die = function() {
-    html.unmobify();
-};
+define(["./mobifyjs"], function(Mobify) {
 
 // i18n function converts in a list of language types and data and returns
 // a function that allows you to grab translation keys from that data

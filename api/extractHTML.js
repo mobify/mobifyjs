@@ -119,7 +119,7 @@ var defineHTML = function(Mobify) {
             });
         }
 
-      , unmobify : function() {
+      , unmobify : Mobify.die = function() {
             var unmobifier = function() {
                 document.removeEventListener('DOMContentLoaded', unmobifier, false);
                 html.writeHTML();
@@ -136,7 +136,7 @@ var defineHTML = function(Mobify) {
     return html;
 }
 
-if (!window.define) {
+if (!define) {
     Mobify.api = 1;
     Mobify.html = defineHTML(Mobify);
     Mobify.html.unmobify();

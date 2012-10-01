@@ -1,11 +1,11 @@
-(function(Mobify) {
+define(["mobifyjs/mobifyjs", "mobifyjs/timing", "mobifyjs/iter"], function(Mobify, timing, iter) {
 
     if (!console.group) {
         console.group = console.log;
         console.groupEnd = function(){};
     }
 
-    Mobify.iter.extend(console, {
+    iter.extend(console, {
         logCollapsedGroup : function(fn, title, obj) {
             return this.logGroup(fn, title, obj, !!console.groupCollapsed);
         }
@@ -29,6 +29,11 @@
         }
     });
 
+    timing.emit = function() {
+        console.logTiming && console.logTiming();
+        console.logMObjects && console.logMObjects();  
+    };
+
     Mobify.die = function() {
         var args = [].slice.call(arguments);
         console.group('(T_T) Fatal error (T_T)');
@@ -37,19 +42,4 @@
 
         throw args;
     }
-
-    var oldAdaptHTML = Mobify.transform.adaptHTML;
-
-    Mobify.transform.adaptHTML = function(adaptFn) {
-        oldAdaptHTML.call(this, function(source, callback) {
-            adaptFn.call(this, source, function(result) {
-                callback(result);
-                console.logTiming();
-                console.logMObjects();                
-            });
-        });
-
-        
-    };
-
-})(Mobify);
+});

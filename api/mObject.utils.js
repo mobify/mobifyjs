@@ -1,4 +1,4 @@
-define(["./mObject", "./mobifyjs"], function(MObject, Mobify) {
+define(["./mObject", "./mobifyjs", "dev!./log.mObject"], function(MObject, Mobify) {
 
     var staticMethods = {
         make: function() {

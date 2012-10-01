@@ -2,6 +2,10 @@ define(["./mobifyjs"], function(Mobify){
     return function($root) {
         var $ = Mobify.$;
 
+        if (!$) return function(selector) {
+            return $root.document.querySelectorAll(selector);
+        }
+
         var rootedQuery = function(selector, context, rootQuery) {
             return ($.fn.init || $.zepto.init).call(this, selector, context || anchored.context(), rootQuery);
         };
