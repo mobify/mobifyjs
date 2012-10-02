@@ -398,6 +398,24 @@ non-mobified version of your site:
     View Full Site
     </a>
 
+## Back to Mobile
+
+This anchor tag will allow users to go back to the mobile site:
+
+    <a href="#" onclick="document.cookie='mobify-path=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';location.reload()">
+        Back to Mobile
+    </a>
+
+But with a "Back to Mobile" button, you don't want it to show up on your desktop site for non-mobile devices.
+So the best thing to do here is to conditionally insert this element into your desktop site based on the device, like this:
+
+    <script type="text/javascript">
+        if (/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)) {
+            var backToMobile = document.createElement("div"); 
+            backToMobile.innerHTML = '<a href="#" onclick="document.cookie=\'mobify-path=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/\';location.reload()">Mobile Site</a>';
+            document.getElementById("**ELEMENT_TO_APPEND_TO**").appendChild(backToMobile);
+        }
+    </script>
 
 # Best Practices
 
