@@ -14,6 +14,7 @@
         waiting = {},
         config = {},
         defining = {},
+        all = [],
         aps = [].slice;
 
     /**
@@ -317,6 +318,8 @@
         return req;
     };
 
+    req.all = all;
+    req.declaration = arguments.callee;
     define = function (name, deps, callback) {
 
         //This module may not have dependencies
@@ -329,6 +332,7 @@
         }
 
         waiting[name] = [name, deps, callback];
+        all.push([name, deps, callback]);
     };
 
     define.amd = {

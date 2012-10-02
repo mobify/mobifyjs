@@ -1,6 +1,4 @@
 
-{>"/base/api/ark.js"/}
-
 {#lib_export name="lib" passive="true"}{+lib}
     {>"/base/vendor/slide.js"/}
 {/lib}{/lib_export}
@@ -10,16 +8,4 @@ Mobify.iter.extend(Mobify.config, {
   , buildDate: {build_dt}
 });
 
-{#lib_export name="enhance"}{+enhance}
-    {>"/base/api/orientation.js"/}
-    {>"/base/api/enhance.js"/}
-    {>"/base/api/util.js"/}
-{/enhance}{/lib_export}
-
 {>"/base/api/combo.js"/}
-
-{^production}
-    {>"/base/api/log.js"/}
-    {>"/base/api/log.timing.js"/}
-    {>"/base/api/log.mObject.js"/}
-{/production}

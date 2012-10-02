@@ -8,21 +8,26 @@ define(["./mobifyjs"], function(Mobify) {
                 this.keep.push('mobifyjs/' + name);
             }
           , getRebornJS: function() {
-                var fragments = concatenatedJS.toString().split(/define\((['"])(.+?)(\1)/);
-                var moduleBodies = [fragments[0]];
+                var moduleBodies = ['(', require.declaration, ')()'];
                 var moduleNames = [];
                 var keepObj = {};
-                phoenix.keep.forEach(function(x) { keepObj[x] = false; });
 
-                for (var i = 1; i < fragments.length; i += 4) {
-                    if (!keepObj[fragments[i + 1]]) continue;
-                    moduleBodies.push('define', '('); //Prevent self-parsing
-                    moduleBodies.push.apply(moduleBodies, fragments.slice(i, i + 4));
-                    moduleNames.push(fragments[i + 1]);
-                }
+                phoenix.keep.forEach(function(x) { keepObj[x] = true; });
+
+                require.all.forEach(function(dep) {
+                    if (!keepObj[dep[0]]) return;
+                    var prereqs = "";
+                    if (dep[1].length) {
+                        prereqs = '["' + dep[1].join('", "') + '"], ';
+                    }
+                    moduleBodies.push('\ndefine("', dep[0], '", ', prereqs, dep[2], ');');
+                    moduleNames.push(dep[0]);
+                });
                 
-                if (moduleNames.length) moduleBodies.push('\nrequire(["', moduleNames.join('","'), '"]);');
-                return '(' + moduleBodies.join('') + '})();';
+                if (moduleNames.length) {
+                    moduleBodies.push('\nrequire(["', moduleNames.join('","'), '"]);');
+                }
+                return moduleBodies.join('');
             }
         };
 
@@ -31,7 +36,6 @@ define(["./mobifyjs"], function(Mobify) {
         document.open = function() {
             var rebornJS = phoenix.getRebornJS();
 
-            copy(rebornJS);
             oldDocOpen.apply(document, arguments);
             document.open = oldDocOpen;
 
