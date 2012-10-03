@@ -1,8 +1,11 @@
+define(["./mobify"], function(Mobify) {
+
+(function() {
 /**
  * httpCache: An implementation of an in memory HTTP cache that persists data to
  * localStorage.
  */
-(function(window, Mobify) {
+
     /**
      * Retrieve `key` from the cache. Mark as used if `increment` is set.
      */
@@ -128,8 +131,8 @@ var get = function(key, increment) {
       , save: save
       , reset: reset
     }
+})();
 
-})(this, Mobify);
 
 /**
  * httpCache.utils: HTTP 1.1 Caching header helpers.
@@ -218,7 +221,7 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
 /**
  * combineScripts: Clientside API to the combo service.
  */
-(function(window, document, Mobify) {
+
 
 var $ = Mobify.$
 
@@ -347,4 +350,4 @@ Mobify.cssURL = function(obj) {
     return '//combo.mobify.com/css/' + JSONURIencode(obj)
 }
 
-})(this, document, Mobify);
+});

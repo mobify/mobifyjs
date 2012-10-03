@@ -1,4 +1,4 @@
-define(["./mobifyjs"], function(Mobify) {
+define(["./mobifyjs", "./iter", "cond!site.json"], function(Mobify, iter, siteConfig) {
     var config = Mobify.config = Mobify.config || {};
 
     // configFile my already exists if rendering server side, so only grab mobify.js script tag 
@@ -11,6 +11,11 @@ define(["./mobifyjs"], function(Mobify) {
     config.configDir = config.cssDir = config.configFile.replace(/\/[^\/]*$/, '/');
     config.imageDir = config.configDir + 'i/';
     config.ajs = Mobify.ajs;
+
+    iter.extend(config, {
+        buildDate: require("buildDate")
+      , siteConfig: siteConfig
+    });
 
     return config;
 });

@@ -1,5 +1,5 @@
-define(["../transform", "../timing", "dev!../log.timing"], function(transform, timing) {
-    return transform.adaptHTML = function(adaptFn) {
+define(["../transform", "../timing", "cond!../log.timing?dev"], function(transform, timing) {
+        return transform.adaptHTML = function(adaptFn) {
         var runWhenReady = function() {
             if (!/complete|loaded/.test(document.readyState)) {
                 return setTimeout(runWhenReady, 15);
