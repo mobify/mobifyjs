@@ -41,7 +41,6 @@
     {>"/base/api/stack.js"/}
     {>"/base/api/cont.js"/}
     {>"/base/api/tmpl.js"/}
-    {>"/base/api/studioJS.js"/}    
 {/dust}
 
 {>"/base/konf/build_config.konf"/}
@@ -62,10 +61,10 @@
 
 {+main}
 Mobify.transform.run({+rawconf}function() {
-    var $ = this.$, M = this; 
+    var $ = this.$, M = this;
     return { data: $.extend(
         {>"/base/konf/defaults.konf"/},
-        {+konf} 
+        {+konf}
             {! Use konf for plain JS configs, and data for legacy kaffeine ones. !}
             {#kaffeine}
                 {+data}{/data}
