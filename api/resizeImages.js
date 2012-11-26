@@ -10,16 +10,13 @@ var $ = Mobify.$
     // A regex for detecting http(s) URLs.
   , httpRe = /^https?/
 
-    // A protocol relative URL for the host ir0.mobify.com.
-  , PROTOCOL_AND_HOST = '//ir0.mobify.com'
-          
     /**
      * Returns a URL suitable for use with the 'ir' service.
-     */ 
+     */
   , getImageURL = Mobify.getImageURL = function(url, options) {
         options = options || {}
 
-        var bits = [PROTOCOL_AND_HOST];
+        var bits = [defaults.host];
 
         if (defaults.projectName) {
             var projectId = "project-" + defaults.projectName;
@@ -44,8 +41,8 @@ var $ = Mobify.$
 
     /**
      * Searches the collection for image elements and modifies them to use
-     * the Image Resize service. Pass `options` to modify how the images are 
-     * resized.
+     * the Image Resize service. Pass `options` to modify how the images are
+     * resized. Returns the collection of images that were modified.
      */
   , resizeImages = $.fn.resizeImages = function(options) {
         var opts = $.extend(defaults, typeof options == 'object' && options)
@@ -67,19 +64,21 @@ var $ = Mobify.$
             }
         }
 
-        return $imgs.each(function() {
+        return $imgs.filter(function() {
             if (attr = this.getAttribute(opts.attribute)) {
                 absolutify.href = attr;
                 var url = absolutify.href;
                 if (httpRe.test(url)) {
                     this.setAttribute('x-src', getImageURL(url, opts));
+                    return true
                 }
             }
         });
     }
 
   , defaults = resizeImages.defaults = {
-        selector: 'img[x-src]'
+        host: '//ir0.mobify.com'
+      , selector: 'img[x-src]'
       , attribute: 'x-src'
       , projectName: Mobify.config.projectName || ''
     }
