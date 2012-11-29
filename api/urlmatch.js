@@ -8,8 +8,8 @@
  * contructor will match the literal contents of the string.
  */
 var reEscape = function (str) {
-     return str.replace(/([.?*+^$[\]\\(){}-])/g, "\\$1");
- }; 
+    return str.replace(/([.?*+^$[\]\\(){}-])/g, "\\$1");
+}; 
 
 var declareUrlMatch = function(window, Mobify) {
     /**
@@ -43,7 +43,7 @@ var declareUrlMatch = function(window, Mobify) {
      * function that can be used to match against the current window's path, 
      * `window.location.pathname`.
      */
-    return function(expr) {
+    var urlmatch = function(expr) {
         var exprIsRegExp, exprIsString, re;
         
         exprIsRegExp = expr instanceof RegExp;
@@ -51,15 +51,29 @@ var declareUrlMatch = function(window, Mobify) {
         
         if (!(exprIsRegExp || exprIsString)) {
             return false;
-        } else if (exprIsRegExp) {
+        }
+        if (exprIsRegExp) {
             re = expr;
         } else { 
             re = getExpressionRegExp(expr);
         }
         return function() {
+            // Note, window is the closed-overarguemnt to the parent function, 
+            // not necessarily the global window
             return re.test(window.location.pathname) ? expr : false;
         };
     };
+
+    /* 
+    * Set a new object with a location property for the urlmatch function to be 
+    * used in place window.
+    */
+    urlmatch.setWindow = function (newWindow) {
+        // change closed over window
+        window = newWindow;
+    }
+
+    return urlmatch;
 };
 
 // Conditional loading using `define`, or adding to `Mobify`.
