@@ -12,30 +12,77 @@ var reEscape = function (str) {
 }; 
 
 var declareUrlMatch = function(window, Mobify) {
+
     /**
      * Given a a path expression `expr`, returns a RegExp that can be
      * used to match a URL's path.
      */
     var getExpressionRegExp = function(expr) {
-        var SLASH = '/';
-        var WILD = '*';
-        var WILD_RE_STR = '.*';
-        var SLASH_RE_STR = '\\/?';
+        var SLASH = '/'
+          , WILD = '*'
+          , WILD_RE_STR = '[^\\/]+'
+          , SLASH_RE_STR = '\\/+'
+          , FINAL_WILD_RE = '.+'
+          , TRAILING_SLASH_RE = '(\\/*)?'
+          , reStr = '^'
+          , bits = expr.split(SLASH)
+          , firstRun = true;
 
-        var bits = expr.slice(1).split(SLASH);
-        var reStr = '';
+        if(expr === "/*") {
+            return /^.*$/;
+        }
 
         while (bits.length) {
-            bit = bits.pop();
-            bit = (bit == WILD ? WILD_RE_STR : reEscape(bit));
-            reStr = SLASH_RE_STR + bit + reStr;
+            bit = bits.shift();
 
-            WILD_RE_STR = '[^\/]+';
-            SLASH_RE_STR = '\\/';
-        };
+            if (bits.length === 0) {
+                if(!firstRun && bit != '') reStr += SLASH_RE_STR;
+                firstRun = false;
 
-        var re = new RegExp("^" + reStr + "$", "i");
+                bit = (bit == WILD ? FINAL_WILD_RE : reEscape(bit));
+                reStr += bit + TRAILING_SLASH_RE;
+            } else {
+                if (bit === '') {
+                    firstRun = false;
+                    continue;
+                }
+                if(!firstRun) reStr += SLASH_RE_STR;
+                firstRun = false;
+
+                bit = (bit == WILD ? WILD_RE_STR : reEscape(bit));
+                reStr += bit;
+            }
+        }
+
+        var re = new RegExp(reStr + "$", "i");
+        console.log(re);
         return re;
+
+
+        // var SLASH = '/';
+        // var WILD = '*';
+        // var WILD_RE_STR = '.*';
+        // var SLASH_RE_STR = '\\/*';
+
+        // var bits = expr.slice(1).split(SLASH);
+        // var reStr = SLASH_RE_STR;
+
+        // console.log(bits)
+
+        // while (bits.length) {
+        //     bit = bits.pop();
+        //     if (bit === '') continue;
+
+            // bit = (bit == WILD ? WILD_RE_STR : reEscape(bit));
+            // reStr = SLASH_RE_STR + bit + reStr;
+
+        //     WILD_RE_STR = '[^\/]+';
+        //     SLASH_RE_STR = '\\/+';
+        // };
+
+        // var re = new RegExp("^\\/" + reStr + "$", "i");
+        // console.log(re);
+        // return re;
     };
 
     /**

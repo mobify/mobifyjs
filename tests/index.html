@@ -598,9 +598,11 @@
         test("urlmatch", function() {
             // Path Expression test suite
             testUrlMatch("/", "/", true);
+            testUrlMatch("/////", "/", true);
             testUrlMatch("/", "/*/", false);
             testUrlMatch("/", "/*", true);
             testUrlMatch("/a", "/a/", true);
+            testUrlMatch("/a/", "/a", true);
             testUrlMatch("/a/", "/a/", true);
             testUrlMatch("/a/", "/*/", true);
             testUrlMatch("/a/", "/*", true);
@@ -629,8 +631,8 @@
             testUrlMatch("/a/", /^\/a\//, true);
             testUrlMatch("/a", /^\/a\//, false);
             testUrlMatch("/blah/", /^[^a]+$/, false);
-            testUrlMatch("/a/some/other/stuff/b", /^\/a.*b(\/)?$/, true);
-            testUrlMatch("/a/some/other/other/stuff/b/", /^\/a.*b(\/)?$/, true);
+            testUrlMatch("/a/some/other/stuff/b", /^\/a.*b(\/)?$/, true)
+            testUrlMatch("/a/some/other/other/stuff/b/", /^\/a.*b(\/)?$/, true)
 
             // Things other than path expressions and RegExps
             equal(urlmatch({}), false, 
