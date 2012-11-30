@@ -56,6 +56,8 @@
         <script src="../api/main.js"></script>
         <script src="../api/resizeImages.js"></script>
 
+        <script src="../api/urlmatch.js"></script>
+
         <script src="../api/ark.js"></script>
 
     </div>
@@ -224,19 +226,15 @@
 
                 iframe.document.open();
                 iframe.document.write(html);
-                iframe.document.close();
 
                 function load() {
                     equal(iframe.window.a.length, 4, 'a = [a, b, c , d]');
 
                     start();
                 }
+                $(iframeEl).on('load', load);
 
-                if (iframe.document.readyState == 'complete') {
-                    load();
-                } else {
-                    $(iframeEl).on('load', load);
-                }
+                iframe.document.close();
             });
         });
 
@@ -547,6 +545,101 @@
 
             equal(got, vow);
         });
+
+        module('Mobify.urlmatch');
+        // First, some utility functions and variables
+        var locationify, urlmatch, testUrlMatch;
+        locationify = (function() {
+            var urlify;
+            urlify = document.createElement("a");
+            return function(url) {
+                urlify.href = url;
+                return {
+                    host: urlify.host,
+                    hostname: urlify.hostname,
+                    href: urlify.href,
+                    pathname: urlify.pathname,
+                    port: urlify.port,
+                    protocol: urlify.protocol,
+                    toString: function() {
+                        return url;
+                    }
+                };
+            };
+        })();
+
+        urlmatch = Mobify.urlmatch;
+
+        /* 
+        * Takes a path, an urlmatch path expression or regular expression and an 
+        * expectation about whether these should match and calls qunit's 
+        * `equal()` on the result of running urlmatch with the given expression 
+        * window.location faked to the given path on http://a.com/
+        */
+        testUrlMatch = function(path, expression, expected) {
+            var match, matched, symbol, url;
+            
+            // Set up urlmatch with a mocked window object with a mocked location object
+            // set to `url`
+            url = "http://a.com" + path;
+            urlmatch.setWindow({location: locationify(url)});
+
+            match = urlmatch(expression)
+            matched = !!match();
+            symbol = (expected != false ? "☑": "☒");
+
+            expression = (typeof expression === 'string' ? 
+              '"' + expression + '"' : expression);
+
+            equal(matched, expected, 
+              symbol + " : " + path + " : " + expression);
+        };
+
+        test("urlmatch", function() {
+            // Path Expression test suite
+            testUrlMatch("/", "/", true);
+            testUrlMatch("/////", "/", true);
+            testUrlMatch("/", "/*/", false);
+            testUrlMatch("/", "/*", true);
+            testUrlMatch("/a", "/a/", true);
+            testUrlMatch("/a/", "/a", true);
+            testUrlMatch("/a/", "/a/", true);
+            testUrlMatch("/a/", "/*/", true);
+            testUrlMatch("/a/", "/*", true);
+            testUrlMatch("/a/b", "/b/", false);
+            testUrlMatch("/a/b", "/*/", false);
+            testUrlMatch("/a/b", "/*", true);
+            testUrlMatch("/a/b", "/a/b/", true);
+            testUrlMatch("/a/b/", "/a/b/", true);
+            testUrlMatch("/a/b/", "/*/b/", true);
+            testUrlMatch("/a/b/", "/a/*/", true);
+            testUrlMatch("/a/b/", "/a/*", true);
+            testUrlMatch("/a/b/", "/*/*/", true);
+            testUrlMatch("/a/b/c", "/*/*/", false);
+            testUrlMatch("/a/b/c", "/*", true);
+            testUrlMatch("/A/", "/a/", true);
+            testUrlMatch("/ゲーム/", "/*", true);
+
+            // Let's throw in some regex relevant characters to test proper escaping
+            testUrlMatch("/a+b/c", "/a+b/*/", true);
+            testUrlMatch("/abb/c", "/a.b/c", false);
+            testUrlMatch("/aab/c", "/a+b/*/", false);
+            testUrlMatch("/a$b/c", "/a$b/*", true);
+              
+            // RegExp test suite
+            testUrlMatch("/a", /a/, true);
+            testUrlMatch("/a/", /^\/a\//, true);
+            testUrlMatch("/a", /^\/a\//, false);
+            testUrlMatch("/blah/", /^[^a]+$/, false);
+            testUrlMatch("/a/some/other/stuff/b", /^\/a.*b(\/)?$/, true)
+            testUrlMatch("/a/some/other/other/stuff/b/", /^\/a.*b(\/)?$/, true)
+
+            // Things other than path expressions and RegExps
+            equal(urlmatch({}), false, 
+              "passing the empty object to urlmatch makes it return false");
+            equal(urlmatch("/a/b/c")(5), false, 
+              "passing a number to urlmatch makes it return false");
+        }); //test
 
         // test('Mobify.html.extractHTML', function() {
         //     var doc = createDocument()
