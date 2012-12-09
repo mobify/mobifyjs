@@ -7,47 +7,35 @@ define(["./iter"], function(iter) {
 var $ = Mobify.$ || window.$ || { fn: {}};
 
 var absolutify = document.createElement('a')
-  , hosts = [
-        '//ir0.mobify.com'
-      , '//ir1.mobify.com'
-      , '//ir2.mobify.com'
-      , '//ir3.mobify.com'
-    ]
-    // Hash `url` into a well distributed int.
-  , URLHash = Mobify.URLHash = function(url) {
-        var hc, len = url.length;
 
-        // Let's hash on 8 different character codes, chosen 
-        // progresively back from the end of the URL, and xor 'em
-        hc = url.charCodeAt(len - 2 % len) ^ url.charCodeAt(len - 3 % len)
-           ^ url.charCodeAt(len - 5 % len) ^ url.charCodeAt(len - 7 % len)
-           ^ url.charCodeAt(len - 11 % len) ^ url.charCodeAt(len - 13 % len)
-           ^ url.charCodeAt(len - 17 % len) ^ url.charCodeAt(len - 19 % len)
+    // A regex for detecting http(s) URLs.
+  , httpRe = /^https?/
 
-        // A little linear congruential generator action to shuffle 
-        // things up, inspired by libc's random number generator
-        hc = (((hc * 1103515245) % 4294967296 + 12345) % 4294967296);
-        hc = (hc < 0) ? hc + 4294967296: hc;
-        return hc;
-    }
-          
-    // Returns a URL suitable for use with irX.mobify.com.
-    // :host/:format:quality/:width/:height/:url
-  , getImageURL = Mobify.getImageURL = function(url, opts) {
-        opts = opts || {}
+    // A protocol relative URL for the host ir0.mobify.com.
+  , PROTOCOL_AND_HOST = '//ir0.mobify.com'
 
-        var host = hosts[URLHash(url) % hosts.length]
-          , bits = [host];
+    /**
+     * Returns a URL suitable for use with the 'ir' service.
+     */ 
+  , getImageURL = Mobify.getImageURL = function(url, options) {
+        options = options || {};
 
-        if (opts.format) {
-            bits.push(opts.format + (opts.quality || ''));
+        var bits = [PROTOCOL_AND_HOST];
+
+        if (options.projectName) {
+            var projectId = "project-" + options.projectName;
+            bits.push(projectId);
         }
 
-        if (opts.maxWidth) {
-            bits.push(opts.maxWidth)
+        if (options.format) {
+            bits.push(options.format + (options.quality || ''));
+        }
 
-            if (opts.maxHeight) {
-                bits.push(opts.maxHeight);
+        if (options.maxWidth) {
+            bits.push(options.maxWidth)
+
+            if (options.maxHeight) {
+                bits.push(options.maxHeight);
             }
         }
 
@@ -55,17 +43,24 @@ var absolutify = document.createElement('a')
         return bits.join('/');
     }
 
-    // Alter the `src` of child images to pass through 
-    // irX.mobify.com. Return the set of altered elements.
-  , resizeImages = $.fn.resizeImages = function(options) {
-        var opts = iter.extend(resizeImages.defaults, typeof options == 'object' && options)
+    /**
+     * Searches the collection for image elements and modifies them to use
+     * the Image Resize service. Pass `options` to modify how the images are 
+     * resized.
+     */
+  , resizeImages = $.fn.resizeImages = function($imgs, options) {
+        if (this.appendTo) {
+            options = $imgs;
+            $imgs = this;
+        }
+
+        var opts = Mobify.iter.extend({}, defaults, typeof options == 'object' && options)
           , dpr = window.devicePixelRatio;
 
         if (typeof options == 'number') {
-            opts.maxWidth = options;
+            opts.maxWidth = Math.floor(options);
         }
 
-        // https://github.com/Modernizr/Modernizr/pull/443
         if (dpr) {
             if (opts.maxWidth) {
                 opts.maxWidth = Math.ceil(opts.maxWidth * dpr);
@@ -76,23 +71,26 @@ var absolutify = document.createElement('a')
             }
         }
 
-        var $imgs = this.filter(opts.selector).add(this.find(opts.selector));
-        return $imgs.each(function() {
-            var attr = this.getAttribute(opts.attribute);
+        [].forEach.call($imgs, function(img) {
+            var attr = img.getAttribute(opts.attribute);
             if (attr) {
                 absolutify.href = attr;
-                // This is slow, but its nice because it preloads the asset.
-                //this.src = getImageURL(absolutify.href, opts);
-                this.setAttribute('x-src', getImageURL(absolutify.href, opts))
-                // this.removeAttribute(opts.attribute);
+                var url = absolutify.href;
+
+                if (httpRe.test(url)) {
+                    img.setAttribute('x-src', getImageURL(url, opts));
+                }
             }
         });
-    };
 
-resizeImages.defaults = {
-    selector: 'img[x-src]',
-    attribute: 'x-src'
-};
+        return $imgs;
+    }
+
+  , defaults = {
+        selector: 'img[x-src]'
+      , attribute: 'x-src'
+      , projectName: Mobify.config.projectName || ''
+    };
 
 return resizeImages;
 

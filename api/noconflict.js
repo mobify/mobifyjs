@@ -1,5 +1,5 @@
 define(["./mobifyjs"], function() {
-    var $ = window.$ || Mobify.$;
+    var $ = window.$ || window.Zepto || Mobify.$;
     if (!$) return;
 
     if ($.noConflict) {

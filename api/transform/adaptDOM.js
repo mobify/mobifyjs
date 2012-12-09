@@ -8,7 +8,7 @@ function($, adaptDOM, extractDOM, anchorQuery, transform, externals, timing, Mob
         if (obj.appendTo) obj = obj.map(function(el) { return el.outerHTML || "" }).join("");
         if (obj.document) obj = obj.document;
         if (obj.nodeType === Node.DOCUMENT_NODE) {
-            obj = Mobify.html.doctype(doc) + obj.document.documentElement.outerHTML;
+            obj = Mobify.html.doctype(obj) + obj.documentElement.outerHTML;
         }
 
         return obj;

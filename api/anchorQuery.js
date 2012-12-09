@@ -1,9 +1,10 @@
 define(["./mobifyjs"], function(Mobify){
     return function($root) {
-        var $ = Mobify.$;
+        var $ = Mobify.$
+          , emptyArray = [];
 
         if (!$) return function(selector) {
-            return $root.document.querySelectorAll(selector);
+            return emptyArray.slice.call($root.querySelectorAll(selector));
         }
 
         var rootedQuery = function(selector, context, rootQuery) {
