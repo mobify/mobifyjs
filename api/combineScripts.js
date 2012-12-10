@@ -79,7 +79,7 @@ iter.extend(combineScripts, {
   , getLoaderScript: function(uncached, loadCallback) {
         var bootstrap = document.createElement('script')
         if (uncached.length) {
-            bootstrap.src = combineScripts.getURL(uncached, loadCallback);
+            bootstrap.src = this.getURL(uncached, loadCallback);
         } else {
             bootstrap.innerHTML = loadCallback + '();';
         }
@@ -114,7 +114,7 @@ Mobify.externals.enable = function() {
     }
     if (!~firstIndex) return htmlStr;
     
-    bootstrap = combineScript.getLoaderScript(uncached, defaults.loadCallback);
+    bootstrap = combineScripts.getLoaderScript(uncached, defaults.loadCallback);
 
     return htmlStr.substr(0, firstIndex) + bootstrap.outerHTML + htmlStr.substr(firstIndex);
 };
