@@ -220,7 +220,7 @@ The konf is extended by a default konf containing the following reserved
 keys:
 
 `!__match`
-: A matching function, used by Mobify Studio
+: A template matching function, used by Mobify Studio
 
 `__url`
 
