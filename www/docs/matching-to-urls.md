@@ -22,7 +22,7 @@ For example, in your konf, in a call to the choose function, you could cause the
             }
         }
 
-## Mobify.urlmatch() Path Expressions
+<h2 id="path-expressions"> Mobify.urlmatch() Path Expressions </h2>
 
 Path expressions let you match templates to URL paths of pages on your site. 
 

@@ -204,10 +204,27 @@ a required key, it may affect evaluation later in the konf leading to
 difficult to debug errors. Do not alter the DOM in required keys. Move 
 DOM altering operations to non-required keys.
 
+### Matching URLs with Mobify.urlmatch()
+
+Mobify.js provides the `Mobify.urlmatch()` function as a convenient method of making matches based on patterns in the path portion of the URL.
+
+It takes as an argument a string containing a [path expression](../matching-to-urls#path-expressions), or a JavaScript `RegExp` object, and returns a function that will match the expression against `window.location.pathname`. 
+
+The returned function takes no arguments, and will return a regular expression object when it matches, and false otherwise.
+
+See the document [Matching Templates to URLs](../matching-to-urls) for further reference.
+
 ##  Reserved Keys
 
 The konf is extended by a default konf containing the following reserved
 keys:
+
+`!__match`
+: A matching function, used by Mobify Studio
+
+`__url`
+
+: A template's prototype page url, used by Mobify Studio
 
 `$html`
 : Reference to the source DOM `<html>` element
