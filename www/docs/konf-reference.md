@@ -103,7 +103,7 @@ passed to `context.tmpl` for output with _OUTPUTHTML_:
 
 This assigns the value `"home"` to the templateName key. `context.data`
 looks up the value and passes it to `context.tmpl` which finds the matching
-template and renders it. The result is then output ot the browser!
+template and renders it. The result is then output to the browser!
 
 
 ##  `context.choose(obj1[, obj2[, ...]])` {#context-choose}
@@ -128,7 +128,7 @@ start with `!`, evaluate to truthy values:
     }
 
 In this example, the first argument matches if the function assigned 
-to the _!home_ evalutes to a truthy value. If it doesn't, the next
+to the _!home_ evaluates to a truthy value. If it doesn't, the next
 argument would be tested.
 
 An argument with no required keys always matches:
