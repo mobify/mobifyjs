@@ -10,8 +10,9 @@ title: Konf Reference
 
 ##  `$(selector)`
 
-Inside the `{<konf} ... {/konf}` block, `$` references the [Zepto](http://zeptojs.com/) 
-object. Its context is bound to the source DOM document.
+Inside the `{<konf} ... {/konf}` block, `$` references the 
+[Zepto](http://zeptojs.com/) object. Its context is bound to the source DOM 
+document.
 
 **Differences from the Regular DOM**
 
@@ -206,13 +207,19 @@ DOM altering operations to non-required keys.
 
 ### Matching URLs with Mobify.urlmatch()
 
-Mobify.js provides the `Mobify.urlmatch()` function as a convenient method of making matches based on patterns in the path portion of the URL.
+Mobify.js provides the `Mobify.urlmatch()` function as a convenient method of 
+making matches based on patterns in the path portion of the URL.
 
-It takes as an argument a string containing a [path expression](../matching-to-urls#path-expressions), or a JavaScript `RegExp` object, and returns a function that will match the expression against `window.location.pathname`. 
+It takes as an argument a string containing a 
+[path expression](../matching-to-urls#path-expressions), or a JavaScript 
+`RegExp` object, and returns a function that will match the expression against 
+`window.location.pathname`. 
 
-The returned function takes no arguments, and will return a regular expression object when it matches, and false otherwise.
+The returned function takes no arguments, and will return a regular expression 
+object when it matches, and false otherwise.
 
-See the document [Matching Templates to URLs](../matching-to-urls) for further reference.
+See the document [Matching Templates to URLs](../matching-to-urls) for further 
+reference.
 
 ##  Reserved Keys
 
@@ -251,7 +258,8 @@ keys:
 : A boolean flag that will be true if Mobify.js is running in debug mode
 
 `config.orientation`
-: A string that will be "portrait" if the device is taller than it is wide, or "landscape" if it is wider than it is tall
+: A string that will be "portrait" if the device is taller than it is wide, or 
+"landscape" if it is wider than it is tall
 
 `config.os`
 : A string representing the detected operating system of the device
@@ -266,16 +274,19 @@ keys:
 : Version of the Mobify tag used on this site
 
 `config.touch`
-: A boolean flag that will be true if touch events are supported, false otherwise
+: A boolean flag that will be true if touch events are supported, false 
+otherwise
 
 `configName`
-: A property pulled from _project.json_ - most likely the unique identifier for your site
+: A property pulled from _project.json_ - most likely the unique identifier for 
+your site
 
 `cssName`
 : A function returning the name of the css file to be applied
 
 `imageDir`
-: A function returning a path to where mobify adaptation specific images are kept
+: A function returning a path to where mobify adaptation specific images are 
+kept
 
 `mobileViewport`
 : Contents of the meta viewport tag to be sent
@@ -284,7 +295,8 @@ keys:
 : An object containing analytics configuration information
 
 `touchIcon`
-: The location of a file to be used as the bookmark icon for this website on iOS devices
+: The location of a file to be used as the bookmark icon for this website on iOS 
+devices
 
 `unmobify`
 : An internal flag used to record whether the page has been unmobified

@@ -10,9 +10,11 @@ elements, you can also match templates against URLs.
 
 Mobify.js provides the `Mobify.urlmatch()` helper function to enable this. In 
 your konf, you pass it a string containing a Mobify path matching pattern, or a
-regular expression, and it will return a function to be used to check whether the URL of the page matches that pattern or expression. 
+regular expression, and it will return a function to be used to check whether 
+the URL of the page matches that pattern or expression. 
 
-For example, in your konf, in a call to the choose function, you could cause the about template to be selected like so:
+For example, in your konf, in a call to the choose function, you could cause the 
+about template to be selected like so:
 
         {
             'templateName': 'about'
@@ -46,7 +48,8 @@ this we use wildcard matching. For example, in a blog, a post without titles
 would have a path such as `/post/29803152490` and a post with a title would have 
 a path of `/post/29800908081/10-best-10-best-lists of all-time`.
 
-We can match both of these with the expression `"/post/*"`. Note the lack of a trailing slash in comparison to the placeholder match: ending the expression 
+We can match both of these with the expression `"/post/*"`. Note the lack of a 
+trailing slash in comparison to the placeholder match: ending the expression 
 with `*` will cause any path components after the one specified to match.
 
 ### Examples
@@ -65,8 +68,12 @@ with `*` will cause any path components after the one specified to match.
 | `"/foo/*/baz/*"`| `/foo/bar/baz/qux`, `/foo/qux/baz/quux/bar` |
 
 
-\* The expression `"/*"` is a special case of the wildcard expression, it will match any and every path, including `/`, other paths ending in the wildcard match require _at least_ one path component present in place of the `*`.
+\* The expression `"/*"` is a special case of the wildcard expression, it will 
+match any and every path, including `/`, other paths ending in the wildcard 
+match require _at least_ one path component present in place of the `*`.
 
 ## Matching with Regular Expressions
 
-You can also pass in a JavaScript `RegExp` object, the returned function will call the `RegExp`'s `.test()` method against `window.location.pathname` and if it matches, return the expression, and otherwise return false.
+You can also pass in a JavaScript `RegExp` object, the returned function will 
+call the `RegExp`'s `.test()` method against `window.location.pathname` and if 
+it matches, return the expression, and otherwise return false.
