@@ -112,8 +112,8 @@ define(["module"], function(module) {
                         var templateName = file.split('/').pop().replace(/\.[^.]*$/, '');
 
                         text = text.replace(
-                            /(<script[\s\S]*?>[\s\S]*?<\/script\s*>)/gi,
-                            '{%whitespace:true}$1{/whitespace}'
+                            /(^{)(<script[\s\S]*?>[\s\S]*?<\/script\s*>)/gi,
+                            '$1{%whitespace:true}$2{/whitespace}'
                         );
                         text = '\n    ' + dust.compile(text, templateName);
                     } catch (err) {
