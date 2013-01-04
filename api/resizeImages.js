@@ -26,6 +26,10 @@ var $ = Mobify.$
             bits.push(projectId);
         }
 
+        if (options.cache_hours && typeof(options.cache_hours) === 'number') {
+            bits.push('c' + options.cache_hours)
+        }
+
         if (options.format) {
             bits.push(options.format + (options.quality || ''));
         }
