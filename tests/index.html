@@ -463,6 +463,22 @@
             }
         });
 
+        test('Mobify.getImageURL - projectName and cache expiry set', function() {
+            expect(1);
+            
+            try {
+                Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
+
+                got = Mobify.getImageURL('http://test/image.jpg', 
+                    {maxWidth: 320, cacheHours:8});
+                vow = "//ir0.mobify.com/project-testing/c8/320/http://test/image.jpg";
+
+                equal(got, vow);
+            } finally {
+                delete Mobify.$.fn.resizeImages.defaults.projectName;
+            }
+        });        
+
 
         module('enhance');
 
