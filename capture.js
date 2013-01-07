@@ -347,12 +347,17 @@ var Capture = {}
         //injectScript += "\n\ndocument.addEventListener(\"DOMContentLoaded\", function() { document.createElement(\"script\");script.type=\"text/javascript\"; script.src = \"" + document.getElementById("mobifyjs").src + "\"; $(\"body\").append(script); }, false );"
         //injectScript += "</script>";
 
-        //getSourceDOM().append(document.getElementById("mobifyjs").outerHTML);
+        //getSourceDOM().find("body").append(document.getElementById("mobifyjs").outerHTML);
         // getSourceDOM().find("#mobifyjs")[0].src = getSourceDOM().find("#mobifyjs")[0].getAttribute("data-main") + "?postcapture"
         //getSourceDOM().find("#mobifyjs")[0].src = "http://localhost:3000/mobify.js" + "?postcapture"
-        //getSourceDOM().find("#mobifyjs")[0].setAttribute("data-main", "http://localhost:3000/main2.js");
-        getSourceDOM().append("<script src=\"http://localhost:3000/mobify.js?postcapture\"></script>");
-
+        //getSourceDOM().find("#mobifyjs").first().remove();
+        //getSourceDOM().find("#mobifyjs")[0].removeAttribute("data-main");
+        getSourceDOM().find("#mobifyjs").remove();
+        getSourceDOM().find("[data-requiremodule]").remove();
+        //getSourceDOM().find("body").append("<script src=\"http://localhost:3000/require.js?postcapture\"></script>");
+        //getSourceDOM().find("body").append("<script src=\"http://localhost:3000/main.js?postcapture\"></script>");
+        capturing = false;
+        
         window.setTimeout(function(){
             document.open();
             document.write(escapedHtmlString());

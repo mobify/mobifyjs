@@ -1,0 +1,31 @@
+<script>
+(function(window, document, mjs) {
+
+window.Mobify = {points: [+new Date], tagVersion: [2, 0]};
+
+// var isMobile = /ip(hone|od|ad)|android|blackberry.*applewebkit/i.test(navigator.userAgent)
+//  , optedOut = /mobify-path=($|;)/.test(document.cookie);
+
+//if (!isMobile || optedOut) {
+//    return 
+//}
+
+// sj: TODO - Write logic to remove incompatable browsers
+
+document.write('<plaintext style="display:none">');
+
+setTimeout(function() {
+    window.capturing = true;
+    var script = document.getElementsByTagName('script')[0]
+      , mobifyjs = document.createElement('script');
+
+    mobifyjs.setAttribute("data-main", "http://localhost:3000/main.js");
+    mobifyjs.src = mjs;
+    mobifyjs.id = "mobifyjs"
+
+    script.parentNode.insertBefore(mobifyjs, script);
+});
+
+// })(this, document, '{{ mobifyjsPath }}');
+})(this, document, 'http://localhost:3000/require.js');
+</script>
