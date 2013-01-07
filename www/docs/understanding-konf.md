@@ -135,11 +135,11 @@ evaluates the first one that matches. An argument is said to match if
 all keys starting with `!` evaluate to truthy values.
 
 In the example above, when _content_ is evaluted, `context.choose` is
-be called. It checks the first argument and finds one required key, 
-_home_. If `$('#home')` is found in the source DOM then the first
-argument will match. `context.choose` will then add the keys 
-_templateName_ and _home_ under the group _content_. If `$('#home')` 
-is not found, it would move to the next argument and repeat the process.
+called. It checks the first argument and finds one required key, _home_. If 
+`$('#home')` is found in the source DOM then the first argument will match. 
+`context.choose` will then add the keys _templateName_ and _home_ under the
+group _content_. If `$('#home')` is not found, it would move to the next 
+argument and repeat the process.
 
 Later, when _OUTPUTHTML_ is evaluted, the value of _content.templateName_
 will be used to decide which template to render.
