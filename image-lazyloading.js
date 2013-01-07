@@ -1,4 +1,8 @@
-define([], function() { 
+var Mobify = window.Mobify = window.Mobify || {};
+Mobify.$ = Mobify.$ || window.Zepto || window.jQuery;
+
+// Requires Mobify object for method attachment
+(function(Mobify){
 
 // Private Methods
 
@@ -31,19 +35,9 @@ var Lazyload = {}
         }
     }
   , attachLazyloadEvents = Lazyload.attachLazyloadEvents = function($document, captured) {
-        if (captured && $document) {
-                var injectScript = "<script id=\"mobify-injected\">";
-                injectScript = injectScript + "var elementInViewport = " + elementInViewport.toString() + ";";
-                injectScript = injectScript + "\n\nvar renderImages = " + renderImages.toString() + ";";
-                injectScript += "\n\ndocument.addEventListener(\"DOMContentLoaded\", function() { renderImages(); Mobify.$(window).on(\"scroll\", function() { debugger; renderImages(); })}, false );"
-                injectScript += "</script>";
-
-                $document.find("body").append(injectScript);
-        } else {
-            document.addEventListener("DOMContentLoaded", function() { renderImages(); $(window).on("scroll", renderImages )}, false );
-        }
+        document.addEventListener("DOMContentLoaded", function() { renderImages(); $(window).on("scroll", renderImages )}, false );
   }
 
-return Lazyload;
+Mobify.Lazyload = Lazyload;
 
-});
+})(Mobify);

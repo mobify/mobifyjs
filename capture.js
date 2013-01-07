@@ -1,9 +1,11 @@
-define(["Zepto",], function($) {
+var Mobify = window.Mobify = window.Mobify || {};
+Mobify.$ = Mobify.$ || window.Zepto || window.jQuery;
 
-// externals
+// Requires Mobify object for method attachment, and $ for Zepto or jQuery
+(function(Mobify, $){
 
     // Returns an array of keys from an object
-var keys = function(obj) { 
+var keys = function(obj) {
         return $.map(obj, function(val, key) {
             return key 
         }) 
@@ -352,8 +354,8 @@ var Capture = {}
         //getSourceDOM().find("#mobifyjs")[0].src = "http://localhost:3000/mobify.js" + "?postcapture"
         //getSourceDOM().find("#mobifyjs").first().remove();
         //getSourceDOM().find("#mobifyjs")[0].removeAttribute("data-main");
-        getSourceDOM().find("#mobifyjs").remove();
-        getSourceDOM().find("[data-requiremodule]").remove();
+        //getSourceDOM().find("#mobifyjs").remove();
+        //getSourceDOM().find("[data-requiremodule]").remove();
         //getSourceDOM().find("body").append("<script src=\"http://localhost:3000/require.js?postcapture\"></script>");
         //getSourceDOM().find("body").append("<script src=\"http://localhost:3000/main.js?postcapture\"></script>");
         capturing = false;
@@ -367,7 +369,6 @@ var Capture = {}
 
 
 
-    return Capture
+Mobify.Capture = Capture;
 
-
-});
+})(Mobify, Mobify.$);

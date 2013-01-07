@@ -1,36 +1,18 @@
-require.config({
-    "paths": {   
-        "Zepto": "vendor/zepto"
-    },
-    "shim": {
-        "Zepto": {"exports": "$"}
-    },
-    baseUrl: "http://localhost:3000",
-    waitSeconds: 15,
-});
+capturing = window.capturing || false;
 
-require(["Zepto", "capture", "image-lazyloading"], function($, Capture, Lazyload) {
+if (capturing) {
+    var $html = Mobify.Capture.getSourceDOM();
 
-    window.Mobify = {};
-    window.Mobify.$ = $;
-    
-    capturing = window.capturing || false;
+    //$html.find("script").remove();
 
-    if (capturing) {
-        var $html = Capture.getSourceDOM();
+    // Poor mans Ark :)
+    //var injectScript = "<script id=\"mobify-injected\">";
+    //injectScript += "\n\ndocument.addEventListener(\"DOMContentLoaded\", function() { console.log(\"hello!\") }, false );"
+    //injectScript += "</script>";
+    //$html.find("body").append(injectScript);
 
-        //$html.find("script").remove();
+    Mobify.Lazyload.rewriteSrc($html[0]);
+    Mobify.Lazyload.attachLazyloadEvents($html, true);
 
-        // Poor mans Ark :)
-        //var injectScript = "<script id=\"mobify-injected\">";
-        //injectScript += "\n\ndocument.addEventListener(\"DOMContentLoaded\", function() { console.log(\"hello!\") }, false );"
-        //injectScript += "</script>";
-        //$html.find("body").append(injectScript);
-
-        Lazyload.rewriteSrc($html[0]);
-        Lazyload.attachLazyloadEvents($html, true);
-
-        Capture.renderSourceDOM();
-    }
-
-});
+    Capture.renderSourceDOM();
+}
