@@ -6,9 +6,9 @@
     <script src="junit.js"></script>
 </head>
 <body>
-    <!-- 
+    <!--
 
-    Usage: 
+    Usage:
 
         $ node tests/server.js
 
@@ -17,11 +17,11 @@
         http://127.0.0.1:1337/tests/
 
     -->
-    <h1 id="qunit-header">QUnit Test Suite</h1>  
-    <h2 id="qunit-banner"></h2>  
-    <div id="qunit-testrunner-toolbar"></div>  
-    <h2 id="qunit-userAgent"></h2>  
-    <ol id="qunit-tests"></ol>  
+    <h1 id="qunit-header">QUnit Test Suite</h1>
+    <h2 id="qunit-banner"></h2>
+    <div id="qunit-testrunner-toolbar"></div>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
 
     <div id="fixtures">
         <script>
@@ -31,7 +31,7 @@
         <script src="../vendor/zepto/src/event.js"></script>
 
         <script src="../api/noconflict.js"></script>
-        
+
         <script src="../api/combo.js"></script>
         <script src="../api/util.js"></script>
         <script src="../api/persistHash.js"></script>
@@ -61,7 +61,7 @@
         <script src="../api/ark.js"></script>
 
     </div>
-    
+
     <textarea id="combineScripts-1">
         <script>var a = ['a']</script>
         <script x-src="push.js#b"></script>
@@ -82,7 +82,6 @@
         <img x-src="gopher://archie.ftp.mailto/somanyprotocols" />
     </div>
 
-
     <script id="test-disable-1" type="text/test">
         <link href="style.css" />
         <img src="img.jpg" width="1" height="1" />
@@ -100,16 +99,16 @@
     </script>
 
     <script id="test-disable-multiline" type="text/test">
-<script 
-    type="text/javascript" 
+<script
+    type="text/javascript"
     src="https://t.p.mybuys.com/js/mybuys3.js">
 <\/script>
     </script>
 
     <script id="test-disable-script-in-comment" type="text/test">
 <!-- <script> -->
-<script 
-    type="text/javascript" 
+<script
+    type="text/javascript"
     src="https://t.p.mybuys.com/js/mybuys3.js">
 <\/script>
     </script>
@@ -120,11 +119,11 @@
         <iframe x-src="iframe.html"></iframe>
         <style media="mobify-media"></style>
         <script x-src="script.js" type="text/mobify-script" x-type="text/javascript"><\/script>
-    </script>    
+    </script>
 
     <script id="test-enable-double-src" type="text/test">
         <img x-src="x-src" src="src" />
-    </script>    
+    </script>
 
     <script id="test-extractHTMLFromElement" type="text/test">
         <div>
@@ -132,7 +131,7 @@
             <script>window.Mobify<\/script>
             <script src="mobify.js"><\/script>
             <title>title</title>
-            <plaintext>plaintext</plaintext> 
+            <plaintext>plaintext</plaintext>
         </div>
     </script>
 
@@ -219,9 +218,9 @@
                 $('body').append(iframeEl);
 
                 var iframe = (iframeEl.contentWindow)
-                            ? iframeEl.contentWindow 
-                            : (iframeEl.contentDocument.document) 
-                                ? iframeEl.contentDocument.document 
+                            ? iframeEl.contentWindow
+                            : (iframeEl.contentDocument.document)
+                                ? iframeEl.contentDocument.document
                                 : iframeEl.contentDocument;
 
                 iframe.document.open();
@@ -256,9 +255,9 @@
             $('body').append(iframeEl);
 
             var iframe = (iframeEl.contentWindow)
-                        ? iframeEl.contentWindow 
-                        : (iframeEl.contentDocument.document) 
-                            ? iframeEl.contentDocument.document 
+                        ? iframeEl.contentWindow
+                        : (iframeEl.contentDocument.document)
+                            ? iframeEl.contentDocument.document
                             : iframeEl.contentDocument;
 
             iframe.document.open();
@@ -395,11 +394,11 @@
                         }
                     }
                 };
- 
+
             ok(isStale(resources['stale-expires']));
             ok(isStale(resources['stale-cache-control']));
             ok(!isStale(resources['fresh-expires']));
-            ok(!isStale(resources['fresh-cache-control']));            
+            ok(!isStale(resources['fresh-cache-control']));
             ok(isStale(resources['no-headers']), 'No cache headers is stale');
             ok(isStale(resources['undefined-headers']), 'undefined cache headers is stale');
             ok(isStale(resources['invalid-date']), 'Invalid date is stale');
@@ -416,14 +415,16 @@
             equal($got.length, 1);
         });
 
+        // Non-HTTP URLs should be unchanged.
         test('$.fn.resizeImages non-http-url', function() {
-            expect(1);
+            expect(2);
 
-            var $imgs = $('#resizeImages-non-http').resizeImages()
-              , got = $imgs.attr('x-src')
-              , vow = "gopher://archie.ftp.mailto/somanyprotocols"
+            var before = $('#resizeImages-non-http').find('img').attr('x-src')
+              , $imgs = $('#resizeImages-non-http').resizeImages()
+              , after = $('#resizeImages-non-http').find('img').attr('x-src');
 
-            equal(got, vow, "Non-http url unchanged");
+            equal($imgs.length, 0);
+            equal(before, after, "Non-http url unchanged");
         });
 
         test('$.fn.resizeImages defaults', function(assert) {
@@ -465,7 +466,7 @@
 
         test('Mobify.getImageURL - projectName set on Mobify.conf.data', function() {
             expect(1);
-            
+
             try {
                 Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
 
@@ -537,7 +538,7 @@
             var got = Mobify.html.disable(getText('#test-disable-script-in-comment'))
               , vow = '<!-- <script> --> '
                     + '<script type="text/mobify-script" x-type="text/javascript" x-src="https://t.p.mybuys.com/js/mybuys3.js"> <\/script>'
-            
+
             equal(got, vow);
         });
 
