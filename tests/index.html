@@ -448,6 +448,21 @@
             equal(got, vow);
         });
 
+
+        test('Mobify.getImageURL cached string', function() {
+            expect(2);
+
+            var got = Mobify.getImageURL('http://test/image.jpg')
+              , vow = '//ir0.mobify.com/http://test/image.jpg';
+
+            equal(got, vow);
+
+            got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320,cacheHours:'8'});
+            vow = '//ir0.mobify.com/c8/320/http://test/image.jpg';
+
+            equal(got, vow);
+        });        
+
         test('Mobify.getImageURL - projectName set on Mobify.conf.data', function() {
             expect(1);
             
