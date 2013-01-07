@@ -16,7 +16,7 @@ var $ = Mobify.$
         }) 
     }
 
-  , openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
+  , openingScriptRe = /(<script[\s\S]*?>)/gi
 
     // Inline styles are scripts are disabled using a unkonwn type.
   , tagDisablers = {
@@ -52,7 +52,7 @@ $.each(disablingMap, function(tagName, targetAttributes) {
     attributeDisablingRes[tagName] = new RegExp(
         '\\s+((?:'
         + targetAttributes.join('|')
-        + ")\\s*=\\s*(?:'([\\s\\S])+?'|\"([\\s\\S])+?\"))", 'gi');
+        + ")\\s*=\\s*('|\")[\\s\\S]+?\\2)", 'gi');
 })
 
 attributeEnablingRe = new RegExp('\\sx-(' + keys(attributesToEnable).join('|') + ')', 'gi');
