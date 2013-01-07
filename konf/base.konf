@@ -55,6 +55,9 @@
 {>"/base/api/main.js"/}
 {>"/base/api/resizeImages.js"/}
 
+{! Mobify Studio Compatible Url Matching !}
+{>"/base/api/urlmatch.js"/}
+
 {+tmpl}
     {>"/base/tmpl/*.tmpl"/}
     {>"tmpl/*.tmpl"/}
