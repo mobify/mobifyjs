@@ -19,7 +19,7 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', 'lib/vendor/zepto.js', 'lib/capture.js', 'lib/image-lazyloading.js'],
+        src: ['<banner:meta.banner>', 'lib/vendor/zepto.js', 'lib/capture.js', 'lib/resizeImages.js', 'lib/lazyloadImages.js'],
         dest: 'dist/mobify.js'
       }
     },
