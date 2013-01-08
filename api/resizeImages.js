@@ -19,8 +19,11 @@ var $ = Mobify.$
         var bits = [defaults.host];
 
         if (defaults.projectName) {
-            var projectId = "project-" + defaults.projectName;
-            bits.push(projectId);
+            bits.push("project-" + defaults.projectName);
+        }
+
+        if (options.cacheHours) {
+            bits.push('c' + options.cacheHours);
         }
 
         if (options.format) {
@@ -28,7 +31,7 @@ var $ = Mobify.$
         }
 
         if (options.maxWidth) {
-            bits.push(options.maxWidth)
+            bits.push(options.maxWidth);
 
             if (options.maxHeight) {
                 bits.push(options.maxHeight);
