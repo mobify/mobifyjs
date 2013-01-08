@@ -1,11 +1,14 @@
 ---
 layout: modules
-title: Mobify.js Accordion Examples
+title: Mobify.js Accordion Module Examples
+description:
+    See examples of the Mobify.js expanding accordion module in action,
+    including the sample code snippets.
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/accordion.css">
 <link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/accordion-style.css">
-<style type="text/css">
+<style>
 
 .m-arrows .m-inner-content {
     color: #fff;
@@ -129,7 +132,7 @@ The basic accordion control with default styling.
         <div class="m-content">
             <div class="m-inner-content">
                 <h2>Helvetica</h2>
-                <p>Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p> 
+                <p>Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p>
             </div>
         </div>
     </li>
@@ -196,7 +199,7 @@ The basic accordion control with images to reveal when a header is expanded or c
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Fixie retro photo booth portland. Pop-up PBR hella, fingerstache photo booth beard tumblr aesthetic craft beer. Lo-fi banh mi cred, VHS squid sartorial helvetica pork belly high life brooklyn carles. Sustainable shoreditch bicycle rights fixie butcher street art.</p> 
+                <p>Fixie retro photo booth portland. Pop-up PBR hella, fingerstache photo booth beard tumblr aesthetic craft beer. Lo-fi banh mi cred, VHS squid sartorial helvetica pork belly high life brooklyn carles. Sustainable shoreditch bicycle rights fixie butcher street art.</p>
             </div>
         </div>
     </li>
@@ -260,7 +263,7 @@ The basic accordion control with +/- CSS indicators that reveal when a header is
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Twee skateboard butcher wolf sriracha. Wes anderson wolf ennui tattooed, marfa raw denim craft beer carles locavore bushwick synth pinterest biodiesel pour-over. Raw denim scenester keytar, bespoke mixtape VHS mlkshk banh mi before they sold out fixie.</p> 
+                <p>Twee skateboard butcher wolf sriracha. Wes anderson wolf ennui tattooed, marfa raw denim craft beer carles locavore bushwick synth pinterest biodiesel pour-over. Raw denim scenester keytar, bespoke mixtape VHS mlkshk banh mi before they sold out fixie.</p>
             </div>
         </div>
     </li>
@@ -323,7 +326,7 @@ The same style as the image indicators above, but CSS-only instead of images.
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Gentrify vinyl wayfarers yr mumblecore, hoodie pop-up PBR VHS 3 wolf moon bushwick leggings ethical. Salvia put a bird on it squid retro before they sold out chillwave, street art lomo selvage keytar cardigan.</p> 
+                <p>Gentrify vinyl wayfarers yr mumblecore, hoodie pop-up PBR VHS 3 wolf moon bushwick leggings ethical. Salvia put a bird on it squid retro before they sold out chillwave, street art lomo selvage keytar cardigan.</p>
             </div>
         </div>
     </li>
@@ -387,7 +390,7 @@ The basic accordion control with CSS arrows to indicate open headers.
         </h3>
         <div class="m-content">
             <div class="m-inner-content">
-                <p>Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p> 
+                <p>Williamsburg quinoa sartorial, tattooed VHS food truck polaroid authentic gentrify Austin readymade vinyl dreamcatcher freegan seitan.</p>
             </div>
         </div>
     </li>

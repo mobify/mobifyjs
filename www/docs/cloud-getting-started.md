@@ -1,6 +1,6 @@
 ---
 layout: doc
-title: Getting Started with the Mobify Cloud
+title: Getting Started with the Mobify Cloud | Mobify.js Framework Documentation
 ---
 
 
@@ -10,7 +10,7 @@ Mobify should be setup on your website before beginning this guide:
 
   * You have inserted the Mobify tag onto your website.
 
-  * You have downloaded the Mobify Client and ran the development 
+  * You have downloaded the Mobify Client and ran the development
     server using the command `mobify preview`.
 
   * You have created or downloaded a project folder.
@@ -23,8 +23,8 @@ finish setting up your site!
 # Introduction
 
 In this guide you will alter the look and feel of your mobile site
-by changing the files in the project folder. You will learn how to 
-select additional elements from your desktop site and how to use 
+by changing the files in the project folder. You will learn how to
+select additional elements from your desktop site and how to use
 different mobile templates on other pages of your site.
 
 ## Previewing your Work
@@ -32,10 +32,10 @@ different mobile templates on other pages of your site.
 To see your changes you'll need to run the development server from
 your project folder.
 
-In Terminal, change directory into your project. Start the development 
+In Terminal, change directory into your project. Start the development
 server by running the `mobify preview` command.
 
-On cloud.mobify.com browse to your project's "Preview" page. Select 
+On cloud.mobify.com browse to your project's "Preview" page. Select
 "localhost" to preview the adaptation created from the project folder
 on your computer.
 
@@ -48,7 +48,7 @@ changes.
 
 ## Debugging your Work
 
-Debugging Mobify requires the use of a web inspection tool like WebKit 
+Debugging Mobify requires the use of a web inspection tool like WebKit
 Inspector or Firebug. [For more information visit the Mobify.js Appendix](http://www.mobify.com/mobifyjs/docs/appendix/#debugging).
 
 ----
@@ -56,13 +56,13 @@ Inspector or Firebug. [For more information visit the Mobify.js Appendix](http:/
 # How does Mobify work?
 
 When a mobile device arrives on your website, the Mobify tag activates
-and loads the adaptation to create your mobile site. In development, 
+and loads the adaptation to create your mobile site. In development,
 the adaptation is loaded from the development server running on your
 computer.
 
 The adaptation is created from the files in your project folder. The
-most import file in your project is the "mobify.konf" file. The "konf" 
-is JavaScript file required by every Mobify project. It controls how 
+most import file in your project is the "mobify.konf" file. The "konf"
+is JavaScript file required by every Mobify project. It controls how
 your mobile site is created by performing a series of operations on
 the DOM constructed from the page's original HTML or source DOM.
 
@@ -72,8 +72,8 @@ Start changing your mobile site by editing the konf!
 
 # Diving into the Konf
 
-Open 'mobify.konf' with your text editor. You'll find it inside the 'src' 
-folder of your project. 
+Open 'mobify.konf' with your text editor. You'll find it inside the 'src'
+folder of your project.
 
 Inside the konf you'll find CSS selectors used to select content
 from your desktop site. In the konf, `$` references a Zepto object
@@ -111,14 +111,14 @@ syntax to avoid errors!
 ## Page Specific Selections
 
 Up to this point you have been using the same selections on every
-page of your site. Often you will want elements to only be selected on 
+page of your site. Often you will want elements to only be selected on
 specific pages.
 
 For instance, what if you'd like to select company information on the
 "About" page but not on the "Home" page?
 
 In the konf file, find the following block and uncomment it:
- 
+
     /*
     ,{
         '!templateName': 'about',
@@ -143,12 +143,12 @@ through them:
      are called "required" keys.
 
   2. Run the functions assigned to the required keys. If any of
-     them return falsey values, for example an empty collection, 
+     them return falsey values, for example an empty collection,
      advance to the next argument and repeat the process.
 
   3. If all required keys return truthy values, run the rest of the
      keys in the argument and return the result.
- 
+
   4. If no arguments match, return `undefined`.
 
 So for the second argument added to `context.choose` to match, we must
@@ -170,10 +170,10 @@ Let's create that now!
 
 ----
 
-# Templates 
+# Templates
 
 Templates are text files that contain HTML markup, as well as variables
-that are replaced with the selections from the konf when the template 
+that are replaced with the selections from the konf when the template
 is rendered. The konf decides which template should be rendered based
 on the contents of the source DOM.
 
@@ -184,10 +184,10 @@ Projects start with four templates:
     including a mobile viewport, a default CSS file and a set of
     block placeholders which can be overridden by other templates.
 
-  * **home.tmpl**: A page template that extends the 'base.tmpl' to 
+  * **home.tmpl**: A page template that extends the 'base.tmpl' to
     create the homepage.
 
-  * **_header.tmpl**: A partial template included by 'base.tmpl' to 
+  * **_header.tmpl**: A partial template included by 'base.tmpl' to
     creates the site's header.
 
   * **_footer.tmpl**: A partial template included by 'base.tmpl' to
@@ -197,8 +197,8 @@ In the konf, _OUTPUTHTML_ calls `context.tmpl` which finds the matching
 template and renders it.
 
 When you referred to a new template, there was no corresponding template
-file for it! Create a file "&lt;template&gt;.tmpl" inside the templates 
-folder where &lt;template&gt; is the value you assigned to _templateName_. 
+file for it! Create a file "&lt;template&gt;.tmpl" inside the templates
+folder where &lt;template&gt; is the value you assigned to _templateName_.
 Paste the following:
 
     {>base/}

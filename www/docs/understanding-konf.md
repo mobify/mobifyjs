@@ -1,13 +1,13 @@
 ---
 layout: doc
-title: Understanding the Konf 
+title: Understanding the Konf | Mobify.js Framework Documentation
 ---
 
 #   Understanding the Konf
 
-The konf is a JavaScript file required by every Mobify.js project. In 
+The konf is a JavaScript file required by every Mobify.js project. In
 the default project scaffold it lives at _src/mobify.konf_. It controls
-how the page is adapted for different devices and is responsible for 
+how the page is adapted for different devices and is responsible for
 selecting elements from the source DOM, picking a template and rendering
 the output to the browser.
 
@@ -24,13 +24,13 @@ Here is a minimal _mobify.konf_:
 
     } {/konf}
 
-Inside the `{<konf} ... {/konf}` block, we declare the konf object. 
-We give the konf object a key _[OUTPUTHTML]({{ site.baseurl }}/docs/konf-reference/#outputhtml)_ 
-and assign that to a function that returns an HTML string. When the konf 
+Inside the `{<konf} ... {/konf}` block, we declare the konf object.
+We give the konf object a key _[OUTPUTHTML]({{ site.baseurl }}/docs/konf-reference/#outputhtml)_
+and assign that to a function that returns an HTML string. When the konf
 object is evaluated, the function assigned to _OUTPUTHTML_ is called.
 The value assigned to _OUTPUTHTML_ is immediately rendered to the browser.
 
-The konf object is an ordinary JavaScript object so we can add other keys 
+The konf object is an ordinary JavaScript object so we can add other keys
 to it:
 
     {>"/base/lib/base_konf.konf"/}
@@ -46,7 +46,7 @@ to it:
     } {/konf}
 
 Here we have added the key _body-element_ which queries the source DOM
-by calling `$('body')` and returning the result. Inside the konf block, 
+by calling `$('body')` and returning the result. Inside the konf block,
 `$` references the [Zepto](http://zeptojs.com/) object and is the primary
 method for selecting elements.
 
@@ -67,7 +67,7 @@ Konf key values _must_ be functions that return their selections:
         return $('body');
     }
 
-All konf key functions are passed an argument called [`context`]({{ site.baseurl }}/docs/konf-reference/). 
+All konf key functions are passed an argument called [`context`]({{ site.baseurl }}/docs/konf-reference/).
 The argument is optional, and enables additional functionality:
 
     'body-element': function() {
@@ -78,9 +78,9 @@ The argument is optional, and enables additional functionality:
     }
 
 Here, the function assigned to the _images_ uses [`context.data`]({{ site.baseurl }}/docs/konf-reference/#context-data)
-to look up the previously assigned value of _body-element_,  which is 
-a Zepto set containing the source DOM's _<body>_ element. 
-It then finds all of its child _<img>_ elements using Zepto's 
+to look up the previously assigned value of _body-element_,  which is
+a Zepto set containing the source DOM's _<body>_ element.
+It then finds all of its child _<img>_ elements using Zepto's
 `find` function.
 
 ##  Konf in Practice
@@ -135,10 +135,10 @@ evaluates the first one that matches. An argument is said to match if
 all keys starting with `!` evaluate to truthy values.
 
 In the example above, when _content_ is evaluted, `context.choose` is
-called. It checks the first argument and finds one required key, _home_. If 
-`$('#home')` is found in the source DOM then the first argument will match. 
+called. It checks the first argument and finds one required key, _home_. If
+`$('#home')` is found in the source DOM then the first argument will match.
 `context.choose` will then add the keys _templateName_ and _home_ under the
-group _content_. If `$('#home')` is not found, it would move to the next 
+group _content_. If `$('#home')` is not found, it would move to the next
 argument and repeat the process.
 
 Later, when _OUTPUTHTML_ is evaluted, the value of _content.templateName_
