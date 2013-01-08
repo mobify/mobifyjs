@@ -449,20 +449,14 @@
             equal(got, vow);
         });
 
-
-        test('Mobify.getImageURL cached string', function() {
-            expect(2);
-
-            var got = Mobify.getImageURL('http://test/image.jpg')
-              , vow = '//ir0.mobify.com/http://test/image.jpg';
-
-            equal(got, vow);
-
-            got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320,cacheHours:'8'});
-            vow = '//ir0.mobify.com/c8/320/http://test/image.jpg';
-
-            equal(got, vow);
-        });        
+        test('Mobify.getImageURL cached string', 2, function() {
+            var url = 'http://test/image.jpg';
+            var result1 = Mobify.getImageURL(url, {maxWidth: '320', cacheHours: '8'});
+            var result2 = Mobify.getImageURL(url, {maxWidth: 320, cacheHours: 8});
+            var expected = '//ir0.mobify.com/c8/320/' + url;
+            equal(result1, expected);
+            equal(result2, expected);
+        });
 
         test('Mobify.getImageURL - projectName set on Mobify.conf.data', function() {
             expect(1);
@@ -481,11 +475,11 @@
 
         test('Mobify.getImageURL - projectName and cache expiry set', function() {
             expect(1);
-            
+
             try {
                 Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
 
-                got = Mobify.getImageURL('http://test/image.jpg', 
+                got = Mobify.getImageURL('http://test/image.jpg',
                     {maxWidth: 320, cacheHours:8});
                 vow = "//ir0.mobify.com/project-testing/c8/320/http://test/image.jpg";
 
@@ -493,7 +487,7 @@
             } finally {
                 delete Mobify.$.fn.resizeImages.defaults.projectName;
             }
-        });        
+        });
 
 
         module('enhance');
@@ -602,15 +596,15 @@
 
         urlmatch = Mobify.urlmatch;
 
-        /* 
-        * Takes a path, an urlmatch path expression or regular expression and an 
-        * expectation about whether these should match and calls qunit's 
-        * `equal()` on the result of running urlmatch with the given expression 
+        /*
+        * Takes a path, an urlmatch path expression or regular expression and an
+        * expectation about whether these should match and calls qunit's
+        * `equal()` on the result of running urlmatch with the given expression
         * window.location faked to the given path on http://a.com/
         */
         testUrlMatch = function(path, expression, expected) {
             var match, matched, symbol, url;
-            
+
             // Set up urlmatch with a mocked window object with a mocked location object
             // set to `url`
             url = "http://a.com" + path;
@@ -620,10 +614,10 @@
             matched = !!match();
             symbol = (expected != false ? "☑": "☒");
 
-            expression = (typeof expression === 'string' ? 
+            expression = (typeof expression === 'string' ?
               '"' + expression + '"' : expression);
 
-            equal(matched, expected, 
+            equal(matched, expected,
               symbol + " : " + path + " : " + expression);
         };
 
@@ -657,7 +651,7 @@
             testUrlMatch("/abb/c", "/a.b/c", false);
             testUrlMatch("/aab/c", "/a+b/*/", false);
             testUrlMatch("/a$b/c", "/a$b/*", true);
-              
+
             // RegExp test suite
             testUrlMatch("/a", /a/, true);
             testUrlMatch("/a/", /^\/a\//, true);
@@ -667,9 +661,9 @@
             testUrlMatch("/a/some/other/other/stuff/b/", /^\/a.*b(\/)?$/, true)
 
             // Things other than path expressions and RegExps
-            equal(urlmatch({}), false, 
+            equal(urlmatch({}), false,
               "passing the empty object to urlmatch makes it return false");
-            equal(urlmatch("/a/b/c")(5), false, 
+            equal(urlmatch("/a/b/c")(5), false,
               "passing a number to urlmatch makes it return false");
         }); //test
 
