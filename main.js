@@ -1,4 +1,4 @@
-capturing = window.capturing || false;
+capturing = window.capturing;
 
 if (capturing) {
     var $html = Mobify.Capture.getSourceDOM();
@@ -12,7 +12,10 @@ if (capturing) {
     //$html.find("body").append(injectScript);
 
     Mobify.Lazyload.rewriteSrc($html[0]);
+
+    Mobify.Capture.renderSourceDOM();
+} else {
+
     Mobify.Lazyload.attachLazyloadEvents($html, true);
 
-    Capture.renderSourceDOM();
 }

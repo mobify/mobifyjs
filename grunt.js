@@ -19,14 +19,14 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', '<file_strip_banner:lib/<%= pkg.name %>.js>'],
-        dest: 'dist/<%= pkg.name %>.js'
+        src: ['<banner:meta.banner>', 'lib/vendor/zepto.js', 'lib/capture.js', 'lib/image-lazyloading.js'],
+        dest: 'dist/mobify.js'
       }
     },
     min: {
       dist: {
         src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-        dest: 'dist/<%= pkg.name %>.min.js'
+        dest: 'dist/mobify.min.js'
       }
     },
     watch: {
@@ -56,5 +56,6 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', 'lint qunit concat min');
+  grunt.registerTask('skiptests', 'concat min');
 
 };
