@@ -10,8 +10,9 @@ title: Konf Reference
 
 ##  `$(selector)`
 
-Inside the `{<konf} ... {/konf}` block, `$` references the [Zepto](http://zeptojs.com/) 
-object. Its context is bound to the source DOM document.
+Inside the `{<konf} ... {/konf}` block, `$` references the 
+[Zepto](http://zeptojs.com/) object. Its context is bound to the source DOM 
+document.
 
 **Differences from the Regular DOM**
 
@@ -103,7 +104,7 @@ passed to `context.tmpl` for output with _OUTPUTHTML_:
 
 This assigns the value `"home"` to the templateName key. `context.data`
 looks up the value and passes it to `context.tmpl` which finds the matching
-template and renders it. The result is then output ot the browser!
+template and renders it. The result is then output to the browser!
 
 
 ##  `context.choose(obj1[, obj2[, ...]])` {#context-choose}
@@ -128,7 +129,7 @@ start with `!`, evaluate to truthy values:
     }
 
 In this example, the first argument matches if the function assigned 
-to the _!home_ evalutes to a truthy value. If it doesn't, the next
+to the _!home_ evaluates to a truthy value. If it doesn't, the next
 argument would be tested.
 
 An argument with no required keys always matches:
@@ -204,10 +205,33 @@ a required key, it may affect evaluation later in the konf leading to
 difficult to debug errors. Do not alter the DOM in required keys. Move 
 DOM altering operations to non-required keys.
 
+### Matching URLs with Mobify.urlmatch()
+
+Mobify.js provides the `Mobify.urlmatch()` function as a convenient method of 
+making matches based on patterns in the path portion of the URL.
+
+It takes as an argument a string containing a 
+[path expression](../matching-to-urls#path-expressions), or a JavaScript 
+`RegExp` object, and returns a function that will match the expression against 
+`window.location.pathname`. 
+
+The returned function takes no arguments, and will return a regular expression 
+object when it matches, and false otherwise.
+
+See the document [Matching Templates to URLs](../matching-to-urls) for further 
+reference.
+
 ##  Reserved Keys
 
 The konf is extended by a default konf containing the following reserved
 keys:
+
+`!__match`
+: A template matching function, used by Mobify Studio
+
+`__url`
+
+: A template's prototype page url, used by Mobify Studio
 
 `$html`
 : Reference to the source DOM `<html>` element
@@ -234,7 +258,8 @@ keys:
 : A boolean flag that will be true if Mobify.js is running in debug mode
 
 `config.orientation`
-: A string that will be "portrait" if the device is taller than it is wide, or "landscape" if it is wider than it is tall
+: A string that will be "portrait" if the device is taller than it is wide, or 
+"landscape" if it is wider than it is tall
 
 `config.os`
 : A string representing the detected operating system of the device
@@ -249,16 +274,19 @@ keys:
 : Version of the Mobify tag used on this site
 
 `config.touch`
-: A boolean flag that will be true if touch events are supported, false otherwise
+: A boolean flag that will be true if touch events are supported, false 
+otherwise
 
 `configName`
-: A property pulled from _project.json_ - most likely the unique identifier for your site
+: A property pulled from _project.json_ - most likely the unique identifier for 
+your site
 
 `cssName`
 : A function returning the name of the css file to be applied
 
 `imageDir`
-: A function returning a path to where mobify adaptation specific images are kept
+: A function returning a path to where mobify adaptation specific images are 
+kept
 
 `mobileViewport`
 : Contents of the meta viewport tag to be sent
@@ -267,7 +295,8 @@ keys:
 : An object containing analytics configuration information
 
 `touchIcon`
-: The location of a file to be used as the bookmark icon for this website on iOS devices
+: The location of a file to be used as the bookmark icon for this website on iOS 
+devices
 
 `unmobify`
 : An internal flag used to record whether the page has been unmobified
