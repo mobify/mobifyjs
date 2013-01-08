@@ -1,6 +1,9 @@
 ---
 layout: modules
-title: Mobify.js Accordion Module
+title: Mobify.js Accordion Module for Mobile Websites
+description:
+    Learn about Mobify.js Accordion module, an expanding accordion menu for
+    two-level navigation systems.
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/modules/accordion/accordion.css">
@@ -29,7 +32,7 @@ An expanding accordion menu for two-level nav systems.
         <div class="m-content">
             <div class="m-inner-content">
                 <h2>Content 2</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p> 
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
             </div>
         </div>
     </li>

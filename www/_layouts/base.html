@@ -1,80 +1,97 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>{{ page.title }}</title>
+<head>
+    <!--
 
-        <link rel="stylesheet" href="{{ site.baseurl }}/static/css/bootstrap.css" type="text/css" media="screen, projection" />
-        <link rel="stylesheet" href="{{ site.baseurl }}/static/css/syntax.css" type="text/css" media="screen, projection" />
-        <link rel="stylesheet" href="{{ site.baseurl }}/static/css/font-awesome.css" type="text/css" media="screen, projection" />
-        <link rel="stylesheet" href="{{ site.baseurl }}/static/js/highlight/styles/github.css" type="text/css" media="screen, projection" />
-        <link rel="stylesheet" href="{{ site.baseurl }}/static/css/ui-dev.css?version=2" type="text/css" media="screen, projection" />
-        <link rel="shortcut icon" href="{{ site.baseurl }}/static/img/favicon.ico" type="image/x-icon" />
+                     |    _)  _|        _)
+     __ `__ \   _ \  __ \  | |   |   |   |  __|
+     |   |   | (   | |   | | __| |   |   |\__ \
+    _|  _|  _|\___/ _.__/ _|_|  \__, |   |____/
+                                ____/___/
 
-        <script>
-            var _gaq = [
-                    ['_setAccount', 'UA-993328-16']
-                  , ['_trackPageview']
-                  , ['_setDomainName', 'mobify.com']
-                  , ['_setSiteSpeedSampleRate', 25]
-                  , ['_setAllowLinker', true]
-                ];
+    www.mobifyjs.com, coded in Vancouver, Canada. https://www.mobify.com/about/jobs/ -->
+    <meta charset="utf-8" />
+    <meta name="author" content="Mobify">
+    <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}Mobify.js is an open source web framework that helps you adapt any website to support any device. Powering millions of daily visits to your favourite websites.{% endif %}">
+    <meta name="keywords" content="mobify,mobile,mobile commerce,m-commerce,e-commerce,mobile web,mobile website,mobile view,create a mobile site">
+    <title>{{ page.title }}</title>
 
-            (function() {
-                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-            })();
-        </script>
+    <link rel="stylesheet" href="{{ site.baseurl }}/static/css/bootstrap.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/static/css/syntax.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/static/css/font-awesome.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/static/js/highlight/styles/github.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/static/css/ui-dev.css?version=2">
+    <link rel="shortcut icon" href="{{ site.baseurl }}/static/img/favicon.ico">
 
-        <script src="{{ site.baseurl }}/static/js/highlight/highlight.pack.js"></script>
+    <!-- Google Analytics -->
+    <script>
+        var _gaq = [
+            ['_setAccount', 'UA-993328-16'],
+            ['_trackPageview'],
+            ['_setDomainName', 'mobify.com'],
+            ['_setSiteSpeedSampleRate', 25],
+            ['_setAllowLinker', true]
+        ];
 
-        <script>
-            hljs.initHighlightingOnLoad();
-            /*! A fix for the iOS orientationchange zoom bug. Script by @scottjehl, rebound by @wilto.MIT / GPLv2 License.*/
-            (function(a){function m(){d.setAttribute("content",g),h=!0}function n(){d.setAttribute("content",f),h=!1}function o(b){l=b.accelerationIncludingGravity,i=Math.abs(l.x),j=Math.abs(l.y),k=Math.abs(l.z),(!a.orientation||a.orientation===180)&&(i>7||(k>6&&j<8||k<8&&j>6)&&i>5)?h&&n():h||m()}var b=navigator.userAgent;if(!(/iPhone|iPad|iPod/.test(navigator.platform)&&/OS [1-5]_[0-9_]* like Mac OS X/i.test(b)&&b.indexOf("AppleWebKit")>-1))return;var c=a.document;if(!c.querySelector)return;var d=c.querySelector("meta[name=viewport]"),e=d&&d.getAttribute("content"),f=e+",maximum-scale=1",g=e+",maximum-scale=10",h=!0,i,j,k,l;if(!d)return;a.addEventListener("orientationchange",m,!1),a.addEventListener("devicemotion",o,!1)})(this);
-        </script>
-        <script src="{{ site.baseurl }}/static/js/jquery.min.js"></script>
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body class="{{ page.bodyclass }}">
-        <div class="viewport">
-            <div class="navbar row-fluid">
-                <div class="navbar-inner"> 
-                    <a class="brand" href="/mobifyjs/">Mobify.js</a>
+    <script>
+        /*! A fix for the iOS orientationchange zoom bug. Script by @scottjehl, rebound by @wilto.MIT / GPLv2 License.*/
+        (function(a){function m(){d.setAttribute("content",g),h=!0}function n(){d.setAttribute("content",f),h=!1}function o(b){l=b.accelerationIncludingGravity,i=Math.abs(l.x),j=Math.abs(l.y),k=Math.abs(l.z),(!a.orientation||a.orientation===180)&&(i>7||(k>6&&j<8||k<8&&j>6)&&i>5)?h&&n():h||m()}var b=navigator.userAgent;if(!(/iPhone|iPad|iPod/.test(navigator.platform)&&/OS [1-5]_[0-9_]* like Mac OS X/i.test(b)&&b.indexOf("AppleWebKit")>-1))return;var c=a.document;if(!c.querySelector)return;var d=c.querySelector("meta[name=viewport]"),e=d&&d.getAttribute("content"),f=e+",maximum-scale=1",g=e+",maximum-scale=10",h=!0,i,j,k,l;if(!d)return;a.addEventListener("orientationchange",m,!1),a.addEventListener("devicemotion",o,!1)})(this);
+    </script>
 
-                    {% include nav.html %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="{{ page.bodyclass }}">
+    <div class="viewport">
+        <div class="navbar row-fluid">
+            <div class="navbar-inner">
+                <a class="brand" href="/mobifyjs/">
+                    Mobify.js
+                </a>
 
-                    <!-- Not Implemented
-                    <form class="navbar-search pull-right" action="">
-                        <input type="text" class="search-query span2" placeholder="Search">
-                    </form>
-                    -->
+                {% include nav.html %}
 
-                </div><!-- .navbar-inner -->
-            </div><!-- .navbar -->
+            </div><!-- .navbar-inner -->
+        </div><!-- .navbar -->
 
-            {{ content }}
+        {{ content }}
 
-        </div>
-        <div class="footer">
-            <div class="row-fluid">
-                <div class="span6">
-                    <p>Copyright &copy; 2012 <a href="//www.mobify.com/">Mobify</a>.</p>
-                </div>
+    </div>
 
-                <div class="span6">
-                    <ul class="nav pull-right">
-                        <li>
-                            <a href="//twitter.com/mobifyjs" title="Mobify on Twitter"><i class="icon-twitter"></i>@Mobifyjs</a>
-                        </li><li>
-                            <a href="//github.com/mobify" title="Mobify on Github"><i class="icon-github"></i>Github</a>
-                        </li><li>
-                            <a href="{{ site.baseurl }}/license/">License</a>
-                        </li>
-                    </ul>
-                </div>
-            </div><!-- .row-fluid -->
-        </div><!-- .footer -->
-    </body>
+    <div class="footer">
+        <div class="row-fluid">
+            <div class="span6">
+                <p>Copyright &copy; 2013 <a href="//www.mobify.com/">Mobify</a>.</p>
+            </div>
+
+            <div class="span6">
+                <ul class="nav pull-right">
+                    <li>
+                        <a href="//twitter.com/mobifyjs" title="Mobify on Twitter">
+                            <i class="icon-twitter"></i>@Mobifyjs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="//github.com/mobify" title="Mobify on Github">
+                            <i class="icon-github"></i>Github
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ site.baseurl }}/license/">License</a>
+                    </li>
+                </ul>
+            </div>
+        </div><!-- .row-fluid -->
+    </div><!-- .footer -->
+
+    <!-- JavaScript -->
+    <script src="{{ site.baseurl }}/static/js/highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</body>
 </html>

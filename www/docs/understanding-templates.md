@@ -1,13 +1,13 @@
 ---
 layout: doc
-title: Understanding Templates 
+title: Understanding Templates | Mobify.js Framework Documentation
 ---
 
 # Understanding Templates
-    
+
 In Mobify.js, templates are text files that contain HTML markup, as
 well as variables that are replaced with the selections from the konf
-when the template is rendered. The konf decides which template should 
+when the template is rendered. The konf decides which template should
 be rendered based on the contents of the source DOM.
 
 ## Templates in Theory
@@ -33,13 +33,13 @@ and later call `context.tmpl` on it:
 
 
 If `'home'` is assigned to _content.templateName_ the template
-compiled from _src/tmpl/home.tmpl_ will be rendered. This is explained 
+compiled from _src/tmpl/home.tmpl_ will be rendered. This is explained
 in more detail in the [Konf Reference]({{ site.baseurl }}/docs/konf-reference/).
 
 By default, Mobify.js compiles _.tmpl_ files from the _src/tmpl/_
 directory and makes them available to `context.tmpl`.
 
-Templates are text files that construct an HTML document. A simple 
+Templates are text files that construct an HTML document. A simple
 _home_ template might look like this:
 
     <!DOCTYPE html>
@@ -75,8 +75,8 @@ markup:
 ## Templates in Practice
 
 Websites generally have the same common templates: a header, footer,
-base, and page specific templates. We include these different 
-templates in our scaffold when you initially create a product. For 
+base, and page specific templates. We include these different
+templates in our scaffold when you initially create a product. For
 example, a home template would typically look like this:
 
     {>base/}
@@ -91,8 +91,8 @@ example, a home template would typically look like this:
     {/content}
 
 _{>base/}_ is a **partial**, or template include, that uses base as its
-parent template. _{<content}_ is a **block override** that overrides the 
-content **block placeholder** within the base template. Here is a basic 
+parent template. _{<content}_ is a **block override** that overrides the
+content **block placeholder** within the base template. Here is a basic
 example of a base template:
 
     <html>
@@ -107,10 +107,10 @@ example of a base template:
     </body>
     </html>
 
-{+content} is the block placeholder being overridden in the 
+{+content} is the block placeholder being overridden in the
 home template. We also have {>_header} and {>_footer}, which are two more
 partials that insert the _header and _footer files above and below the
-content block. Thus, any page that includes base will also have the header 
+content block. Thus, any page that includes base will also have the header
 and footer.
 
 ---
