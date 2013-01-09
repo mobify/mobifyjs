@@ -1,6 +1,6 @@
 ---
 layout: doc
-title: Template Reference 
+title: Template Reference | Mobify.js Framework Documentation
 ---
 
 # Template Reference
@@ -29,7 +29,7 @@ The context is a tree of all the keys that your konf has evaluated
 that apply to this template.
 
 When developing with Mobify.js, you can view the full tree within your
-browser's Javascript console (see [our tools guide in the 
+browser's Javascript console (see [our tools guide in the
 appendix]({{ site.baseurl }}/docs/appendix/#tools), if
 you're not familiar with its use). Browse to the page you'd like to
 inspect, open the console and find `All extracted data` -- expand it
@@ -39,7 +39,7 @@ Mobify generates during operation, see
 [Reserved Keys]({{ site.baseurl }}/docs/konf-reference/#reserved-keys)
 for a list of these.
 
-Note that when we talk about changing levels of context below, we mean traversing 
+Note that when we talk about changing levels of context below, we mean traversing
 the levels of this context tree.
 
 
@@ -58,7 +58,7 @@ syntax:
 ### Assign a selection to a key, in the konf:
 
      'search': function() {
-         return $("form#search"); 
+         return $("form#search");
      },
 
 ### Render the result of the `search` key selection in the konf as a
@@ -112,7 +112,7 @@ template tag:
 ### The selection in the konf:
 
     'warning': function() {
-        return $(".warning"); 
+        return $(".warning");
     },
 
 ### Add a filter to the `warning` variable within your template:
@@ -130,19 +130,19 @@ the previous one.
 
 ### Available Filters
 
-* `innerHTML` - render the `innerHTML` of a Zepto collection or DOM 
-                element. Note: the output of this filter will be HTML 
+* `innerHTML` - render the `innerHTML` of a Zepto collection or DOM
+                element. Note: the output of this filter will be HTML
                 escaped, chain with `s` to safely render as HTML.
 
-* `openTag` - output the literal opening tag of a DOM element. Note: 
-              the output of this filter will be HTML escaped, chain 
+* `openTag` - output the literal opening tag of a DOM element. Note:
+              the output of this filter will be HTML escaped, chain
               with `s` to safely render as HTML.
 
-* `closeTag` - output the literal closing tag of a DOM element. 
-               Note: the output of this filter will be HTML escaped, 
+* `closeTag` - output the literal closing tag of a DOM element.
+               Note: the output of this filter will be HTML escaped,
                chain with `s` to safely render as HTML.
 
-* `s` - render HTML safe output, unescapes HTML escaped strings, such 
+* `s` - render HTML safe output, unescapes HTML escaped strings, such
         as values filtered through the `innerHTML` filter.
 
 
@@ -183,7 +183,7 @@ syntax:
 
     <div id="fixed-nav">
         <h1>DemoCorp Inc.</h1>
-    </div>            
+    </div>
 
 Note that you can also access the same attribute within your template
 by descending into the header block, which is valuable when you have
@@ -228,7 +228,7 @@ current iteration:
         }
     }
 
-### Descend into the `header` variable to access `logo` and `nav` 
+### Descend into the `header` variable to access `logo` and `nav`
 attributes, also iterate `nav`:
 
     <div id="fixed-nav">
@@ -257,7 +257,7 @@ attributes, also iterate `nav`:
                 <a href="/contact/">Contact</a>
             </li>
         </ul>
-    </div>            
+    </div>
 
 
 ## `{>foo/}` - Include The Partial `foo` Inside The Current Template
@@ -317,7 +317,7 @@ included template _products.tmpl_:
     {<header}
         More Specific Products Header!
     {/header}
-    
+
 Note that a special variable is available within a block that allows
 you to access the content that would otherwise be replaced from a
 block being overridden. This variable is called `_SUPER_` and it
@@ -346,7 +346,7 @@ Provide conditional output based on the existence of a variable.
     {:else}
         Please login.
     {/user}
-    
+
 Here, if the key 'user' is defined and non-empty in the context, the
 template will render a greeting to the user, otherwise, it will render
 the text "Please Login".
@@ -356,13 +356,13 @@ the text "Please Login".
 
 Provide conditional output based on the non-existence of a variable.
 This template will render be the same as above.
-    
+
     {^user}
         Please login.
     {:else}
         Welcome {user}.
     {/user}
-    
+
 
 
 ## `{{ '{%' }}script} ... {/script}` - Inline Script Pragma
@@ -391,7 +391,7 @@ Text surrounded by `{!` and `!}` are considered comments and will not be rendere
 
 ## Mobify.desktop() - Back to Desktop
 
-Add this anchor tag to your templates to allow users to revert back to the 
+Add this anchor tag to your templates to allow users to revert back to the
 non-mobified version of your site:
 
     <a href="" onclick="Mobify.desktop();return false;">
@@ -411,7 +411,7 @@ So the best thing to do here is to conditionally insert this element into your d
 
     <script type="text/javascript">
         if (/ip(hone|od)|android.*(mobile)|blackberry.*applewebkit/i.test(navigator.userAgent)) {
-            var backToMobile = document.createElement("div"); 
+            var backToMobile = document.createElement("div");
             backToMobile.innerHTML = '<a href="#" onclick="document.cookie=\'mobify-path=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/\';location.reload()">Mobile Site</a>';
             document.getElementById("**ELEMENT_TO_APPEND_TO**").appendChild(backToMobile);
         }

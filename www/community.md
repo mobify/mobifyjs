@@ -1,16 +1,20 @@
 ---
 layout: page-community
-title: Mobify.js Community
+title: Mobify.js Community – Get Help, Report Bugs, &amp; Contribute
+description:
+    Find out how to get support, report bugs or issues and contribute changes
+    to Mobify.js open source project. Join a community of mobile website
+    developers.
 ---
 
 ## Where to get help?
 
-Questions are best posted on [StackOverflow](http://stackoverflow.com/) under 
-the tag **mobifyjs**. Our team is active on StackOverflow for mobify.js and 
+Questions are best posted on [StackOverflow](http://stackoverflow.com/) under
+the tag **mobifyjs**. Our team is active on StackOverflow for mobify.js and
 other projects.
 
-If you have a problem with the [Mobify Cloud Platform](https://cloud.mobify.com/) 
-or you wish to reach our Mobify Cloud support team you can reach us through our 
+If you have a problem with the [Mobify Cloud Platform](https://cloud.mobify.com/)
+or you wish to reach our Mobify Cloud support team you can reach us through our
 [support site](https://support.mobify.com/).
 {:.cloud}
 
@@ -21,14 +25,14 @@ Bugs and feature requests should be submitted to our issue tracker on GitHub:
   - [Issues with the Mobify.js Framework](https://github.com/mobify/mobifyjs/issues)
   - [Issues with the Mobify Client](https://github.com/mobify/mobify-client/issues)
 
-If you're not sure which project to submit your issues to, submit to either and 
+If you're not sure which project to submit your issues to, submit to either and
 we will sort them out.
 
 ## How to Contribute
 
-The development of Mobify.js takes place on GitHub. We have two primary 
-repositories dedicated to Mobify.js: the [Mobify.js Framework](https://github.com/mobify/mobifyjs) 
-and the [Mobify Client](https://github.com/mobify/mobify-client), which is our 
+The development of Mobify.js takes place on GitHub. We have two primary
+repositories dedicated to Mobify.js: the [Mobify.js Framework](https://github.com/mobify/mobifyjs)
+and the [Mobify Client](https://github.com/mobify/mobify-client), which is our
 development tool.
 
 Contributing changes is straightforward:

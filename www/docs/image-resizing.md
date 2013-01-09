@@ -1,9 +1,9 @@
 ---
 layout: doc
-title: Image Resizing with Mobify.js
+title: Image Resizing | Mobify.js Framework Documentation
 ---
 
-The image resizing service is a [Mobify Cloud](https://cloud.mobify.com/) 
+The image resizing service is a [Mobify Cloud](https://cloud.mobify.com/)
 feature. You must be a Mobify Cloud user to use it with Mobify.js.
 
 <a href="//cloud.mobify.com/" class="btn btn-primary rounded">Try Mobify Cloud for Free</a>
@@ -32,13 +32,13 @@ for mobile devices, reducing their weight!
 
 ## Usage
 
-Mobify.js provides an API to format images for use with the image 
-resizing service. Inside your konf, use `$` to select the images you 
+Mobify.js provides an API to format images for use with the image
+resizing service. Inside your konf, use `$` to select the images you
 would like to resize and then format them using `resizeImages`:
 
     'img': function() {
         var $imgs = $('img').resizeImages();
-        return $imgs;    
+        return $imgs;
     }
 
 ----
