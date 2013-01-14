@@ -69,9 +69,7 @@ if (paths.shift()) {
 }
 
 })(function() {
-    if (/ip(hone|od|ad)|android|blackberry.*applewebkit/i.test(navigator.userAgent)){
-        return [1,"mobify.js"];
-    }
+      return [1,"unmobify.js"];
 });
 </script>
 
@@ -79,5 +77,6 @@ if (paths.shift()) {
 </head>
 <body attr="<attr>">
     <h1>Basic</h1>
+    <div id="testforme">Am I here?</div>
 </body>
 </html>
