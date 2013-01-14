@@ -1,0 +1,3 @@
+/*
+Stub for future a.js test.
+*/

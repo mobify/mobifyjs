@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html attr="<attr>">
+<head attr="<attr>">
+
+<script>
+(function(detector) {
+
+if (this.Mobify) return;
+
+// Initial load and followup.
+// If src=1, don't load.
+// If src=-1, total failure, set the opt out cookie.
+// Otherwise just load the script.
+function load(src, callback) {
+    if (+src) return ~src || (doc.cookie = mobifypath + '=; path=/');
+
+    script = doc.createElement(sscript);
+    firstScript = doc.getElementsByTagName(sscript)[0];
+    script.src = src;
+    callback && (script.onload = script.onerror = callback);
+    firstScript.parentNode.insertBefore(script, firstScript);
+}
+
+function next() {
+    Mobify.api || load(paths.shift() || -1, next);
+}
+
+var doc = document
+  , sscript = 'script'
+  , mobify = 'mobify'
+  , mobifycom = '.' + mobify + '.com/'
+  , mobifypath = mobify + '-path'
+  , unmobify = 'unmobify.js'
+  , script
+  , firstScript
+  , paths = [false, 1]
+  , bundle
+  , Mobify = this.Mobify = {points: [+new Date], tagVersion: [6, 1]}
+  , matchedPath = /((; )|#|&|^)mobify-path=([^&;]*)/g.exec(location.hash + '; ' + doc.cookie);
+
+// If path matched, load from preview. 
+// If path was empty, don't load.
+// Otherwise ask the `detector` what to load and provide `unmobify` fallbacks.
+// Prioritize anchor over cookie and sessionStorage.
+if (matchedPath) {
+    (bundle = matchedPath[3])
+        && !+(bundle = matchedPath[2] && sessionStorage[mobifypath] || bundle)
+        && (paths = [true, '//preview' + mobifycom + escape(bundle)]);
+} else {
+    // Allows `detector` to not return a value and still not mobify.
+    paths = detector() || paths;
+    if (paths[0]) {
+        paths.push(unmobify);
+    }
+}
+
+// Load Mobify.js using `setTimeout` to foil the lookahead parser.
+// Otherwise load any provided fallback script.
+if (paths.shift()) {
+    // To support late tag injection, uncomment the following:
+    // readyState: uninitialized|loading|loaded|interactive|complete
+    // Loading is document.write friendly, all others will blow up the doc.
+    //if (/g$/.test(doc.readyState)) {
+    doc.write('<plaintext style="display:none;">');
+    //}
+    setTimeout(next);
+} else {
+    load(paths[0]);
+}
+
+})(function() {
+    if (/ip(hone|od|ad)|android|blackberry.*applewebkit/i.test(navigator.userAgent)){
+        return [1,"mobify.js"];
+    }
+});
+</script>
+
+    <title>Basic</title>
+</head>
+<body attr="<attr>">
+    <h1>Basic</h1>
+</body>
+</html>
