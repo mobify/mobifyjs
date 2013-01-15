@@ -20,33 +20,12 @@ module.exports = function(grunt) {
         qunit: {
           files: ['tests/**/*.html']
         },
-        // requirejs: {
-        //     compile: {
-        //         options: {
-        //             baseUrl: ".",
-        //             mainConfigFile: "./lib/config.js",
-        //             keepBuildDir: true,
-        //             optimize: none,
-        //             appDir: "lib/",
-        //             baseUrl: ".",
-        //             dir: "./build",
-        //             optimize: 'uglify',
-        //             //mainConfigFile:'./src/main.js',
-        //             modules:[
-        //               {
-        //                 name:'main'
-        //               }
-        //             ]
-        //         }
-        //     }
-        // },
         requirejs: {
             compile: {
                 options: {
                     almond: true,
                     wrap: true,
                     baseUrl: "./lib",
-                    mainConfigFile: "./lib/config.js",
                     optimize: "none",
                     keepBuildDir: true,
                     out: "./build/mobify.js",

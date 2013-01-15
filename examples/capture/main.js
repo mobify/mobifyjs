@@ -1,5 +1,7 @@
 capturing = window.capturing;
 
+var Mobify = require("Mobify");
+
 if (capturing) {
     console.log("Executing main during capturing phase!")
     var $html = Mobify.Capture.getSourceDOM();
