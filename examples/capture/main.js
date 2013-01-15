@@ -1,7 +1,4 @@
 capturing = window.capturing;
-
-var Mobify = require("Mobify");
-
 if (capturing) {
     console.log("Executing main during capturing phase!")
     var $html = Mobify.Capture.getSourceDOM();
@@ -11,7 +8,7 @@ if (capturing) {
 
     //Mobify.Lazyload.rewriteSrc($html[0]);
 
-    Mobify.Capture.renderSourceDOM({injectLibrary: true, injectMain: false});
+    Mobify.Capture.renderSourceDOM({injectMain: false});
 
 } else {
     console.log("Executing main in post-capturing phase!");
