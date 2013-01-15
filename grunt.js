@@ -24,18 +24,11 @@ module.exports = function(grunt) {
             compile: {
                 options: {
                     almond: true,
-                    wrap: true,
-                    baseUrl: "./lib",
+                    mainConfigFile: "./src/config.js",
                     optimize: "none",
                     keepBuildDir: true,
                     out: "./build/mobify.js",
                     name: "main",
-                    paths: {
-                        "Zepto": "vendor/zepto"
-                    },
-                    shim: {
-                        "Zepto": {"exports": "$"}
-                    }
                 }
             }
         },
