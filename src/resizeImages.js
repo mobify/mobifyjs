@@ -1,12 +1,6 @@
-var Mobify = window.Mobify = window.Mobify || {};
-Mobify.$ = Mobify.$ || window.Zepto || window.jQuery;
+define(["Zepto"], function($) {
 
-/**
- * Mobify.js API to the Mobify Image Resizing Service.
- */
-(function(Mobify) {
-
-var $ = Mobify.$
+var ResizeImages = {}
 
   , absolutify = document.createElement('a')
 
@@ -19,7 +13,7 @@ var $ = Mobify.$
     /**
      * Returns a URL suitable for use with the 'ir' service.
      */ 
-  , getImageURL = Mobify.getImageURL = function(url, options) {
+  , getImageURL = ResizeImages.getImageURL = function(url, options) {
         options = options || {}
 
         var bits = [PROTOCOL_AND_HOST];
@@ -85,6 +79,8 @@ var $ = Mobify.$
         selector: 'img[x-src]'
       , attribute: 'x-src'
       , projectName: ''
-    }
+    };
 
-})(Mobify);
+  return ResizeImages;
+
+});

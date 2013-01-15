@@ -31,6 +31,16 @@ module.exports = function(grunt) {
                     out: "./build/mobify-capture.js",
                 }
             },
+            resizeImages: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: true,
+                    name: "mobify-capture",
+                    out: "./build/mobify-resizeImages.js",
+                }
+            },
             full: {
                 options: {
                     almond: true,

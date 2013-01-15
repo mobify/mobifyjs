@@ -350,13 +350,15 @@ var Capture = {}
 
         // Re-add this script back into the DOM to be re-executed post processing
         // aka new Ark :)
-        var injectScript = "<script id=\"mobifyjs\" type=\"text/javascript\">" + window.library + "</scr" + "ipt>";
-        getSourceDOM().find("body").prepend(injectScript);
+        if (!/webkit/i.test(navigator.userAgent)) {
+            var injectScript = "<script id=\"mobifyjs\" type=\"text/javascript\">" + window.library + "</scr" + "ipt>";
+            getSourceDOM().find("body").prepend(injectScript);
+        }
 
         // Remove main, and if it should be reinjected, append it as the last child of body
         var main = getSourceDOM().find("#mobify-js-main");
         if (options.injectMain) {
-            getSourceDOM().find("body").append(main);
+            getSourceDOM().find("body").append(main[0].outerHTML);
         }
         main.remove();
 

@@ -4,14 +4,13 @@ if (capturing) {
     var $html = Mobify.Capture.getSourceDOM();
 
     //$html.find("script").remove();
-    //$html.find("img").resizeImages();
+    $html.find("img").resizeImages();
 
     //Mobify.Lazyload.rewriteSrc($html[0]);
 
-    Mobify.Capture.renderSourceDOM({injectMain: false});
+    Mobify.Capture.renderSourceDOM({injectMain: true});
 
 } else {
     console.log("Executing main in post-capturing phase!");
     //Mobify.Lazyload.attachLazyloadEvents($html, true);
-
 }
