@@ -1,61 +1,93 @@
+// http://stackoverflow.com/questions/13567312/working-project-structure-that-uses-grunt-js-to-combine-javascript-files-using-r
+
 /*global module:false*/
 module.exports = function(grunt) {
 
-  // Project configuration.
-  grunt.initConfig({
-    pkg: '<json:package.json>',
-    meta: {
-      banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-        '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-        '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>' +
-        '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-        ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
-    },
-    lint: {
-      files: ['grunt.js', 'lib/**/*.js', 'tests/**/*.js']
-    },
-    qunit: {
-      files: ['tests/**/*.html']
-    },
-    concat: {
-      dist: {
-        src: ['<banner:meta.banner>', 'lib/vendor/zepto.js', 'lib/capture.js', 'lib/resizeImages.js', 'lib/lazyloadImages.js', 'lib/orientation.js', 'lib/enhance.js'],
-        dest: 'dist/mobify.js'
-      }
-    },
-    min: {
-      dist: {
-        src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-        dest: 'dist/mobify.min.js'
-      }
-    },
-    watch: {
-      files: '<config:lint.files>',
-      tasks: 'lint qunit'
-    },
-    jshint: {
-      options: {
-        curly: true,
-        eqeqeq: true,
-        immed: true,
-        latedef: true,
-        newcap: true,
-        noarg: true,
-        sub: true,
-        undef: true,
-        boss: true,
-        eqnull: true,
-        browser: true
-      },
-      globals: {
-        jQuery: true
-      }
-    },
-    uglify: {}
-  });
+    console.log("test");
+    // Project configuration.
+    grunt.initConfig({
+        pkg: '<json:package.json>',
+        meta: {
+          banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
+            '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
+            '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>' +
+            '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
+            ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
+        },
+        lint: {
+          files: ['grunt.js', 'lib/**/*.js', 'tests/**/*.js']
+        },
+        qunit: {
+          files: ['tests/**/*.html']
+        },
+        // requirejs: {
+        //     compile: {
+        //         options: {
+        //             baseUrl: ".",
+        //             mainConfigFile: "./lib/config.js",
+        //             keepBuildDir: true,
+        //             optimize: none,
+        //             appDir: "lib/",
+        //             baseUrl: ".",
+        //             dir: "./build",
+        //             optimize: 'uglify',
+        //             //mainConfigFile:'./src/main.js',
+        //             modules:[
+        //               {
+        //                 name:'main'
+        //               }
+        //             ]
+        //         }
+        //     }
+        // },
+        requirejs: {
+            compile: {
+                options: {
+                    almond: true,
+                    wrap: true,
+                    baseUrl: "./lib",
+                    mainConfigFile: "./lib/config.js",
+                    optimize: "none",
+                    keepBuildDir: true,
+                    out: "./build/mobify.js",
+                    name: "main",
+                    paths: {
+                        "Zepto": "vendor/zepto"
+                    },
+                    shim: {
+                        "Zepto": {"exports": "$"}
+                    }
+                }
+            }
+        },
+        watch: {
+          files: '<config:lint.files>',
+          tasks: 'lint qunit'
+        },
+        jshint: {
+          options: {
+            curly: true,
+            eqeqeq: true,
+            immed: true,
+            latedef: true,
+            newcap: true,
+            noarg: true,
+            sub: true,
+            undef: true,
+            boss: true,
+            eqnull: true,
+            browser: true
+          },
+        },
+        uglify: {}
+    });
 
-  // Default task.
-  grunt.registerTask('default', 'lint qunit concat min');
-  grunt.registerTask('skiptests', 'concat min');
+    grunt.loadNpmTasks('grunt-requirejs');
+
+    // Default task.
+    // grunt.registerTask('default', 'lint qunit requirejs');
+    grunt.registerTask('default', 'requirejs');
+    //grunt.registerTask('skiptests', 'concat');
+    grunt.registerTask('build', 'requirejs');
 
 };

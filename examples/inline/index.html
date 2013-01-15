@@ -1,0 +1,13 @@
+<html>
+<head><title>Shawn's test page</title></head>
+<body>
+
+<p>Classes in HTML: <div class="classes"></div></p>
+
+<script src="http://cloud.dev:8000/static/mobifyjs/mobify.js"></script>
+<script>
+    Mobify.enhance();
+    $(".classes").text($("html")[0].className);
+</script>
+</body>
+</html>
