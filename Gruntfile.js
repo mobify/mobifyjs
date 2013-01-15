@@ -3,7 +3,6 @@
 /*global module:false*/
 module.exports = function(grunt) {
 
-    console.log("test");
     // Project configuration.
     grunt.initConfig({
         pkg: '<json:package.json>',
@@ -15,20 +14,31 @@ module.exports = function(grunt) {
             ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
         },
         lint: {
-          files: ['grunt.js', 'lib/**/*.js', 'tests/**/*.js']
+          files: ['grunt.js', 'src/**/*.js', 'tests/**/*.js']
         },
         qunit: {
           files: ['tests/**/*.html']
         },
+        // Building Mobify with Capturing only (dev)
         requirejs: {
-            compile: {
+            capture: {
                 options: {
                     almond: true,
                     mainConfigFile: "./src/config.js",
                     optimize: "none",
                     keepBuildDir: true,
+                    name: "mobify-capture",
+                    out: "./build/mobify-capture.js",
+                }
+            },
+            full: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: true,
+                    name: "mobify-full",
                     out: "./build/mobify.js",
-                    name: "main",
                 }
             }
         },
@@ -51,15 +61,15 @@ module.exports = function(grunt) {
             browser: true
           },
         },
-        uglify: {}
     });
 
     grunt.loadNpmTasks('grunt-requirejs');
 
     // Default task.
     // grunt.registerTask('default', 'lint qunit requirejs');
-    grunt.registerTask('default', 'requirejs');
     //grunt.registerTask('skiptests', 'concat');
-    grunt.registerTask('build', 'requirejs');
+    grunt.registerTask('default', ['requirejs:capture', 'requirejs:full']);
+    grunt.registerTask('capture', 'requirejs:capture');
+    grunt.registerTask('full', 'requirejs:full');
 
 };
