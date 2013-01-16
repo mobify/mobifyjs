@@ -1,12 +1,14 @@
 <html>
-<head><title>Shawn's test page</title></head>
+<head>
+<title>Mobify.js Inline Test Page</title>
+</head>
 <body>
 
-<p>Classes in HTML: <div class="classes"></div></p>
+<p><h3>Classes added to &lt;html&gt;:</h3> <div class="classes"></div></p>
 
-<script src="http://cloud.dev:8000/static/mobifyjs/mobify.js"></script>
+<script src="http://localhost:3000/build/mobify.js"></script>
 <script>
-    Mobify.enhance();
+    Mobify.Enhance();
     $(".classes").text($("html")[0].className);
 </script>
 </body>

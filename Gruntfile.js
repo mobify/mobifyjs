@@ -38,8 +38,19 @@ module.exports = function(grunt) {
                     mainConfigFile: "./src/config.js",
                     optimize: "none",
                     keepBuildDir: true,
-                    name: "mobify-capture",
+                    name: "mobify-resizeImages",
                     out: "./build/mobify-resizeImages.js",
+                }
+            },
+            // Build enhance only - TODO: Rename!!!
+            enhance: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: true,
+                    name: "mobify-enhance",
+                    out: "./build/mobify-enhance.js",
                 }
             },
             // Building full Mobify.js library
@@ -66,7 +77,10 @@ module.exports = function(grunt) {
     // grunt.registerTask('default', 'lint qunit requirejs');
     //grunt.registerTask('skiptests', 'concat');
     grunt.registerTask('watch', 'watch');
-    grunt.registerTask('default', ['requirejs:capture', 'requirejs:full']);
+    grunt.registerTask('default', ['requirejs:resizeImages',
+                                   'requirejs:capture',
+                                   'requirejs:enhance',
+                                   'requirejs:full']);
     grunt.registerTask('capture', 'requirejs:capture');
     grunt.registerTask('full', 'requirejs:full');
 

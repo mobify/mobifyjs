@@ -1,8 +1,5 @@
-var Mobify = window.Mobify = window.Mobify || {};
-Mobify.$ = Mobify.$ || window.Zepto || window.jQuery;
-
 // Polyfills the `orientationchange` event.
-// Exposes Touch, OS, HD and Orientation properties on `Mobify.config`.
+// Exposes Touch, OS, HD and Orientation properties
 // x-desktop, x-ios, x-android, x-blackberry, x-webos, x-nokia
 // x-notouch, x-touch
 // x-landscape, x-portrait
@@ -10,7 +7,73 @@ Mobify.$ = Mobify.$ || window.Zepto || window.jQuery;
 //
 // TODO: Windows Phone
 // http://windowsteamblog.com/windows_phone/b/wpdev/archive/2011/03/22/targeting-mobile-optimized-css-at-windows-phone-7.aspx
-(function(Mobify, $) {
+define([], function() {
+
+// ###
+// # Orientation Change
+// ###
+
+// Android `orientation` support is broken.
+var supportsOrientation = 'orientation' in window 
+                       && 'onorientationchange' in window
+                       && !/android/i.test(navigator.userAgent)
+
+    // Returns 'landscape' or 'portrait' based on the current orientation.
+  , getOrientation = function() {
+        var docEl = document.documentElement;
+        return !!(supportsOrientation
+            // 0 in portrait, 1 in landscape
+            ? orientation % 180 
+            // false in portrait, true in landscape
+            : docEl.clientWidth > docEl.clientHeight)
+        ? 'landscape'
+        : 'portrait';
+    }
+
+    // Some Android browsers (HTC Sensation) don't update widths immediately,
+    // so wait to trigger the event.
+  , prevWidth
+  , timeout
+  , ersatzOrientation = function() {
+        clearTimeout(timeout);
+        var width = document.documentElement.clientWidth;
+        if (width == prevWidth) {
+            return timeout = setTimeout(ersatzOrientation, 250);
+        }
+        prevWidth = width;
+        $(window).trigger('orientationchange');
+        dispatchListeners();
+    }
+
+  , lastOrientation = getOrientation()
+  , listeners = []
+  , dispatchListeners = function() {
+        var orientation = getOrientation(),
+            prev = lastOrientation;
+
+        if (orientation != lastOrientation) {
+            lastOrientation = orientation;
+
+            // We have this strange order and an extra variable
+            // to ensure that exception in a listener would not leave
+            // lastOrientation not updated
+            for (var i = 0, l = listeners.length; i < l; ++i) {
+                listeners[i](orientation, prev);
+            }
+        }
+    }
+
+  , evName = supportsOrientation ? "orientationchange" : "resize"
+  , handler = supportsOrientation ? dispatchListeners : ersatzOrientation
+  , ensureOrientationHandler = function() {
+        $(window).unbind(evName, handler).bind(evName, handler);
+    }
+
+  , orientation = function(fn) {
+      if (!fn) return getOrientation();
+      ensureOrientationHandler();
+      listeners.push(fn);
+  };
 
 // ###
 // # Device Properties
@@ -64,18 +127,17 @@ if ('devicePixelRatio' in window) {
 }
 
 // ###
-// # Mobify.config
+// # config
 // ###
 
-// Expose Touch, OS, HD and Orientation properties on `Mobify.config` for
-// use in templating.
+// Touch, OS, HD and Orientation properties
 
-var config = Mobify.config || {};
+var config = {};
 config.os = os;
 config.tablet = tablet;
 config.smartphone = smartphone;
 config.touch = touch;
-config.orientation = Mobify.orientation();
+config.orientation = orientation();
 
 if (dpr > 1) {
     config.HD = '@2x';
@@ -85,7 +147,7 @@ if (dpr > 1) {
 }
 
 // ###
-// # Mobify.enhance
+// # enhance
 // ###
 
 // Update orientation class on `orientationchange`.
@@ -97,9 +159,9 @@ if (dpr > 1) {
 // ???
 // .sd or .hd .hd15 .hd2
 // .dpr1 .dpr15 .dpr2
-Mobify.enhance = function() {
+return function() {
     
-    var classes = [os, (!touch ? 'no' : '') + 'touch', Mobify.orientation()];
+    var classes = [os, (!touch ? 'no' : '') + 'touch', config.orientation];
 
     if (dpr > 1) {
         classes.push('hd' + (dpr + '').replace(/[^\w]/, ''), 'hd');
@@ -109,9 +171,9 @@ Mobify.enhance = function() {
 
     $('html').addClass('x-' + classes.join(' x-'));
 
-    Mobify.orientation(function(orientation, prevOrientation) {
+    orientation(function(orientation, prevOrientation) {
         $('html').removeClass('x-' + prevOrientation).addClass('x-' + orientation);
     });
 };
 
-})(Mobify, Mobify.$);
+});
