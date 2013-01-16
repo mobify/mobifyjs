@@ -150,7 +150,7 @@ var openTag = function(element) {
     })
 
     return '<' + nodeName(element) + stringBuffer.join('') + '>';
-}
+};
 
 /**
  * Return a string for the closing tag of DOMElement `element`.
@@ -160,7 +160,7 @@ var closeTag = function(element) {
     if (element.length) element = element[0];
 
     return '</' + nodeName(element) + '>';
-}
+};
 
 /**
  * Return a string for the doctype of the current document.
@@ -176,7 +176,7 @@ var doctype = function() {
         + (doctypeEl.publicId ? ' PUBLIC "' + doctypeEl.publicId + '"' : '')
         + (doctypeEl.systemId ? ' "' + doctypeEl.systemId + '"' : '')
         + '>';
-}
+};
 
 /**
  * Returns a string of the unesacped content from a plaintext escaped `container`.
@@ -191,7 +191,7 @@ var extractHTMLStringFromElement = function(container) {
         if (tagName == 'script' && ((/mobify\./.test(el.src) || /Mobify/.test(el.textContent)))) return '';
         return el.outerHTML || el.nodeValue;
     }).join('');
-}
+};
 
 // Memoize result of extract
 var captured;
@@ -269,7 +269,7 @@ var captureSourceHTMLFromPlaintext = function() {
         }
     }
     return captured;
-}
+};
 
 /**
  * Setup unmobifier
@@ -280,23 +280,23 @@ var unmobify = function() {
     } else {
         document.addEventListener('DOMContentLoaded', unmobifier, false);
     }
-}
+};
 
 /** 
  * Gather escaped content from the DOM, unescaped it, and then use 
  * `document.write` to revert to the original page.
  */
 var unmobifier = function() {
-        document.removeEventListener('DOMContentLoaded', unmobifier, false);
-        var captured = extractSourceHTMLStrings();
+    document.removeEventListener('DOMContentLoaded', unmobifier, false);
+    var captured = extractSourceHTMLStrings();
 
-        // Wait up for IE, which may not be ready to.
-        setTimeout(function() {
-            document.open();
-            document.write(captured.all(inject));
-            document.close();
-        }, 15);
-    }
+    // Wait up for IE, which may not be ready to.
+    setTimeout(function() {
+        document.open();
+        document.write(captured.all(inject));
+        document.close();
+    }, 15);
+};
 
 /**
  * Transform a string <tag attr="value" ...></tag> into corresponding DOM element
@@ -362,25 +362,25 @@ var Capture = {}
  * Grabs source DOM as a new document object - TODO: Remove Zepto to make this true!
  */
 var getSourceDoc = Capture.getSourceDoc = function() {
-        if (!Capture.capturedDoc) {
-            var capturedDoc = Capture.capturedDoc = createSourceDocument();
-        }
-        return Capture.capturedDoc;
-    };
+    if (!Capture.capturedDoc) {
+        var capturedDoc = Capture.capturedDoc = createSourceDocument();
+    }
+    return Capture.capturedDoc;
+};
 
 /**
  * Returns an unescaped HTML representation of the source document
  */
 var unescapedHtmlString = Capture.unescapedHtmlString = function() {
-        return getSourceDoc().documentElement.outerHTML;
-    };
+    return getSourceDoc().documentElement.outerHTML;
+};
 
 /**
  * Returns an escaped HTML representation of the source DOM
  */
 var escapedHtmlString = Capture.escapedHtmlString =  function() {
-        return enable(unescapedHtmlString());
-    };
+    return enable(unescapedHtmlString());
+};
 
 /**
  * Rewrite the document with a new html string
