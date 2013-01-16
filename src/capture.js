@@ -1,21 +1,39 @@
 define("capture", ["Zepto"], function($) {
 
-    // Returns an array of keys from an object
+// ##
+// # Utility methods - TODO: Break into seperate utils.js
+// ##
+
+var extend = function(target){
+    [].slice.call(arguments, 1).forEach(function(source) {
+      for (key in source)
+          if (source[key] !== undefined)
+              target[key] = source[key];
+    }); 
+    return target;
+};
+
 var keys = function(obj) {
-        return $.map(obj, function(val, key) {
-            return key 
-        }) 
-    }
-    // Returns an array of keys from an object
-  , values = function(obj) { 
-        return $.map(obj, function(val, key) { 
-            return val 
-        }) 
-    }
+    var result = []; 
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key))
+          result.push(key);
+    }   
+    return result;
+};  
 
-  , openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
+var values = function(obj) {
+    var result = []; 
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key))
+          result.push(obj[key]);
+    }   
+    return result;
+};
 
-    // Inline styles are scripts are disabled using a unkonwn type.
+var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
+
+    // Inline styles are scripts are disabled using a unknown type.
   , tagDisablers = {
         style: ' media="mobify-media"'
       , script: ' type="text/mobify-script"'
@@ -35,22 +53,20 @@ var keys = function(obj) {
   , attributeEnablingRe
 
 // Populate `attributesToEnable` and `attributesToEnable`.
-$.each(disablingMap, function(tagName, targetAttributes) {
-    $.each(targetAttributes, function(key, value) {
-        attributesToEnable[value] = true;
-    });
+for (var tagName in disablingMap) {
+    if (!disablingMap.hasOwnProperty(tagName)) continue;
+    var targetAttributes = disablingMap[tagName];
 
-    // Special treatment for images - disable existing width/height attributes.
-    if (tagName === 'img') {
-        targetAttributes = targetAttributes.concat('width', 'height')
-    }
+    targetAttributes.forEach(function(value) {
+        attributesToEnable[value] = true;
+    }); 
 
     // <space><attr>='...'|"..."
     attributeDisablingRes[tagName] = new RegExp(
         '\\s+((?:'
         + targetAttributes.join('|')
-        + ")\\s*=\\s*(?:'([\\s\\S])+?'|\"([\\s\\S])+?\"))", 'gi');
-})
+        + ")\\s*=\\s*(?:('|\")[\\s\\S]+?\\2))", 'gi');
+}
 
 // sj: WHY do we need to generate a regexp object here? 
 //     Hmmm probably makes it easier to add new tags/attributes in the future...
@@ -135,8 +151,8 @@ var nodeName = function(node) {
     /**
      * Return a string for the doctype of the current document.
      */
-  , doctype = function(doc) {
-        var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
+  , doctype = function() {
+        var doctypeEl = document.doctype || [].filter.call(document.childNodes, function(el) {
                 return el.nodeType == Node.DOCUMENT_TYPE_NODE
             })[0];
 
@@ -170,16 +186,15 @@ var nodeName = function(node) {
      * Returns an object containing the state of the original page. Caches the object
      * in `extractedHTML` for later use.
      */
-  , extractHTML = function(doc) {
+  , extractHTML = function() {
         if (extractedHTML) return extractedHTML;
 
-        var doc = doc || document
-          , headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head')
-          , bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body')
-          , htmlEl = doc.getElementsByTagName('html')[0];
+        var headEl = document.getElementsByTagName('head')[0] || document.createElement('head')
+          , bodyEl = document.getElementsByTagName('body')[0] || document.createElement('body')
+          , htmlEl = document.getElementsByTagName('html')[0];
 
         extractedHTML = {
-            doctype: doctype(doc),
+            doctype: doctype(),
             htmlTag: openTag(htmlEl),
             headTag: openTag(headEl),
             bodyTag: openTag(bodyEl),
@@ -199,12 +214,11 @@ var nodeName = function(node) {
         return extractedHTML;
     }
 
-  , unmobify = function(doc) {
-        doc = doc || document
-        if (/complete|loaded/.test(doc.readyState)) {
-            unmobifier(doc);
+  , unmobify = function() {
+        if (/complete|loaded/.test(document.readyState)) {
+            unmobifier();
         } else {
-            doc.addEventListener('DOMContentLoaded', unmobifier, false);
+            document.addEventListener('DOMContentLoaded', unmobifier, false);
         }
     }
 
@@ -212,33 +226,32 @@ var nodeName = function(node) {
      * Gather escaped content from the DOM, unescaped it, and then use 
      * `document.write` to revert to the original page.
      */
-  , unmobifier = function(doc) {
-        doc = (doc && doc.target || doc) || document
-        doc.removeEventListener('DOMContentLoaded', unmobifier, false);
-        var captured = extractHTML(doc);
+  , unmobifier = function() {
+        document.removeEventListener('DOMContentLoaded', unmobifier, false);
+        var captured = extractHTML();
 
         // Wait up for IE, which may not be ready to.
         setTimeout(function() {
             // TODO: deal with ajs
 
-            doc.open();
-            doc.write(captured.all(inject));
-            doc.close();
+            document.open();
+            document.write(captured.all(inject));
+            document.close();
         }, 15);
     }
 
 // extractDOM
 
 // During capturing, we will usually end up hiding our </head>/<body ... > boundary
-// within <plaintext> capturing element. To construct shadow DOM, we need to rejoin
+// within <plaintext> capturing element. To construct source DOM, we need to rejoin
 // head and body content, iterate through it to find head/body boundary and expose
 // opening <body ... > tag as a string.
-var guillotine = function(captured) {
+var captureElementsFromPlaintext = function(captured) {
         // Consume comments without grouping to avoid catching
         // <body> inside a comment, common with IE conditional comments.
         var bodySnatcher = /<!--(?:[\s\S]*?)-->|(<\/head\s*>|<body[\s\S]*$)/gi;
 
-        captured = $.extend({}, captured);
+        captured = extend({}, captured);
         //Fallback for absence of </head> and <body>
         var rawHTML = captured.bodyContent = captured.headContent + captured.bodyContent;
         captured.headContent = '';
@@ -275,16 +288,20 @@ var guillotine = function(captured) {
         return captured;
     }
 
-    // Transform a primitive <tag attr="value" ...> into corresponding DOM element
-    // Unlike $('<tag>'), correctly handles <head>, <body> and <html>
-  , makeElement = function(html) {
-        var match = html.match(/^<(\w+)([\s\S]*)/i);
+    // Transform a string <tag attr="value" ...></tag> into corresponding DOM element
+  , createElementFromString = function(htmlString) {
+        var match = htmlString.match(/^<(\w+)([\s\S]*)/i);
+        var div = document.createElement('div');
+        div.innerHTML = '<div' + match[2];
+
+        // Create the element we want to return
         var el = document.createElement(match[1]);
 
-        $.each($('<div' + match[2])[0].attributes, function(i, attr) {
-            el.setAttribute(attr.nodeName, attr.nodeValue);
-        });
-
+        // Set correct attributes on el from the string
+        var attributes = div.firstChild.attributes;
+        for (int i=0; i<attributes.length; i++){
+            el.setAttribute(attributes[i].nodeName, attributes[i].nodeValue);
+        }
         return el;
     }
 
@@ -293,17 +310,17 @@ var guillotine = function(captured) {
     // 3. Construct the source pseudoDOM.    
   , extractDOM = function() {
         // Extract escaped markup out of the DOM
-        var captured = guillotine(extractHTML());
+        var captured = captureElementsFromPlaintext(extractHTML());
             
         // Disable attributes that can cause loading of external resources
         var disabledHead = disable(captured.headContent)
           , disabledBody = disable(captured.bodyContent);
         
-        // Reinflate HTML strings back into declawed DOM nodes.
+        // Reconstruct html, body, and head with the same attributes as the original document
         var div = document.createElement('div');
-        var headEl = makeElement(captured.headTag);
-        var bodyEl = makeElement(captured.bodyTag);
-        var htmlEl = makeElement(captured.htmlTag);
+        var headEl = createElementFromString(captured.headTag);
+        var bodyEl = createElementFromString(captured.bodyTag);
+        var htmlEl = createElementFromString(captured.htmlTag);
         var result = {
             'doctype' : captured.doctype
           , '$html' : $(htmlEl)
@@ -336,7 +353,7 @@ var Capture = {}
     }
   , render = Capture.render = function(htmlString) {
         // Cleanup. 
-        // Objects are blown away on FF after doc.write, but not in Chrome, so we delete them
+        // Objects are blown away on FF after document.write, but not in Chrome, so we delete them
         // explicitly to maintain consistency. To get around this, we re-inject the mobify.js libray below
         
         window.setTimeout(function(){
