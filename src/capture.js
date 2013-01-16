@@ -31,6 +31,10 @@ var values = function(obj) {
     return result;
 };
 
+// ##
+// # Regex Setup
+// ##
+
 var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
 
     // Inline styles are scripts are disabled using a unknown type.
@@ -71,6 +75,10 @@ for (var tagName in disablingMap) {
 // sj: WHY do we need to generate a regexp object here? 
 //     Hmmm probably makes it easier to add new tags/attributes in the future...
 attributeEnablingRe = new RegExp('\\sx-(' + keys(attributesToEnable).join('|') + ')', 'gi');
+
+// ##
+// # Private Methods
+// ##
 
 function disableAttributes(whole, tagName, tail) {
     tagName = tagName.toLowerCase();
@@ -167,7 +175,7 @@ var nodeName = function(node) {
     /**
      * Returns a string of the unesacped content from a plaintext escaped `container`.
      */
-  , extractHTMLFromElement = function(container) {
+  , extractHTMLStringFromElement = function(container) {
         if (!container) return '';
 
         return [].map.call(container.childNodes, function(el) {
@@ -180,26 +188,26 @@ var nodeName = function(node) {
     }
 
     // Memoize result of extract
-  , extractedHTML
+  , captured
 
     /**
      * Returns an object containing the state of the original page. Caches the object
      * in `extractedHTML` for later use.
      */
-  , extractHTML = function() {
-        if (extractedHTML) return extractedHTML;
+  , captureSourceHTMLFromPlaintext = function() {
+        if (captured) return captured;
 
         var headEl = document.getElementsByTagName('head')[0] || document.createElement('head')
           , bodyEl = document.getElementsByTagName('body')[0] || document.createElement('body')
           , htmlEl = document.getElementsByTagName('html')[0];
 
-        extractedHTML = {
+        captured = {
             doctype: doctype(),
             htmlTag: openTag(htmlEl),
             headTag: openTag(headEl),
             bodyTag: openTag(bodyEl),
-            headContent: extractHTMLFromElement(headEl),
-            bodyContent: extractHTMLFromElement(bodyEl)
+            headContent: extractHTMLStringFromElement(headEl),
+            bodyContent: extractHTMLStringFromElement(bodyEl)
         };
 
         /**
@@ -207,46 +215,15 @@ var nodeName = function(node) {
          * it emits would capture the </head><body> boundary, as well as closing </body></html>
          * Therefore, bodyContent will have these tags, and they do not need to be added to .all()
          */
-        extractedHTML.all = function(inject) {
+        captured.all = function(inject) {
             return this.doctype + this.htmlTag + this.headTag + (inject || '') + this.headContent + this.bodyContent;
         }
 
-        return extractedHTML;
-    }
+        // During capturing, we will usually end up hiding our </head>/<body ... > boundary
+        // within <plaintext> capturing element. To construct source DOM, we need to rejoin
+        // head and body content, iterate through it to find head/body boundary and expose
+        // opening <body ... > tag as a string.
 
-  , unmobify = function() {
-        if (/complete|loaded/.test(document.readyState)) {
-            unmobifier();
-        } else {
-            document.addEventListener('DOMContentLoaded', unmobifier, false);
-        }
-    }
-
-    /** 
-     * Gather escaped content from the DOM, unescaped it, and then use 
-     * `document.write` to revert to the original page.
-     */
-  , unmobifier = function() {
-        document.removeEventListener('DOMContentLoaded', unmobifier, false);
-        var captured = extractHTML();
-
-        // Wait up for IE, which may not be ready to.
-        setTimeout(function() {
-            // TODO: deal with ajs
-
-            document.open();
-            document.write(captured.all(inject));
-            document.close();
-        }, 15);
-    }
-
-// extractDOM
-
-// During capturing, we will usually end up hiding our </head>/<body ... > boundary
-// within <plaintext> capturing element. To construct source DOM, we need to rejoin
-// head and body content, iterate through it to find head/body boundary and expose
-// opening <body ... > tag as a string.
-var captureElementsFromPlaintext = function(captured) {
         // Consume comments without grouping to avoid catching
         // <body> inside a comment, common with IE conditional comments.
         var bodySnatcher = /<!--(?:[\s\S]*?)-->|(<\/head\s*>|<body[\s\S]*$)/gi;
@@ -274,7 +251,7 @@ var captureElementsFromPlaintext = function(captured) {
                 captured.bodyContent = match[0];
 
                 // Find the end of <body ... >
-                var parseBodyTag = /^((?:[^>'"]*|'[^']*?'|"[^"]*?")*>)([\s\S]*)$/.exec(match[0]);
+                var parseBodyTag = /^((?:[^>'"]*|'[^']*?'|"[^"]*?")*>)([\s\S]*)$/.exec(captured.bodyContent);
                 
                 // Will skip this if <body was malformed (e.g. no closing > )
                 if (parseBodyTag) {
@@ -288,8 +265,32 @@ var captureElementsFromPlaintext = function(captured) {
         return captured;
     }
 
-    // Transform a string <tag attr="value" ...></tag> into corresponding DOM element
-  , createElementFromString = function(htmlString) {
+  , unmobify = function() {
+        if (/complete|loaded/.test(document.readyState)) {
+            unmobifier();
+        } else {
+            document.addEventListener('DOMContentLoaded', unmobifier, false);
+        }
+    }
+
+    /** 
+     * Gather escaped content from the DOM, unescaped it, and then use 
+     * `document.write` to revert to the original page.
+     */
+  , unmobifier = function() {
+        document.removeEventListener('DOMContentLoaded', unmobifier, false);
+        var captured = extractSourceHTMLStrings();
+
+        // Wait up for IE, which may not be ready to.
+        setTimeout(function() {
+            document.open();
+            document.write(captured.all(inject));
+            document.close();
+        }, 15);
+    }
+
+// Transform a string <tag attr="value" ...></tag> into corresponding DOM element
+var createElementFromString = function(htmlString) {
         var match = htmlString.match(/^<(\w+)([\s\S]*)/i);
         var div = document.createElement('div');
         div.innerHTML = '<div' + match[2];
@@ -299,42 +300,48 @@ var captureElementsFromPlaintext = function(captured) {
 
         // Set correct attributes on el from the string
         var attributes = div.firstChild.attributes;
-        for (int i=0; i<attributes.length; i++){
+        for (var i=0; i<attributes.length; i++) {
             el.setAttribute(attributes[i].nodeName, attributes[i].nodeValue);
         }
         return el;
-    }
-
-    // 1. Get the original markup from the document.
-    // 2. Disable the markup.
-    // 3. Construct the source pseudoDOM.    
-  , extractDOM = function() {
-        // Extract escaped markup out of the DOM
-        var captured = captureElementsFromPlaintext(extractHTML());
-            
-        // Disable attributes that can cause loading of external resources
-        var disabledHead = disable(captured.headContent)
-          , disabledBody = disable(captured.bodyContent);
-        
-        // Reconstruct html, body, and head with the same attributes as the original document
-        var div = document.createElement('div');
-        var headEl = createElementFromString(captured.headTag);
-        var bodyEl = createElementFromString(captured.bodyTag);
-        var htmlEl = createElementFromString(captured.htmlTag);
-        var result = {
-            'doctype' : captured.doctype
-          , '$html' : $(htmlEl)
-        };
-
-        for (div.innerHTML = disabledHead; div.firstChild; headEl.appendChild(div.firstChild));
-        for (div.innerHTML = disabledBody; div.firstChild; bodyEl.appendChild(div.firstChild));
-        htmlEl.appendChild(headEl);
-        htmlEl.appendChild(bodyEl);
-                    
-        return result;
     };
 
-// Public Methods
+// Set the content of an element with html from a string
+var setElementContentFromString = function(el, htmlString) {
+        var div = document.createElement('div'); // TODO: Memoize
+        for (div.innerHTML = htmlString; div.firstChild; el.appendChild(div.firstChild));
+    };
+
+// 1. Get the original markup from the document.
+// 2. Disable the markup.
+// 3. Construct the source DOM.    
+var extractDOM = function() {
+        // Extract escaped markup out of the DOM
+        var captured = captureSourceHTMLFromPlaintext();
+        
+        // Reconstruct html, body, and head with the same attributes as the original document
+        var htmlEl = createElementFromString(captured.htmlTag);
+        var headEl = createElementFromString(captured.headTag);
+        var bodyEl = createElementFromString(captured.bodyTag);
+
+        // Set innerHTML of new source DOM body and head
+        bodyEl.innerHTML = disable(captured.bodyContent);
+        headEl.innerHTML = disable(captured.headContent);
+
+        // Append head and body to the html element
+        htmlEl.appendChild(headEl);
+        htmlEl.appendChild(bodyEl);
+
+        return {
+            'doctype' : captured.doctype,
+            '$html' : $(htmlEl)
+        };
+    };
+
+// ##
+// # Public methods
+// ##
+
 var Capture = {}
 
   , getSourceDOM = Capture.getSourceDOM = function() {
