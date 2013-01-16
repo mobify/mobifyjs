@@ -19,8 +19,8 @@ module.exports = function(grunt) {
         qunit: {
           files: ['tests/**/*.html']
         },
-        // Building Mobify with Capturing only (dev)
         requirejs: {
+            // Building capturing only
             capture: {
                 options: {
                     almond: true,
@@ -31,6 +31,7 @@ module.exports = function(grunt) {
                     out: "./build/mobify-capture.js",
                 }
             },
+            // Build resizeImages only
             resizeImages: {
                 options: {
                     almond: true,
@@ -41,6 +42,7 @@ module.exports = function(grunt) {
                     out: "./build/mobify-resizeImages.js",
                 }
             },
+            // Building full Mobify.js library
             full: {
                 options: {
                     almond: true,
@@ -54,22 +56,7 @@ module.exports = function(grunt) {
         },
         watch: {
           files: '<config:lint.files>',
-          tasks: 'lint qunit'
-        },
-        jshint: {
-          options: {
-            curly: true,
-            eqeqeq: true,
-            immed: true,
-            latedef: true,
-            newcap: true,
-            noarg: true,
-            sub: true,
-            undef: true,
-            boss: true,
-            eqnull: true,
-            browser: true
-          },
+          tasks: 'requirejs:full'
         },
     });
 
@@ -78,6 +65,7 @@ module.exports = function(grunt) {
     // Default task.
     // grunt.registerTask('default', 'lint qunit requirejs');
     //grunt.registerTask('skiptests', 'concat');
+    grunt.registerTask('watch', 'watch');
     grunt.registerTask('default', ['requirejs:capture', 'requirejs:full']);
     grunt.registerTask('capture', 'requirejs:capture');
     grunt.registerTask('full', 'requirejs:full');

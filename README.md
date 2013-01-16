@@ -1,22 +1,33 @@
 # Mobify.js
 
-Mobify.js is a client side adaptation framework for quickly adapting 
-websites to support mobile and tablet devices.
+Mobify.js is a modular javascript library that offers a number of performance and user interface enhancements for any site.
 
-This repository contains the Mobify.js core. The [Mobify Client](https://github.com/mobify/mobify-client/)
-is required to compile the core.
+For instructions on how to use the library, follow the instructions on [mobifyjs.com](https://www.mobifyjs.com/)
+or build the docs site manually in the instructions below.
 
-To get started with Mobify.js, follow the instructions on [mobifyjs.com](https://www.mobifyjs.com/).
+## Development
 
-## Install
+### Building
 
-    make
+Mobify.js uses Grunt.js and Require.js to build the library, and manage all of the dependancies.
 
-## Tests
+    git checkout https://github.com/mobify/mobifyjs.git
+    npm install
+    grunt
 
-Running the tests requires [PhantomJS](http://phantomjs.org/):
+Open the ./build folder to see the generated Mobify.js libraries.
 
-    make test
+Mobify.js uses Require.js mainly to be AMD-compliant, and for dependency management. But we don't use it for dynamic
+library loading when developing. In order to build Mobify.js during development without having to run `grunt` everytime
+you change a file, run the following command:
+    
+    grunt watch // TODO: Make this work!
+
+### Tests
+
+TODO - longer writup, and get tests working
+
+    grunt test    
 
 ##  Docs
 
@@ -31,14 +42,6 @@ and run it from `www` folder:
     
 Then navigate to http://localhost:4000/mobifyjs/docs/.
 
-## Modules
-
-Mobify.js includes a library customizable user interface modules in the
-`modules` folder.
-
-To package the modules for download use this command (they will be stored in /static/downloads):
-
-    make modules
 
 ## Build mobifyjs.com
 
