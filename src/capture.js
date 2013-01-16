@@ -35,26 +35,29 @@ var values = function(obj) {
 // # Regex Setup
 // ##
 
-var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi')
+var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi');
 
-    // Inline styles are scripts are disabled using a unknown type.
-  , tagDisablers = {
-        style: ' media="mobify-media"'
-      , script: ' type="text/mobify-script"'
-    }
-  , tagEnablingRe = new RegExp(values(tagDisablers).join('|'), 'g')
-  // sj: Make this configurable?
-  , disablingMap = { 
-        img:    ['src', 'height', 'width']
-      , iframe: ['src']
-      , script: ['src', 'type']
-      , link:   ['href']
-      , style:  ['media']
-    }
-  , affectedTagRe = new RegExp('<(' + keys(disablingMap).join('|') + ')([\\s\\S]*?)>', 'gi')
-  , attributeDisablingRes = {}
-  , attributesToEnable = {}
-  , attributeEnablingRe
+// Inline styles are scripts are disabled using a unknown type.
+var tagDisablers = {
+        style: ' media="mobify-media"',
+        script: ' type="text/mobify-script"'
+    };
+
+var tagEnablingRe = new RegExp(values(tagDisablers).join('|'), 'g');
+
+// sj: TODO: Make this configurable? Also make x- prefix configurable
+var disablingMap = { 
+        img:    ['src', 'height', 'width'],
+        iframe: ['src'],
+        script: ['src', 'type'],
+        link:   ['href'],
+        style:  ['media'],
+    };
+
+var affectedTagRe = new RegExp('<(' + keys(disablingMap).join('|') + ')([\\s\\S]*?)>', 'gi');
+var attributeDisablingRes = {};
+var attributesToEnable = {};
+var attributeEnablingRe;
 
 // Populate `attributesToEnable` and `attributesToEnable`.
 for (var tagName in disablingMap) {
