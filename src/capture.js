@@ -1,4 +1,4 @@
-define("capture", ["Zepto"], function($) {
+define([], function() {
 
 // ##
 // # Utility methods - TODO: Break into seperate utils.js
@@ -116,7 +116,7 @@ var disable = function(htmlStr) {
         });
 
     return [].concat.apply([], ret).join('');
-}
+};
 
 
 /**
@@ -124,17 +124,17 @@ var disable = function(htmlStr) {
  */
 var enable = function(htmlStr) {
     return htmlStr.replace(attributeEnablingRe, ' $1').replace(tagEnablingRe, '');
-}
+};
 
 // extractHTML
 
 var nodeName = function(node) {
-        return node.nodeName.toLowerCase();
-    }
+    return node.nodeName.toLowerCase();
+};
 
 var escapeQuote = function(s) {
-        return s.replace('"', '&quot;');
-    }
+    return s.replace('"', '&quot;');
+};
 
 /**
  * Return a string for the opening tag of DOMElement `element`.
@@ -301,21 +301,17 @@ var unmobifier = function() {
 /**
  * Transform a string <tag attr="value" ...></tag> into corresponding DOM element
  */
-var createElementFromString = function(htmlString) {
-    var match = htmlString.match(/^<(\w+)([\s\S]*)/i);
+var cloneAttributes = function(sourceString, dest) {
+    var match = sourceString.match(/^<(\w+)([\s\S]*)$/i);
     var div = document.createElement('div');
     div.innerHTML = '<div' + match[2];
 
-    // Create the element we want to return
-    var el = document.createElement(match[1]);
+    [].forEach.call(div.firstChild.attributes, function(attr) {
+        dest.setAttribute(attr.nodeName, attr.nodeValue);
+    }); 
 
-    // Set correct attributes on el from the string
-    var attributes = div.firstChild.attributes;
-    for (var i=0; i<attributes.length; i++) {
-        el.setAttribute(attributes[i].nodeName, attributes[i].nodeValue);
-    }
-    return el;
-};
+    return dest;
+}; 
 
 /**
  * Set the content of an element with html from a string
@@ -330,14 +326,20 @@ var setElementContentFromString = function(el, htmlString) {
  * 2. Disable the markup.
  * 3. Construct the source DOM.    
  */
-var extractDOM = function() {
+var createSourceDocument = function() {
     // Extract escaped markup out of the DOM
     var captured = captureSourceHTMLFromPlaintext();
     
+    // create source document
+    var sourceDoc = document.implementation.createHTMLDocument("")
+    var htmlEl = sourceDoc.documentElement;
+    var headEl = htmlEl.firstChild;
+    var bodyEl = htmlEl.lastChild;
+
     // Reconstruct html, body, and head with the same attributes as the original document
-    var htmlEl = createElementFromString(captured.htmlTag);
-    var headEl = createElementFromString(captured.headTag);
-    var bodyEl = createElementFromString(captured.bodyTag);
+    cloneAttributes(captured.htmlTag, htmlEl);
+    cloneAttributes(captured.headTag, headEl);
+    cloneAttributes(captured.bodyTag, bodyEl);
 
     // Set innerHTML of new source DOM body and head
     bodyEl.innerHTML = disable(captured.bodyContent);
@@ -347,10 +349,7 @@ var extractDOM = function() {
     htmlEl.appendChild(headEl);
     htmlEl.appendChild(bodyEl);
 
-    return {
-        'doctype' : captured.doctype,
-        '$html' : $(htmlEl)
-    };
+    return sourceDoc;
 };
 
 // ##
@@ -362,18 +361,18 @@ var Capture = {}
 /**
  * Grabs source DOM as a new document object - TODO: Remove Zepto to make this true!
  */
-var getSourceDOM = Capture.getSourceDOM = function() {
-        if (!Capture.capturedDOM) {
-            var capturedDOM = Capture.capturedDOM = extractDOM()['$html'];
+var getSourceDoc = Capture.getSourceDoc = function() {
+        if (!Capture.capturedDoc) {
+            var capturedDoc = Capture.capturedDoc = createSourceDocument();
         }
-        return Capture.capturedDOM;
+        return Capture.capturedDoc;
     };
 
 /**
- * Returns an unescaped HTML representation of the source DOM
+ * Returns an unescaped HTML representation of the source document
  */
 var unescapedHtmlString = Capture.unescapedHtmlString = function() {
-        return getSourceDOM()[0].outerHTML;
+        return getSourceDoc().documentElement.outerHTML;
     };
 
 /**
@@ -395,24 +394,27 @@ var render = Capture.render = function(htmlString) {
 };
 
 /**
- * Grab the source DOM and render it
+ * Grab the source document and render it
  */
-var renderSourceDOM = Capture.renderSourceDOM = function(options) {
+var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     // Objects are blown away on FF after document.write, but not in Chrome.
     // To get around this, we re-inject the mobify.js libray by re-adding
     // this script back into the DOM to be re-executed post processing (FF Only)
     // aka new Ark :)
+
+    /* TODO: Un-$ify this chunk
     if (!/webkit/i.test(navigator.userAgent)) {
         var injectScript = "<script id=\"mobifyjs\" type=\"text/javascript\">" + window.library + "</scr" + "ipt>";
-        getSourceDOM().find("body").prepend(injectScript);
+        getSourceDoc().find("body").prepend(injectScript);
     }
 
     // Remove main, and if it should be reinjected, append it as the last child of body
-    var main = getSourceDOM().find("#mobify-js-main");
+    var main = getSourceDoc().find("#mobify-js-main");
     if (options.injectMain) {
-        getSourceDOM().find("body").append(main[0].outerHTML);
+        getSourceDoc().find("body").append(main[0].outerHTML);
     }
     main.remove();
+    */
 
     // Set capturing state to false so that the user main code knows how to execute
     capturing = false;
