@@ -1,35 +1,4 @@
-define([], function() {
-
-// ##
-// # Utility methods - TODO: Break into seperate utils.js
-// ##
-
-var extend = function(target){
-    [].slice.call(arguments, 1).forEach(function(source) {
-      for (key in source)
-          if (source[key] !== undefined)
-              target[key] = source[key];
-    }); 
-    return target;
-};
-
-var keys = function(obj) {
-    var result = []; 
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key))
-          result.push(key);
-    }   
-    return result;
-};  
-
-var values = function(obj) {
-    var result = []; 
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key))
-          result.push(obj[key]);
-    }   
-    return result;
-};
+define(["utils"], function(Utils) {
 
 // ##
 // # Regex Setup
@@ -43,7 +12,7 @@ var tagDisablers = {
         script: ' type="text/mobify-script"'
     };
 
-var tagEnablingRe = new RegExp(values(tagDisablers).join('|'), 'g');
+var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 
 // sj: TODO: Make this configurable? Also make x- prefix configurable
 var disablingMap = { 
@@ -54,7 +23,7 @@ var disablingMap = {
         style:  ['media'],
     };
 
-var affectedTagRe = new RegExp('<(' + keys(disablingMap).join('|') + ')([\\s\\S]*?)>', 'gi');
+var affectedTagRe = new RegExp('<(' + Utils.keys(disablingMap).join('|') + ')([\\s\\S]*?)>', 'gi');
 var attributeDisablingRes = {};
 var attributesToEnable = {};
 var attributeEnablingRe;
@@ -77,7 +46,7 @@ for (var tagName in disablingMap) {
 
 // sj: WHY do we need to generate a regexp object here? 
 //     Hmmm probably makes it easier to add new tags/attributes in the future...
-attributeEnablingRe = new RegExp('\\sx-(' + keys(attributesToEnable).join('|') + ')', 'gi');
+attributeEnablingRe = new RegExp('\\sx-(' + Utils.keys(attributesToEnable).join('|') + ')', 'gi');
 
 // ##
 // # Private Methods
@@ -234,7 +203,7 @@ var captureSourceHTMLFromPlaintext = function() {
     // <body> inside a comment, common with IE conditional comments.
     var bodySnatcher = /<!--(?:[\s\S]*?)-->|(<\/head\s*>|<body[\s\S]*$)/gi;
 
-    captured = extend({}, captured);
+    captured = Utils.extend({}, captured);
     //Fallback for absence of </head> and <body>
     var rawHTML = captured.bodyContent = captured.headContent + captured.bodyContent;
     captured.headContent = '';

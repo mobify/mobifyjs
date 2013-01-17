@@ -1,8 +1,8 @@
-require(["capture", "resizeImages", "enhance"], function(Capture, ResizeImages, Enhance) {
+require(["capture", "resizeImages"], function(Capture, ResizeImages) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
-    Mobify.Enhance = Enhance;
+    //Mobify.Enhance = Enhance;
 
     return Mobify
 

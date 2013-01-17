@@ -7,7 +7,7 @@
 //
 // TODO: Windows Phone
 // http://windowsteamblog.com/windows_phone/b/wpdev/archive/2011/03/22/targeting-mobile-optimized-css-at-windows-phone-7.aspx
-define([], function() {
+define(["Zepto"], function($) {
 
 // ###
 // # Orientation Change

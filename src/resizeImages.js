@@ -1,4 +1,4 @@
-define(["Zepto"], function($) {
+define(["utils", "Zepto"], function(Utils) {
 
 var ResizeImages = {}
 
@@ -44,11 +44,16 @@ var ResizeImages = {}
      * the Image Resize service. Pass `options` to modify how the images are 
      * resized.
      */
-  , resizeImages = $.fn.resizeImages = function(options) {
-        var opts = $.extend({}, defaults, typeof options == 'object' && options)
-          , dpr = window.devicePixelRatio
-          , $imgs = this.filter(opts.selector).add(this.find(opts.selector))
-          , attr;
+  , resizeImages = ResizeImages.resize = function(document, options) {
+        var opts;
+        if (typeof options == 'object') {
+            opts = Utils.extend(defaults, options);
+        } else {
+            opts = defaults;
+        }
+        var dpr = window.devicePixelRatio;
+        var imgs = document.querySelectorAll(opts.selector);
+        var attr;
 
         if (typeof options == 'number') {
             opts.maxWidth = Math.floor(options);
@@ -64,19 +69,21 @@ var ResizeImages = {}
             }
         }
 
-        return $imgs.each(function() {
-            if (attr = this.getAttribute(opts.attribute)) {
+        for(var i=0; i<imgs.length; i++) {
+            var img = imgs[i];
+            if (attr = img.getAttribute(opts.attribute)) {
                 absolutify.href = attr;
                 var url = absolutify.href;
                 if (httpRe.test(url)) {
-                    this.setAttribute('x-src', getImageURL(url, opts));
+                    img.setAttribute('x-src', getImageURL(url, opts));
                 }
             }
-        });
+        }
+        return imgs;
     }
 
   , defaults = resizeImages.defaults = {
-        selector: 'img[x-src]'
+        selector: 'img'
       , attribute: 'x-src'
       , projectName: ''
     };
