@@ -51,12 +51,12 @@ setTimeout(function() {
         script.parentNode.insertBefore(main, script);
     };
 
-    request("http://localhost:3000/build/mobify.js", processLib);
+    request("/build/mobify.js", processLib);
 
 });
 
 // })(this, document, 'http://localhost:8080/mobify.js');
-})(this, document, 'http://localhost:3000/examples/headtag-capture/main.js');
+})(this, document, '/examples/headtag-capture/main.js');
 </script>
 <style>
 body {

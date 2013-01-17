@@ -391,7 +391,7 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         createSourceDocument().bodyEl.appendChild(main);
         var originalScript = createSourceDocument().headEl.querySelectorAll("#mobify-js-main")[0];
         if (originalScript) {
-            originalScript.remove()
+            originalScript.parentNode.removeChild(originalScript);
         }
     }
 
