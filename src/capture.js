@@ -285,8 +285,11 @@ var cloneAttributes = function(sourceString, dest) {
 /**
  * Set the content of an element with html from a string
  */
-var setElementContentFromString = function(el, htmlString) {
-    var div = document.createElement('div'); // TODO: Memoize
+var setElementContentFromString = function(el, htmlString, _doc) {
+    // We must pass in document because elements created for dom insertion must be
+    // inserted into the same dom they are created by.
+    var doc = _doc || document;
+    var div = doc.createElement('div'); // TODO: Memoize
     for (div.innerHTML = htmlString; div.firstChild; el.appendChild(div.firstChild));
 };
 
@@ -313,9 +316,18 @@ var createSourceDocument = function() {
     cloneAttributes(captured.headTag, headEl);
     cloneAttributes(captured.bodyTag, bodyEl);
 
-    // Set innerHTML of new source DOM body and head
+    // Set innerHTML of new source DOM body
     bodyEl.innerHTML = disable(captured.bodyContent);
-    headEl.innerHTML = disable(captured.headContent);
+    var disabledHeadContent = disable(captured.headContent);
+    try {
+        headEl.innerHTML = disableHeadContent;
+    } catch (e) {
+        // On some browsers, you cannot modify <head> using innerHTML.
+        // In that case, do a manual copy of each element
+        var title = headEl.getElementsByTagName('title')[0];
+        title && headEl.removeChild(title);
+        setElementContentFromString(headEl, disabledHeadContent, sourceDoc);
+    }
 
     // Append head and body to the html element
     htmlEl.appendChild(headEl);
@@ -372,10 +384,11 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     // To get around this, we re-inject the mobify.js libray by re-adding
     // this script back into the DOM to be re-executed post processing (FF Only)
     // aka new Ark :)
+    var doc = createSourceDocument().sourceDoc; // should be cached
 
     if (!/webkit/i.test(navigator.userAgent)) {
         // Create script with the mobify library
-        var injectScript = document.createElement("script");
+        var injectScript = doc.createElement("script");
         injectScript.id = "mobify-js-library"
         injectScript.type = "text/javascript";
         injectScript.innerHTML = window.library;
@@ -387,12 +400,20 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     }
 
     if (options.injectMain) {
+        // Remove main.js from the top of the head tag in the source dom
+        var mainInSource = doc.getElementById("mobify-js-main");
+        if (!mainInSource) return;
+        mainInSource && mainInSource.parentNode.removeChild(mainInSource);
+
+        // Grab main from the original document and stick it into source dom
+        // at the end of body
         var main = document.getElementById("mobify-js-main");
-        createSourceDocument().bodyEl.appendChild(main);
-        var originalScript = createSourceDocument().headEl.querySelectorAll("#mobify-js-main")[0];
-        if (originalScript) {
-            originalScript.parentNode.removeChild(originalScript);
-        }
+        // Since you can't move nodes from one document to another,
+        // we must clone it first using importNode:
+        // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
+        var mainClone = doc.importNode(main);
+        createSourceDocument().bodyEl.appendChild(mainClone);
+        
     }
 
     // Set capturing state to false so that the user main code knows how to execute
