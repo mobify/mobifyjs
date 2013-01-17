@@ -321,20 +321,23 @@ var setElementContentFromString = function(el, htmlString) {
     for (div.innerHTML = htmlString; div.firstChild; el.appendChild(div.firstChild));
 };
 
+var documentObj; // Cache document object
 /**
  * 1. Get the original markup from the document.
  * 2. Disable the markup.
  * 3. Construct the source DOM.    
  */
 var createSourceDocument = function() {
+    if (documentObj) return documentObj;
     // Extract escaped markup out of the DOM
     var captured = captureSourceHTMLFromPlaintext();
     
     // create source document
-    var sourceDoc = document.implementation.createHTMLDocument("")
-    var htmlEl = sourceDoc.documentElement;
-    var headEl = htmlEl.firstChild;
-    var bodyEl = htmlEl.lastChild;
+    var docObj = {};
+    var sourceDoc = docObj.sourceDoc = document.implementation.createHTMLDocument("")
+    var htmlEl = docObj.htmlEl = sourceDoc.documentElement;
+    var headEl = docObj.headEl = htmlEl.firstChild;
+    var bodyEl = docObj.bodyEl = htmlEl.lastChild;
 
     // Reconstruct html, body, and head with the same attributes as the original document
     cloneAttributes(captured.htmlTag, htmlEl);
@@ -349,7 +352,8 @@ var createSourceDocument = function() {
     htmlEl.appendChild(headEl);
     htmlEl.appendChild(bodyEl);
 
-    return sourceDoc;
+    documentObj = docObj;
+    return docObj;
 };
 
 // ##
@@ -362,10 +366,8 @@ var Capture = {}
  * Grabs source DOM as a new document object - TODO: Remove Zepto to make this true!
  */
 var getSourceDoc = Capture.getSourceDoc = function() {
-    if (!Capture.capturedDoc) {
-        var capturedDoc = Capture.capturedDoc = createSourceDocument();
-    }
-    return Capture.capturedDoc;
+    var capturedDoc = createSourceDocument().sourceDoc;
+    return capturedDoc;
 };
 
 /**
@@ -402,19 +404,27 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     // this script back into the DOM to be re-executed post processing (FF Only)
     // aka new Ark :)
 
-    /* TODO: Un-$ify this chunk
     if (!/webkit/i.test(navigator.userAgent)) {
-        var injectScript = "<script id=\"mobifyjs\" type=\"text/javascript\">" + window.library + "</scr" + "ipt>";
-        getSourceDoc().find("body").prepend(injectScript);
+        // Create script with the mobify library
+        var injectScript = document.createElement("script");
+        injectScript.id = "mobify-js-library"
+        injectScript.type = "text/javascript";
+        injectScript.innerHTML = window.library;
+
+        // insert at the top of head
+        var head = createSourceDocument().headEl;
+        var firstChild = head.firstChild;
+        head.insertBefore(injectScript, firstChild)
     }
 
-    // Remove main, and if it should be reinjected, append it as the last child of body
-    var main = getSourceDoc().find("#mobify-js-main");
     if (options.injectMain) {
-        getSourceDoc().find("body").append(main[0].outerHTML);
+        var main = document.getElementById("mobify-js-main");
+        createSourceDocument().bodyEl.appendChild(main);
+        var originalScript = createSourceDocument().headEl.querySelectorAll("#mobify-js-main")[0];
+        if (originalScript) {
+            originalScript.remove()
+        }
     }
-    main.remove();
-    */
 
     // Set capturing state to false so that the user main code knows how to execute
     capturing = false;
