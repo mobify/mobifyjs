@@ -1,4 +1,4 @@
-define(["utils", "Zepto"], function(Utils) {
+define(["utils"], function(Utils) {
 
 var ResizeImages = {}
 
