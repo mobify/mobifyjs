@@ -351,7 +351,7 @@ var getSourceDoc = Capture.getSourceDoc = function() {
     return capturedDoc;
 };
 
-/**
+/**  
  * Returns an unescaped HTML representation of the source document
  */
 var unescapedHtmlString = Capture.unescapedHtmlString = function() {

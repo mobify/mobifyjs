@@ -6,7 +6,8 @@
   "devDependencies": {
     "connect": "2.3.4",
     "grunt": "~0.4.0",
-    "grunt-requirejs": "~0.3.1"
+    "grunt-requirejs": "~0.3.1",
+    "grunt-contrib-watch": "~0.2.x"
   },
   "engine": "node 0.6.2",
   "repository": {

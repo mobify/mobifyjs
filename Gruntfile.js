@@ -63,20 +63,20 @@ module.exports = function(grunt) {
                     name: "mobify-full",
                     out: "./build/mobify.js",
                 }
-            }
+          }
         },
         watch: {
-          files: '<config:lint.files>',
-          tasks: 'requirejs:full'
+          files: 'src/**/*.js',
+          tasks: ['requirejs'],
         },
     });
 
     grunt.loadNpmTasks('grunt-requirejs');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task.
     // grunt.registerTask('default', 'lint qunit requirejs');
     //grunt.registerTask('skiptests', 'concat');
-    grunt.registerTask('watch', 'watch');
     grunt.registerTask('default', ['requirejs:resizeImages',
                                    'requirejs:capture',
                                    'requirejs:enhance',
