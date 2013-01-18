@@ -399,7 +399,7 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         head.insertBefore(injectScript, firstChild)
     }
 
-    if (options.injectMain) {
+    if (options && options.injectMain) {
         // Remove main.js from the top of the head tag in the source dom
         var mainInSource = doc.getElementById("mobify-js-main");
         if (!mainInSource) return;
@@ -411,7 +411,7 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         // Since you can't move nodes from one document to another,
         // we must clone it first using importNode:
         // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
-        var mainClone = doc.importNode(main);
+        var mainClone = doc.importNode(main, false);
         createSourceDocument().bodyEl.appendChild(mainClone);
         
     }

@@ -21,7 +21,7 @@ Mobify.js uses Require.js mainly to be AMD-compliant, and for dependency managem
 library loading when developing. In order to build Mobify.js during development without having to run `grunt` everytime
 you change a file, run the following command:
     
-    grunt watch // TODO: Make this work!
+    grunt watch
 
 ### Tests
 
