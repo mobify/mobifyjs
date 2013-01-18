@@ -4,6 +4,8 @@ define(["utils"], function(Utils) {
 // # Regex Setup
 // ##
 
+var Capture = {};
+
 var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi');
 
 // Inline styles are scripts are disabled using a unknown type.
@@ -20,7 +22,7 @@ var disablingMap = {
         iframe: ['src'],
         script: ['src', 'type'],
         link:   ['href'],
-        style:  ['media'],
+        style:  ['media'], // sj: Why?
     };
 
 var affectedTagRe = new RegExp('<(' + Utils.keys(disablingMap).join('|') + ')([\\s\\S]*?)>', 'gi');
@@ -66,7 +68,7 @@ var disableAttributes = function(whole, tagName, tail) {
  * Includes special handling for resources referenced in scripts and inside
  * comments.
  */
-var disable = function(htmlStr) {            
+var disable = Capture.disable = function(htmlStr) {            
     var splitRe = /(<!--[\s\S]*?-->)|(?=<\/script)/i
       , tokens = htmlStr.split(splitRe)
       , ret = tokens.map(function(fragment) {
@@ -91,7 +93,7 @@ var disable = function(htmlStr) {
 /**
  * Returns a string with all disabled external attributes enabled.
  */
-var enable = function(htmlStr) {
+var enable = Capture.enable = function(htmlStr) {
     return htmlStr.replace(attributeEnablingRe, ' $1').replace(tagEnablingRe, '');
 };
 
@@ -108,7 +110,7 @@ var escapeQuote = function(s) {
 /**
  * Return a string for the opening tag of DOMElement `element`.
  */
-var openTag = function(element) {
+var openTag = Capture.openTag = function(element) {
     if (!element) return '';
     if (element.length) element = element[0];
 
@@ -124,7 +126,7 @@ var openTag = function(element) {
 /**
  * Return a string for the closing tag of DOMElement `element`.
  */
-var closeTag = function(element) {
+var closeTag = Capture.closeTag = function(element) {
     if (!element) return '';
     if (element.length) element = element[0];
 
@@ -336,12 +338,6 @@ var createSourceDocument = function() {
     documentObj = docObj;
     return docObj;
 };
-
-// ##
-// # Public methods
-// ##
-
-var Capture = {}
 
 /**
  * Grabs source DOM as a new document object - TODO: Remove Zepto to make this true!

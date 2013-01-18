@@ -1,18 +1,93 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>QUnit Example</title>
+  <title>Capture.js Tests</title>
   <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/require.js"></script>
+  <script src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
 </head>
 <body>
-  <div id="qunit"></div>
-  <script src="/tests/resources/qunit-1.10.0.js"></script>
-  <script>
-    test( "hello test", function() {
-      ok( 1 == 1, "Passed!" );
+
+<div id="qunit"></div>
+
+<div id="qunit-fixture">
+<textarea id="disable-test-fixture">
+<html>
+<head>
+    <link href="/path/to/stylesheet.css">
+    <style media="query"></style>
+</head>
+<body>
+    <img src="/path/to/image.png"></img>
+    <iframe src="/path/to/page.html"></iframe>
+</body>
+</html>
+</textarea>
+
+<textarea id="enable-test-fixture">
+<html>
+<head>
+    <link x-href="/path/to/stylesheet.css">
+    <style x-media="query"></style>
+</head>
+<body>
+    <img x-src="/path/to/image.png"></img>
+    <iframe x-src="/path/to/page.html"></iframe>
+</body>
+</html>
+</textarea>
+
+</div>
+
+<script>
+    QUnit.config.autostart = false;
+    require.config({
+        "baseUrl": "../src/",  
+    })
+    require(["../src/capture.js"], function(Capture) {
+        QUnit.start();
+        
+        // Test disabling attributes that cause resource loading
+        test("disable", function() {
+            var html = $("#disable-test-fixture").text();
+            var expectedHtml = "<html>\
+\n<head>\
+\n    <link x-href=\"/path/to/stylesheet.css\">\
+\n    <style media=\"mobify-media\" x-media=\"query\"></style>\
+\n</head>\
+\n<body>\
+\n    <img x-src=\"/path/to/image.png\"></img>\
+\n    <iframe x-src=\"/path/to/page.html\"></iframe>\
+\n</body>\
+\n</html>\
+\n"
+
+            equal(Capture.disable(html), expectedHtml, "Passed!" );
+        });
+
+        // Test enabling attributes that cause resource loading
+        test("enable", function() {
+            var html = $("#enable-test-fixture").text();
+            var expectedHtml = "<html>\
+\n<head>\
+\n    <link href=\"/path/to/stylesheet.css\">\
+\n    <style media=\"query\"></style>\
+\n</head>\
+\n<body>\
+\n    <img src=\"/path/to/image.png\"></img>\
+\n    <iframe src=\"/path/to/page.html\"></iframe>\
+\n</body>\
+\n</html>\
+\n"
+
+            equal(Capture.enable(html), expectedHtml, "Passed!" );
+        });
+
+
+
     });
-  </script>
+</script>
 </body>
 </html>
