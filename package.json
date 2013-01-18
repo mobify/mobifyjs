@@ -5,11 +5,13 @@
   "author": "Mobify <dev@mobify.com>",
   "devDependencies": {
     "connect": "2.3.4",
-    "grunt": "~0.4.0",
+    "grunt": "~0.4.x",
     "grunt-requirejs": "~0.3.1",
-    "grunt-contrib-watch": "~0.2.x"
+    "grunt-contrib-watch": "~0.2.x",
+    "grunt-contrib-qunit": "~0.1.x",
+    "grunt-contrib-connect": "~0.1.0"
   },
-  "engine": "node 0.6.2",
+  "engine": "node 0.8.12",
   "repository": {
     "type": "git",
     "url": "git@github.com:mobify/mobify-js.git"

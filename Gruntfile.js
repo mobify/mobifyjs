@@ -14,10 +14,24 @@ module.exports = function(grunt) {
             ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
         },
         lint: {
-          files: ['grunt.js', 'src/**/*.js', 'tests/**/*.js']
+            files: ['grunt.js', 'src/**/*.js', 'tests/**/*.js']
         },
         qunit: {
-          files: ['tests/**/*.html']
+            all: {
+              options: {
+                urls: [
+                  'http://localhost:3000/tests/capture.html',
+                ]
+              }
+            }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 3000,
+                    base: '.'
+                }
+            }
         },
         requirejs: {
             // Building capturing only
@@ -63,7 +77,7 @@ module.exports = function(grunt) {
                     name: "mobify-full",
                     out: "./build/mobify.js",
                 }
-          }
+            }
         },
         watch: {
           files: 'src/**/*.js',
@@ -73,6 +87,8 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-qunit');
+    grunt.loadNpmTasks('grunt-contrib-connect');
 
     // Default task.
     // grunt.registerTask('default', 'lint qunit requirejs');
@@ -83,5 +99,6 @@ module.exports = function(grunt) {
                                    'requirejs:full']);
     grunt.registerTask('capture', 'requirejs:capture');
     grunt.registerTask('full', 'requirejs:full');
-
+    grunt.registerTask('test', ['connect', 'qunit']);
+    grunt.registerTask('serve', 'connect');
 };
