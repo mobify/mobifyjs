@@ -9,7 +9,8 @@
     "grunt-requirejs": "~0.3.1",
     "grunt-contrib-watch": "~0.2.x",
     "grunt-contrib-qunit": "~0.1.x",
-    "grunt-contrib-connect": "~0.1.0"
+    "grunt-contrib-connect": "~0.1.0",
+    "grunt-saucelabs": "~2.0.0"
   },
   "engine": "node 0.8.12",
   "repository": {
