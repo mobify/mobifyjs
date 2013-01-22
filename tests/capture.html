@@ -41,8 +41,6 @@
 
 <div id="foo-element" foo="bar"></div>
 
-<iframe id="plaintext-example" src="/tests/fixtures/plaintext-example.html"></iframe>
-
 </div>
 
 <script>
@@ -101,9 +99,9 @@
             equal(Capture.closeTag(element), "</div>")
         });
 
+
         asyncTest("createDocumentFromSource", function(){
-            // Create new source DOM from the contents of an iframe
-            var iframe = $("iframe#plaintext-example")
+            var iframe = $("<iframe>", {id: "plaintext-example"});
             iframe.attr("src", "/tests/fixtures/plaintext-example.html")
             iframe.load(function(){
                 var doc = this.contentDocument;
@@ -123,8 +121,8 @@
                 equal(newDoc.documentElement.outerHTML, expectedHtml, "Passed!");
                 start();
             });
-            $("#qunit-fixtures").append(iframe);
-        })
+            $("#qunit-fixture").append(iframe);
+        });
 
 
     });
