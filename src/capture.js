@@ -159,7 +159,8 @@ var extractHTMLStringFromElement = function(container) {
         var tagName = nodeName(el);
         if (tagName == '#comment') return '<!--' + el.textContent + '-->';
         if (tagName == 'plaintext') return el.textContent;
-        if (tagName == 'script' && ((/mobify\./.test(el.src) || /Mobify/.test(el.textContent)))) return '';
+        // Don't allow mobify related scripts to be added to the new document
+        if (tagName == 'script' && el.getAttribute("class") == "mobify" ) return '';
         return el.outerHTML || el.nodeValue;
     }).join('');
 };
@@ -171,12 +172,13 @@ var captured;
  * Returns an object containing the state of the original page. Caches the object
  * in `extractedHTML` for later use.
  */
-var captureSourceHTMLFromPlaintext = function() {
+var captureSourceDocumentFragments = function(_doc) {
     if (captured) return captured;
 
-    var headEl = document.getElementsByTagName('head')[0] || document.createElement('head')
-      , bodyEl = document.getElementsByTagName('body')[0] || document.createElement('body')
-      , htmlEl = document.getElementsByTagName('html')[0];
+    var doc = _doc || document;
+    var headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head');
+    var bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body');
+    var htmlEl = doc.getElementsByTagName('html')[0];
 
     captured = {
         doctype: doctype(),
@@ -301,10 +303,10 @@ var documentObj; // Cache document object
  * 2. Disable the markup.
  * 3. Construct the source DOM.    
  */
-var createSourceDocument = function() {
+var createDocumentFromSource = Capture.createDocumentFromSource = function(_doc) {
     if (documentObj) return documentObj;
     // Extract escaped markup out of the DOM
-    var captured = captureSourceHTMLFromPlaintext();
+    var captured = captureSourceDocumentFragments(_doc);
     
     // create source document
     var docObj = {};
@@ -343,32 +345,27 @@ var createSourceDocument = function() {
  * Grabs source DOM as a new document object - TODO: Remove Zepto to make this true!
  */
 var getSourceDoc = Capture.getSourceDoc = function() {
-    var capturedDoc = createSourceDocument().sourceDoc;
+    var capturedDoc = createDocumentFromSource().sourceDoc;
     return capturedDoc;
-};
-
-/**  
- * Returns an unescaped HTML representation of the source document
- */
-var unescapedHtmlString = Capture.unescapedHtmlString = function() {
-    return getSourceDoc().documentElement.outerHTML;
 };
 
 /**
  * Returns an escaped HTML representation of the source DOM
  */
-var escapedHtmlString = Capture.escapedHtmlString =  function() {
-    return enable(unescapedHtmlString());
+var escapedHtmlString = Capture.escapedHtmlString =  function(_doc) {
+    var doc = _doc || getSourceDoc();
+    return enable(doc.documentElement.outerHTML);
 };
 
 /**
  * Rewrite the document with a new html string
  */
-var render = Capture.render = function(htmlString) {
+var render = Capture.render = function(htmlString, _doc) {
+    var doc = _doc || document;
     window.setTimeout(function(){
-        document.open();
-        document.write(htmlString);
-        document.close();
+        doc.open();
+        doc.write(htmlString);
+        doc.close();
     });
 };
 
@@ -380,7 +377,7 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     // To get around this, we re-inject the mobify.js libray by re-adding
     // this script back into the DOM to be re-executed post processing (FF Only)
     // aka new Ark :)
-    var doc = createSourceDocument().sourceDoc; // should be cached
+    var doc = getSourceDoc(); // should be cached
 
     if (!/webkit/i.test(navigator.userAgent)) {
         // Create script with the mobify library
@@ -390,17 +387,12 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         injectScript.innerHTML = window.library;
 
         // insert at the top of head
-        var head = createSourceDocument().headEl;
+        var head = createDocumentFromSource().headEl;
         var firstChild = head.firstChild;
         head.insertBefore(injectScript, firstChild)
     }
 
     if (options && options.injectMain) {
-        // Remove main.js from the top of the head tag in the source dom
-        var mainInSource = doc.getElementById("mobify-js-main");
-        if (!mainInSource) return;
-        mainInSource && mainInSource.parentNode.removeChild(mainInSource);
-
         // Grab main from the original document and stick it into source dom
         // at the end of body
         var main = document.getElementById("mobify-js-main");
@@ -408,7 +400,7 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         // we must clone it first using importNode:
         // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
         var mainClone = doc.importNode(main, false);
-        createSourceDocument().bodyEl.appendChild(mainClone);
+        createDocumentFromSource().bodyEl.appendChild(mainClone);
         
     }
 

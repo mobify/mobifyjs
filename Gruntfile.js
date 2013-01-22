@@ -85,6 +85,16 @@ module.exports = function(grunt) {
                     name: "mobify-full",
                     out: "./build/mobify.js",
                 }
+            },
+            // Building full Mobify.js library
+            fullOptimized: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    keepBuildDir: true,
+                    name: "mobify-full",
+                    out: "./build/mobify.min.js",
+                }
             }
         },
         watch: {
@@ -129,7 +139,8 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['requirejs:resizeImages',
                                    'requirejs:capture',
                                    'requirejs:enhance',
-                                   'requirejs:full']);
+                                   'requirejs:full',
+                                   'requirejs:fullOptimized']);
     grunt.registerTask('capture', 'requirejs:capture');
     grunt.registerTask('full', 'requirejs:full');
     grunt.registerTask('test', ['connect', 'qunit']);

@@ -39,6 +39,10 @@
 </html>
 </textarea>
 
+<div id="foo-element" foo="bar"></div>
+
+<iframe id="plaintext-example" src="/tests/fixtures/plaintext-example.html"></iframe>
+
 </div>
 
 <script>
@@ -85,6 +89,42 @@
             equal(Capture.enable(html), expectedHtml, "Passed!" );
         });
 
+        test("openTag", function(){
+            var element = $("#foo-element");
+
+            equal(Capture.openTag(element), "<div id=\"foo-element\" foo=\"bar\">")
+        });
+
+        test("closeTag", function(){
+            var element = $("#foo-element");
+
+            equal(Capture.closeTag(element), "</div>")
+        });
+
+        asyncTest("createDocumentFromSource", function(){
+            // Create new source DOM from the contents of an iframe
+            var iframe = $("iframe#plaintext-example")
+            iframe.attr("src", "/tests/fixtures/plaintext-example.html")
+            iframe.load(function(){
+                var doc = this.contentDocument;
+                var newDoc = Capture.createDocumentFromSource(doc).sourceDoc;
+                var expectedHtml = "<html><head>\
+\n    \
+\n    <link rel=\"stylesheet\" x-href=\"/path/to/stylesheet.css\">\
+\n\
+\n</head><body>\
+\n    <p>Plaintext example page!</p>\
+\n    <script type=\"text/mobify-script\" x-src=\"/path/to/script.js\"><\/script>\
+\n\
+\n\
+\n\
+\n</body></html>";
+                console.log(newDoc.documentElement.outerHTML);
+                equal(newDoc.documentElement.outerHTML, expectedHtml, "Passed!");
+                start();
+            });
+            $("#qunit-fixtures").append(iframe);
+        })
 
 
     });
