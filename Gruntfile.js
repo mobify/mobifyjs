@@ -108,8 +108,14 @@ module.exports = function(grunt) {
                 urls: ['http://localhost:3000/tests/capture.html'],
                 concurrency: 2,
                 tunneled: true,
-                browsers: [{
-                    browserName: 'chrome'
+                browsers: [/*{
+                    browserName: 'internet explorer',
+                    version: '9'
+                },*/{
+                    browserName: 'chrome',
+                },{
+                    browserName: 'firefox',
+                    version: '13.0'
                 }], // https://saucelabs.com/docs/browsers
                 onTestComplete: function(){
                     // Called after a qunit unit is done, per page, per browser

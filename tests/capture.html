@@ -41,7 +41,6 @@
 
 <div id="foo-element" foo="bar"></div>
 
-</div>
 
 <script>
     QUnit.config.autostart = false;
@@ -89,8 +88,8 @@
 
         test("openTag", function(){
             var element = $("#foo-element");
-
-            equal(Capture.openTag(element), "<div id=\"foo-element\" foo=\"bar\">")
+            var openTag = Capture.openTag(element);
+            ok((openTag === "<div id=\"foo-element\" foo=\"bar\">") || openTag === "<div foo=\"bar\" id=\"foo-element\">")
         });
 
         test("closeTag", function(){
