@@ -107,17 +107,17 @@
                 var newDoc = Capture.createDocumentFromSource(doc).sourceDoc;
                 var expectedHtml = "<html><head>\
 \n    \
-\n    <link rel=\"stylesheet\" x-href=\"/path/to/stylesheet.css\">\
+\n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\
 \n\
 \n</head><body>\
 \n    <p>Plaintext example page!</p>\
-\n    <script type=\"text/mobify-script\" x-src=\"/path/to/script.js\"><\/script>\
+\n    <script src=\"/path/to/script.js\"><\/script>\
 \n\
 \n\
 \n\
 \n</body></html>";
-                console.log(newDoc.documentElement.outerHTML);
-                equal(newDoc.documentElement.outerHTML, expectedHtml, "Passed!");
+                var html = Capture.escapedHtmlString(newDoc);
+                equal(html, expectedHtml, "Passed!");
                 start();
             });
             $("#qunit-fixture").append(iframe);

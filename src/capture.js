@@ -149,6 +149,16 @@ var doctype = function() {
         + '>';
 };
 
+// outerHTML polyfill - https://gist.github.com/889005
+var outerHTML = function(el, _doc){
+    var doc = _doc || document;
+    var div = doc.createElement('div');
+    div.appendChild(el.cloneNode(true));
+    var contents = div.innerHTML;
+    div = null;
+    return contents;
+}
+
 /**
  * Returns a string of the unesacped content from a plaintext escaped `container`.
  */
@@ -160,8 +170,10 @@ var extractHTMLStringFromElement = function(container) {
         if (tagName == '#comment') return '<!--' + el.textContent + '-->';
         if (tagName == 'plaintext') return el.textContent;
         // Don't allow mobify related scripts to be added to the new document
-        if (tagName == 'script' && el.getAttribute("class") == "mobify" ) return '';
-        return el.outerHTML || el.nodeValue;
+        if (tagName == 'script' && el.getAttribute("class") == "mobify" ){
+            return '';
+        }
+        return el.outerHTML || el.nodeValue || outerHTML(el);
     }).join('');
 };
 
@@ -324,7 +336,7 @@ var createDocumentFromSource = Capture.createDocumentFromSource = function(_doc)
     bodyEl.innerHTML = disable(captured.bodyContent);
     var disabledHeadContent = disable(captured.headContent);
     try {
-        headEl.innerHTML = disableHeadContent;
+        headEl.innerHTML = disabledHeadContent;
     } catch (e) {
         // On some browsers, you cannot modify <head> using innerHTML.
         // In that case, do a manual copy of each element
@@ -354,7 +366,7 @@ var getSourceDoc = Capture.getSourceDoc = function() {
  */
 var escapedHtmlString = Capture.escapedHtmlString =  function(_doc) {
     var doc = _doc || getSourceDoc();
-    return enable(doc.documentElement.outerHTML);
+    return enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement));
 };
 
 /**
