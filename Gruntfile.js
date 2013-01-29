@@ -106,16 +106,23 @@ module.exports = function(grunt) {
                 username: '<%= localConfig.saucelabs.username %>', // if not provided it'll default to ENV SAUCE_USERNAME (if applicable)
                 key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                 urls: ['http://localhost:3000/tests/capture.html'],
-                concurrency: 2,
+                concurrency: 1,
                 tunneled: true,
-                browsers: [/*{
+                browsers: [
+                { // Only working version of IE compatable
                     browserName: 'internet explorer',
-                    version: '9'
-                },*/{
+                    version: '10'
+                },
+                { // Always tests latest Chrome (on Windows)
                     browserName: 'chrome',
-                },{
+                },
+                { // Lowest known working version of FF
                     browserName: 'firefox',
-                    version: '13.0'
+                    version: '4.0' 
+                },
+                { // Highest known working version of FF
+                    browserName: 'firefox',
+                    version: '18.0'
                 }], // https://saucelabs.com/docs/browsers
                 onTestComplete: function(){
                     // Called after a qunit unit is done, per page, per browser
