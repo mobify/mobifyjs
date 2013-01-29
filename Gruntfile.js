@@ -158,5 +158,5 @@ module.exports = function(grunt) {
     grunt.registerTask('full', 'requirejs:full');
     grunt.registerTask('test', ['connect', 'qunit']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
-    grunt.registerTask('serve', 'connect');
+    grunt.registerTask('preview', ['connect', 'watch']);
 };
