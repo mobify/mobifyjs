@@ -104,7 +104,12 @@
             iframe.attr("src", "/tests/fixtures/plaintext-example.html")
             iframe.load(function(){
                 var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
                 var newDoc = Capture.createDocumentFromSource(doc).sourceDoc;
+                
                 var expectedHtml = "<html class=\"testclass\"><head>\
 \n    \
 \n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\
