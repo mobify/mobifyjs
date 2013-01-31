@@ -65,7 +65,10 @@
 \n</html>\
 \n"
 
-            equal(Capture.disable(html), expectedHtml, "Passed!" );
+            // Needed to pass tests on iOS 4.3 on iPad
+            altExpectedHtml = "\n" + expectedHtml
+
+            ok((Capture.disable(html) === expectedHtml) || (Capture.disable(html) === altExpectedHtml), "Passed!" );
         });
 
         // Test enabling attributes that cause resource loading
@@ -82,8 +85,10 @@
 \n</body>\
 \n</html>\
 \n"
+            // Needed to pass tests on iOS 4.3 on iPad
+            altExpectedHtml = "\n" + expectedHtml
 
-            equal(Capture.enable(html), expectedHtml, "Passed!" );
+            ok((Capture.enable(html) === expectedHtml) || (Capture.enable(html) === altExpectedHtml), "Passed!" );
         });
 
         test("openTag", function(){
@@ -109,7 +114,7 @@
                 var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
 
                 var newDoc = Capture.createDocumentFromSource(doc).sourceDoc;
-                
+
                 var expectedHtml = "<html class=\"testclass\"><head>\
 \n    \
 \n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\

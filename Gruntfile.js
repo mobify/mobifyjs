@@ -125,8 +125,17 @@ module.exports = function(grunt) {
                     platform: 'Windows 2008',
                     version: '12'
                 },
-                { // Always tests latest Chrome (on Windows)
+                { // Latest Chrome on Windows XP
                     browserName: 'chrome',
+                    platform: 'Windows 2003'
+                },
+                { // Latest Chrome on Windows 7
+                    browserName: 'chrome',
+                    platform: 'Windows 2008'
+                },
+                { // Latest Chrome on Linux (unknown distro)
+                    browserName: 'chrome',
+                    platform: 'Linux'
                 },
                 { // Lowest known working version of FF
                     browserName: 'firefox',
@@ -140,7 +149,45 @@ module.exports = function(grunt) {
                     browserName: 'firefox',
                     platform: 'Mac 10.6',
                     version: '14.0'
-                }], // https://saucelabs.com/docs/browsers
+                },
+                { // Lowest Safari on OSX
+                    browserName: 'safari',
+                    platform: 'Mac 10.6',
+                    version: '5'
+                },
+                { // Highest Safari on OSX
+                    browserName: 'safari',
+                    platform: 'Mac 10.8',
+                    version: '6'
+                },
+                { // Lowest iPad on OSX (simulator)
+                    browserName: 'ipad',
+                    platform: 'Mac 10.6',
+                    version: '4.3'
+                },
+                { // Highest iPad on OSX (simulator)
+                  // NOTE: iOS 6 is available, but it hangs on SauceLabs...
+                    browserName: 'ipad',
+                    platform: 'Mac 10.6',
+                    version: '5'
+                },
+                { // Lowest iPhone on OSX (simulator)
+                    browserName: 'iphone',
+                    platform: 'Mac 10.6',
+                    version: '4.3'
+                },
+                { // Highest iPhone on OSX (simulator)
+                  // NOTE: iOS 6 is available, but it hangs on SauceLabs...
+                    browserName: 'iphone',
+                    platform: 'Mac 10.6',
+                    version: '5'
+                },
+                { // Android 4.0 (simulator)
+                    browserName: 'android',
+                    platform: 'Linux',
+                    version: '4'
+                }
+                ], // https://saucelabs.com/docs/browsers
                 onTestComplete: function(){
                     // Called after a qunit unit is done, per page, per browser
                     // Return true or false, passes or fails the test
