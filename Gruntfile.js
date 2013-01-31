@@ -112,17 +112,30 @@ module.exports = function(grunt) {
                 browsers: [
                 { // Only working version of IE compatable
                     browserName: 'internet explorer',
+                    platform: 'Windows 2012',
                     version: '10'
+                },
+                { // Lowest known working version of FF
+                    browserName: 'opera',
+                    platform: 'Windows 2003',
+                    version: '11'
+                },
+                { // Highest known working version of Opera
+                    browserName: 'opera',
+                    platform: 'Windows 2008',
+                    version: '12'
                 },
                 { // Always tests latest Chrome (on Windows)
                     browserName: 'chrome',
                 },
                 { // Lowest known working version of FF
                     browserName: 'firefox',
+                    platform: 'Mac 10.6',
                     version: '4.0' 
                 },
                 { // Highest known working version of FF
                     browserName: 'firefox',
+                    platform: 'Mac 10.6',
                     version: '18.0'
                 }], // https://saucelabs.com/docs/browsers
                 onTestComplete: function(){
