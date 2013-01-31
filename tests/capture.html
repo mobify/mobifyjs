@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="foo">
 <head>
   <meta charset="utf-8">
   <title>Capture.js Tests</title>
@@ -116,6 +116,7 @@
 \n\
 \n\
 \n</body></html>";
+
                 var html = Capture.escapedHtmlString(newDoc);
                 equal(html, expectedHtml, "Passed!");
                 start();
