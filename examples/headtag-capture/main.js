@@ -10,7 +10,7 @@ if (capturing) {
 
     // Resize images using Mobify Image Resizer
     // $html.find("img").resizeImages(320);
-    Mobify.ResizeImages.resize(sourceDoc, 320)
+    Mobify.ResizeImages.resize(sourceDoc, 320);
     // Render source DOM to document
     Mobify.Capture.renderSourceDoc({injectMain: true});
 

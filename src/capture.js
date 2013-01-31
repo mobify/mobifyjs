@@ -374,6 +374,10 @@ var escapedHtmlString = Capture.escapedHtmlString =  function(_doc) {
  */
 var render = Capture.render = function(htmlString, _doc) {
     var doc = _doc || document;
+
+    // Set capturing state to false so that the user main code knows how to execute
+    capturing = false;
+    
     window.setTimeout(function(){
         doc.open();
         doc.write(htmlString);
@@ -415,9 +419,6 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         createDocumentFromSource().bodyEl.appendChild(mainClone);
         
     }
-
-    // Set capturing state to false so that the user main code knows how to execute
-    capturing = false;
 
     render(escapedHtmlString());
 };
