@@ -377,7 +377,7 @@ var render = Capture.render = function(htmlString, _doc) {
 
     // Set capturing state to false so that the user main code knows how to execute
     capturing = false;
-    
+
     window.setTimeout(function(){
         doc.open();
         doc.write(htmlString);
@@ -395,6 +395,7 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     // aka new Ark :)
     var doc = getSourceDoc(); // should be cached
 
+    /*
     if (!/webkit/i.test(navigator.userAgent)) {
         // Create script with the mobify library
         var injectScript = doc.createElement("script");
@@ -406,9 +407,14 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         var head = createDocumentFromSource().headEl;
         var firstChild = head.firstChild;
         head.insertBefore(injectScript, firstChild)
-    }
+    }*/
 
     if (options && options.injectMain) {
+        var library = document.getElementById("mobify-js-library");
+        var libraryClone = doc.importNode(library, false);
+        createDocumentFromSource().bodyEl.appendChild(libraryClone);
+
+
         // Grab main from the original document and stick it into source dom
         // at the end of body
         var main = document.getElementById("mobify-js-main");

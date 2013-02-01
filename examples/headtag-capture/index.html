@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head><script class="mobify" id="mobify-tag">
-(function(window, document, mainUrl) {
+(function(window, document, libraryUrl, mainUrl) {
 window.Mobify = {points: [+new Date], tagVersion: [2, 0]};
 
 // var isMobile = /ip(hone|od|ad)|android|blackberry.*applewebkit/i.test(navigator.userAgent)
@@ -30,37 +30,29 @@ function request(url, callback) {
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     // load user code
-    var main = document.createElement('script')
-      , script = document.getElementById('mobify-tag');
+    var attachedScript = document.createElement('script')
+      , mobifyTagScript = document.getElementById('mobify-tag');
 
-    main.src = mainUrl;
-    main.id = id;
-    main.setAttribute("class", classNames);
-    script.parentNode.insertBefore(main, script);
+    attachedScript.src = src;
+    attachedScript.id = id;
+    attachedScript.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
+    return attachedScript;
 }
 
 document.write('<plaintext style="display:none">');
 
 setTimeout(function() {
     window.capturing = true;
-
-    var processLibrary = function(library) {
-        // attach library to window for later use
-        window.library = library;
-
-        // load library
-        eval(library);
-
-
-        attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify")
+    var libraryScript = attachScriptBeforeMobifyTag(libraryUrl, "mobify-js-library", "mobify");
+    libraryScript.onload = function(){
+        attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
     };
-
-    request("/build/mobify.js", processLibrary);
 
 });
 
 // })(this, document, 'http://localhost:8080/mobify.js');
-})(this, document, '/examples/headtag-capture/main.js');
+})(this, document, '/build/mobify.js', '/examples/headtag-capture/main.js');
 </script>
 <style>
 body {
