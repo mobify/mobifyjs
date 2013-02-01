@@ -41,8 +41,6 @@
 
 <div id="foo-element" foo="bar"></div>
 
-<iframe id="render-script-order-test"></iframe>
-
 
 <script>
     QUnit.config.autostart = false;
@@ -137,27 +135,38 @@
         });
 
         asyncTest("scriptsCorrectOrder", function(){
-            var $iframe = $("#render-script-order-test");
-            var iframe = $iframe[0];
-            var html = "<html><head></head>\
+            var iframe = $("<iframe>", {id: "script-order-test"});
+            iframe.attr("src", "/tests/fixtures/blank-example.html");
+
+            window.addEventListener("message", function(event) {
+                window.messageReceived = true;
+                console.log(event.data["verify"])
+                equal(event.data, "1,2,3,4,5");
+                start();
+            }, true);
+
+            var iframeLoaded = false;
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                var html = "<html><head></head>\
 \n<body>\
 \n<h1>Script order test</h1>\
 \n<script>var verify=[1];</scr" + "ipt>\
-\n<script src=\"/tests/resources/bigscript.js\"></scr" + "ipt>\
+\n<script src=\"/tests/resources/bigscript.js\"><\/script>\
 \n<script>verify.push(3);</scr" + "ipt>\
-\n<script src=\"/tests/resources/smallscript.js\"></scr" + "ipt>\
+\n<script src=\"/tests/resources/smallscript.js\"><\/script>\
 \n<script>verify.push(5);</scr" + "ipt>\
-\n<script>parent.postMessage(verify.join(), \"*\")</scr" + "ipt>\
+\n<script>parent.postMessage(verify.join(), \"*\");<\/script>\
 \n</body>\
 \n</html>";
-
-            Capture.render(html, iframe.contentDocument);
-
-            window.addEventListener("message", function(event) {
-                ok(event.data === "1,2,3,4,5");
-                start();
+                if (iframeLoaded == false) {
+                    iframeLoaded = true;
+                    Capture.render(html, doc, undefined);
+                }
             });
-        })
+            $("#qunit-fixture").append(iframe);
+        });
 
 
     });
