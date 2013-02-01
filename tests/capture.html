@@ -41,6 +41,8 @@
 
 <div id="foo-element" foo="bar"></div>
 
+<iframe id="render-script-order-test"></iframe>
+
 
 <script>
     QUnit.config.autostart = false;
@@ -133,6 +135,29 @@
             });
             $("#qunit-fixture").append(iframe);
         });
+
+        asyncTest("scriptsCorrectOrder", function(){
+            var $iframe = $("#render-script-order-test");
+            var iframe = $iframe[0];
+            var html = "<html><head></head>\
+\n<body>\
+\n<h1>Script order test</h1>\
+\n<script>var verify=[1];</scr" + "ipt>\
+\n<script src=\"/tests/resources/bigscript.js\"></scr" + "ipt>\
+\n<script>verify.push(3);</scr" + "ipt>\
+\n<script src=\"/tests/resources/smallscript.js\"></scr" + "ipt>\
+\n<script>verify.push(5);</scr" + "ipt>\
+\n<script>parent.postMessage(verify.join(), \"*\")</scr" + "ipt>\
+\n</body>\
+\n</html>";
+
+            Capture.render(html, iframe.contentDocument);
+
+            window.addEventListener("message", function(event) {
+                ok(event.data === "1,2,3,4,5");
+                start();
+            });
+        })
 
 
     });
