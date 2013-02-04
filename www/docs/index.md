@@ -32,7 +32,7 @@ website you want to adapt:
 
     window.Mobify = {points: [+new Date], tagVersion: [1, 0]};
 
-    var isMobile = /ip(hone|od|ad)|android|blackberry.*applewebkit/i.test(navigator.userAgent);
+    var isMobile = /ip(hone|od|ad)|android|blackberry.*applewebkit|bb1\d.*mobile/i.test(navigator.userAgent);
     var optedOut = /mobify-path=($|;)/.test(document.cookie);
 
     if (!isMobile || optedOut) {
