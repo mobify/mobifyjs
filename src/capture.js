@@ -406,8 +406,15 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         // insert at the top of head
         var head = createDocumentFromSource().headEl;
         var firstChild = head.firstChild;
-        head.insertBefore(injectScript, firstChild)
+        head.insertBefore(injectScript, firstChild);
     }
+
+    // Inject timing point (because of blowing away objects on document.write)
+    var body = createDocumentFromSource().bodyEl;
+    var date = doc.createElement("div");
+    date.id = "mobify-point";
+    date.innerHTML = window.Mobify.points[0];
+    body.insertBefore(date, body.firstChild);
 
     if (options && options.injectMain) {
         // Grab main from the original document and stick it into source dom
