@@ -382,7 +382,6 @@ var render = Capture.render = function(htmlString, _doc) {
         doc.open();
         doc.write(htmlString);
         doc.close();
-        callback && callback();
     });
 };
 
@@ -396,25 +395,13 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     // aka new Ark :)
     var doc = getSourceDoc(); // should be cached
 
-    
+    // Most (all?) non-webkit browsers remove objects after document.write,
+    // therefor we must re-inject the library into the newly rendered DOM.
     if (!/webkit/i.test(navigator.userAgent)) {
         var library = document.getElementById("mobify-js-library");
         var libraryClone = doc.importNode(library, false);
         var head = createDocumentFromSource().headEl
         head.insertBefore(libraryClone, head.firstChild);
-
-        /* 
-        // Create script with the mobify library
-        var injectScript = doc.createElement("script");
-        injectScript.id = "mobify-js-library"
-        injectScript.type = "text/javascript";
-        injectScript.innerHTML = window.library;
-
-        // insert at the top of head
-        var head = createDocumentFromSource().headEl;
-        var firstChild = head.firstChild;
-        head.insertBefore(injectScript, firstChild)
-        */
     }
 
     // Inject timing point (because of blowing away objects on document.write)
@@ -426,7 +413,6 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     body.insertBefore(date, body.firstChild);
 
     if (options && options.injectMain) {
-
         // Grab main from the original document and stick it into source dom
         // at the end of body
         var main = document.getElementById("mobify-js-main");
