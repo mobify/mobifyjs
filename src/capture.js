@@ -420,7 +420,8 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     if (options && options.injectMain) {
         var library = document.getElementById("mobify-js-library");
         var libraryClone = doc.importNode(library, false);
-        createDocumentFromSource().bodyEl.appendChild(libraryClone);
+        var head = createDocumentFromSource().headEl
+        head.insertBefore(libraryClone, head.firstChild);
 
 
         // Grab main from the original document and stick it into source dom
