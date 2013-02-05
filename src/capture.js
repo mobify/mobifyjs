@@ -396,8 +396,14 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     // aka new Ark :)
     var doc = getSourceDoc(); // should be cached
 
-    /*
+    
     if (!/webkit/i.test(navigator.userAgent)) {
+        var library = document.getElementById("mobify-js-library");
+        var libraryClone = doc.importNode(library, false);
+        var head = createDocumentFromSource().headEl
+        head.insertBefore(libraryClone, head.firstChild);
+
+        /* 
         // Create script with the mobify library
         var injectScript = doc.createElement("script");
         injectScript.id = "mobify-js-library"
@@ -408,7 +414,8 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         var head = createDocumentFromSource().headEl;
         var firstChild = head.firstChild;
         head.insertBefore(injectScript, firstChild)
-    }*/
+        */
+    }
 
     // Inject timing point (because of blowing away objects on document.write)
     var body = createDocumentFromSource().bodyEl;
@@ -418,11 +425,6 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     body.insertBefore(date, body.firstChild);
 
     if (options && options.injectMain) {
-        var library = document.getElementById("mobify-js-library");
-        var libraryClone = doc.importNode(library, false);
-        var head = createDocumentFromSource().headEl
-        head.insertBefore(libraryClone, head.firstChild);
-
 
         // Grab main from the original document and stick it into source dom
         // at the end of body
