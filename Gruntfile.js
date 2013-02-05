@@ -54,28 +54,6 @@ module.exports = function(grunt) {
                     out: "./build/mobify-capture.js",
                 }
             },
-            // Build resizeImages only
-            resizeImages: {
-                options: {
-                    almond: true,
-                    mainConfigFile: "./src/config.js",
-                    optimize: "none",
-                    keepBuildDir: true,
-                    name: "mobify-resizeImages",
-                    out: "./build/mobify-resizeImages.js",
-                }
-            },
-            // Build enhance only - TODO: Rename!!!
-            enhance: {
-                options: {
-                    almond: true,
-                    mainConfigFile: "./src/config.js",
-                    optimize: "none",
-                    keepBuildDir: true,
-                    name: "mobify-enhance",
-                    out: "./build/mobify-enhance.js",
-                }
-            },
             // Building full Mobify.js library
             full: {
                 options: {

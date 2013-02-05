@@ -372,17 +372,16 @@ var escapedHtmlString = Capture.escapedHtmlString =  function(_doc) {
 /**
  * Rewrite the document with a new html string
  */
-var render = Capture.render = function(htmlString, _doc, callback) {
+var render = Capture.render = function(htmlString, _doc) {
     var doc = _doc || document;
 
     // Set capturing state to false so that the user main code knows how to execute
     capturing = false;
-    
+
     window.setTimeout(function(){
         doc.open();
         doc.write(htmlString);
         doc.close();
-        callback && callback();
     });
 };
 
@@ -396,18 +395,22 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     // aka new Ark :)
     var doc = getSourceDoc(); // should be cached
 
+    // Most (all?) non-webkit browsers remove objects after document.write,
+    // therefor we must re-inject the library into the newly rendered DOM.
     if (!/webkit/i.test(navigator.userAgent)) {
-        // Create script with the mobify library
-        var injectScript = doc.createElement("script");
-        injectScript.id = "mobify-js-library"
-        injectScript.type = "text/javascript";
-        injectScript.innerHTML = window.library;
-
-        // insert at the top of head
-        var head = createDocumentFromSource().headEl;
-        var firstChild = head.firstChild;
-        head.insertBefore(injectScript, firstChild)
+        var library = document.getElementById("mobify-js-library");
+        var libraryClone = doc.importNode(library, false);
+        var head = createDocumentFromSource().headEl
+        head.insertBefore(libraryClone, head.firstChild);
     }
+
+    // Inject timing point (because of blowing away objects on document.write)
+    var body = createDocumentFromSource().bodyEl;
+    var date = doc.createElement("div");
+    date.id = "mobify-point";
+    date.setAttribute("style", "display: none;")
+    date.innerHTML = window.Mobify.points[0];
+    body.insertBefore(date, body.firstChild);
 
     if (options && options.injectMain) {
         // Grab main from the original document and stick it into source dom

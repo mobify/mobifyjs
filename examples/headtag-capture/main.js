@@ -1,4 +1,4 @@
-capturing = window.capturing;
+var capturing = window.capturing || false;
 if (capturing) {
     console.log("Executing main during capturing phase!")
 
@@ -16,4 +16,5 @@ if (capturing) {
 
 } else {
     console.log("Executing main in post-capturing phase!");
+    console.log(Mobify);
 }

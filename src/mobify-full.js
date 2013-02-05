@@ -3,7 +3,7 @@ require(["capture", "resizeImages"], function(Capture, ResizeImages) {
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
     //Mobify.Enhance = Enhance;
-
+    Mobify.api = 2.0
     return Mobify
 
 }, undefined, true);
