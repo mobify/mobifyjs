@@ -1,10 +1,41 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-<head><script class="mobify" id="mobify-tag">
-(function(libraryUrl, mainUrl) {
+<head>
+
+<!-- START MOBIFY TAG -->
+<script class="mobify" id="mobify-tag">
+(function(libraryUrl, mainUrl, detector) {
 window.Mobify = {points: [+new Date]};
 
-var detector = function() {
+function attachScriptBeforeMobifyTag(src, id, classNames) {
+    // load user code
+    var attachedScript = document.createElement('script')
+      , mobifyTagScript = document.getElementById('mobify-tag');
+
+    attachedScript.src = src;
+    attachedScript.id = id;
+    attachedScript.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
+    return attachedScript;
+}
+
+if (!detector()) {
+    return;
+}
+
+document.write('<plaintext style="display:none">');
+
+setTimeout(function() {
+    window.capturing = true;
+    var libraryScript = attachScriptBeforeMobifyTag(libraryUrl, "mobify-js-library", "mobify");
+    libraryScript.onload = function(){
+        attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+    };
+
+});
+
+// pathToLibrary, pathToMainExecution, detectorfunction
+})('/build/mobify.js', '/examples/headtag-capture/main.js', function (){
     var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
     var isCompatible;
     if (match) {
@@ -19,37 +50,10 @@ var detector = function() {
         return false;
     }
     return true;
-}
-
-if (!detector) {
-    return;
-}
-
-function attachScriptBeforeMobifyTag(src, id, classNames) {
-    // load user code
-    var attachedScript = document.createElement('script')
-      , mobifyTagScript = document.getElementById('mobify-tag');
-
-    attachedScript.src = src;
-    attachedScript.id = id;
-    attachedScript.setAttribute("class", classNames);
-    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
-    return attachedScript;
-}
-
-document.write('<plaintext style="display:none">');
-
-setTimeout(function() {
-    window.capturing = true;
-    var libraryScript = attachScriptBeforeMobifyTag(libraryUrl, "mobify-js-library", "mobify");
-    libraryScript.onload = function(){
-        attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
-    };
-
 });
-
-})('/build/mobify.js', '/examples/headtag-capture/main.js');
 </script>
+<!-- END MOBIFY TAG -->
+
 <style>
 body {
     background-color: teal;

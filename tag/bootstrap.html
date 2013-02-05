@@ -1,57 +1,51 @@
-<script class="mobify">
-(function(window, document, mainUrl) {
+<script class="mobify" id="mobify-tag">
+(function(libraryUrl, mainUrl, detector) {
 
-window.Mobify = {points: [+new Date], tagVersion: [2, 0]};
+// Start Mobify object with initial timestamp when loaded
+window.Mobify = {points: [+new Date]};
 
-// var isMobile = /ip(hone|od|ad)|android|blackberry.*applewebkit/i.test(navigator.userAgent)
-//  , optedOut = /mobify-path=($|;)/.test(document.cookie);
+function attachScriptBeforeMobifyTag(src, id, classNames) {
+    // load user code
+    var attachedScript = document.createElement('script')
+      , mobifyTagScript = document.getElementById('mobify-tag');
 
-//if (!isMobile || optedOut) {
-//    return 
-//}
+    attachedScript.src = src;
+    attachedScript.id = id;
+    attachedScript.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
+    return attachedScript;
+}
 
-// sj: TODO - Write logic to remove incompatable browsers
-function request(url, callback) {
-    httpRequest = new XMLHttpRequest();
-    httpRequest.onreadystatechange = function() {
-        if (httpRequest.readyState === 4) {
-            if (httpRequest.status === 200) {
-                callback(httpRequest.responseText);
-            } else {
-                callback(undefined, "Error with request");
-            }
-        }
-    };
-    httpRequest.open('GET', url);
-    httpRequest.send();
+if (!detector()) {
+    return;
 }
 
 document.write('<plaintext style="display:none">');
 
-
 setTimeout(function() {
     window.capturing = true;
-
-    var processLib = function(library) {
-        // attach library to window for later use
-        window.library = library;
-
-        // load library
-        eval(library);
-
-        // load user code
-        var main = document.createElement('script')
-          , script = document.getElementsByTagName('script')[0];
-
-        main.src = mainUrl;
-        main.id = "mobify-js-main";
-        script.parentNode.insertBefore(main, script);
+    var libraryScript = attachScriptBeforeMobifyTag(libraryUrl, "mobify-js-library", "mobify");
+    libraryScript.onload = function(){
+        attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
     };
-
-    request("http://cloud.dev:8000/static/mobifyjs/mobify.js", processLib);
 
 });
 
-// })(this, document, '{{ mobifyjsPath }}');
-})(this, document, 'http://localhost:3000/examples/capture/main.js');
+// pathToLibrary, pathToMainExecution, detectorfunction
+})('/build/mobify.js', '/examples/headtag-capture/main.js', function (){
+    var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
+    var isCompatible;
+    if (match) {
+        if (match[1] && (match[1] === "firefox") && (+match[2] < 4)) {
+            isCompatible = false;
+        } else {
+            isCompatible = true;
+        }
+    }
+    var optedOut = /mobify-path=($|;)/.test(document.cookie);
+    if (!isCompatible || optedOut) {
+        return false;
+    }
+    return true;
+});
 </script>
