@@ -1,29 +1,40 @@
-define(["capture"], function(capture) {
-	return function() {
-		// TODO: We need a hook so this runs against the content of capture BEFORE it gets injected into the dom...
+define(function() {
+	return function(capture) {
+		// TODO: write some TESTS.
 
 		var frag = document.createDocumentFragment();
-		var createEl = document.createElement;
 
 		// make sure prefetch control is on
-		var prefetchCtl = createEl('meta');
+		var prefetchCtl = document.createElement('meta');
 		prefetchCtl.setAttribute('http-equiv','x-dns-prefetch-control');
 		prefetchCtl.setAttribute('content', 'on');
 		frag.appendChild(prefetchCtl);
 
-		var els = document.querySelectorAll('a[href],img[src],link[href],script[src]');
+		var els = capture.querySelectorAll('a[href],img[x-src],link[href],script[x-src]');
+		var uniqNames = {};
 		for (var i=0,ii=els.length;i<ii;i++) {
-			var txt = els[i].href || els[i].src;
+			var txt = els[i].href || els[i].getAttribute('x-src');
 			var hn = (/(http(s)?:)?\/\/([-.\w]+)\//).exec(txt);
 			if (hn && hn.length == 4) {
-				var ln = createEl('link');
-				ln.setAttribute('rel','dns-prefetch');
-				ln.href = hn;
-				frag.appendChild(ln);
+				uniqNames[hn[3]] = true;
 			}
 		}
-		if (document.head) {
-			document.head.append(frag);
+
+		for (var hn in uniqNames) {
+			var ln = document.createElement('link');
+			ln.setAttribute('rel','dns-prefetch');
+			ln.href = '//' + hn;
+			frag.appendChild(ln);
+		}
+		var head = capture.head;
+		if (head)  {
+			var firstChild = head.firstChild;
+			if (firstChild) {
+				head.insertBefore(frag, firstChild);
+			} else {
+				head.appendChild(frag);
+			}
 		}
 	}
 }
+);

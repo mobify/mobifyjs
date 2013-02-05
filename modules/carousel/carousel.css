@@ -1,0 +1,91 @@
+/*  Classes  on  outer  slideshow  wrapper:
+    either  NONE  or  'fraction'  or  'fraction'  +  one  of  'fraction1'...'fraction10'.
+        fraction  sets  box-sizing:  border-box,  so  that  padding  on  the  element  is  taken  out  ;
+    either  NONE  or  'center'  or  'right'
+
+*/
+.m-carousel  {
+    position:  relative;
+    overflow:  hidden;
+    -webkit-font-smoothing:  antialiased;  }
+    .m-carousel.m-left  {
+        text-align:  left;  }
+    .m-carousel.m-center  {
+        text-align:  center;  }
+    .m-carousel.m-fluid  >  .m-carousel-inner  >  *  {
+        width:  100%;  }
+    .m-carousel.m-fluid.m-center  >  .m-carousel-inner  >  *:first-child  {
+        margin-left:  0%;  }
+    .m-carousel.m-fluid-2  >  .m-carousel-inner  >  *  {
+        width:  50%;  }
+    .m-carousel.m-fluid-2.m-center  >  .m-carousel-inner  >  *:first-child  {
+        margin-left:  25%;  }
+    .m-carousel.m-fluid-3  >  .m-carousel-inner  >  *  {
+        width:  33.333%;  }
+    .m-carousel.m-fluid-3.m-center  >  .m-carousel-inner  >  *:first-child  {
+        margin-left:  33.333%;  }
+    .m-carousel.m-fluid-4  >  .m-carousel-inner  >  *  {
+        width:  25%;  }
+    .m-carousel.m-fluid-4.m-center  >  .m-carousel-inner  >  *:first-child  {
+        margin-left:  37.5%;  }
+    .m-carousel.m-fluid-5  >  .m-carousel-inner  >  *  {
+        width:  20%;  }
+    .m-carousel.m-fluid-5.m-center  >  .m-carousel-inner  >  *:first-child  {
+        margin-left:  40%;  }
+    .m-carousel.m-fluid-6  >  .m-carousel-inner  >  *  {
+        width:  16.667%;  }
+    .m-carousel.m-fluid-6.m-center  >  .m-carousel-inner  >  *:first-child  {
+        margin-left:  41.667%;  }
+    .m-carousel  img  {
+        -ms-interpolation-mode:  bicubic;  }
+
+.m-carousel-inner  {
+    position:  relative;
+    white-space:  nowrap;
+    text-align:  left;
+    /*  Removes  inline-block  gaps  due  to  whitespace  */
+    font-size:  0;
+    /*  Configure  animations  */
+    -webkit-transition-property:  -webkit-transform;
+    -moz-transition-property:  -moz-transform;
+    -ms-transition-property:  -ms-transform;
+    -o-transition-property:  -o-transform;
+    transition-property:  transform;
+    /*  iOS  like  slide  timings  */
+    -webkit-transition-timing-function:  cubic-bezier(0.33,  0.66,  0.66,  1);
+    -moz-transition-timing-function:  cubic-bezier(0.33,  0.66,  0.66,  1);
+    -ms-transition-timing-function:  cubic-bezier(0.33,  0.66,  0.66,  1);
+    -o-transition-timing-function:  cubic-bezier(0.33,  0.66,  0.66,  1);
+    transition-timing-function:  cubic-bezier(0.33,  0.66,  0.66,  1);
+    -webkit-transition-duration:  0.5s;
+    -moz-transition-duration:  0.5s;
+    -ms-transition-duration:  0.5s;
+    -o-transition-duration:  0.5s;
+    transition-duration:  0.5s;  }
+    .m-carousel-inner  >  *  {
+        display:  inline-block;
+        vertical-align:  top;
+        white-space:  normal;
+        /*  We  must  reset  the  font-size  here  */
+        font-size:  16px;  }
+    .m-fluid  >  .m-carousel-inner  >  *  {
+        box-sizing:  border-box;
+        -ms-box-sizing:  border-box;
+        -moz-box-sizing:  border-box;
+        -o-box-sizing:  border-box;
+        -webkit-box-sizing:  border-box;  }
+    .m-center:not(.m-fluid)  >  .m-carousel-inner  {
+        display:  inline-block;
+        margin-right:  -20000px  !important;
+        margin-left:  0  !important;  }
+        .m-center:not(.m-fluid)  >  .m-carousel-inner  >  *  {
+            position:  relative;
+            left:  -20000px;  }
+        .m-center:not(.m-fluid)  >  .m-carousel-inner  >  *:first-child  {
+            float:  left;
+            margin-right:  20000px;
+            left:  0;  }
+            .m-center:not(.m-fluid)  >  .m-carousel-inner  >  *:first-child:last-child  {
+                margin-right:  0;  }
+        .m-center:not(.m-fluid)  >  .m-carousel-inner  >  *:last-child  {
+            margin-right:  -30000px;  }

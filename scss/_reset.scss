@@ -1,0 +1,22 @@
+@import "compass";
+
+@include global-reset;
+@include reset-html5;
+
+strong, 
+b { 
+	font-weight: bold; 
+}
+
+em, 
+i { 
+	font-style: italic; 
+}
+
+p,blockquote {
+	@include reset-box-model;
+}
+
+mark {
+	background: none;
+}

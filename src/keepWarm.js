@@ -2,7 +2,7 @@ define(function() {
 	return function(){
 		setInterval(function(){
 			var img = document.createElement('img');
-			img.style.cssText = 'display: none';
+			// img.style.cssText = 'display: none';
 			img.src = '//cdn.mobify.com/1x1.gif';
 			// Typical 3G 5 second tail time to half power
 			// Additional 12 seconds to radio idle
@@ -11,3 +11,4 @@ define(function() {
 		}, 10000);		
 	}
 }
+);

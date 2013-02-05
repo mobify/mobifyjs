@@ -1,0 +1,75 @@
+// Include in .x-slide-canvas
+//
+// .x-slide-outer
+//     .x-slide-canvas
+//         .x-slide-items
+//             <slide item>
+//
+// NOTE: Include this rule in your CSS to activate the slide styles
+// .x-slide-canvas {
+//    @include slide;
+// }
+
+@mixin slide($item-width:320px, $landscape-width: 0px) {
+    overflow: hidden;
+    padding-left: 50%;
+
+    // .x-slide-items
+    > * {
+        position: relative;
+        width: 30000px;
+        margin-left: -$item-width / 2;
+
+        // <slide item>
+        > * { 
+            float: left; 
+            overflow: hidden;
+            width: $item-width;
+            height: auto;
+        }
+    }
+
+    @if $landscape-width > 0 {
+
+        .x-landscape & > * {
+            margin-left: -$landscape-width / 2;
+
+            > * {
+                width: $landscape-width;
+            }
+        }
+    }
+}
+
+
+// TODO: How much of this is custom? - It should be extracted.
+.x-slide-dots {
+    display: none;
+    position: relative;
+    z-index: 9999;
+
+    text-align: center;
+    margin-top:8px;
+
+    &.on {
+        display: block;
+    }
+
+    span {
+        display: inline-block;
+        width: 4px;
+        height: 4px;
+        margin: 4px 8px;
+        border: 1px solid #999;
+
+        @include border-radius(4px);
+        text-indent: -9999px;
+        background: #ddd;
+        vertical-align: middle;
+
+        &.x-current {
+            background:#003F74 !important;
+            border-color:#003F74;
+        }
+    }
+}

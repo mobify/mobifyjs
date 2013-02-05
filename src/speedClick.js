@@ -19,3 +19,4 @@ define(function() {
 		});
 	}
 }
+);

@@ -1,0 +1,18 @@
+<script src="{config.configDir}a.js"></script>
+
+{%script}
+    // If data misses happen, reveal them in a separate element so that
+    // automated tools like Selenium could pick them up
+    Mobify.$(function() {
+        if (!Mobify.evaluatedCont) return;
+        
+        var oWarnings = Mobify.evaluatedCont.root.warnings || {};
+        var sWarnings = Mobify.$.map(oWarnings, function(value, key) {
+            return key;
+        }).join(' ');
+        if (sWarnings)
+            Mobify.$('<div id="x-mobify-warnings" style="display: none">')
+                .text(sWarnings)
+                .appendTo(document.body);
+    });
+{/script}

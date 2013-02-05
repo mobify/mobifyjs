@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="testsuites">
+	<testsuite name="combo" errors="0" failures="0" tests="16" time="0.313">
+		<testcase classname="combo" name="Mobify.cssURL - It exists" time="0.002"/>
+		<testcase classname="combo" name="combo - Warm cache" time="0.049"/>
+		<testcase classname="combo" name="combo - Cold cache" time="0.134"/>
+		<testcase classname="combo" name="Mobify.combo.load - Encoded Urls are cached" time="0.015"/>
+		<testcase classname="combo" name="httpCache - Eviction on an unused resource" time="0.054"/>
+		<testcase classname="combo" name="httpCache - Least recently used eviction" time="0.058"/>
+		<testcase classname="combo" name="httpCache.utils.isStale" time="0.001"/>
+	</testsuite>
+	<testsuite name="resizeImages" errors="0" failures="0" tests="10" time="0.003">
+		<testcase classname="resizeImages" name="$.fn.resizeImages" time="0.001"/>
+		<testcase classname="resizeImages" name="$.fn.resizeImages non-http-url" time="0"/>
+		<testcase classname="resizeImages" name="$.fn.resizeImages defaults" time="0.001"/>
+		<testcase classname="resizeImages" name="Mobify.getImageURL" time="0"/>
+		<testcase classname="resizeImages" name="Mobify.getImageURL cached string" time="0"/>
+		<testcase classname="resizeImages" name="Mobify.getImageURL - projectName set on Mobify.conf.data" time="0"/>
+		<testcase classname="resizeImages" name="Mobify.getImageURL - projectName and cache expiry set" time="0.001"/>
+	</testsuite>
+	<testsuite name="enhance" errors="0" failures="0" tests="1" time="0.003">
+		<testcase classname="enhance" name="Mobify.enhance" time="0.003"/>
+	</testsuite>
+	<testsuite name="externals" errors="0" failures="0" tests="6" time="0.002">
+		<testcase classname="externals" name="Mobify.html.disable" time="0.001"/>
+		<testcase classname="externals" name="Mobify.html.disable - does not escape resources in scripts" time="0"/>
+		<testcase classname="externals" name="Mobify.html.disable - handles multiline resources" time="0"/>
+		<testcase classname="externals" name="Mobify.html.disable - handles &lt;script&gt; in comment" time="0.001"/>
+		<testcase classname="externals" name="Mobify.html.enable" time="0"/>
+		<testcase classname="externals" name="Mobify.html.enable - double source" time="0"/>
+	</testsuite>
+	<testsuite name="extractDOM" errors="0" failures="0" tests="2" time="0.001">
+		<testcase classname="extractDOM" name="Mobify.html.openTag" time="0.001"/>
+		<testcase classname="extractDOM" name="Mobify.html.closeTag" time="0"/>
+	</testsuite>
+	<testsuite name="Mobify.urlmatch" errors="0" failures="0" tests="36" time="0.003">
+		<testcase classname="Mobify.urlmatch" name="urlmatch" time="0.002"/>
+		<testcase classname="Mobify.urlmatch" name="tag v6 reset" time="0"/>
+		<testcase classname="Mobify.urlmatch" name="tag v6 reset sticky cookie set" time="0"/>
+	</testsuite>
+</testsuites>

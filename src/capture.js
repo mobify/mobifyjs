@@ -4,6 +4,7 @@ define(["utils"], function(Utils) {
 // # Regex Setup
 // ##
 
+
 var Capture = {};
 
 var openingScriptRe = new RegExp('(<script[\\s\\S]*?>)', 'gi');
@@ -356,16 +357,15 @@ var createDocumentFromSource = Capture.createDocumentFromSource = function(_doc)
 /**
  * Grabs source DOM as a new document object - TODO: Remove Zepto to make this true!
  */
-var getSourceDoc = Capture.getSourceDoc = function() {
-    var capturedDoc = createDocumentFromSource().sourceDoc;
-    return capturedDoc;
+var getCaptureDoc = Capture.getCaptureDoc = function() {
+    return createDocumentFromSource().sourceDoc;;
 };
 
 /**
  * Returns an escaped HTML representation of the source DOM
  */
 var escapedHtmlString = Capture.escapedHtmlString =  function(_doc) {
-    var doc = _doc || getSourceDoc();
+    var doc = _doc || getCaptureDoc();
     return enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement));
 };
 
@@ -389,12 +389,12 @@ var render = Capture.render = function(htmlString, _doc, callback) {
 /**
  * Grab the source document and render it
  */
-var renderSourceDoc = Capture.renderSourceDoc = function(options) {
+var renderCaptureDoc = Capture.renderCaptureDoc = function(options) {
     // Objects are blown away on FF after document.write, but not in Chrome.
     // To get around this, we re-inject the mobify.js libray by re-adding
     // this script back into the DOM to be re-executed post processing (FF Only)
     // aka new Ark :)
-    var doc = getSourceDoc(); // should be cached
+    var doc = getCaptureDoc(); // should be cached
 
     if (!/webkit/i.test(navigator.userAgent)) {
         // Create script with the mobify library
