@@ -372,7 +372,7 @@ var escapedHtmlString = Capture.escapedHtmlString =  function(_doc) {
 /**
  * Rewrite the document with a new html string
  */
-var render = Capture.render = function(htmlString, _doc) {
+var render = Capture.render = function(htmlString, _doc, callback) {
     var doc = _doc || document;
 
     // Set capturing state to false so that the user main code knows how to execute
@@ -382,6 +382,7 @@ var render = Capture.render = function(htmlString, _doc) {
         doc.open();
         doc.write(htmlString);
         doc.close();
+        callback && callback();
     });
 };
 
@@ -408,6 +409,13 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
         var firstChild = head.firstChild;
         head.insertBefore(injectScript, firstChild)
     }*/
+
+    // Inject timing point (because of blowing away objects on document.write)
+    var body = createDocumentFromSource().bodyEl;
+    var date = doc.createElement("div");
+    date.id = "mobify-point";
+    date.innerHTML = window.Mobify.points[0];
+    body.insertBefore(date, body.firstChild);
 
     if (options && options.injectMain) {
         var library = document.getElementById("mobify-js-library");

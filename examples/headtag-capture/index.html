@@ -65,6 +65,17 @@ body {
 <img src="https://www.mobify.com/wp-content/uploads/2012/08/Entrance-1.jpg">
 <img src="https://comassets.mobify.com/wp-content/uploads/2012/08/photo-6.jpg">
 <script>
+var end = +new Date;
+var point = document.getElementById("mobify-point");
+if (document.all) {
+    var begin = point.innerText;
+} else {
+    var begin = point.textContent;
+}
+var diff = end - begin;
+parent.postMessage(diff, "*");
+</script>
+<script>
 console.log("#1")
 </script>
 <script src="bigscript.js"></script>

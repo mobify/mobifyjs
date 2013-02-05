@@ -107,7 +107,7 @@ module.exports = function(grunt) {
                 username: '<%= localConfig.saucelabs.username %>', // if not provided it'll default to ENV SAUCE_USERNAME (if applicable)
                 key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                 urls: ['http://localhost:3000/tests/capture.html'],
-                concurrency: 2,
+                concurrency: 1,
                 tunneled: true,
                 browsers: [
                 { // Only working version of IE compatable
@@ -149,16 +149,6 @@ module.exports = function(grunt) {
                     browserName: 'firefox',
                     platform: 'Mac 10.6',
                     version: '14.0'
-                },
-                { // Lowest Safari on OSX
-                    browserName: 'safari',
-                    platform: 'Mac 10.6',
-                    version: '5'
-                },
-                { // Highest Safari on OSX
-                    browserName: 'safari',
-                    platform: 'Mac 10.8',
-                    version: '6'
                 },
                 { // Lowest iPad on OSX (simulator)
                     browserName: 'ipad',
