@@ -372,7 +372,7 @@ var escapedHtmlString = Capture.escapedHtmlString =  function(_doc) {
 /**
  * Rewrite the document with a new html string
  */
-var render = Capture.render = function(htmlString, _doc, callback) {
+var render = Capture.render = function(htmlString, _doc) {
     var doc = _doc || document;
 
     // Set capturing state to false so that the user main code knows how to execute
@@ -413,6 +413,7 @@ var renderSourceDoc = Capture.renderSourceDoc = function(options) {
     var body = createDocumentFromSource().bodyEl;
     var date = doc.createElement("div");
     date.id = "mobify-point";
+    date.setAttribute("style", "display: none;")
     date.innerHTML = window.Mobify.points[0];
     body.insertBefore(date, body.firstChild);
 
