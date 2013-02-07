@@ -7,7 +7,7 @@ require(["capture", "resizeImages", "dnsPrefetch", "keepWarm", "speedClick"], fu
     Mobify.SpeedClick = SpeedClick;
 
     //Mobify.Enhance = Enhance;
-
+    Mobify.api = 2.0
     return Mobify
 
 }, undefined, true);
