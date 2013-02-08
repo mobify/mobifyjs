@@ -98,17 +98,6 @@ function cloneAttributes(sourceString, dest) {
     }); 
 
     return dest;
-}; 
-
-/**
- * Set the content of an element with html from a string
- */
-function setElementContentFromString(el, htmlString) {
-    // We must pass in document because elements created for dom insertion must be
-    // inserted into the same dom they are created by.
-    var doc = this.doc;
-    var div = doc.createElement('div'); // TODO: Memoize
-    for (div.innerHTML = htmlString; div.firstChild; el.appendChild(div.firstChild));
 };
 
 // ##
@@ -307,6 +296,17 @@ Capture.prototype.restorer = function() {
 };
 
 /**
+ * Set the content of an element with html from a string
+ */
+Capture.prototype.setElementContentFromString = function(el, htmlString) {
+    // We must pass in document because elements created for dom insertion must be
+    // inserted into the same dom they are created by.
+    var doc = this.doc;
+    var div = doc.createElement('div'); // TODO: Memoize
+    for (div.innerHTML = htmlString; div.firstChild; el.appendChild(div.firstChild));
+};
+
+/**
  * Grab fragment strings and construct DOM fragments
  * returns htmlEl, headEl, bodyEl, doc
  */
@@ -333,7 +333,7 @@ Capture.prototype.createDocumentFragments = function() {
     } catch (e) {
         var title = headEl.getElementsByTagName('title')[0];
         title && headEl.removeChild(title);
-        setElementContentFromString(headEl, disabledHeadContent, doc);
+        this.setElementContentFromString(headEl, disabledHeadContent);
     }
 
     // Append head and body to the html element

@@ -66,9 +66,11 @@
 \n"
 
             // Needed to pass tests on iOS 4.3 on iPad
-            altExpectedHtml = "\n" + expectedHtml
+            if (/ip(hone|ad).*4_/i.test(navigator.userAgent)){
+                expectedHtml = "\n" + expectedHtml
+            }
 
-            ok((Capture.disable(html, "x-") === expectedHtml) || (Capture.disable(html) === altExpectedHtml), "Passed!" );
+            equal(Capture.disable(html, "x-"), expectedHtml, "Passed!" );
         });
 
         // Test enabling attributes that cause resource loading
@@ -80,15 +82,18 @@
 \n    <style media=\"query\"></style>\
 \n</head>\
 \n<body>\
+\n\
 \n    <img src=\"/path/to/image.png\"></img>\
 \n    <iframe src=\"/path/to/page.html\"></iframe>\
 \n</body>\
 \n</html>\
 \n"
-            // Needed to pass tests on iOS 4.3 on iPad
-            altExpectedHtml = "\n" + expectedHtml
+            // Needed to pass tests on iOS 4.3 on iPad/iPhone
+            if (/ip(hone|ad).*4_/i.test(navigator.userAgent)){
+                expectedHtml = "\n" + expectedHtml
+            }
 
-            ok((Capture.enable(html, "x-") === expectedHtml) || (Capture.enable(html) === altExpectedHtml), "Passed!" );
+            ok(Capture.enable(html, "x-"), expectedHtml, "Passed!" );
         });
 
         test("openTag", function(){
@@ -134,7 +139,6 @@
 
             window.addEventListener("message", function(event) {
                 window.messageReceived = true;
-                console.log(event.data["verify"])
                 equal(event.data, "1,2,3,4,5");
                 start();
             }, true);
