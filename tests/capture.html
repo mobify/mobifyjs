@@ -97,13 +97,6 @@
             ok((openTag === "<div id=\"foo-element\" foo=\"bar\">") || openTag === "<div foo=\"bar\" id=\"foo-element\">")
         });
 
-        test("closeTag", function(){
-            var element = $("#foo-element");
-
-            equal(Capture.closeTag(element), "</div>")
-        });
-
-
         asyncTest("createDocumentFromSource", function(){
             var iframe = $("<iframe>", {id: "plaintext-example"});
             iframe.attr("src", "/tests/fixtures/plaintext-example.html")
@@ -162,7 +155,7 @@
 \n</html>";
                 if (iframeLoaded == false) {
                     iframeLoaded = true;
-                    Capture.render(html, doc, undefined);
+                    Capture.render(html, doc);
                 }
             });
             $("#qunit-fixture").append(iframe);
