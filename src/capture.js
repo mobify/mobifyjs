@@ -126,14 +126,6 @@ var Capture = function(_doc, prefix) {
     Utils.extend(this, capturedDOMFragments);
 };
 
-/**
- * Disables all attributes in disablingMap by prepending prefix
- */
-Capture.prototype.disableAttributes = function(whole, tagName, tail) {
-    lowercaseTagName = tagName.toLowerCase();
-    return result = '<' + lowercaseTagName + (tagDisablers[lowercaseTagName] || '')
-        + tail.replace(attributeDisablingRes[lowercaseTagName], ' ' + self.prefix + '$1') + '>';
-} 
 
 /**
  * Returns a string with all external attributes disabled.
@@ -142,6 +134,13 @@ Capture.prototype.disableAttributes = function(whole, tagName, tail) {
  */
 Capture.prototype.disable = function(htmlStr) {   
     var self = this;
+
+    // Disables all attributes in disablingMap by prepending prefix
+    function disableAttributes(whole, tagName, tail) {
+        lowercaseTagName = tagName.toLowerCase();
+        return result = '<' + lowercaseTagName + (tagDisablers[lowercaseTagName] || '')
+            + tail.replace(attributeDisablingRes[lowercaseTagName], ' ' + self.prefix + '$1') + '>';
+    }
 
     var splitRe = /(<!--[\s\S]*?-->)|(?=<\/script)/i;
     var tokens = htmlStr.split(splitRe);
@@ -155,8 +154,8 @@ Capture.prototype.disable = function(htmlStr) {
         // Disable before and the <script> itself.
         // parsed = [before, <script>, script contents]
         parsed = fragment.split(openingScriptRe);
-        parsed[0] = parsed[0].replace(affectedTagRe, self.disableAttributes);
-        if (parsed[1]) parsed[1] = parsed[1].replace(affectedTagRe, self.disableAttributes);
+        parsed[0] = parsed[0].replace(affectedTagRe, disableAttributes);
+        if (parsed[1]) parsed[1] = parsed[1].replace(affectedTagRe, disableAttributes);
         return parsed;
     });
 
