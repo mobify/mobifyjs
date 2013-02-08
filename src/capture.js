@@ -117,7 +117,6 @@ function setElementContentFromString(el, htmlString) {
 var Capture = function(_doc, prefix) {
     this.doc = _doc || document;
     this.prefix = prefix || "x-";
-    this.attributeEnablingRe = new RegExp('\\s' + this.prefix + '(' + Utils.keys(attributesToEnable).join('|') + ')', 'gi');
 
     var capturedStringFragments = this.createDocumentFragmentsStrings();
     Utils.extend(this, capturedStringFragments);
@@ -131,33 +130,35 @@ var Capture = function(_doc, prefix) {
  * Returns a string with all external attributes disabled.
  * Includes special handling for resources referenced in scripts and inside
  * comments.
+ * Not declared on the prototype so it can be used as a static method.
  */
-Capture.prototype.disable = function(htmlStr) {   
+var disable = Capture.disable = function(htmlStr, prefix) {   
     var self = this;
-
     // Disables all attributes in disablingMap by prepending prefix
-    function disableAttributes(whole, tagName, tail) {
-        lowercaseTagName = tagName.toLowerCase();
-        return result = '<' + lowercaseTagName + (tagDisablers[lowercaseTagName] || '')
-            + tail.replace(attributeDisablingRes[lowercaseTagName], ' ' + self.prefix + '$1') + '>';
-    }
+    var disableAttributes = (function(){
+        return function(whole, tagName, tail) {
+            lowercaseTagName = tagName.toLowerCase();
+            return result = '<' + lowercaseTagName + (tagDisablers[lowercaseTagName] || '')
+                + tail.replace(attributeDisablingRes[lowercaseTagName], ' ' + prefix + '$1') + '>';
+        }
+    })();
 
     var splitRe = /(<!--[\s\S]*?-->)|(?=<\/script)/i;
     var tokens = htmlStr.split(splitRe);
     var ret = tokens.map(function(fragment) {
-        var parsed
+                var parsed
 
-        // Fragment may be empty or just a comment, no need to escape those.
-        if (!fragment) return '';
-        if (/^<!--/.test(fragment)) return fragment;
+                // Fragment may be empty or just a comment, no need to escape those.
+                if (!fragment) return '';
+                if (/^<!--/.test(fragment)) return fragment;
 
-        // Disable before and the <script> itself.
-        // parsed = [before, <script>, script contents]
-        parsed = fragment.split(openingScriptRe);
-        parsed[0] = parsed[0].replace(affectedTagRe, disableAttributes);
-        if (parsed[1]) parsed[1] = parsed[1].replace(affectedTagRe, disableAttributes);
-        return parsed;
-    });
+                // Disable before and the <script> itself.
+                // parsed = [before, <script>, script contents]
+                parsed = fragment.split(openingScriptRe);
+                parsed[0] = parsed[0].replace(affectedTagRe, disableAttributes);
+                if (parsed[1]) parsed[1] = parsed[1].replace(affectedTagRe, disableAttributes);
+                return parsed;
+            });
 
     return [].concat.apply([], ret).join('');
 };
@@ -165,15 +166,17 @@ Capture.prototype.disable = function(htmlStr) {
 
 /**
  * Returns a string with all disabled external attributes enabled.
+ * Not declared on the prototype so it can be used as a static method.
  */
-Capture.prototype.enable = function(htmlStr) {
-    return htmlStr.replace(this.attributeEnablingRe, ' $1').replace(tagEnablingRe, '');
+var enable = Capture.enable = function(htmlStr, prefix) {
+    var attributeEnablingRe = new RegExp('\\s' + prefix + '(' + Utils.keys(attributesToEnable).join('|') + ')', 'gi');
+    return htmlStr.replace(attributeEnablingRe, ' $1').replace(tagEnablingRe, '');
 };
 
 /**
  * Return a string for the opening tag of DOMElement `element`.
  */
-Capture.prototype.openTag = function(element) {
+var openTag = Capture.openTag = function(element) {
     if (!element) return '';
     if (element.length) element = element[0];
 
@@ -214,9 +217,9 @@ Capture.prototype.doctype = function() {
 
     captured = {
         doctype: this.doctype(),
-        htmlOpenTag: this.openTag(htmlEl),
-        headOpenTag: this.openTag(headEl),
-        bodyOpenTag: this.openTag(bodyEl),
+        htmlOpenTag: openTag(htmlEl),
+        headOpenTag: openTag(headEl),
+        bodyOpenTag: openTag(bodyEl),
         headContent: extractHTMLStringFromElement(headEl),
         bodyContent: extractHTMLStringFromElement(bodyEl)
     };
@@ -320,8 +323,8 @@ Capture.prototype.createDocumentFragments = function() {
     cloneAttributes(this.bodyOpenTag, bodyEl);
 
     // Set innerHTML of new source DOM body
-    bodyEl.innerHTML = this.disable(this.bodyContent);
-    var disabledHeadContent = this.disable(this.headContent);
+    bodyEl.innerHTML = disable(this.bodyContent, this.prefix);
+    var disabledHeadContent = disable(this.headContent, this.prefix);
 
     // On some browsers, you cannot modify <head> using innerHTML.
     // In that case, do a manual copy of each element
@@ -345,7 +348,7 @@ Capture.prototype.createDocumentFragments = function() {
  */
 Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
-    return this.enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement));
+    return enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement), this.prefix);
 };
 
 /**

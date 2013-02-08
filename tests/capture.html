@@ -68,7 +68,7 @@
             // Needed to pass tests on iOS 4.3 on iPad
             altExpectedHtml = "\n" + expectedHtml
 
-            ok((Capture.disable(html) === expectedHtml) || (Capture.disable(html) === altExpectedHtml), "Passed!" );
+            ok((Capture.disable(html, "x-") === expectedHtml) || (Capture.disable(html) === altExpectedHtml), "Passed!" );
         });
 
         // Test enabling attributes that cause resource loading
@@ -88,7 +88,7 @@
             // Needed to pass tests on iOS 4.3 on iPad
             altExpectedHtml = "\n" + expectedHtml
 
-            ok((Capture.enable(html) === expectedHtml) || (Capture.enable(html) === altExpectedHtml), "Passed!" );
+            ok((Capture.enable(html, "x-") === expectedHtml) || (Capture.enable(html) === altExpectedHtml), "Passed!" );
         });
 
         test("openTag", function(){
@@ -106,7 +106,8 @@
                 // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
                 var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
 
-                var newDoc = Capture.createDocumentFromSource(doc).sourceDoc;
+                var capture = new Capture(doc);
+                var capturedDoc = capture.capturedDoc;
 
                 var expectedHtml = "<html class=\"testclass\"><head>\
 \n    \
@@ -120,7 +121,7 @@
 \n\
 \n</body></html>";
 
-                var html = Capture.escapedHtmlString(newDoc);
+                var html = capture.escapedHTMLString(capturedDoc);
                 equal(html, expectedHtml, "Passed!");
                 start();
             });
@@ -142,6 +143,9 @@
             iframe.load(function(){
                 var doc = this.contentDocument;
 
+                var capture = new Capture(doc);
+                var capturedDoc = capture.capturedDoc;
+
                 var html = "<html><head></head>\
 \n<body>\
 \n<h1>Script order test</h1>\
@@ -155,7 +159,7 @@
 \n</html>";
                 if (iframeLoaded == false) {
                     iframeLoaded = true;
-                    Capture.render(html, doc);
+                    capture.render(html);
                 }
             });
             $("#qunit-fixture").append(iframe);
