@@ -181,13 +181,10 @@ module.exports = function(grunt) {
     // Default task.
     // grunt.registerTask('default', 'lint qunit requirejs');
     //grunt.registerTask('skiptests', 'concat');
-    grunt.registerTask('default', ['requirejs:resizeImages',
-                                   'requirejs:capture',
-                                   'requirejs:enhance',
+    grunt.registerTask('default', ['requirejs:capture',
                                    'requirejs:full',
                                    'requirejs:fullOptimized']);
     grunt.registerTask('capture', 'requirejs:capture');
-    grunt.registerTask('full', 'requirejs:full');
     grunt.registerTask('test', ['connect', 'qunit']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('preview', ['connect', 'watch']);
