@@ -1,5 +1,9 @@
 <script class="mobify" id="mobify-tag">
-(function(libraryUrl, mainUrl, detector) {
+(function(window, document, libraryUrl, mainUrl, detector) {
+
+if (!detector()) {
+    return;
+}
 
 // Start Mobify object with initial timestamp when loaded
 window.Mobify = {points: [+new Date]};
@@ -16,10 +20,6 @@ function attachScriptBeforeMobifyTag(src, id, classNames) {
     return attachedScript;
 }
 
-if (!detector()) {
-    return;
-}
-
 document.write('<plaintext style="display:none">');
 
 setTimeout(function() {
@@ -32,7 +32,7 @@ setTimeout(function() {
 });
 
 // pathToLibrary, pathToMainExecution, detectorfunction
-})('/build/mobify.js', '/examples/headtag-capture/main.js', function (){
+})(window, document, '/build/mobify.js', '/examples/headtag-capture/main.js', function (){
     var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
     var isCompatible;
     if (match) {
