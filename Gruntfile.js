@@ -74,7 +74,7 @@ module.exports = function(grunt) {
                     mainConfigFile: "./src/config.js",
                     optimize: "none",
                     keepBuildDir: true,
-                    name: "../<%= localConfig.mobifyjsCustom.bootstrap %>",
+                    name: "../mobify-custom.js",
                     out: "./build/custom/mobify.js",
                 }
             },
@@ -83,14 +83,14 @@ module.exports = function(grunt) {
                     almond: true,
                     mainConfigFile: "./src/config.js",
                     keepBuildDir: true,
-                    name: "../<%= localConfig.mobifyjsCustom.bootstrap %>",
+                    name: "../mobify-custom.js",
                     out: "./build/custom/mobify.min.js",
                 }
             }
         },
         watch: {
             files: ["src/**/*.js", 
-                  "<%= localConfig.mobifyjsCustom.bootstrap %>"
+                  "mobify-custom.js"
             ],
             tasks: ['requirejs'],
         },
