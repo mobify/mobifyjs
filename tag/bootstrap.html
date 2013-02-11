@@ -1,5 +1,5 @@
 <script class="mobify" id="mobify-tag">
-(function(window, document, libraryUrl, mainUrl, detector) {
+(function(window, document, detector, libraryUrl, mainUrl) {
 
 // If Mobify has been defined already, or if the detector fails,
 // exit
@@ -29,19 +29,15 @@ setTimeout(function() {
     window.capturing = true;
     var libraryScript = attachScriptBeforeMobifyTag(libraryUrl, "mobify-js-library", "mobify");
     libraryScript.onload = function(){
-        attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+        if (mainUrl) {
+            attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+        }
         // TODO: If main fails to load, load capture.restore
     };
 
 });
 
 })( window, document,
-    // path to library
-    'http://localhost:3000/build/mobify-2.0.0.js',
-
-    // path to main executable 
-    'http://localhost:3000//examples/headtag-capture/main.js',
-
     // detector function
     function (){
         var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
@@ -58,6 +54,11 @@ setTimeout(function() {
             return false;
         }
         return true;
-    }
+    },
+    // path to library
+    'http://localhost:3000/build/mobify-custom.js',
+
+    // path to main executable 
+    //'http://localhost:3000/examples/headtag-capture/main.js',
 );
 </script>

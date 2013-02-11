@@ -382,7 +382,7 @@ Capture.prototype.renderCapturedDoc = function(options) {
     if (!/webkit/i.test(navigator.userAgent)) {
         var library = document.getElementById("mobify-js-library");
         var libraryClone = doc.importNode(library, false);
-        var head = this.headEl
+        var head = this.headEl;
         head.insertBefore(libraryClone, head.firstChild);
     }
 

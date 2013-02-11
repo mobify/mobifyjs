@@ -58,7 +58,6 @@ module.exports = function(grunt) {
                     out: "./build/mobify-2.0.0.js",
                 }
             },
-            // Building full Mobify.js library
             fullOptimized: {
                 options: {
                     almond: true,
@@ -67,11 +66,33 @@ module.exports = function(grunt) {
                     name: "mobify-full",
                     out: "./build/mobify-2.0.0.min.js",
                 }
+            },
+            // Building custom Mobify.js library
+            custom: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: true,
+                    name: "../<%= localConfig.mobifyjsCustom.bootstrap %>",
+                    out: "./build/custom/mobify.js",
+                }
+            },
+            customOptimized: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    keepBuildDir: true,
+                    name: "../<%= localConfig.mobifyjsCustom.bootstrap %>",
+                    out: "./build/custom/mobify.min.js",
+                }
             }
         },
         watch: {
-          files: 'src/**/*.js',
-          tasks: ['requirejs'],
+            files: ["src/**/*.js", 
+                  "<%= localConfig.mobifyjsCustom.bootstrap %>"
+            ],
+            tasks: ['requirejs'],
         },
         'saucelabs-qunit': {
             all: {
@@ -175,7 +196,7 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['requirejs:capture',
                                    'requirejs:full',
                                    'requirejs:fullOptimized']);
-    grunt.registerTask('capture', 'requirejs:capture');
+    grunt.registerTask('build', 'default');
     grunt.registerTask('test', ['connect', 'qunit']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('preview', ['connect', 'watch']);
