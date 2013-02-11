@@ -44,7 +44,7 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "mobify-capture",
-                    out: "./build/mobify-capture.js",
+                    out: "./build/mobify-capture-2.0.0.js",
                 }
             },
             // Building full Mobify.js library

@@ -1,7 +1,9 @@
 <script class="mobify" id="mobify-tag">
 (function(window, document, libraryUrl, mainUrl, detector) {
 
-if (!detector()) {
+// If Mobify has been defined already, or if the detector fails,
+// exit
+if (this.Mobify || !detector()) {
     return;
 }
 
@@ -9,9 +11,8 @@ if (!detector()) {
 window.Mobify = {points: [+new Date]};
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
-    // load user code
-    var attachedScript = document.createElement('script')
-      , mobifyTagScript = document.getElementById('mobify-tag');
+    var attachedScript = document.createElement('script');
+    var mobifyTagScript = document.getElementById('mobify-tag');
 
     attachedScript.src = src;
     attachedScript.id = id;
@@ -20,32 +21,43 @@ function attachScriptBeforeMobifyTag(src, id, classNames) {
     return attachedScript;
 }
 
+// Prevent the browser from downloading website resources
 document.write('<plaintext style="display:none">');
 
+// On next tick, load library and main executable
 setTimeout(function() {
     window.capturing = true;
     var libraryScript = attachScriptBeforeMobifyTag(libraryUrl, "mobify-js-library", "mobify");
     libraryScript.onload = function(){
         attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+        // TODO: If main fails to load, load capture.restore
     };
 
 });
 
-// pathToLibrary, pathToMainExecution, detectorfunction
-})(window, document, '/build/mobify.js', '/examples/headtag-capture/main.js', function (){
-    var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
-    var isCompatible;
-    if (match) {
-        if (match[1] && (match[1] === "firefox") && (+match[2] < 4)) {
-            isCompatible = false;
-        } else {
-            isCompatible = true;
+})( window, document,
+    // path to library
+    'http://localhost:3000/build/mobify-2.0.0.js',
+
+    // path to main executable 
+    'http://localhost:3000//examples/headtag-capture/main.js',
+
+    // detector function
+    function (){
+        var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
+        var isCompatible;
+        if (match) {
+            if (match[1] && (match[1] === "firefox") && (+match[2] < 4)) {
+                isCompatible = false;
+            } else {
+                isCompatible = true;
+            }
         }
+        var optedOut = /mobify-path=($|;)/.test(document.cookie);
+        if (!isCompatible || optedOut) {
+            return false;
+        }
+        return true;
     }
-    var optedOut = /mobify-path=($|;)/.test(document.cookie);
-    if (!isCompatible || optedOut) {
-        return false;
-    }
-    return true;
-});
+);
 </script>

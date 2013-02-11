@@ -14,6 +14,7 @@ var tagDisablers = {
 
 var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 
+// Map of all attributes we should disable (to prevent resources from downloading)
 var disablingMap = { 
     img:    ['src', 'height', 'width'],
     iframe: ['src'],
@@ -181,7 +182,7 @@ var openTag = Capture.openTag = function(element) {
 /**
  * Return a string for the doctype of the current document.
  */
-Capture.prototype.doctype = function() {
+Capture.prototype.getDoctype = function() {
     var doctypeEl = this.doc.doctype || [].filter.call(this.doc.childNodes, function(el) {
             return el.nodeType == Node.DOCUMENT_TYPE_NODE
         })[0];
@@ -205,7 +206,7 @@ Capture.prototype.doctype = function() {
     var htmlEl = doc.getElementsByTagName('html')[0];
 
     captured = {
-        doctype: this.doctype(),
+        doctype: this.getDoctype(),
         htmlOpenTag: openTag(htmlEl),
         headOpenTag: openTag(headEl),
         bodyOpenTag: openTag(bodyEl),
@@ -348,7 +349,9 @@ Capture.prototype.createDocumentFragments = function() {
  */
 Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
-    return enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement), this.prefix);
+    var html = enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement), this.prefix);
+    var htmlWithDoctype = this.doctype + html;
+    return htmlWithDoctype;
 };
 
 /**
