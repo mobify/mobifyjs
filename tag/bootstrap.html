@@ -39,22 +39,23 @@ setTimeout(function() {
 
 })( window, document,
     // detector function
-    function (){
-        var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
+    var detector = function (){
+        var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
         var isCompatible;
         if (match) {
-            if (match[1] && (match[1] === "firefox") && (+match[2] < 4)) {
+            if (match[1] && (match[1].toLowerCase() === "firefox") && (+match[2] < 4)) {
                 isCompatible = false;
+            } else if (match[3] && (match[3].toLowerCase() === "opera") && (+match[4] < 11)) {
+                isCompatible = false
             } else {
                 isCompatible = true;
             }
         }
-        var optedOut = /mobify-path=($|;)/.test(document.cookie);
-        if (!isCompatible || optedOut) {
+        if (!isCompatible) {
             return false;
         }
         return true;
-    },
+    };
     // path to library
     'http://localhost:3000/build/mobify-custom.js',
 

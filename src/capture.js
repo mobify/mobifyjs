@@ -397,12 +397,14 @@ Capture.prototype.renderCapturedDoc = function(options) {
     if (options && options.injectMain) {
         // Grab main from the original document and stick it into source dom
         // at the end of body
-        var main = document.getElementById("mobify-js-main");
-        // Since you can't move nodes from one document to another,
-        // we must clone it first using importNode:
-        // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
-        var mainClone = doc.importNode(main, false);
-        this.bodyEl.appendChild(mainClone);
+        var mainScript = document.getElementById("mobify-js-main");
+        if (mainScript) {
+            // Since you can't move nodes from one document to another,
+            // we must clone it first using importNode:
+            // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
+            var mainClone = doc.importNode(main, false);
+            this.bodyEl.appendChild(mainClone);
+        }
         
     }
 
