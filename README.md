@@ -13,7 +13,7 @@ Mobify.js uses Grunt.js and Require.js to build the library, and manage all of t
 
     npm install -g grunt-cli
 
-    And then download the latest code from git and install the dependancies:
+And then download the latest code from git and install the dependancies:
 
     git checkout https://github.com/mobify/mobifyjs.git
     cd mobifyjs
@@ -51,9 +51,9 @@ mobify.js library (or to compile the library with executable code)
 
  - mobify-custom.js.example
 
- To create a custom build, run the following:
+To create a custom build, run the following:
 
-    cp mobify-custom.js.example mobify-custom.js
+    `cp mobify-custom.js.example mobify-custom.js`
 
 Then, run `grunt preview` as normal. The output of the custom build will be
 located in `./build/custom`.
