@@ -2,8 +2,5 @@
     "saucelabs": {
         "username": "{SAUCELABS_USERNAME}",
         "key": "{SAUCELABS_KEY}"
-    },
-    "mobifyjsCustom": {
-        bootstrap: "./mobify-custom.js"
     }
 }
