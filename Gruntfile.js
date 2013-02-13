@@ -11,16 +11,9 @@ module.exports = function(grunt) {
                         try { 
                             return grunt.file.readJSON('localConfig.json') 
                         } catch(e) {
-                            return {} 
+                            return {};
                         }
-                    })() ,
-        meta: {
-          banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-            '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-            '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>' +
-            '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-            ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
-        },
+                    })(),
         lint: {
             files: ['grunt.js', 'src/**/*.js', 'tests/**/*.js']
         },
@@ -51,7 +44,7 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "mobify-capture",
-                    out: "./build/mobify-capture.js",
+                    out: "./build/mobify-capture-2.0.0.js",
                 }
             },
             // Building full Mobify.js library
@@ -62,23 +55,44 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "mobify-full",
-                    out: "./build/mobify.js",
+                    out: "./build/mobify-2.0.0.js",
                 }
             },
-            // Building full Mobify.js library
             fullOptimized: {
                 options: {
                     almond: true,
                     mainConfigFile: "./src/config.js",
                     keepBuildDir: true,
                     name: "mobify-full",
-                    out: "./build/mobify.min.js",
+                    out: "./build/mobify-2.0.0.min.js",
+                }
+            },
+            // Building custom Mobify.js library
+            custom: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: true,
+                    name: "../mobify-custom.js",
+                    out: "./build/custom/mobify.js",
+                }
+            },
+            customOptimized: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    keepBuildDir: true,
+                    name: "../mobify-custom.js",
+                    out: "./build/custom/mobify.min.js",
                 }
             }
         },
         watch: {
-          files: 'src/**/*.js',
-          tasks: ['requirejs'],
+            files: ["src/**/*.js", 
+                  "mobify-custom.js"
+            ],
+            tasks: ['requirejs'],
         },
         'saucelabs-qunit': {
             all: {
@@ -179,15 +193,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-saucelabs');
 
     // Default task.
-    // grunt.registerTask('default', 'lint qunit requirejs');
-    //grunt.registerTask('skiptests', 'concat');
-    grunt.registerTask('default', ['requirejs:resizeImages',
-                                   'requirejs:capture',
-                                   'requirejs:enhance',
+    grunt.registerTask('default', ['requirejs:capture',
                                    'requirejs:full',
                                    'requirejs:fullOptimized']);
-    grunt.registerTask('capture', 'requirejs:capture');
-    grunt.registerTask('full', 'requirejs:full');
+    grunt.registerTask('build', 'default');
     grunt.registerTask('test', ['connect', 'qunit']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('preview', ['connect', 'watch']);
