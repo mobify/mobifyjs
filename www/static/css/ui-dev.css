@@ -1256,3 +1256,7 @@ table td code {
 
 
 }
+
+pre#mobify-tag code{
+    word-wrap: break-word;    
+}
