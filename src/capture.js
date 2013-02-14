@@ -269,31 +269,23 @@ Capture.prototype.getDoctype = function() {
     return captured;
 };
 
-/**
- * Setup restorer
- */
-Capture.prototype.restore = function() {
-    if (/complete|loaded/.test(document.readyState)) {
-        this.restorer.call(this);
-    } else {
-        document.addEventListener('DOMContentLoaded', this.restorer, false);
-    }
-};
-
 /** 
  * Gather escaped content from the DOM, unescaped it, and then use 
  * `document.write` to revert to the original page.
  */
-Capture.prototype.restorer = function() {
-    document.removeEventListener('DOMContentLoaded', this.restorer, false);
+Capture.prototype.restore = function() {
+    if (/complete|loaded/.test(document.readyState)) {
+        document.removeEventListener('DOMContentLoaded', this.restorer, false);
 
-    // Wait up for IE, which may not be ready to.
-    var self = this;
-    setTimeout(function() {
-        document.open();
-        document.write(self.all());
-        document.close();
-    }, 15);
+        var self = this;
+        setTimeout(function() {
+            document.open();
+            document.write(self.all());
+            document.close();
+        }, 15);
+    } else {
+        document.addEventListener('DOMContentLoaded', this.restorer, false);
+    }
 };
 
 /**
@@ -364,7 +356,7 @@ Capture.prototype.render = function(htmlString) {
     capturing = false;
 
     // Asynchronously render the new document
-    window.setTimeout(function(){
+    setTimeout(function(){
         doc.open();
         doc.write(htmlString);
         doc.close();
