@@ -104,8 +104,8 @@ function cloneAttributes(sourceString, dest) {
 // ##
 // # Constructor
 // ##
-var Capture = function(_doc, prefix) {
-    this.doc = _doc || document;
+var Capture = function(doc, prefix) {
+    this.doc = doc || document;
     this.prefix = prefix || "x-";
 
     var capturedStringFragments = this.createDocumentFragmentsStrings();
