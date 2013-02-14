@@ -363,6 +363,7 @@ Capture.prototype.render = function(htmlString) {
     // Set capturing state to false so that the user main code knows how to execute
     capturing = false;
 
+    // Asynchronously render the new document
     window.setTimeout(function(){
         doc.open();
         doc.write(htmlString);
@@ -379,18 +380,18 @@ Capture.prototype.renderCapturedDoc = function(options) {
     // After document.open(), all objects will be removed. 
     // To provide our library functionality afterwards, we
     // must re-inject the script.
-    var library = document.getElementById("mobify-js-library");
+    var mobifyjsScript = document.getElementById("mobify-js-library");
     // Since you can't move nodes from one document to another,
     // we must clone it first using importNode:
     // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
-    var libraryClone = doc.importNode(library, false);
+    var mobifyjsClone = doc.importNode(mobifyjsScript, false);
     var head = this.headEl;
-    head.insertBefore(libraryClone, head.firstChild);
+    head.insertBefore(mobifyjsClone, head.firstChild);
 
     // If main exists, re-inject it as well.
     var mainScript = document.getElementById("mobify-js-main");
     if (mainScript) {
-        var mainClone = doc.importNode(main, false);
+        var mainClone = doc.importNode(mainScript, false);
         this.bodyEl.appendChild(mainClone);
     }
 
