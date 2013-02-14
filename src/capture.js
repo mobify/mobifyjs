@@ -376,14 +376,22 @@ Capture.prototype.render = function(htmlString) {
 Capture.prototype.renderCapturedDoc = function(options) {
     var doc = this.capturedDoc;
 
-    // Most (all?) non-webkit browsers remove objects after document.write,
-    // therefor we must re-inject the library into the newly rendered DOM.
-    // AKA, new Ark :)
-    if (!/webkit/i.test(navigator.userAgent)) {
-        var library = document.getElementById("mobify-js-library");
-        var libraryClone = doc.importNode(library, false);
-        var head = this.headEl;
-        head.insertBefore(libraryClone, head.firstChild);
+    // After document.open(), all objects will be removed. 
+    // To provide our library functionality afterwards, we
+    // must re-inject the script.
+    var library = document.getElementById("mobify-js-library");
+    // Since you can't move nodes from one document to another,
+    // we must clone it first using importNode:
+    // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
+    var libraryClone = doc.importNode(library, false);
+    var head = this.headEl;
+    head.insertBefore(libraryClone, head.firstChild);
+
+    // If main exists, re-inject it as well.
+    var mainScript = document.getElementById("mobify-js-main");
+    if (mainScript) {
+        var mainClone = doc.importNode(main, false);
+        this.bodyEl.appendChild(mainClone);
     }
 
     // Inject timing point (because of blowing away objects on document.write)
@@ -394,19 +402,6 @@ Capture.prototype.renderCapturedDoc = function(options) {
     date.innerHTML = window.Mobify.points[0];
     body.insertBefore(date, body.firstChild);
 
-    if (options && options.injectMain) {
-        // Grab main from the original document and stick it into source dom
-        // at the end of body
-        var mainScript = document.getElementById("mobify-js-main");
-        if (mainScript) {
-            // Since you can't move nodes from one document to another,
-            // we must clone it first using importNode:
-            // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
-            var mainClone = doc.importNode(main, false);
-            this.bodyEl.appendChild(mainClone);
-        }
-        
-    }
 
     this.render(this.escapedHTMLString());
 };
