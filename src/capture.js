@@ -232,7 +232,6 @@ Capture.prototype.getDoctype = function() {
     // <body> inside a comment, common with IE conditional comments.
     var bodySnatcher = /<!--(?:[\s\S]*?)-->|(<\/head\s*>|<body[\s\S]*$)/gi;
 
-    captured = Utils.extend({}, captured);
     //Fallback for absence of </head> and <body>
     var rawHTML = captured.bodyContent = captured.headContent + captured.bodyContent;
     captured.headContent = '';
