@@ -6,7 +6,7 @@ define(["utils"], function(Utils) {
 
 var openingScriptRe = /(<script[\s\S]*?>)/gi;
 
-// Inline styles are scripts are disabled using a unknown type.
+// Inline styles and scripts are disabled using a unknown type.
 var tagDisablers = {
     style: ' media="mobify-media"',
     script: ' type="text/mobify-script"'
@@ -320,8 +320,8 @@ Capture.prototype.createDocumentFragments = function() {
     bodyEl.innerHTML = disable(this.bodyContent, this.prefix);
     var disabledHeadContent = disable(this.headContent, this.prefix);
 
-    // On some browsers, you cannot modify <head> using innerHTML.
-    // In that case, do a manual copy of each element
+    // On FF4, and potentially other browsers, you cannot modify <head> 
+    // using innerHTML. In that case, do a manual copy of each element
     try {
         headEl.innerHTML = disabledHeadContent;
     } catch (e) {
