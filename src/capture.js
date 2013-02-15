@@ -16,7 +16,7 @@ var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 
 // Map of all attributes we should disable (to prevent resources from downloading)
 var disablingMap = { 
-    img:    ['src', 'height', 'width'],
+    img:    ['src'],
     iframe: ['src'],
     script: ['src', 'type'],
     link:   ['href'],
@@ -69,7 +69,8 @@ function outerHTML(el){
 }
 
 /**
- * Returns a string of the unescaped content from a plaintext escaped `container`.
+ * Helper method for looping through and grabbing strings of elements 
+ * in the captured DOM after plaintext insertion
  */
 function extractHTMLStringFromElement(container) {
     if (!container) return '';
