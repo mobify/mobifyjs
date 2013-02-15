@@ -56,12 +56,34 @@ Mobify.UI.Utils = (function($) {
         return;
     };
 
+    // determine which transition event to use
+    function whichTransitionEvent(){
+        // http://stackoverflow.com/questions/5023514/how-do-i-normalize-css3-transition-functions-across-browsers
+        // hack for ios 3.1.* because of poor transition support.
+        if (/iPhone\ OS\ 3_1/.test(navigator.userAgent)) {
+            return undefined;
+        }
+
+        var el = document.createElement('fakeelement');
+        var transitions = {
+            'transition':'transitionEnd transitionend',
+            'OTransition':'oTransitionEnd',
+            'MSTransition':'msTransitionEnd',
+            'MozTransition':'transitionend',
+            'WebkitTransition':'webkitTransitionEnd'
+        }
+
+        var t;
+        for(t in transitions){
+            if( el.style[t] !== undefined ){
+                return transitions[t];
+            }
+        }
+        return;
+    };
+
     $.extend(exports.events, {
-        'transitionend': [  "transitionEnd",
-                            "oTransitionEnd",
-                            "msTransitionEnd",
-                            "transitionend",
-                            "webkitTransitionEnd" ].join(" ")
+        'transitionend': whichTransitionEvent()
      });
 
 
