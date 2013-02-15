@@ -6,7 +6,7 @@ define(["utils"], function(Utils) {
 
 var openingScriptRe = /(<script[\s\S]*?>)/gi;
 
-// Inline styles are scripts are disabled using a unknown type.
+// Inline styles and scripts are disabled using a unknown type.
 var tagDisablers = {
     style: ' media="mobify-media"',
     script: ' type="text/mobify-script"'
@@ -16,7 +16,7 @@ var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 
 // Map of all attributes we should disable (to prevent resources from downloading)
 var disablingMap = { 
-    img:    ['src', 'height', 'width'],
+    img:    ['src'],
     iframe: ['src'],
     script: ['src', 'type'],
     link:   ['href'],
@@ -69,7 +69,8 @@ function outerHTML(el){
 }
 
 /**
- * Returns a string of the unescaped content from a plaintext escaped `container`.
+ * Helper method for looping through and grabbing strings of elements 
+ * in the captured DOM after plaintext insertion
  */
 function extractHTMLStringFromElement(container) {
     if (!container) return '';
@@ -86,15 +87,17 @@ function extractHTMLStringFromElement(container) {
     }).join('');
 }
 
+// cached div used repeatedly to create new elements
+var cachedDiv = document.createElement('div');
+
 /**
  * Transform a string <tag attr="value" ...></tag> into corresponding DOM element
  */
-function cloneAttributes(sourceString, dest) {
+function deserializeString(sourceString, dest) {
     var match = sourceString.match(/^<(\w+)([\s\S]*)$/i);
-    var div = document.createElement('div');
-    div.innerHTML = '<div' + match[2];
+    cachedDiv.innerHTML = '<div' + match[2];
 
-    [].forEach.call(div.firstChild.attributes, function(attr) {
+    [].forEach.call(cachedDiv.firstChild.attributes, function(attr) {
         dest.setAttribute(attr.nodeName, attr.nodeValue);
     }); 
 
@@ -104,8 +107,8 @@ function cloneAttributes(sourceString, dest) {
 // ##
 // # Constructor
 // ##
-var Capture = function(_doc, prefix) {
-    this.doc = _doc || document;
+var Capture = function(doc, prefix) {
+    this.doc = doc || document;
     this.prefix = prefix || "x-";
 
     var capturedStringFragments = this.createDocumentFragmentsStrings();
@@ -232,7 +235,6 @@ Capture.prototype.getDoctype = function() {
     // <body> inside a comment, common with IE conditional comments.
     var bodySnatcher = /<!--(?:[\s\S]*?)-->|(<\/head\s*>|<body[\s\S]*$)/gi;
 
-    captured = Utils.extend({}, captured);
     //Fallback for absence of </head> and <body>
     var rawHTML = captured.bodyContent = captured.headContent + captured.bodyContent;
     captured.headContent = '';
@@ -269,31 +271,23 @@ Capture.prototype.getDoctype = function() {
     return captured;
 };
 
-/**
- * Setup restorer
- */
-Capture.prototype.restore = function() {
-    if (/complete|loaded/.test(document.readyState)) {
-        this.restorer.call(this);
-    } else {
-        document.addEventListener('DOMContentLoaded', this.restorer, false);
-    }
-};
-
 /** 
  * Gather escaped content from the DOM, unescaped it, and then use 
  * `document.write` to revert to the original page.
  */
-Capture.prototype.restorer = function() {
-    document.removeEventListener('DOMContentLoaded', this.restorer, false);
+Capture.prototype.restore = function() {
+    if (/complete|loaded/.test(document.readyState)) {
+        document.removeEventListener('DOMContentLoaded', this.restorer, false);
 
-    // Wait up for IE, which may not be ready to.
-    var self = this;
-    setTimeout(function() {
-        document.open();
-        document.write(self.all());
-        document.close();
-    }, 15);
+        var self = this;
+        setTimeout(function() {
+            document.open();
+            document.write(self.all());
+            document.close();
+        }, 15);
+    } else {
+        document.addEventListener('DOMContentLoaded', this.restorer, false);
+    }
 };
 
 /**
@@ -303,8 +297,7 @@ Capture.prototype.setElementContentFromString = function(el, htmlString) {
     // We must pass in document because elements created for dom insertion must be
     // inserted into the same dom they are created by.
     var doc = this.doc;
-    var div = doc.createElement('div'); // TODO: Memoize
-    for (div.innerHTML = htmlString; div.firstChild; el.appendChild(div.firstChild));
+    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
 };
 
 /**
@@ -319,16 +312,16 @@ Capture.prototype.createDocumentFragments = function() {
     var bodyEl = docFrags.bodyEl = htmlEl.lastChild;
 
     // Reconstruct html, body, and head with the same attributes as the original document
-    cloneAttributes(this.htmlOpenTag, htmlEl);
-    cloneAttributes(this.headOpenTag, headEl);
-    cloneAttributes(this.bodyOpenTag, bodyEl);
+    deserializeString(this.htmlOpenTag, htmlEl);
+    deserializeString(this.headOpenTag, headEl);
+    deserializeString(this.bodyOpenTag, bodyEl);
 
     // Set innerHTML of new source DOM body
     bodyEl.innerHTML = disable(this.bodyContent, this.prefix);
     var disabledHeadContent = disable(this.headContent, this.prefix);
 
-    // On some browsers, you cannot modify <head> using innerHTML.
-    // In that case, do a manual copy of each element
+    // On FF4, and potentially other browsers, you cannot modify <head> 
+    // using innerHTML. In that case, do a manual copy of each element
     try {
         headEl.innerHTML = disabledHeadContent;
     } catch (e) {
@@ -363,7 +356,8 @@ Capture.prototype.render = function(htmlString) {
     // Set capturing state to false so that the user main code knows how to execute
     capturing = false;
 
-    window.setTimeout(function(){
+    // Asynchronously render the new document
+    setTimeout(function(){
         doc.open();
         doc.write(htmlString);
         doc.close();
@@ -376,14 +370,22 @@ Capture.prototype.render = function(htmlString) {
 Capture.prototype.renderCapturedDoc = function(options) {
     var doc = this.capturedDoc;
 
-    // Most (all?) non-webkit browsers remove objects after document.write,
-    // therefor we must re-inject the library into the newly rendered DOM.
-    // AKA, new Ark :)
-    if (!/webkit/i.test(navigator.userAgent)) {
-        var library = document.getElementById("mobify-js-library");
-        var libraryClone = doc.importNode(library, false);
-        var head = this.headEl;
-        head.insertBefore(libraryClone, head.firstChild);
+    // After document.open(), all objects will be removed. 
+    // To provide our library functionality afterwards, we
+    // must re-inject the script.
+    var mobifyjsScript = document.getElementById("mobify-js-library");
+    // Since you can't move nodes from one document to another,
+    // we must clone it first using importNode:
+    // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
+    var mobifyjsClone = doc.importNode(mobifyjsScript, false);
+    var head = this.headEl;
+    head.insertBefore(mobifyjsClone, head.firstChild);
+
+    // If main exists, re-inject it as well.
+    var mainScript = document.getElementById("mobify-js-main");
+    if (mainScript) {
+        var mainClone = doc.importNode(mainScript, false);
+        this.bodyEl.appendChild(mainClone);
     }
 
     // Inject timing point (because of blowing away objects on document.write)
@@ -394,19 +396,6 @@ Capture.prototype.renderCapturedDoc = function(options) {
     date.innerHTML = window.Mobify.points[0];
     body.insertBefore(date, body.firstChild);
 
-    if (options && options.injectMain) {
-        // Grab main from the original document and stick it into source dom
-        // at the end of body
-        var mainScript = document.getElementById("mobify-js-main");
-        if (mainScript) {
-            // Since you can't move nodes from one document to another,
-            // we must clone it first using importNode:
-            // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
-            var mainClone = doc.importNode(main, false);
-            this.bodyEl.appendChild(mainClone);
-        }
-        
-    }
 
     this.render(this.escapedHTMLString());
 };
