@@ -86,15 +86,17 @@ function extractHTMLStringFromElement(container) {
     }).join('');
 }
 
+// cached div used repeatedly to create new elements
+var cachedDiv = document.createElement('div');
+
 /**
  * Transform a string <tag attr="value" ...></tag> into corresponding DOM element
  */
-function cloneAttributes(sourceString, dest) {
+function deserializeString(sourceString, dest) {
     var match = sourceString.match(/^<(\w+)([\s\S]*)$/i);
-    var div = document.createElement('div');
-    div.innerHTML = '<div' + match[2];
+    cachedDiv.innerHTML = '<div' + match[2];
 
-    [].forEach.call(div.firstChild.attributes, function(attr) {
+    [].forEach.call(cachedDiv.firstChild.attributes, function(attr) {
         dest.setAttribute(attr.nodeName, attr.nodeValue);
     }); 
 
@@ -294,8 +296,7 @@ Capture.prototype.setElementContentFromString = function(el, htmlString) {
     // We must pass in document because elements created for dom insertion must be
     // inserted into the same dom they are created by.
     var doc = this.doc;
-    var div = doc.createElement('div'); // TODO: Memoize
-    for (div.innerHTML = htmlString; div.firstChild; el.appendChild(div.firstChild));
+    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
 };
 
 /**
@@ -310,9 +311,9 @@ Capture.prototype.createDocumentFragments = function() {
     var bodyEl = docFrags.bodyEl = htmlEl.lastChild;
 
     // Reconstruct html, body, and head with the same attributes as the original document
-    cloneAttributes(this.htmlOpenTag, htmlEl);
-    cloneAttributes(this.headOpenTag, headEl);
-    cloneAttributes(this.bodyOpenTag, bodyEl);
+    deserializeString(this.htmlOpenTag, htmlEl);
+    deserializeString(this.headOpenTag, headEl);
+    deserializeString(this.bodyOpenTag, bodyEl);
 
     // Set innerHTML of new source DOM body
     bodyEl.innerHTML = disable(this.bodyContent, this.prefix);

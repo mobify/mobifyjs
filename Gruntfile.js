@@ -99,7 +99,7 @@ module.exports = function(grunt) {
                 username: '<%= localConfig.saucelabs.username %>', // if not provided it'll default to ENV SAUCE_USERNAME (if applicable)
                 key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                 urls: ['http://localhost:3000/tests/capture.html'],
-                concurrency: 1,
+                concurrency: 2,
                 tunneled: true,
                 browsers: [
                 { // Only working version of IE compatable
