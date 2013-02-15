@@ -62,10 +62,10 @@ setTimeout(function() {
         return true;
     },
     // path to mobify.js
-    '/build/mobify-2.0.0alpha1.min.js',
+    '/build/mobify-2.0.0alpha1.js',
 
     // path to main executable 
-    '/examples/headtag-capture/main.js'
+    '/examples/resizeImages/main.js'
 );
 </script>
 <!-- END MOBIFY TAG -->
@@ -81,6 +81,8 @@ body {
 <img src="https://www.mobify.com/wp-content/uploads/2012/08/Entrance-1.jpg">
 <img src="https://www.mobify.com/wp-content/uploads/2012/08/photo-6.jpg">
 <script>
+// Grab the total time since starting capturing and send it
+// to the parent for testing in performance.html
 var end = +new Date;
 var point = document.getElementById("mobify-point");
 if (document.all) {
@@ -90,17 +92,6 @@ if (document.all) {
 }
 var diff = end - begin;
 parent.postMessage(diff, "*");
-</script>
-<script>
-console.log("#1")
-</script>
-<script src="bigscript.js"></script>
-<script>
-console.log("#3")
-</script>
-<script src="smallscript.js"></script>
-<script>
-console.log("#5")
 </script>
 </body>
 </html>

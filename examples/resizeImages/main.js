@@ -10,7 +10,7 @@ if (capturing) {
     Mobify.ResizeImages.resize(capturedDoc, 320);
     
     // Render source DOM to document
-    capture.renderCapturedDoc({injectMain: true});
+    capture.renderCapturedDoc();
 
 } else {
     console.log("Executing main in post-capturing phase!");

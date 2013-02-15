@@ -39,7 +39,7 @@ to your newly created file.
         }
 
         // Render captured dom back to original document
-        capture.renderCapturedDoc({injectMain: true});
+        capture.renderCapturedDoc();
 
         // End example 1
 
@@ -61,7 +61,7 @@ to your newly created file.
             }
         }
         // Render captured dom back to original document
-        capture.renderCapturedDoc({injectMain: true});
+        capture.renderCapturedDoc();
 
         // End example 2
         */
