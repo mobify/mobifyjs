@@ -4,7 +4,7 @@
 
 <!-- START MOBIFY TAG -->
 <script class="mobify" id="mobify-tag">
-(function(window, document, detector, libraryUrl, mainUrl) {
+(function(window, document, detector, mobifyjsUrl, mainUrl) {
 
 // If Mobify has been defined already, or if the detector fails,
 // exit
@@ -32,8 +32,8 @@ document.write('<plaintext style="display:none">');
 // On next tick, load library and main executable
 setTimeout(function() {
     window.capturing = true;
-    var libraryScript = attachScriptBeforeMobifyTag(libraryUrl, "mobify-js-library", "mobify");
-    libraryScript.onload = function(){
+    var mobifyjsScript = attachScriptBeforeMobifyTag(mobifyjsUrl, "mobify-js", "mobify");
+    mobifyjsScript.onload = function(){
         if (mainUrl) {
             attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
         }
@@ -61,8 +61,8 @@ setTimeout(function() {
         }
         return true;
     },
-    // path to library
-    '/build/mobify-2.0.0.min.js',
+    // path to mobify.js
+    '/build/mobify-2.0.0alpha1.min.js',
 
     // path to main executable 
     '/examples/headtag-capture/main.js'
@@ -79,7 +79,7 @@ body {
 </head>
 <body class="foo">
 <img src="https://www.mobify.com/wp-content/uploads/2012/08/Entrance-1.jpg">
-<img src="https://comassets.mobify.com/wp-content/uploads/2012/08/photo-6.jpg">
+<img src="https://www.mobify.com/wp-content/uploads/2012/08/photo-6.jpg">
 <script>
 var end = +new Date;
 var point = document.getElementById("mobify-point");
