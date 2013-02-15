@@ -92,7 +92,7 @@ module.exports = function(grunt) {
             files: ["src/**/*.js", 
                   "mobify-custom.js"
             ],
-            tasks: ['requirejs'],
+            tasks: ['build'],
         },
         'saucelabs-qunit': {
             all: {
@@ -192,11 +192,14 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-saucelabs');
 
-    // Default task.
-    grunt.registerTask('default', ['requirejs:capture',
-                                   'requirejs:full',
-                                   'requirejs:fullOptimized']);
-    grunt.registerTask('build', 'default');
+    // Builds librarys, and custom library if mobify-custom.js is present
+    grunt.registerTask('build', function() {
+        grunt.task.run("requirejs:capture", "requirejs:full", "requirejs:fullOptimized")
+        if (grunt.file.exists("mobify-custom.js")) {
+            grunt.task.run("requirejs:custom", "requirejs:customOptimized");
+        }
+    });
+    grunt.registerTask('default', 'build');
     grunt.registerTask('test', ['connect', 'qunit']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('preview', ['connect', 'watch']);
