@@ -106,6 +106,20 @@ function deserializeString(sourceString, dest) {
 
 
 
+// ##
+// # Constructor
+// ##
+var Capture = function(doc, prefix) {
+    this.doc = doc || document;
+    this.prefix = prefix || "x-";
+
+    var capturedStringFragments = this.createDocumentFragmentsStrings();
+    Utils.extend(this, capturedStringFragments);
+
+    var capturedDOMFragments = this.createDocumentFragments();
+    Utils.extend(this, capturedDOMFragments);
+};
+
 /**
  * Returns a string with all external attributes disabled.
  * Includes special handling for resources referenced in scripts and inside
@@ -166,21 +180,6 @@ var openTag = Capture.openTag = function(element) {
     })
 
     return '<' + nodeName(element) + stringBuffer.join('') + '>';
-};
-
-
-// ##
-// # Constructor
-// ##
-var Capture = function(doc, prefix) {
-    this.doc = doc || document;
-    this.prefix = prefix || "x-";
-
-    var capturedStringFragments = this.createDocumentFragmentsStrings();
-    Utils.extend(this, capturedStringFragments);
-
-    var capturedDOMFragments = this.createDocumentFragments();
-    Utils.extend(this, capturedDOMFragments);
 };
 
 /**
