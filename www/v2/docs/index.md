@@ -9,7 +9,7 @@ Mobify.js is a JavaScript library for adapting websites across every device.
 
 1. Install the Mobify.js tag in your site:
 
-    <pre id="mobify-tag"><code>&lt;script class="mobify" id="mobify-tag">(function(a,b,c,d,e){function f(a,c,d){var e=b.createElement("script"),f=b.getElementById("mobify-tag");return e.src=a,e.id=c,e.setAttribute("class",d),f.parentNode.insertBefore(e,f),e}!this.Mobify&&c()&&(a.Mobify={points:[+new Date]},b.write('&lt;plaintext style="display:none">'),setTimeout(function(){a.capturing=!0;var b=f(d,"mobify-js-library","mobify");b.onload=function(){e&&f(e,"mobify-js-main","mobify")}}))})(window,document,function(){var b,a=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return a&&(b=a[1]&&"firefox"===a[1].toLowerCase()&&4>+a[2]?!1:a[3]&&"opera"===a[3].toLowerCase()&&11>+a[4]?!1:!0),b?!0:!1},"//cdn.mobify.com/mobifyjs/mobify-2.0.0.min.js","/PATH/TO/SCRIPT.js");&lt;/script></code></pre>
+    <pre id="mobify-tag"><code class="javascript">&lt;script class="mobify" id="mobify-tag">(function(a,b,c,d,e){function f(a,c,d){var e=b.createElement("script"),f=b.getElementById("mobify-tag");return e.src=a,e.id=c,e.setAttribute("class",d),f.parentNode.insertBefore(e,f),e}!this.Mobify&&c()&&(a.Mobify={points:[+new Date]},b.write('&lt;plaintext style="display:none">'),setTimeout(function(){a.capturing=!0;var b=f(d,"mobify-js-library","mobify");b.onload=function(){e&&f(e,"mobify-js-main","mobify")}}))})(window,document,function(){var b,a=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return a&&(b=a[1]&&"firefox"===a[1].toLowerCase()&&4>+a[2]?!1:a[3]&&"opera"===a[3].toLowerCase()&&11>+a[4]?!1:!0),b?!0:!1},"//cdn.mobify.com/mobifyjs/mobify-2.0.0.min.js","/PATH/TO/SCRIPT.js");&lt;/script></code></pre>
 
 (to see the source code for this tag, [check it out on Github](https://github.com/mobify/mobifyjs/blob/v2.0-capture-refactor/tag/bootstrap.html)!)
 
@@ -18,7 +18,7 @@ to your newly created file.
 
 3. Copy the following code into your new js file. It is a script which contains a number of examples on how you can use the API:
 
-    <pre><code>
+    <pre><code class="javascript">
     var capturing = window.capturing || false;
     if (capturing) {
         console.log("Executing during capturing phase!")

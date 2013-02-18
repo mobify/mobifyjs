@@ -104,19 +104,6 @@ function deserializeString(sourceString, dest) {
     return dest;
 };
 
-// ##
-// # Constructor
-// ##
-var Capture = function(doc, prefix) {
-    this.doc = doc || document;
-    this.prefix = prefix || "x-";
-
-    var capturedStringFragments = this.createDocumentFragmentsStrings();
-    Utils.extend(this, capturedStringFragments);
-
-    var capturedDOMFragments = this.createDocumentFragments();
-    Utils.extend(this, capturedDOMFragments);
-};
 
 
 /**
@@ -156,7 +143,6 @@ var disable = Capture.disable = function(htmlStr, prefix) {
     return [].concat.apply([], ret).join('');
 };
 
-
 /**
  * Returns a string with all disabled external attributes enabled.
  * Not declared on the prototype so it can be used as a static method.
@@ -180,6 +166,21 @@ var openTag = Capture.openTag = function(element) {
     })
 
     return '<' + nodeName(element) + stringBuffer.join('') + '>';
+};
+
+
+// ##
+// # Constructor
+// ##
+var Capture = function(doc, prefix) {
+    this.doc = doc || document;
+    this.prefix = prefix || "x-";
+
+    var capturedStringFragments = this.createDocumentFragmentsStrings();
+    Utils.extend(this, capturedStringFragments);
+
+    var capturedDOMFragments = this.createDocumentFragments();
+    Utils.extend(this, capturedDOMFragments);
 };
 
 /**
