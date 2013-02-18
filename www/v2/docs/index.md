@@ -21,7 +21,7 @@ to your newly created file.
     <pre><code class="javascript">
     var capturing = window.capturing || false;
     if (capturing) {
-        console.log("Executing during capturing phase!")
+        console.log("Executing during capturing phase!");
 
         // Grab reference to the captured document
         var capture = new Mobify.Capture();

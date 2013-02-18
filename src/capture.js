@@ -365,7 +365,14 @@ Capture.prototype.render = function(htmlString) {
 };
 
 /**
- * Grab the source document and render it
+ * Get the captured document
+ */
+Capture.prototype.getCapturedDoc = function(options) {
+    return this.capturedDoc;
+};
+
+/**
+ * Render the captured document
  */
 Capture.prototype.renderCapturedDoc = function(options) {
     var doc = this.capturedDoc;
