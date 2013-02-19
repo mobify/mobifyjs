@@ -9,7 +9,7 @@ Mobify.UI = Mobify.UI || {};
         'touch': 'ontouchend' in document
     });
 
-})($, document);
+})(Mobify.$, document);
 
 
 
