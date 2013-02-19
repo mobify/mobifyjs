@@ -67,6 +67,26 @@ module.exports = function(grunt) {
                     out: "./build/mobify-<%= pkg.version %>.min.js",
                 }
             },
+            // Building experimental swift features
+            full: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: true,
+                    name: "mobify-swift",
+                    out: "./build/mobify-swift-<%= pkg.version %>.js",
+                }
+            },
+            fullOptimized: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    keepBuildDir: true,
+                    name: "mobify-swift",
+                    out: "./build/mobify-swift-<%= pkg.version %>.min.js",
+                }
+            },
             // Building custom Mobify.js library
             custom: {
                 options: {
