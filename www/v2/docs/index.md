@@ -23,7 +23,7 @@ the opening <head> tag. ([Non-minified version on Github](https://github.com/mob
 set the path to this script by replacing /PATH/TO/ with the
 path to your new script.
 
-3. Copy the following code into your new js file. It is a script which contains a number of examples on how you can use the API:
+3. Copy the following code into your new js file. It is an example which will replace all images with grumpy cats on your site (and will NOT load the original image!):
 
     <pre><code class="javascript">
     var capturing = window.capturing || false;
@@ -54,6 +54,9 @@ path to your new script.
     </code></pre>
 
 4. Browse to your site on a compatible browser - WebKit (Chrome, Safari, etc), FF4 or greater, Opera 11/12, IE10. Also, browse to a page with images to see the full effect of the grumpy cat!
+
+- Note: You may also want to open up web inspector on your browser to see that
+the original images from your site were not downloaded.
 
 
 ## Where to next?
