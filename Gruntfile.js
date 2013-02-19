@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 
     // Project configuration.
     grunt.initConfig({
-        pkg: '<json:package.json>',
+        pkg: grunt.file.readJSON('package.json'),
         localConfig: (function(){ 
                         try { 
                             return grunt.file.readJSON('localConfig.json') 
@@ -44,7 +44,7 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "mobify-capture",
-                    out: "./build/mobify-capture-2.0.0.js",
+                    out: "./build/capture-<%= pkg.version %>.js",
                 }
             },
             // Building full Mobify.js library
@@ -55,7 +55,7 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "mobify-full",
-                    out: "./build/mobify-2.0.0.js",
+                    out: "./build/mobify-<%= pkg.version %>.js",
                 }
             },
             fullOptimized: {
@@ -64,7 +64,7 @@ module.exports = function(grunt) {
                     mainConfigFile: "./src/config.js",
                     keepBuildDir: true,
                     name: "mobify-full",
-                    out: "./build/mobify-2.0.0.min.js",
+                    out: "./build/mobify-<%= pkg.version %>.min.js",
                 }
             },
             // Building custom Mobify.js library
@@ -92,14 +92,14 @@ module.exports = function(grunt) {
             files: ["src/**/*.js", 
                   "mobify-custom.js"
             ],
-            tasks: ['requirejs'],
+            tasks: ['build'],
         },
         'saucelabs-qunit': {
             all: {
                 username: '<%= localConfig.saucelabs.username %>', // if not provided it'll default to ENV SAUCE_USERNAME (if applicable)
                 key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                 urls: ['http://localhost:3000/tests/capture.html'],
-                concurrency: 1,
+                concurrency: 2,
                 tunneled: true,
                 browsers: [
                 { // Only working version of IE compatable
@@ -192,11 +192,14 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-saucelabs');
 
-    // Default task.
-    grunt.registerTask('default', ['requirejs:capture',
-                                   'requirejs:full',
-                                   'requirejs:fullOptimized']);
-    grunt.registerTask('build', 'default');
+    // Builds librarys, and custom library if mobify-custom.js is present
+    grunt.registerTask('build', function() {
+        grunt.task.run("requirejs:capture", "requirejs:full", "requirejs:fullOptimized")
+        if (grunt.file.exists("mobify-custom.js")) {
+            grunt.task.run("requirejs:custom", "requirejs:customOptimized");
+        }
+    });
+    grunt.registerTask('default', 'build');
     grunt.registerTask('test', ['connect', 'qunit']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('preview', ['connect', 'watch']);
