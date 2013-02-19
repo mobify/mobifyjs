@@ -1,6 +1,8 @@
 define(function() {
+	// console.log('is this run?');
 	return function(capture) {
 		// TODO: write some TESTS.
+		if (!capture) throw "DNS prefetch requires the captured document.";
 
 		var frag = document.createDocumentFragment();
 

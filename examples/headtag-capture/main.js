@@ -1,6 +1,6 @@
 var capturing = window.capturing || false;
 if (capturing) {
-    console.log("Executing main during capturing phase!")
+    console.log("Executing main during capturing phase!!! ?")
 
     // Grab reference to a newly created document
     var capture = new Mobify.Capture();
@@ -9,6 +9,10 @@ if (capturing) {
     // Resize images using Mobify Image Resizer
     Mobify.ResizeImages.resize(capturedDoc, 320);
     
+    Mobify.dnsPrefetch();
+    Mobify.keepWarm();
+    // Mobify.speedClick();
+
     // Render source DOM to document
     capture.renderCapturedDoc({injectMain: true});
 
