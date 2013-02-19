@@ -31,7 +31,7 @@ path to your new script.
         console.log("Executing during capturing phase!");
 
         // Grab reference to the captured document
-        var capture = new Mobify.Capture();
+        var capture = Mobify.Capture.init();
         var capturedDoc = capture.capturedDoc;
 
         var grumpyUrl = "http://pics.blameitonthevoices.com/092012/small_grumpy%20cat%20caption.jpg";

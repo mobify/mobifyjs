@@ -120,6 +120,10 @@ var Capture = function(doc, prefix) {
     Utils.extend(this, capturedDOMFragments);
 };
 
+var init = Capture.init = function(doc, prefix) {
+    return new Capture(doc, prefix);
+};
+
 /**
  * Returns a string with all external attributes disabled.
  * Includes special handling for resources referenced in scripts and inside

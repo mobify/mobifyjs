@@ -2,7 +2,7 @@
   
   - [Quick start]({{ site.baseurl }}/v2/docs/)
   - [Capturing]({{ site.baseurl }}/v2/docs/capturing)
-    - [`new Mobify.Capture()`]({{ site.baseurl }}/v2/docs/capturing/#new-mobifycapturedocument-prefixx-)
+    - [`Capture.init()`]({{ site.baseurl }}/v2/docs/capturing/#captureinitdocument-prefixx-)
     - [`getCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#getcaptureddoc)
     - [`window.capturing`]({{ site.baseurl }}/v2/docs/capturing/#windowcapturing)
     - [`escapedHTMLString()`]({{ site.baseurl }}/v2/docs/capturing/#escapedhtmlstring)

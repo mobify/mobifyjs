@@ -3,7 +3,7 @@ if (capturing) {
     console.log("Executing main during capturing phase!")
 
     // Grab reference to a newly created document
-    var capture = new Mobify.Capture();
+    var capture = Mobify.Capture.init();
     var capturedDoc = capture.capturedDoc;
 
     // Resize images using Mobify Image Resizer
