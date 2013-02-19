@@ -6,6 +6,7 @@
 <script class="mobify" id="mobify-tag">
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
+
 // If Mobify has been defined already, or if the detector fails,
 // exit
 if (this.Mobify || !detector()) {
@@ -14,6 +15,8 @@ if (this.Mobify || !detector()) {
 
 // Start Mobify object with initial timestamp when loaded
 window.Mobify = {points: [+new Date]};
+
+//return;
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     var attachedScript = document.createElement('script');
@@ -84,14 +87,15 @@ body {
 // Grab the total time since starting capturing and send it
 // to the parent for testing in performance.html
 var end = +new Date;
-var point = document.getElementById("mobify-point");
-if (document.all) {
-    var begin = point.innerText;
+var begin;
+if (window.Mobify.points) {
+    begin = window.Mobify.points[0];
 } else {
-    var begin = point.textContent;
+    begin = document.getElementById("mobify-point").innerText;
 }
 var diff = end - begin;
 parent.postMessage(diff, "*");
+
 </script>
 </body>
 </html>

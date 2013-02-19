@@ -5,7 +5,6 @@
 <!-- START MOBIFY TAG -->
 <script class="mobify" id="mobify-tag">
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
-
 // If Mobify has been defined already, or if the detector fails,
 // exit
 if (this.Mobify || !detector()) {
@@ -14,6 +13,7 @@ if (this.Mobify || !detector()) {
 
 // Start Mobify object with initial timestamp when loaded
 window.Mobify = {points: [+new Date]};
+
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     var attachedScript = document.createElement('script');
@@ -69,26 +69,42 @@ setTimeout(function() {
 );
 </script>
 <!-- END MOBIFY TAG -->
-
-<style>
-body {
-    background-color: teal;
-}
-</style>
+<link rel="stylesheet" href="/examples/assets/css/stylesheet.css" type="text/css">
 <title>Mobify.js image gallary example</title>
 </head>
 <body class="foo">
-<img src="https://www.mobify.com/wp-content/uploads/2012/08/Entrance-1.jpg">
-<img src="https://www.mobify.com/wp-content/uploads/2012/08/photo-6.jpg">
+<div class="header"></div>
+<div class="example">
+    <p>The original img srcs were swapped out for a couple of grumpy cats.
+    Open your web inspector and note the original imgs did not load.
+    Also note, they were plain old img elements (no data&ndash;src tricks).
+    <a href="#" id="swap">Click here to download and view the original images.</a></p>
+    <div class="img">
+        <img src="/examples/assets/images/leaves-big.jpg" width="100%">
+    </div>
+    <div class="img">
+        <img src="/examples/assets/images/office-big.jpg" width="100%">
+    </div>
+
+</div>
+<script>
+var swapEl = document.getElementById("swap");
+var images = document.getElementsByTagName("img");
+swapEl.onclick = function() {
+    for (var i=0; i<images.length; i++) {
+        images[i].setAttribute("src", images[i].getAttribute("old-src"));
+    }
+}
+</script>
 <script>
 // Grab the total time since starting capturing and send it
 // to the parent for testing in performance.html
 var end = +new Date;
-var point = document.getElementById("mobify-point");
-if (document.all) {
-    var begin = point.innerText;
+var begin;
+if (window.Mobify.points) {
+    begin = window.Mobify.points[0];
 } else {
-    var begin = point.textContent;
+    begin = document.getElementById("mobify-point").innerText;
 }
 var diff = end - begin;
 parent.postMessage(diff, "*");
