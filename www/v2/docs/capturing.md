@@ -29,6 +29,16 @@ properties prepended with a prefix to prevent resources from loading.
 - element: **link**, attributes: **href**
 - element: **style**, attributes: **media**
 
+**Example**
+
+    // change src of first script
+    var capture = Mobify.Capture.init();
+    var script = capturedDoc.getElementsByTagName("script")[0];
+    // Must use x-src, not src
+    script.setAttribute("x-src", "/path/to/script.js");
+    }
+    capture.renderCapturedDoc();
+
 ### Useful properties
 
 - `capture.doc` - Original document being captured
@@ -41,10 +51,6 @@ properties prepended with a prefix to prevent resources from loading.
 - `capture.headEl` - Reference to head element of captured doc
 - `capture.bodyEl` - Reference to body element of captured doc
 - `capture.capturedDoc` - Captured document object
-
-**Usage/Example:**
-
-    var capture = Mobify.Capture.init();
 
 ## `getCapturedDoc()`
 

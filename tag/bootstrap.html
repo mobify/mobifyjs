@@ -7,8 +7,9 @@ if (this.Mobify || !detector()) {
     return;
 }
 
-// Start Mobify object with initial timestamp when loaded
-window.Mobify = {points: [+new Date]};
+// Start Mobify object with initial timestamp when loaded.
+// Uncomment when needed for performance testing.
+// window.Mobify = {points: [+new Date]};
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     var attachedScript = document.createElement('script');

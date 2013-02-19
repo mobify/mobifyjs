@@ -400,12 +400,15 @@ Capture.prototype.renderCapturedDoc = function(options) {
     }
 
     // Inject timing point (because of blowing away objects on document.write)
-    var body = this.bodyEl;
-    var date = doc.createElement("div");
-    date.id = "mobify-point";
-    date.setAttribute("style", "display: none;")
-    date.innerHTML = window.Mobify.points[0];
-    body.insertBefore(date, body.firstChild);
+    // if it exists
+    if (window.Mobify.points) {
+        var body = this.bodyEl;
+        var date = doc.createElement("div");
+        date.id = "mobify-point";
+        date.setAttribute("style", "display: none;")
+        date.innerHTML = window.Mobify.points[0];
+        body.insertBefore(date, body.firstChild);
+    }
 
 
     this.render(this.escapedHTMLString());
