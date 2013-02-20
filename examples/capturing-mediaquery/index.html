@@ -1,3 +1,8 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+
+<!-- START MOBIFY TAG -->
 <script class="mobify" id="mobify-tag">
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
@@ -7,9 +12,8 @@ if (this.Mobify || !detector()) {
     return;
 }
 
-// Start Mobify object with initial timestamp when loaded.
-// Uncomment when needed for performance testing.
-// window.Mobify = {points: [+new Date]};
+// Start Mobify object with initial timestamp when loaded
+window.Mobify = {points: [+new Date]};
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     var attachedScript = document.createElement('script');
@@ -58,9 +62,44 @@ setTimeout(function() {
         return true;
     },
     // path to mobify.js
-    '//cdn.mobify.com/mobifyjs/mobify-2.0.0alpha1.min.js',
+    '/build/mobify-2.0.0alpha1.min.js',
 
     // path to main executable 
-    '/PATH/TO/main.js'
+    '/examples/capturing-mediaquery/main.js'
 );
 </script>
+<!-- END MOBIFY TAG -->
+
+<style>
+body {
+    background-color: teal;
+}
+</style>
+<title>Mobify.js image gallary example</title>
+</head>
+<body class="foo">
+<div media="(min-width : 320px) and (max-width : 480px)">
+    <h1>Small images downloaded</h1>
+    <img src="/examples/assets/leaves-small.jpg" width="100%">
+    <img src="/examples/assets/office-small.jpg" width="100%">
+</div>
+<div media="(min-width : 481px)">
+    <h1>Big images downloaded</h1>
+    <img src="/examples/assets/leaves-big.jpg" width="100%">
+    <img src="/examples/assets/office-big.jpg" width="100%">
+</div>
+<script>
+// Grab the total time since starting capturing and send it
+// to the parent for testing in performance.html
+var end = +new Date;
+var point = document.getElementById("mobify-point");
+if (document.all) {
+    var begin = point.innerText;
+} else {
+    var begin = point.textContent;
+}
+var diff = end - begin;
+parent.postMessage(diff, "*");
+</script>
+</body>
+</html>

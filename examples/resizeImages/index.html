@@ -1,5 +1,11 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+
+<!-- START MOBIFY TAG -->
 <script class="mobify" id="mobify-tag">
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
+
 
 // If Mobify has been defined already, or if the detector fails,
 // exit
@@ -7,9 +13,10 @@ if (this.Mobify || !detector()) {
     return;
 }
 
-// Start Mobify object with initial timestamp when loaded.
-// Uncomment when needed for performance testing.
-// window.Mobify = {points: [+new Date]};
+// Start Mobify object with initial timestamp when loaded
+window.Mobify = {points: [+new Date]};
+
+//return;
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     var attachedScript = document.createElement('script');
@@ -58,9 +65,37 @@ setTimeout(function() {
         return true;
     },
     // path to mobify.js
-    '//cdn.mobify.com/mobifyjs/mobify-2.0.0alpha1.min.js',
+    '/build/mobify-2.0.0alpha1.js',
 
     // path to main executable 
-    '/PATH/TO/main.js'
+    '/examples/resizeImages/main.js'
 );
 </script>
+<!-- END MOBIFY TAG -->
+
+<style>
+body {
+    background-color: teal;
+}
+</style>
+<title>Mobify.js image gallary example</title>
+</head>
+<body class="foo">
+<img src="https://www.mobify.com/wp-content/uploads/2012/08/Entrance-1.jpg">
+<img src="https://www.mobify.com/wp-content/uploads/2012/08/photo-6.jpg">
+<script>
+// Grab the total time since starting capturing and send it
+// to the parent for testing in performance.html
+var end = +new Date;
+var begin;
+if (window.Mobify.points) {
+    begin = window.Mobify.points[0];
+} else {
+    begin = document.getElementById("mobify-point").innerText;
+}
+var diff = end - begin;
+parent.postMessage(diff, "*");
+
+</script>
+</body>
+</html>
