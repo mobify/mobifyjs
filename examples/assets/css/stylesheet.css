@@ -1,0 +1,10 @@
+body {
+    font-family: 'Helvetica Neue', sans-serif;
+    background: rgb(4, 111, 126);
+}
+
+.example .img {
+    width: 35%;
+    display: inline-block;
+    box-sizing: border-box;
+}
