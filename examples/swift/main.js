@@ -2,8 +2,8 @@ var capturing = window.capturing || false;
 if (capturing) {
     console.log("test")
 
-    var scripts = document.querySelectorAll('script.jazzcatTest');
-    var jcResult = Mobify.combineScripts(scripts);
+    // var scripts = document.querySelectorAll('script.jazzcatTest');
+    // var jcResult = Mobify.combineScripts(scripts);
 
     // Remove the bootstrap and tag scripts
     //var scripts = document.getElementsByTagName("script");
@@ -14,19 +14,23 @@ if (capturing) {
     //var tag = scripts[1];
     //tag.parentNode.removeChild(tag);
 
-    Mobify.dnsPrefetch = dnsPrefetch;
-    Mobify.keepWarm = keepWarm;
-    Mobify.speedClick = speedClick;
+    // Mobify.dnsPrefetch = dnsPrefetch;
+    // Mobify.keepWarm = keepWarm;
+    // Mobify.speedClick = speedClick;
+
 
     // Grab reference to a newly created document
-    var capture = new Capture();
+
+    debugger;
+
+    var capture = new Mobify.Capture();
     var capturedDoc = capture.capturedDoc;
 
     Mobify.dnsPrefetch(capturedDoc);
     Mobify.keepWarm();
 
     // Resize images using Mobify Image Resizer
-    ResizeImages.resize(capturedDoc, 320);
+    Mobify.ResizeImages.resize(capturedDoc, 320);
     // Render source DOM to document
     capture.renderCapturedDoc();
 }

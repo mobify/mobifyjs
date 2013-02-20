@@ -39,7 +39,6 @@ setTimeout(function() {
 
 })( window, document,
     // detector function
-    var detector = function (){
         var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
         var isCompatible;
         if (match) {
@@ -55,7 +54,7 @@ setTimeout(function() {
             return false;
         }
         return true;
-    };
+    },
     // path to library
     'http://localhost:3000/build/mobify-custom.js',
 
