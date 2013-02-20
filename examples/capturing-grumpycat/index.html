@@ -90,10 +90,11 @@ setTimeout(function() {
 <script>
 var swapEl = document.getElementById("swap");
 var images = document.getElementsByTagName("img");
-swapEl.onclick = function() {
+swapEl.onclick = function(event) {
     for (var i=0; i<images.length; i++) {
         images[i].setAttribute("src", images[i].getAttribute("old-src"));
     }
+    event.preventDefault();
 }
 </script>
 <script>
