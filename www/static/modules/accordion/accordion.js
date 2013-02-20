@@ -66,7 +66,7 @@ Mobify.UI.Utils = (function($) {
 
         var el = document.createElement('fakeelement');
         var transitions = {
-            'transition':'transitionEnd',
+            'transition':'transitionEnd transitionend',
             'OTransition':'oTransitionEnd',
             'MSTransition':'msTransitionEnd',
             'MozTransition':'transitionend',
