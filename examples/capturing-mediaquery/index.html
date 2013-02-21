@@ -92,11 +92,12 @@ body {
 // Grab the total time since starting capturing and send it
 // to the parent for testing in performance.html
 var end = +new Date;
-var point = document.getElementById("mobify-point");
-if (document.all) {
-    var begin = point.innerText;
+var begin;
+if (window.Mobify.points) {
+    begin = window.Mobify.points[0];
 } else {
-    var begin = point.textContent;
+    var pointEl = document.getElementById("mobify-point");
+    begin = pointEl.innerText || pointEl.textContent;
 }
 var diff = end - begin;
 parent.postMessage(diff, "*");
