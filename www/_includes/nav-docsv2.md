@@ -9,6 +9,7 @@
     - [`render(htmlString)`]({{ site.baseurl }}/v2/docs/capturing/#renderhtmlstring)
     - [`renderCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#rendercaptureddoc)
     - [`restore()`]({{ site.baseurl }}/v2/docs/capturing/#restore)
+    - [`Browser Support`]({{ site.baseurl }}/v2/docs/capturing/#browser-support)
 
   - Image Resizing (Coming Soon)
   - Jazzcat (Coming Soon)
