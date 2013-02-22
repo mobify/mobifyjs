@@ -144,7 +144,7 @@
                 // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
                 var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
 
-                var capture = new Capture(doc);
+                var capture = Capture.init(doc);
                 var capturedDoc = capture.capturedDoc;
 
                 var expectedHtml = "<!DOCTYPE HTML><html class=\"testclass\"><head>\
@@ -180,7 +180,7 @@
             iframe.load(function(){
                 var doc = this.contentDocument;
 
-                var capture = new Capture(doc);
+                var capture = Capture.init(doc);
                 var capturedDoc = capture.capturedDoc;
 
                 var html = "<html><head></head>\

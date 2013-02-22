@@ -104,6 +104,8 @@ function deserializeString(sourceString, dest) {
     return dest;
 };
 
+
+
 // ##
 // # Constructor
 // ##
@@ -118,6 +120,9 @@ var Capture = function(doc, prefix) {
     Utils.extend(this, capturedDOMFragments);
 };
 
+var init = Capture.init = function(doc, prefix) {
+    return new Capture(doc, prefix);
+};
 
 /**
  * Returns a string with all external attributes disabled.
@@ -155,7 +160,6 @@ var disable = Capture.disable = function(htmlStr, prefix) {
 
     return [].concat.apply([], ret).join('');
 };
-
 
 /**
  * Returns a string with all disabled external attributes enabled.
@@ -365,7 +369,14 @@ Capture.prototype.render = function(htmlString) {
 };
 
 /**
- * Grab the source document and render it
+ * Get the captured document
+ */
+Capture.prototype.getCapturedDoc = function(options) {
+    return this.capturedDoc;
+};
+
+/**
+ * Render the captured document
  */
 Capture.prototype.renderCapturedDoc = function(options) {
     var doc = this.capturedDoc;
@@ -373,7 +384,7 @@ Capture.prototype.renderCapturedDoc = function(options) {
     // After document.open(), all objects will be removed. 
     // To provide our library functionality afterwards, we
     // must re-inject the script.
-    var mobifyjsScript = document.getElementById("mobify-js-library");
+    var mobifyjsScript = document.getElementById("mobify-js");
     // Since you can't move nodes from one document to another,
     // we must clone it first using importNode:
     // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
@@ -389,12 +400,15 @@ Capture.prototype.renderCapturedDoc = function(options) {
     }
 
     // Inject timing point (because of blowing away objects on document.write)
-    var body = this.bodyEl;
-    var date = doc.createElement("div");
-    date.id = "mobify-point";
-    date.setAttribute("style", "display: none;")
-    date.innerHTML = window.Mobify.points[0];
-    body.insertBefore(date, body.firstChild);
+    // if it exists
+    if (window.Mobify.points) {
+        var body = this.bodyEl;
+        var date = doc.createElement("div");
+        date.id = "mobify-point";
+        date.setAttribute("style", "display: none;")
+        date.innerHTML = window.Mobify.points[0];
+        body.insertBefore(date, body.firstChild);
+    }
 
 
     this.render(this.escapedHTMLString());
