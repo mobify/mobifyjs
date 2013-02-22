@@ -221,6 +221,9 @@ define(function() {
         , absolutify = document.createElement('a')
 
         , combineScripts = function(scripts) {
+            // turn scripts into an array
+             scripts = Array.prototype.slice.call(scripts);
+
               // Fastfail if there are no scripts or if required modules are missing.
               if (!scripts.length || !window.localStorage || !window.JSON) {
                   return scripts;

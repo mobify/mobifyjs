@@ -2,8 +2,6 @@ var capturing = window.capturing || false;
 if (capturing) {
     console.log("test")
 
-    // var scripts = document.querySelectorAll('script.jazzcatTest');
-    // var jcResult = Mobify.combineScripts(scripts);
 
     // Remove the bootstrap and tag scripts
     //var scripts = document.getElementsByTagName("script");
@@ -21,10 +19,14 @@ if (capturing) {
 
     // Grab reference to a newly created document
 
-    debugger;
-
     var capture = new Mobify.Capture();
     var capturedDoc = capture.capturedDoc;
+
+    var scripts = capturedDoc.querySelectorAll('script.grabMe');
+    var jcResult = Mobify.combineScripts(scripts);
+    for (var i=0,ii=jcResult.length;i<ii;i++) {
+        capturedDoc.body.appendChild(jcResult[i]);
+    }
 
     Mobify.dnsPrefetch(capturedDoc);
     Mobify.keepWarm();
