@@ -101,6 +101,7 @@ module.exports = function(grunt) {
                 urls: ['http://localhost:3000/tests/capture.html'],
                 concurrency: 2,
                 tunneled: true,
+                detailedError: true,
                 browsers: [
                 { // Only working version of IE compatable
                     browserName: 'internet explorer',
