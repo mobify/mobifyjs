@@ -7,7 +7,7 @@ title: Mobify.js Documentation
 
 ## What is Mobify.js?
 
-Mobify.js is a library for adapting websites across a number of different kinds of devices. One of the core features of Mobify.js is it's ability to capture and 
+Mobify.js is a library for adapting websites across a number of different kinds of devices. Core to Mobify.js is its ability to capture and 
 manipulate the DOM before any resources have downloaded, which unlocks the ability to do resource control, conditional loading, image resizing, javascript 
 concatination and more.
 
