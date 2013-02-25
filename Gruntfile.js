@@ -213,7 +213,7 @@ module.exports = function(grunt) {
         }
     });
     grunt.registerTask('default', 'build');
-    grunt.registerTask('deploy', ['build', 's3:deploy']);
+    grunt.registerTask('deploy', ['build', 's3']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('preview', ['connect', 'watch']);
 };
