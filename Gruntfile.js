@@ -36,17 +36,6 @@ module.exports = function(grunt) {
             }
         },
         requirejs: {
-            // Building capturing only
-            capture: {
-                options: {
-                    almond: true,
-                    mainConfigFile: "./src/config.js",
-                    optimize: "none",
-                    keepBuildDir: true,
-                    name: "mobify-capture",
-                    out: "./build/capture-<%= pkg.version %>.js",
-                }
-            },
             // Building full Mobify.js library
             full: {
                 options: {
@@ -67,7 +56,7 @@ module.exports = function(grunt) {
                     out: "./build/mobify-<%= pkg.version %>.min.js",
                 }
             },
-            // Building custom Mobify.js library
+            // Building custom Mobify.js library (must copy mobify-custom.js.example -> mobify-custom.js)
             custom: {
                 options: {
                     almond: true,
@@ -193,15 +182,19 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-saucelabs');
 
+    grunt.registerTask('test', ['connect', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present
     grunt.registerTask('build', function() {
-        grunt.task.run("requirejs:capture", "requirejs:full", "requirejs:fullOptimized")
+        // First run the tests
+        grunt.task.run("test")
+        // Then build mobify.js library
+        grunt.task.run("requirejs:full", "requirejs:fullOptimized")
+        // Build custom library if it exists
         if (grunt.file.exists("mobify-custom.js")) {
             grunt.task.run("requirejs:custom", "requirejs:customOptimized");
         }
     });
     grunt.registerTask('default', 'build');
-    grunt.registerTask('test', ['connect', 'qunit']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('preview', ['connect', 'watch']);
 };
