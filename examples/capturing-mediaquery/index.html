@@ -75,7 +75,7 @@ body {
     background-color: teal;
 }
 </style>
-<title>Mobify.js image gallary example</title>
+<title>Mobify.js Media Query</title>
 </head>
 <body class="foo">
 <div class="small">
@@ -88,6 +88,10 @@ body {
     <img src="/examples/assets/images/leaves-big.jpg" width="100%" media="(min-width : 481px)">
     <img src="/examples/assets/images/office-big.jpg" width="100%" media="(min-width : 481px)">
 </div>
+
+<h1 media="(min-width : 481px)">
+<script src="/examples/assets/js/small.js" media="(max-width: 480px)"></script>
+<script src="/examples/assets/js/large.js" media="(min-width: 481px)"></script>
 <script>
 // Grab the total time since starting capturing and send it
 // to the parent for testing in performance.html

@@ -78,13 +78,13 @@ body {
 <title>Mobify.js image gallary example</title>
 </head>
 <body class="foo">
-<picture alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-    <source src="/examples/assets/images/small.jpg">
-    <source src="/examples/assets/images/medium.jpg" media="(min-width: 450px)">
-    <source src="/examples/assets/images/large.jpg" media="(min-width: 800px)">
-    <source src="/examples/assets/images/extralarge.jpg" media="(min-width: 1000px)">
-    <img src="/examples/assets/images/small.jpg" alt="A giant stone face at The Bayon temple in Angkor Thom, Cambodia">
-</picture>
+    <picture>
+        <source src="/examples/assets/images/small.jpg">
+        <source src="/examples/assets/images/medium.jpg" media="(min-width: 450px)">
+        <source src="/examples/assets/images/large.jpg" media="(min-width: 800px)">
+        <source src="/examples/assets/images/extralarge.jpg" media="(min-width: 1000px)">
+        <img src="/examples/assets/images/small.jpg">
+    </picture>
 <script>
 // Grab the total time since starting capturing and send it
 // to the parent for testing in performance.html
