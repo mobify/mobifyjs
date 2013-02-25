@@ -1,0 +1,9 @@
+{
+    "name": "mobify-accordion",
+    "version": "0.1.0",
+    "description": "A mobile-first JavaScript driven accordion module",
+    "dependencies": {
+        "grunt": "0.4.x"
+    },
+    "license": "MIT"
+}
