@@ -173,6 +173,23 @@ module.exports = function(grunt) {
                     }, 1000);
                 }
             }
+        },
+        s3: {
+            key: '<%= localConfig.aws.key %>',
+            secret: '<%= localConfig.aws.secret %>',
+            bucket: '<%= localConfig.aws.bucket %>',
+            access: "public-read",
+            upload: [
+                {
+                    src: "build/mobify-<%= pkg.version %>.min.js",
+                    dest: "mobifyjs/mobify-<%= pkg.version %>.min.js",
+                    gzip: true
+                },
+                {
+                    src: "build/mobify-<%= pkg.version %>.js",
+                    dest: "mobifyjs/mobify-<%= pkg.version %>.js"
+                }
+            ]
         }
     });
 
@@ -181,6 +198,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-saucelabs');
+    grunt.loadNpmTasks('grunt-s3');
 
     grunt.registerTask('test', ['connect', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present
@@ -195,6 +213,7 @@ module.exports = function(grunt) {
         }
     });
     grunt.registerTask('default', 'build');
+    grunt.registerTask('deploy', ['build', 's3:deploy']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('preview', ['connect', 'watch']);
 };
