@@ -179,6 +179,7 @@ module.exports = function(grunt) {
             secret: '<%= localConfig.aws.secret %>',
             bucket: '<%= localConfig.aws.bucket %>',
             access: "public-read",
+            headers: { "Cache-Control": "max-age=1200" },
             upload: [
                 { // minified library
                     src: "build/mobify-<%= pkg.version %>.min.js",
