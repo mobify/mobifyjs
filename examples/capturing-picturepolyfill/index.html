@@ -69,15 +69,14 @@ setTimeout(function() {
 );
 </script>
 <!-- END MOBIFY TAG -->
+<link rel="stylesheet" href="/examples/assets/css/stylesheet.css" type="text/css">
 
-<style>
-body {
-    background-color: teal;
-}
-</style>
-<title>Mobify.js image gallary example</title>
+<title>Mobify.js Picturefill example</title>
 </head>
 <body class="foo">
+    <p>Credit to scottjehl for his <a href="http://scottjehl.github.com/picturefill/">picturefill example</a></p>
+    <p>This example has been forked and replicated using capturing to avoid the need for a &lt;noscript&gt; tag (view source to see for yourself).</p>
+    <p>Open up the network tab of your web inspector to see that the img element does not have it's asset downloaded.<p>
     <picture>
         <source src="/examples/assets/images/small.jpg">
         <source src="/examples/assets/images/medium.jpg" media="(min-width: 450px)">
