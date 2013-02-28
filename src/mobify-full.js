@@ -1,7 +1,7 @@
-require(["capture", "resizeImages"], function(Capture, ResizeImages) {
+require(["capture"], function(Capture) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Capture = Capture;
-    Mobify.ResizeImages = ResizeImages;
+    // Mobify.ResizeImages = ResizeImages;
     return Mobify
 
 }, undefined, true);

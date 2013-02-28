@@ -5,9 +5,8 @@ title: Mobify.js Documentation
 
 # Capturing
 
-To use the capturing API, you must install the correct tag on your site.
-If you have not already, please refer to the 
-[quickstart guide](/mobifyjs/v2/docs/) to get setup.
+To use the Capturing API, you must first install the Mobify.js tag on your site.
+If you have not already, please refer to the  [quickstart guide](/mobifyjs/v2/docs/) to get setup.
 
 * TOC
 {:toc}
@@ -31,12 +30,11 @@ properties prepended with a prefix to prevent resources from loading.
 
 **Example**
 
-    // change src of first script
+    // Change src of first script
     var capture = Mobify.Capture.init();
     var script = capturedDoc.getElementsByTagName("script")[0];
     // Must use x-src, not src
     script.setAttribute("x-src", "/path/to/script.js");
-    }
     capture.renderCapturedDoc();
 
 ### Useful properties
@@ -63,7 +61,7 @@ You have access to all DOM API methods on the `captured document`.
 
     var capture = Mobify.Capture.init();
     var capturedDoc = capture.getCapturedDoc();
-    var paragraphs = capturedDoc.querySelectorAll("p")
+    var paragraphs = capturedDoc.querySelectorAll("p");
 
 ## window.capturing
 
@@ -98,13 +96,13 @@ alternative to `capturedDoc.outerHTML`.
 
 ## `render(htmlString)`
 
-Opens the original `document` and renders it from a clean slate 
+Opens the original `document` and renders it from a clean slate
 with the htmlString.
 
 **Usage/Example:**
 
     var capture = Mobify.Capture.init();
-    capture.render("<html><body><h1>Test!</h1></body></html>")
+    capture.render("<html><body><h1>Test!</h1></body></html>");
 
 __Note: This method is async__
 
@@ -117,7 +115,7 @@ Writes out the captured document to the original document.
     var capture = Mobify.Capture.init();
     // Removes all scripts
     var scripts = capturedDoc.getElementsByTagName("script");
-    for(var i = 0; i < scripts.length; i++) {
+    for (var i = 0; i < scripts.length; i++) {
         var script = scripts[i];
         script.parentNode.removeChild(script);
     }
@@ -141,6 +139,15 @@ __Note: This method is async__
         capture.restore();
     }
 
+## Browser Support
+
+
+| Browser                      | Version |
+|------------------------------|---------|
+| Webkit (Safari, Chrome, etc) | ---     |
+| Firefox                      | 4.0+    |
+| Opera                        | 11.0+   |
+| Internet Explorer            | 10+     |
 
 ## Where to next?
 
