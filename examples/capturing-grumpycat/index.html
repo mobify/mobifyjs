@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+
+<!-- START MOBIFY TAG -->
+<script class="mobify" id="mobify-tag">
+(function(window, document, detector, mobifyjsUrl, mainUrl) {
+// If Mobify has been defined already, or if the detector fails,
+// exit
+if (this.Mobify || !detector()) {
+    return;
+}
+
+// Start Mobify object with initial timestamp when loaded
+window.Mobify = {points: [+new Date]};
+
+
+function attachScriptBeforeMobifyTag(src, id, classNames) {
+    var attachedScript = document.createElement('script');
+    var mobifyTagScript = document.getElementById('mobify-tag');
+
+    attachedScript.src = src;
+    attachedScript.id = id;
+    attachedScript.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
+    return attachedScript;
+}
+
+// Prevent the browser from downloading website resources
+document.write('<plaintext style="display:none">');
+
+// On next tick, load library and main executable
+setTimeout(function() {
+    window.capturing = true;
+    var mobifyjsScript = attachScriptBeforeMobifyTag(mobifyjsUrl, "mobify-js", "mobify");
+    mobifyjsScript.onload = function(){
+        if (mainUrl) {
+            attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+        }
+        // TODO: If main fails to load, load capture.restore
+    };
+
+});
+
+})( window, document,
+    // detector function
+    function (){
+        var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
+        var isCompatible;
+        if (match) {
+            if (match[1] && (match[1].toLowerCase() === "firefox") && (+match[2] < 4)) {
+                isCompatible = false;
+            } else if (match[3] && (match[3].toLowerCase() === "opera") && (+match[4] < 11)) {
+                isCompatible = false
+            } else {
+                isCompatible = true;
+            }
+        }
+        if (!isCompatible) {
+            return false;
+        }
+        return true;
+    },
+    // path to mobify.js
+    '/mobifyjs/build/mobify-2.0.0alpha1.min.js',
+
+    // path to main executable 
+    '/mobifyjs/examples/capturing-grumpycat/main.js'
+);
+</script>
+<!-- END MOBIFY TAG -->
+<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
+<title>Mobify.js image gallary example</title>
+</head>
+<body class="foo">
+<div class="header"></div>
+<div class="example">
+    <p>The original img srcs were swapped out for a couple of grumpy cats.
+    Open your web inspector and note the original imgs did not load.
+    Also note, they were plain old img elements (no data&ndash;src tricks).
+    <a href="#" id="swap">Click here to download and view the original images from the source html.</a></p>
+    <div class="img">
+        <img src="/mobifyjs/examples/assets/images/leaves-big.jpg" width="100%">
+    </div>
+    <div class="img">
+        <img src="/mobifyjs/examples/assets/images/office-big.jpg" width="100%">
+    </div>
+
+</div>
+<script>
+// Grab the total time since starting capturing and send it
+// to the parent for testing in performance.html
+var end = +new Date;
+var begin;
+if (window.Mobify.points) {
+    begin = window.Mobify.points[0];
+} else {
+    var pointEl = document.getElementById("mobify-point");
+    begin = pointEl.innerText || pointEl.textContent;
+}
+var diff = end - begin;
+parent.postMessage(diff, "*");
+</script>
+<script>
+var swapEl = document.getElementById("swap");
+var images = document.getElementsByTagName("img");
+swapEl.onclick = function(event) {
+    for (var i=0; i<images.length; i++) {
+        images[i].setAttribute("src", images[i].getAttribute("old-src"));
+    }
+    event.preventDefault();
+}
+</script>
+</body>
+</html>

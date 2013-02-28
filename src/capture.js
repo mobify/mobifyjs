@@ -104,6 +104,8 @@ function deserializeString(sourceString, dest) {
     return dest;
 };
 
+
+
 // ##
 // # Constructor
 // ##
@@ -118,6 +120,9 @@ var Capture = function(doc, prefix) {
     Utils.extend(this, capturedDOMFragments);
 };
 
+var init = Capture.init = function(doc, prefix) {
+    return new Capture(doc, prefix);
+};
 
 /**
  * Returns a string with all external attributes disabled.
@@ -125,7 +130,7 @@ var Capture = function(doc, prefix) {
  * comments.
  * Not declared on the prototype so it can be used as a static method.
  */
-var disable = Capture.disable = function(htmlStr, prefix) {   
+Capture.disable = function(htmlStr, prefix) {   
     var self = this;
     // Disables all attributes in disablingMap by prepending prefix
     var disableAttributes = (function(){
@@ -156,12 +161,11 @@ var disable = Capture.disable = function(htmlStr, prefix) {
     return [].concat.apply([], ret).join('');
 };
 
-
 /**
  * Returns a string with all disabled external attributes enabled.
  * Not declared on the prototype so it can be used as a static method.
  */
-var enable = Capture.enable = function(htmlStr, prefix) {
+Capture.enable = function(htmlStr, prefix) {
     var attributeEnablingRe = new RegExp('\\s' + prefix + '(' + Utils.keys(attributesToEnable).join('|') + ')', 'gi');
     return htmlStr.replace(attributeEnablingRe, ' $1').replace(tagEnablingRe, '');
 };
@@ -169,7 +173,7 @@ var enable = Capture.enable = function(htmlStr, prefix) {
 /**
  * Return a string for the opening tag of DOMElement `element`.
  */
-var openTag = Capture.openTag = function(element) {
+Capture.openTag = function(element) {
     if (!element) return '';
     if (element.length) element = element[0];
 
@@ -210,9 +214,9 @@ Capture.prototype.getDoctype = function() {
 
     captured = {
         doctype: this.getDoctype(),
-        htmlOpenTag: openTag(htmlEl),
-        headOpenTag: openTag(headEl),
-        bodyOpenTag: openTag(bodyEl),
+        htmlOpenTag: Capture.openTag(htmlEl),
+        headOpenTag: Capture.openTag(headEl),
+        bodyOpenTag: Capture.openTag(bodyEl),
         headContent: extractHTMLStringFromElement(headEl),
         bodyContent: extractHTMLStringFromElement(bodyEl)
     };
@@ -317,8 +321,8 @@ Capture.prototype.createDocumentFragments = function() {
     deserializeString(this.bodyOpenTag, bodyEl);
 
     // Set innerHTML of new source DOM body
-    bodyEl.innerHTML = disable(this.bodyContent, this.prefix);
-    var disabledHeadContent = disable(this.headContent, this.prefix);
+    bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
+    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
 
     // On FF4, and potentially other browsers, you cannot modify <head> 
     // using innerHTML. In that case, do a manual copy of each element
@@ -342,7 +346,7 @@ Capture.prototype.createDocumentFragments = function() {
  */
 Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
-    var html = enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement), this.prefix);
+    var html = Capture.enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement), this.prefix);
     var htmlWithDoctype = this.doctype + html;
     return htmlWithDoctype;
 };
@@ -365,7 +369,14 @@ Capture.prototype.render = function(htmlString) {
 };
 
 /**
- * Grab the source document and render it
+ * Get the captured document
+ */
+Capture.prototype.getCapturedDoc = function(options) {
+    return this.capturedDoc;
+};
+
+/**
+ * Render the captured document
  */
 Capture.prototype.renderCapturedDoc = function(options) {
     var doc = this.capturedDoc;
@@ -373,7 +384,7 @@ Capture.prototype.renderCapturedDoc = function(options) {
     // After document.open(), all objects will be removed. 
     // To provide our library functionality afterwards, we
     // must re-inject the script.
-    var mobifyjsScript = document.getElementById("mobify-js-library");
+    var mobifyjsScript = document.getElementById("mobify-js");
     // Since you can't move nodes from one document to another,
     // we must clone it first using importNode:
     // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
@@ -389,12 +400,15 @@ Capture.prototype.renderCapturedDoc = function(options) {
     }
 
     // Inject timing point (because of blowing away objects on document.write)
-    var body = this.bodyEl;
-    var date = doc.createElement("div");
-    date.id = "mobify-point";
-    date.setAttribute("style", "display: none;")
-    date.innerHTML = window.Mobify.points[0];
-    body.insertBefore(date, body.firstChild);
+    // if it exists
+    if (window.Mobify.points) {
+        var body = this.bodyEl;
+        var date = doc.createElement("div");
+        date.id = "mobify-point";
+        date.setAttribute("style", "display: none;")
+        date.innerHTML = window.Mobify.points[0];
+        body.insertBefore(date, body.firstChild);
+    }
 
 
     this.render(this.escapedHTMLString());
