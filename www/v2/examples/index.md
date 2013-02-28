@@ -7,6 +7,45 @@ title: Mobify.js Examples
 
 ----
 
+## Capturing - Picture Polyfill
+
+The Picture element is the official W3C HTML extension for 
+dealing with adaptive images. There are [polyfills that exist in 
+order to use the Picture element in your site today](http://
+scottjehl.github.com/picturefill/), but none of them are able to 
+do a perfect polyfill - the best polyfill implemented thus far 
+requires a `<noscript>` tag surrounding an `img` element in 
+order to support browsers without Javascript. Using Capturing, 
+you can avoid this madness completely.
+
+Open the example and be sure to fire up the network tab 
+in web inspector to see which resources get downloaded:
+
+* [Picture Polyfill Example](http://cdn.mobify.com/mobifyjs/examples/capturing-picturepolyfill/index.html){: target='_blank' }
+
+Here is the important chunk of code that is in the source of the example:
+
+    <picture>
+        <source src="/examples/assets/images/small.jpg">
+        <source src="/examples/assets/images/medium.jpg" media="(min-width: 450px)">
+        <source src="/examples/assets/images/large.jpg" media="(min-width: 800px)">
+        <source src="/examples/assets/images/extralarge.jpg" media="(min-width: 1000px)">
+        <img src="/examples/assets/images/small.jpg">
+    </picture>
+
+Take note that there is an `img` element that uses an `src` 
+attribute, but the browser only downloads the correct image. You 
+can see the code for this example here (note that the polyfill 
+is only available in the example, not the library itself - yet):
+
+* [index.html](https://github.com/mobify/mobifyjs/tree/v2.0-documentation/examples/capturing-picturepolyfill/index.html
+){: target='_blank' }
+* [main.js](https://github.com/mobify/mobifyjs/tree/v2.0-documentation/examples/capturing-picturepolyfill/main.js){: target='_blank' }
+
+Original polyfill example:
+
+* [Original Picture Polyfill example (not using Capturing)](http://scottjehl.github.com/picturefill/){: target='_blank' }
+
 ## Capturing - Grumpy Cat
 
 There is nothing more useful then replacing all 
