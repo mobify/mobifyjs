@@ -225,8 +225,6 @@ module.exports = function(grunt) {
     grunt.registerTask('test', ['connect', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present
     grunt.registerTask('build', function() {
-        // First run the tests
-        grunt.task.run("test")
         // Then build mobify.js library
         grunt.task.run("requirejs:full", "requirejs:fullOptimized")
         // Build custom library if it exists
