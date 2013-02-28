@@ -44,20 +44,14 @@ var getImageURL = ResizeImages.getImageURL = function(url, options) {
  * the Image Resize service. Pass `options` to modify how the images are 
  * resized.
  */
-var resizeImages = ResizeImages.resize = function(document, options) {
+ResizeImages.resize = function(imgs, options) {
     var opts;
-    if (typeof options == 'object') {
+    if (options) {
         opts = Utils.extend(defaults, options);
     } else {
         opts = defaults;
     }
     var dpr = window.devicePixelRatio;
-    var imgs = document.querySelectorAll(opts.selector);
-    var attr;
-
-    if (typeof options == 'number') {
-        opts.maxWidth = Math.floor(options);
-    }
 
     if (dpr) {
         if (opts.maxWidth) {
@@ -69,6 +63,7 @@ var resizeImages = ResizeImages.resize = function(document, options) {
         }
     }
 
+    var attr;
     for(var i=0; i<imgs.length; i++) {
         var img = imgs[i];
         if (attr = img.getAttribute(opts.attribute)) {
@@ -82,11 +77,10 @@ var resizeImages = ResizeImages.resize = function(document, options) {
     return imgs;
 }
 
-var defaults = resizeImages.defaults = {
-        selector: 'img'
-      , attribute: 'x-src'
-      , projectName: ''
-    };
+var defaults = {
+      projectName: "",
+      attribute: "x-src"
+};
 
 return ResizeImages;
 

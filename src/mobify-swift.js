@@ -1,5 +1,5 @@
 require(["capture", "resizeImages", "keepWarm", "dnsPrefetch", "speedClick", "jazzcat"], 
-    function(Capture, ResizeImages, keepWarm, dnsPrefetch, speedClick, combineScripts) {
+    function(Capture, ResizeImages, keepWarm, dnsPrefetch, speedClick, Jazzcat) {
     
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
@@ -7,7 +7,7 @@ require(["capture", "resizeImages", "keepWarm", "dnsPrefetch", "speedClick", "ja
     Mobify.dnsPrefetch = dnsPrefetch;
     Mobify.keepWarm = keepWarm;
     Mobify.speedClick = speedClick;
-    Mobify.combineScripts = combineScripts;
+    Mobify.Jazzcat = Jazzcat;
     return Mobify
 
 }, undefined, true);

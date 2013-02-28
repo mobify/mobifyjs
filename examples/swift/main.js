@@ -23,7 +23,7 @@ if (capturing) {
     var capturedDoc = capture.capturedDoc;
 
     var scripts = capturedDoc.querySelectorAll('script.grabMe');
-    var jcResult = Mobify.combineScripts(scripts);
+    var jcResult = Mobify.Jazzcat.combineScripts(scripts);
     for (var i=0,ii=jcResult.length;i<ii;i++) {
         capturedDoc.body.appendChild(jcResult[i]);
     }
@@ -32,7 +32,12 @@ if (capturing) {
     Mobify.keepWarm();
 
     // Resize images using Mobify Image Resizer
-    Mobify.ResizeImages.resize(capturedDoc, 320);
+    Mobify.ResizeImages.resize( capturedDoc.querySelectorAll("img"), 
+                                { 
+                                  projectName: "mobifycom",
+                                  maxWidth: 320 
+                                });
+    
     // Render source DOM to document
     capture.renderCapturedDoc();
 }

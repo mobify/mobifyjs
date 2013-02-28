@@ -4,9 +4,7 @@
  */
 define(function() {
 
-  return (function(){
-
-  var Mobify = window.Mobify;
+  var Jazzcat = window.Jazzcat = {};
 
   var get = function(key, increment) {
           // Ignore anchors.
@@ -121,9 +119,9 @@ define(function() {
     , localStorageKey = 'Mobify-Combo-Cache-v1.0'
 
       // In memory cache.
-    , cache = {}
+    , cache = {};
 
-    , httpCache = Mobify.httpCache = {
+    Jazzcat.httpCache = {
           get: get
         , set: set
         , load: load
@@ -166,7 +164,7 @@ define(function() {
             return obj;
         }
 
-      , utils = httpCache.utils = {
+      , utils = Jazzcat.httpCache.utils = {
             /**
              * Returns a data URI for `resource` suitable for executing the script.
              */
@@ -216,73 +214,73 @@ define(function() {
         /**
         * combineScripts: Clientside API to the combo service.
         */
-        var httpCache = Mobify.httpCache
+        var httpCache = Jazzcat.httpCache;
 
-        , absolutify = document.createElement('a')
+        var absolutify = document.createElement('a');
 
-        , combineScripts = function(scripts) {
+        Jazzcat.combineScripts = function(scripts) {
             // turn scripts into an array
-             scripts = Array.prototype.slice.call(scripts);
+            scripts = Array.prototype.slice.call(scripts);
 
-              // Fastfail if there are no scripts or if required modules are missing.
-              if (!scripts.length || !window.localStorage || !window.JSON) {
-                  return scripts;
-              }
+            // Fastfail if there are no scripts or if required modules are missing.
+            if (!scripts.length || !window.localStorage || !window.JSON) {
+                return scripts;
+            }
 
-              // Takes a list of candidate script elements
-              var uncached = []
-                , combo = false
-                , bootstrap
-                , url
-                , i
-                , ii;
+            // Takes a list of candidate script elements
+            var uncached = []
+              , combo = false
+              , bootstrap
+              , url
+              , i
+              , ii;
 
-              for (i=0,ii=scripts.length;i<ii;i++) {
+            for (i=0,ii=scripts.length;i<ii;i++) {
                 var script = scripts[i];
                 script.parentNode.removeChild(script);
-              }
+            }
 
-              httpCache.load();
+            httpCache.load();
 
-              for (var i=0,ii=scripts.length;i<ii;i++) {
+            for (var i=0,ii=scripts.length;i<ii;i++) {
                 var script = scripts[i];
                 if (! script.hasAttribute(defaults.attribute)) continue;
                 combo = true; // flag to true if we combine at least one script
                 absolutify.href = script.getAttribute(defaults.attribute);
                 url = absolutify.href;
                 if (!httpCache.get(url)) {
-                    uncached.push(url);
+                  uncached.push(url);
                 }
                 script.removeAttribute(defaults.attribute);
                 script.className += ' x-combo';
                 script.innerHTML = defaults.execCallback + "('" + url + "');";
-              }
+            }
 
-              if (!combo) {
-                  return scripts;
-              }
+            if (!combo) {
+                return scripts;
+            }
 
-              bootstrap = document.createElement('script')
+            bootstrap = document.createElement('script')
 
-              if (uncached.length) {
-                  bootstrap.src = getURL(uncached, defaults.loadCallback);
-              } else {
-                  bootstrap.innerHTML = defaults.loadCallback + '();';
-              }
+            if (uncached.length) {
+                bootstrap.src = getURL(uncached, defaults.loadCallback);
+            } else {
+                bootstrap.innerHTML = defaults.loadCallback + '();';
+            }
 
-              scripts.unshift(bootstrap);                
-              return scripts;
-          }
+            scripts.unshift(bootstrap);                
+            return scripts;
+        }
 
-        , defaults = combineScripts.defaults = {
+        , defaults = Jazzcat.combineScripts.defaults = {
               selector: 'script'
             , attribute: 'x-src'
             , endpoint: '//jazzcat.mobify.com/jsonp/'
-            , execCallback: 'Mobify.jazzcat.exec'
-            , loadCallback: 'Mobify.jazzcat.load'
-          }
+            , execCallback: 'Jazzcat.combo.exec'
+            , loadCallback: 'Jazzcat.combo.load'
+        };
 
-        , combo = Mobify.jazzcat = {
+        Jazzcat.combo = {
               /**
                * Emit a <script> tag to execute the contents of `url` using 
                * `document.write`. Prefer loading contents from cache.
@@ -339,9 +337,6 @@ define(function() {
       // }
 
 
-      return combineScripts;
-
-  })();
-
+      return Jazzcat;
 
 });
