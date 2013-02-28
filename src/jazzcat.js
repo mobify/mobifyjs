@@ -218,7 +218,13 @@ define(function() {
 
         var absolutify = document.createElement('a');
 
-        Jazzcat.combineScripts = function(scripts) {
+        Jazzcat.combineScripts = function(scripts, options) {
+            var opts;
+            if (options) {
+                opts = Utils.extend(defaults, options);
+            } else {
+                opts = defaults;
+            }
             // turn scripts into an array
             scripts = Array.prototype.slice.call(scripts);
 
@@ -244,16 +250,16 @@ define(function() {
 
             for (var i=0,ii=scripts.length;i<ii;i++) {
                 var script = scripts[i];
-                if (! script.hasAttribute(defaults.attribute)) continue;
+                if (! script.hasAttribute(opts.attribute)) continue;
                 combo = true; // flag to true if we combine at least one script
-                absolutify.href = script.getAttribute(defaults.attribute);
+                absolutify.href = script.getAttribute(opts.attribute);
                 url = absolutify.href;
                 if (!httpCache.get(url)) {
                   uncached.push(url);
                 }
-                script.removeAttribute(defaults.attribute);
+                script.removeAttribute(opts.attribute);
                 script.className += ' x-combo';
-                script.innerHTML = defaults.execCallback + "('" + url + "');";
+                script.innerHTML = opts.execCallback + "('" + url + "');";
             }
 
             if (!combo) {
@@ -263,9 +269,9 @@ define(function() {
             bootstrap = document.createElement('script')
 
             if (uncached.length) {
-                bootstrap.src = getURL(uncached, defaults.loadCallback);
+                bootstrap.src = getURL(uncached, opts.loadCallback);
             } else {
-                bootstrap.innerHTML = defaults.loadCallback + '();';
+                bootstrap.innerHTML = opts.loadCallback + '();';
             }
 
             scripts.unshift(bootstrap);                
