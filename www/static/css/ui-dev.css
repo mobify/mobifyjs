@@ -337,10 +337,9 @@ table td code {
 	box-shadow: none;
 	min-height: 0;
 	padding: 0;
-	overflow: hidden;
 }
 .navbar {
-	padding: 4em 0;
+	padding: 3em 0;
 }
 .navbar .brand {
 	font-size: 0;
@@ -1255,4 +1254,8 @@ table td code {
 	}
 
 
+}
+
+pre#mobify-tag code{
+    word-wrap: break-word;    
 }

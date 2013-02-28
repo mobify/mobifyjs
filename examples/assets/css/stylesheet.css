@@ -1,0 +1,21 @@
+body {
+    font-family: 'Helvetica Neue', sans-serif;
+    background: rgb(4, 111, 126);
+    color: #d5ecf2;
+    text-shadow: rgba(0,0,0,0.15) 0 2px 0;
+    font-weight: 200;
+}
+
+a {
+    color: #c07247;
+}
+
+img {
+    padding-top: 20px;
+}
+
+.example .img {
+    width: 35%;
+    display: inline-block;
+    box-sizing: border-box;
+}

@@ -1,6 +1,6 @@
 # Mobify.js
 
-Mobify.js is a modular javascript library that offers a number of performance enhancements and other benefits.
+Mobify.js is a library that allows you to make a number of different kinds of adaptations to your existing site for all kinds of different devices.
 
 For instructions on how to use the library, follow the instructions on [mobifyjs.com](https://www.mobifyjs.com/)
 or build the docs site manually in the instructions below.

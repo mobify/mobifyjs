@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+
+<!-- START MOBIFY TAG -->
+<script class="mobify" id="mobify-tag">
+(function(window, document, detector, mobifyjsUrl, mainUrl) {
+// If Mobify has been defined already, or if the detector fails,
+// exit
+if (this.Mobify || !detector()) {
+    return;
+}
+
+// Start Mobify object with initial timestamp when loaded
+window.Mobify = {points: [+new Date]};
+
+
+function attachScriptBeforeMobifyTag(src, id, classNames) {
+    var attachedScript = document.createElement('script');
+    var mobifyTagScript = document.getElementById('mobify-tag');
+
+    attachedScript.src = src;
+    attachedScript.id = id;
+    attachedScript.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
+    return attachedScript;
+}
+
+// Prevent the browser from downloading website resources
+document.write('<plaintext style="display:none">');
+
+// On next tick, load library and main executable
+setTimeout(function() {
+    window.capturing = true;
+    var mobifyjsScript = attachScriptBeforeMobifyTag(mobifyjsUrl, "mobify-js", "mobify");
+    mobifyjsScript.onload = function(){
+        if (mainUrl) {
+            attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+        }
+        // TODO: If main fails to load, load capture.restore
+    };
+
+});
+
+})( window, document,
+    // detector function
+    function (){
+        var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
+        var isCompatible;
+        if (match) {
+            if (match[1] && (match[1].toLowerCase() === "firefox") && (+match[2] < 4)) {
+                isCompatible = false;
+            } else if (match[3] && (match[3].toLowerCase() === "opera") && (+match[4] < 11)) {
+                isCompatible = false
+            } else {
+                isCompatible = true;
+            }
+        }
+        if (!isCompatible) {
+            return false;
+        }
+        return true;
+    },
+    // path to mobify.js
+    '/mobifyjs/build/mobify-2.0.0alpha1.js',
+
+    // path to main executable 
+    '/mobifyjs/examples/capturing-basictemplating/main.js'
+);
+</script>
+<!-- END MOBIFY TAG -->
+<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
+<title>Mobify.js image gallary example</title>
+</head>
+<body class="foo">
+<div class="header"></div>
+<div class="example">
+
+<p>Just for funzies, I will talk about some of the cool tools we use at Mobify.</p>
+
+<p><a href="http://twitter.github.com/bootstrap/">Bootstrap</a> has been a very useful
+tool for rapidly building prototypes for our projects.</p>
+
+<p> <a href="http://www.sublimetext.com/">Sublime</a>
+is also the default text editor commonly used by our team, except for Ryan! I love the vim integration, personally.</p>
+
+<p><a href="http://mizage.com/divvy/">Divvy</a> is a fantastic product that we use for window management - 
+we all use Macbook Airs and Pros (you'll get a free one if you come work for us!).</p> 
+
+<p><a href="http://progrium.com/localtunnel/">Localtunner</a> is a great little tool that allows you to 
+expose code running on localhost trapped by your NAT to the world!</p>
+
+<p>We use an amazingly fantastic tool for HTTP debugging called <a href="http://www.charlesproxy.com/">Charles</a>.</p>
+
+<p>Annnnd I'm done. You can actually find this full list at our 
+<a href="http://www.mobify.com/blog/top-11-mobile-development-tools-used-at-mobify/">blog</a> :) 
+</p>
+</div>
+<script>
+// Grab the total time since starting capturing and send it
+// to the parent for testing in performance.html
+var end = +new Date;
+var begin;
+if (window.Mobify.points) {
+    begin = window.Mobify.points[0];
+} else {
+    var pointEl = document.getElementById("mobify-point");
+    begin = pointEl.innerText || pointEl.textContent;
+}
+var diff = end - begin;
+parent.postMessage(diff, "*");
+</script>
+</body>
+</html>
