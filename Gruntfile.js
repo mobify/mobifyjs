@@ -181,18 +181,14 @@ module.exports = function(grunt) {
             access: "public-read",
             headers: { "Cache-Control": "max-age=1200" },
             upload: [
-                { // minified library
-                    src: "build/mobify-<%= pkg.version %>.min.js",
-                    dest: "mobifyjs/mobify-<%= pkg.version %>.min.js",
-                    gzip: true
-                },
-                { // unminified library
-                    src: "build/mobify-<%= pkg.version %>.js",
-                    dest: "mobifyjs/mobify-<%= pkg.version %>.js"
+                { // build
+                    src: "build/**/*",
+                    dest: "mobifyjs/build/",
+                    rel: "build"
                 },
                 { // examples
                     src: "examples/**/*",
-                    dest: "examples",
+                    dest: "mobifyjs/examples/",
                     rel: "examples"
                 }
             ]

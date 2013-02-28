@@ -17,7 +17,7 @@ You can view the example in the link below. Be sure to
 open up web inspector to see that the original images 
 on the site did not download.
 
-* [Grumpy Cat Example](http://cdn.mobify.com/examples/capturing-grumpycat/index.html){: target='_blank' }
+* [Grumpy Cat Example](http://cdn.mobify.com/mobifyjs/examples/capturing-grumpycat/index.html){: target='_blank' }
 
 Source code on Github:
 
@@ -34,7 +34,7 @@ You can view the example in the link below. Be sure to
 open up web inspector to see that only the images and scripts
 evaluated by the media query are loaded.
 
-* [Media Query Example](http://cdn.mobify.com/examples/capturing-mediaquery/index.html){: target='_blank' }
+* [Media Query Example](http://cdn.mobify.com/mobifyjs/examples/capturing-mediaquery/index.html){: target='_blank' }
 
 Source code on Github:
 
@@ -53,12 +53,12 @@ possible.
 
 Check out this basic example:
 
-* [Templating Example](http://cdn.mobify.com/examples/capturing-templating/index.html){: target='_blank' }
+* [Templating Example](http://cdn.mobify.com/mobifyjs/examples/capturing-basictemplating/index.html){: target='_blank' }
 
 Source code on Github:
 
-* [index.html](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-templating/index.html){: target='_blank' }
-* [base.html](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-templating/main.js){: target='_blank' }
+* [index.html](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-basictemplating/index.html){: target='_blank' }
+* [base.html](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-basictemplating/main.js){: target='_blank' }
 
 ----
 
