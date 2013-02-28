@@ -38,9 +38,9 @@ attribute, but the browser only downloads the correct image. You
 can see the code for this example here (note that the polyfill 
 is only available in the example, not the library itself - yet):
 
-* [index.html](https://github.com/mobify/mobifyjs/tree/v2.0-documentation/examples/capturing-picturepolyfill/index.html
+* [index.html](https://github.com/mobify/mobifyjs/tree/v2.0/examples/capturing-picturepolyfill/index.html
 ){: target='_blank' }
-* [main.js](https://github.com/mobify/mobifyjs/tree/v2.0-documentation/examples/capturing-picturepolyfill/main.js){: target='_blank' }
+* [main.js](https://github.com/mobify/mobifyjs/tree/v2.0/examples/capturing-picturepolyfill/main.js){: target='_blank' }
 
 Original polyfill example:
 
@@ -60,8 +60,8 @@ on the site did not download.
 
 Source code on Github:
 
-* [index.html](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-grumpycat/index.html){: target='_blank' }
-* [main.js](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-grumpycat/index.html){: target='_blank' }
+* [index.html](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-grumpycat/index.html){: target='_blank' }
+* [main.js](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-grumpycat/index.html){: target='_blank' }
 
 ## Capturing - Media Queries
 
@@ -77,8 +77,8 @@ evaluated by the media query are loaded.
 
 Source code on Github:
 
-* [index.html](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-mediaquery/index.html){: target='_blank' }
-* [main.js](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-mediaquery/main.js){: target='_blank' }
+* [index.html](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-mediaquery/index.html){: target='_blank' }
+* [main.js](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-mediaquery/main.js){: target='_blank' }
 
 ## Capturing - Basic Templating
 
@@ -96,8 +96,8 @@ Check out this basic example:
 
 Source code on Github:
 
-* [index.html](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-basictemplating/index.html){: target='_blank' }
-* [base.html](https://github.com/mobify/mobifyjs/blob/v2.0-documentation/examples/capturing-basictemplating/main.js){: target='_blank' }
+* [index.html](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-basictemplating/index.html){: target='_blank' }
+* [base.html](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-basictemplating/main.js){: target='_blank' }
 
 ----
 

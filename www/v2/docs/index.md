@@ -74,4 +74,4 @@ if (capturing) {
 * [Capturing Reference](./capturing/)
 
 
-[unminified]: https://github.com/mobify/mobifyjs/blob/v2.0-documentation/tag/bootstrap.html
+[unminified]: https://github.com/mobify/mobifyjs/blob/v2.0/tag/bootstrap.html
