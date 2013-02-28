@@ -5,8 +5,9 @@ function modifyDom(elements, prefix) {
         var el = elements[i];
         var mediaQuery = el.getAttribute("media");
         var match = window.matchMedia(mediaQuery).matches;
+        console.log(match, el)
         var src = (prefix || "") + "src";
-        if (el.tagName === "IMG") {
+        if (el.tagName === "IMG" || el.tagName === "SCRIPT") {
             if (match) {
                 var set = src, unset = "unset-src";
             } else {

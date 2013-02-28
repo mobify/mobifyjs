@@ -6,7 +6,6 @@
 <script class="mobify" id="mobify-tag">
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
-
 // If Mobify has been defined already, or if the detector fails,
 // exit
 if (this.Mobify || !detector()) {
@@ -15,8 +14,6 @@ if (this.Mobify || !detector()) {
 
 // Start Mobify object with initial timestamp when loaded
 window.Mobify = {points: [+new Date]};
-
-//return;
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     var attachedScript = document.createElement('script');
@@ -65,24 +62,28 @@ setTimeout(function() {
         return true;
     },
     // path to mobify.js
-    '/build/mobify-2.0.0alpha1.js',
+    '/mobifyjs/build/mobify-2.0.0alpha1.min.js',
 
     // path to main executable 
-    '/examples/resizeImages/main.js'
+    '/mobifyjs/examples/capturing-picturepolyfill/main.js'
 );
 </script>
 <!-- END MOBIFY TAG -->
+<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
 
-<style>
-body {
-    background-color: teal;
-}
-</style>
-<title>Mobify.js image gallary example</title>
+<title>Mobify.js Picturefill example</title>
 </head>
 <body class="foo">
-<img src="https://www.mobify.com/wp-content/uploads/2012/08/Entrance-1.jpg">
-<img src="https://www.mobify.com/wp-content/uploads/2012/08/photo-6.jpg">
+    <p>Credit to scottjehl for his <a href="http://scottjehl.github.com/picturefill/">picturefill example</a></p>
+    <p>This example has been forked and replicated using capturing to avoid the need for a &lt;noscript&gt; tag (view source to see for yourself).</p>
+    <p>Open up the network tab of your web inspector to see that the img element does not have it's asset downloaded.<p>
+    <picture>
+        <source src="/mobifyjs/examples/assets/images/small.jpg">
+        <source src="/mobifyjs/examples/assets/images/medium.jpg" media="(min-width: 450px)">
+        <source src="/mobifyjs/examples/assets/images/large.jpg" media="(min-width: 800px)">
+        <source src="/mobifyjs/examples/assets/images/extralarge.jpg" media="(min-width: 1000px)">
+        <img src="/mobifyjs/examples/assets/images/small.jpg">
+    </picture>
 <script>
 // Grab the total time since starting capturing and send it
 // to the parent for testing in performance.html
@@ -91,11 +92,11 @@ var begin;
 if (window.Mobify.points) {
     begin = window.Mobify.points[0];
 } else {
-    begin = document.getElementById("mobify-point").innerText;
+    var pointEl = document.getElementById("mobify-point");
+    begin = pointEl.innerText || pointEl.textContent;
 }
 var diff = end - begin;
 parent.postMessage(diff, "*");
-
 </script>
 </body>
 </html>

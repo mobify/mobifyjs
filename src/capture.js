@@ -130,7 +130,7 @@ var init = Capture.init = function(doc, prefix) {
  * comments.
  * Not declared on the prototype so it can be used as a static method.
  */
-var disable = Capture.disable = function(htmlStr, prefix) {   
+Capture.disable = function(htmlStr, prefix) {   
     var self = this;
     // Disables all attributes in disablingMap by prepending prefix
     var disableAttributes = (function(){
@@ -165,7 +165,7 @@ var disable = Capture.disable = function(htmlStr, prefix) {
  * Returns a string with all disabled external attributes enabled.
  * Not declared on the prototype so it can be used as a static method.
  */
-var enable = Capture.enable = function(htmlStr, prefix) {
+Capture.enable = function(htmlStr, prefix) {
     var attributeEnablingRe = new RegExp('\\s' + prefix + '(' + Utils.keys(attributesToEnable).join('|') + ')', 'gi');
     return htmlStr.replace(attributeEnablingRe, ' $1').replace(tagEnablingRe, '');
 };
@@ -173,7 +173,7 @@ var enable = Capture.enable = function(htmlStr, prefix) {
 /**
  * Return a string for the opening tag of DOMElement `element`.
  */
-var openTag = Capture.openTag = function(element) {
+Capture.openTag = function(element) {
     if (!element) return '';
     if (element.length) element = element[0];
 
@@ -214,9 +214,9 @@ Capture.prototype.getDoctype = function() {
 
     captured = {
         doctype: this.getDoctype(),
-        htmlOpenTag: openTag(htmlEl),
-        headOpenTag: openTag(headEl),
-        bodyOpenTag: openTag(bodyEl),
+        htmlOpenTag: Capture.openTag(htmlEl),
+        headOpenTag: Capture.openTag(headEl),
+        bodyOpenTag: Capture.openTag(bodyEl),
         headContent: extractHTMLStringFromElement(headEl),
         bodyContent: extractHTMLStringFromElement(bodyEl)
     };
@@ -321,8 +321,8 @@ Capture.prototype.createDocumentFragments = function() {
     deserializeString(this.bodyOpenTag, bodyEl);
 
     // Set innerHTML of new source DOM body
-    bodyEl.innerHTML = disable(this.bodyContent, this.prefix);
-    var disabledHeadContent = disable(this.headContent, this.prefix);
+    bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
+    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
 
     // On FF4, and potentially other browsers, you cannot modify <head> 
     // using innerHTML. In that case, do a manual copy of each element
@@ -346,7 +346,7 @@ Capture.prototype.createDocumentFragments = function() {
  */
 Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
-    var html = enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement), this.prefix);
+    var html = Capture.enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement), this.prefix);
     var htmlWithDoctype = this.doctype + html;
     return htmlWithDoctype;
 };

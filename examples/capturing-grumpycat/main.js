@@ -6,7 +6,7 @@ if (capturing) {
     var capture = Mobify.Capture.init();
     var capturedDoc = capture.capturedDoc;
 
-    var grumpyUrl = "/examples/assets/images/grumpycat.jpg"
+    var grumpyUrl = "/mobifyjs/examples/assets/images/grumpycat.jpg"
 
     var imgs = capturedDoc.getElementsByTagName("img");
     for(var i = 0; i < imgs.length; i++) {
