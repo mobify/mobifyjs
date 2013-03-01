@@ -21,7 +21,7 @@ more.
 
 <pre id="mobify-tag"><code class="html">&lt;script class="mobify" id="mobify-tag">(function(a,b,c,d,e){function f(a,c,d){var e=b.createElement("script"),f=b.getElementById("mobify-tag");return e.src=a,e.id=c,e.setAttribute("class",d),f.parentNode.insertBefore(e,f),e}!this.Mobify&&c()&&(b.write('&lt;plaintext style="display:none">'),setTimeout(function(){a.capturing=!0;var b=f(d,"mobify-js","mobify");b.onload=function(){e&&f(e,"mobify-js-main","mobify")}}))})(window,document,function(){var b,a=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return a&&(b=a[1]&&"firefox"===a[1].toLowerCase()&&4>+a[2]?!1:a[3]&&"opera"===a[3].toLowerCase()&&11>+a[4]?!1:!0),b?!0:!1},
 // path to Mobify.js library
-"//cdn.mobify.com/mobifyjs/mobify-2.0.0alpha1.min.js",
+"//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha1.min.js",
 // Path to main executable
 "/PATH/TO/main.js");
 &lt;/script></code></pre>
@@ -74,4 +74,4 @@ if (capturing) {
 * [Capturing Reference](./capturing/)
 
 
-[unminified]: https://github.com/mobify/mobifyjs/blob/v2.0-documentation/tag/bootstrap.html
+[unminified]: https://github.com/mobify/mobifyjs/blob/v2.0/tag/bootstrap.html

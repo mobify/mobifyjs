@@ -5,7 +5,6 @@
 <!-- START MOBIFY TAG -->
 <script class="mobify" id="mobify-tag">
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
-
 // If Mobify has been defined already, or if the detector fails,
 // exit
 if (this.Mobify || !detector()) {
@@ -14,6 +13,7 @@ if (this.Mobify || !detector()) {
 
 // Start Mobify object with initial timestamp when loaded
 window.Mobify = {points: [+new Date]};
+
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     var attachedScript = document.createElement('script');
@@ -62,28 +62,40 @@ setTimeout(function() {
         return true;
     },
     // path to mobify.js
-    '/mobifyjs/build/mobify-2.0.0alpha1.min.js',
+    '/mobifyjs/build/mobify-2.0.0alpha1.js',
 
     // path to main executable 
-    '/mobifyjs/examples/capturing-picturepolyfill/main.js'
+    '/mobifyjs/examples/capturing-basictemplating/main.js'
 );
 </script>
 <!-- END MOBIFY TAG -->
 <link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
-
-<title>Mobify.js Picturefill example</title>
+<title>Mobify.js image gallary example</title>
 </head>
 <body class="foo">
-    <p>Credit to scottjehl for his <a href="http://scottjehl.github.com/picturefill/">picturefill example</a></p>
-    <p>This example has been forked and replicated using capturing to avoid the need for a &lt;noscript&gt; tag (view source to see for yourself).</p>
-    <p>Open up the network tab of your web inspector to see that the img element does not have it's asset downloaded.<p>
-    <picture>
-        <source src="/mobifyjs/examples/assets/images/small.jpg">
-        <source src="/mobifyjs/examples/assets/images/medium.jpg" media="(min-width: 450px)">
-        <source src="/mobifyjs/examples/assets/images/large.jpg" media="(min-width: 800px)">
-        <source src="/mobifyjs/examples/assets/images/extralarge.jpg" media="(min-width: 1000px)">
-        <img src="/mobifyjs/examples/assets/images/small.jpg">
-    </picture>
+<div class="header"></div>
+<div class="example">
+
+<p>Just for funzies, I will talk about some of the cool tools we use at Mobify.</p>
+
+<p><a href="http://twitter.github.com/bootstrap/">Bootstrap</a> has been a very useful
+tool for rapidly building prototypes for our projects.</p>
+
+<p> <a href="http://www.sublimetext.com/">Sublime</a>
+is also the default text editor commonly used by our team, except for Ryan! I love the vim integration, personally.</p>
+
+<p><a href="http://mizage.com/divvy/">Divvy</a> is a fantastic product that we use for window management - 
+we all use Macbook Airs and Pros (you'll get a free one if you come work for us!).</p> 
+
+<p><a href="http://progrium.com/localtunnel/">Localtunner</a> is a great little tool that allows you to 
+expose code running on localhost trapped by your NAT to the world!</p>
+
+<p>We use an amazingly fantastic tool for HTTP debugging called <a href="http://www.charlesproxy.com/">Charles</a>.</p>
+
+<p>Annnnd I'm done. You can actually find this full list at our 
+<a href="http://www.mobify.com/blog/top-11-mobile-development-tools-used-at-mobify/">blog</a> :) 
+</p>
+</div>
 <script>
 // Grab the total time since starting capturing and send it
 // to the parent for testing in performance.html
