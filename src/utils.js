@@ -44,18 +44,38 @@ Utils.outerHTML = function(el){
     return contents;
 }
 
-Utils.excludesFilter = function(obj, excludes) {
-
+Utils.elementFilter = function(obj, excludes, prefix) {
+    if (!prefix) var prefix = "x-";
     // if elements are an array of dom elements
     var elements = obj;
+    var srcAttr = prefix + "src";
     return [].filter.call(elements, function(el){
         if (el.nodeName === "SCRIPT") {
             var str = el.outerHTML || Utils.outerHTML(el);
         }
         else if (el.nodeName === "IMG") {
-            var str = el.getAttribute("x-src");
+            var str = el.getAttribute(srcAttr);
         }
         // DO THE STRING COMPARISON STUFF
+        [].forEach.call(excludes, function(exclude){
+            var filter = false;
+            if (exclude.matchType === "contains" && str.indexOf(exclude.match) == 0) {
+                filter = true;
+            }
+            /*
+            else if (exclude.matchType === "startswith") {
+
+            }
+            else if (exclude.matchType === "endswith") {
+                
+            }
+            else if (exclude.matchType === "regex") {
+                
+            }
+            */
+            if (filter == exclude.does) return false;
+        })
+        return true; 
     })
 
     // if elements are
