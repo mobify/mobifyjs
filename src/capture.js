@@ -57,16 +57,6 @@ function escapeQuote(s) {
     return s.replace('"', '&quot;');
 }
 
-/**
- * outerHTML polyfill - https://gist.github.com/889005
- */
-function outerHTML(el){
-    var div = document.createElement('div');
-    div.appendChild(el.cloneNode(true));
-    var contents = div.innerHTML;
-    div = null;
-    return contents;
-}
 
 /**
  * Helper method for looping through and grabbing strings of elements 
@@ -83,7 +73,7 @@ function extractHTMLStringFromElement(container) {
         if (tagName == 'script' && el.getAttribute("class") == "mobify" ){
             return '';
         }
-        return el.outerHTML || el.nodeValue || outerHTML(el);
+        return el.outerHTML || el.nodeValue || Utils.outerHTML(el);
     }).join('');
 }
 
@@ -346,7 +336,7 @@ Capture.prototype.createDocumentFragments = function() {
  */
 Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
-    var html = Capture.enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement), this.prefix);
+    var html = Capture.enable(doc.documentElement.outerHTML || Utils.outerHTML(doc.documentElement), this.prefix);
     var htmlWithDoctype = this.doctype + html;
     return htmlWithDoctype;
 };

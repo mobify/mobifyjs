@@ -1,8 +1,5 @@
 var capturing = window.capturing || false;
 if (capturing) {
-    console.log("test")
-
-
     // Remove the bootstrap and tag scripts
     //var scripts = document.getElementsByTagName("script");
     // debugger;
@@ -16,13 +13,63 @@ if (capturing) {
     // Mobify.keepWarm = keepWarm;
     // Mobify.speedClick = speedClick;
 
+    var swiftData = {
+        "jazzcat": {
+            "safe": true,
+            "defaults": [
+                {
+                    "conditionType": "does"
+                    "condition": true,
+                    "matchType": "contains", // contains, startswith, endswith, regex
+                    "match": "adsense"
+                }   
+            ],
+            "excludes": [
+                {
+                    "conditionType": "does"
+                    "condition": true,
+                    "matchType": "contains", // contains, startswith, endswith, regex
+                    "match": "jquery-ui"
+                }
+            ]
+        },
+        "ir": {
+            "defaults": [
+                {
+                    "conditionType": "does"
+                    "condition": true,
+                    "matchType": "contains", // contains, startswith, endswith, regex
+                    "match": "quantcast"
+                }   
+            ],
+            "excludes": [
+                {   
+                    "conditionType": "does"
+                    "condition": true,
+                    "matchType": "contains", // contains, startswith, endswith, regex
+                    "match": "adsense"
+                }
+            ] 
+        },
+        "dom": {
+            "excludes": [
+                {
+                    "conditionType": "mediaquery", // mediaquery, javascript
+                    "condition": "(max-width: 400px)",
+                    "matchType": "css"
+                    "match": ".main img"
+                }
+            ]
+        }
+    }
+
+    // Initiate capture
+    var capture = Mobify.Capture.init();
 
     // Grab reference to a newly created document
-
-    var capture = new Mobify.Capture();
     var capturedDoc = capture.capturedDoc;
 
-    var scripts = capturedDoc.querySelectorAll('script.grabMe');
+    var scripts = capturedDoc.querySelectorAll('script');
     var jcResult = Mobify.Jazzcat.combineScripts(scripts);
     for (var i=0,ii=jcResult.length;i<ii;i++) {
         capturedDoc.body.appendChild(jcResult[i]);
@@ -37,7 +84,7 @@ if (capturing) {
                                   projectName: "mobifycom",
                                   maxWidth: 320 
                                 });
-    
+
     // Render source DOM to document
     capture.renderCapturedDoc();
 }
