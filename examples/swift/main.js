@@ -91,7 +91,6 @@ if (capturing) {
         var filteredScripts = Mobify.Utils.elementFilter(scripts, scriptExcludes);
         Mobify.ResizeImages.resize( capturedDoc.querySelectorAll("img"), { 
             projectName: "mobifycom",
-            maxWidth: 320 
         });
     }
 
