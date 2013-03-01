@@ -2,7 +2,7 @@
  * httpCache: An implementation of an in memory HTTP cache that persists data to
  * localStorage.
  */
-define(function() {
+define(["utils"], function(Utils) {
 
   var Jazzcat = window.Jazzcat = {};
 
@@ -274,7 +274,12 @@ define(function() {
                 bootstrap.innerHTML = opts.loadCallback + '();';
             }
 
-            scripts.unshift(bootstrap);                
+            scripts.unshift(bootstrap);
+            if (options.doc) {
+                for (var i=0,ii=scripts.length;i<ii;i++) {
+                    options.doc.body.appendChild(scripts[i]);
+                }
+            }         
             return scripts;
         }
 

@@ -1,6 +1,7 @@
-require(["capture", "resizeImages", "keepWarm", "dnsPrefetch", "speedClick", "jazzcat"], 
-    function(Capture, ResizeImages, keepWarm, dnsPrefetch, speedClick, Jazzcat) {
+require(["utils", "capture", "resizeImages", "keepWarm", "dnsPrefetch", "speedClick", "jazzcat"], 
+    function(Utils, Capture, ResizeImages, keepWarm, dnsPrefetch, speedClick, Jazzcat) {
     
+    Mobify.Utils = Utils;
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
 
