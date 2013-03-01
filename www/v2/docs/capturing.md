@@ -148,10 +148,3 @@ __Note: This method is async__
 | Firefox                      | 4.0+    |
 | Opera                        | 11.0+   |
 | Internet Explorer            | 10+     |
-
-## Where to next?
-
-* [What can I do with Capturing?](./capturing/)
-* [Dynamic image resizing](./image-resizing/)
-* [Adapt your site using client-side templating](./templating/)
-* [Read tips for debugging Mobify.js in the Appendix](./appendix/)
