@@ -15,8 +15,18 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
             },
             build: {
-                src: 'accordion.js',
+                src: 'src/accordion.js',
                 dest: 'build/<%= pkg.name %>.<%= pkg.version %>.min.js'
+            }
+        },
+        cssmin: {
+            core: {
+                src: 'src/accordion.css',
+                dest: 'build/accordion.<%= pkg.version %>.min.css'
+            },
+            style: {
+                src: 'src/accordion-style.css',
+                dest: 'build/accordion-style.<%= pkg.version %>.min.css'
             }
         },
         s3: {
@@ -27,14 +37,9 @@ module.exports = function(grunt) {
             headers: { "Cache-Control": "max-age=1200" },
             upload: [
                 { // build
-                    src: "build/**/*",
-                    dest: "mobifyjs/build/",
+                    src: "build/*",
+                    dest: "modules/accordion/build/",
                     rel: "build"
-                },
-                { // examples
-                    src: "examples/**/*",
-                    dest: "mobifyjs/examples/",
-                    rel: "examples"
                 }
             ]
         }
@@ -42,8 +47,9 @@ module.exports = function(grunt) {
 
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-css');
 
     // Default task(s).
-    grunt.registerTask('default', ['uglify']);
+    grunt.registerTask('default', ['uglify', 'cssmin']);
 
 };
