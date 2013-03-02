@@ -44,13 +44,12 @@ Utils.outerHTML = function(el){
     return contents;
 }
 
-Utils.elementFilter = function(elements, excludes, prefix) {
-    if (!prefix) var prefix = "x-";
-    var srcAttr = prefix + "src";
+Utils.removeElementFilter = function(elements, excludes, srcAttr) {
+    var srcAttr = srcAttr || "x-src";
     return [].filter.call(elements, function(el){
         // Grab the correct string we want to do comparisons against
         if (el.nodeName === "SCRIPT" && !el.hasAttribute(srcAttr)) {
-            var str = el.innerHTML;
+            var str = el.innerHTML; // maybe grab innerText/textContent
         }
         else if (el.nodeName === "IMG" || (el.nodeName === "SCRIPT" && el.hasAttribute(srcAttr))) {
             var str = el.getAttribute(srcAttr);
