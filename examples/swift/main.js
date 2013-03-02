@@ -53,7 +53,7 @@ if (capturing) {
                     "conditionType": "mediaquery", // mediaquery, javascript
                     "condition": "(max-width: 400px)",
                     "matchType": "css",
-                    "match": ".main img" // img, div, script, etc, *
+                    "match": ".removeme" // img, div, script, etc, *
                 }
             ]
         }
@@ -78,7 +78,7 @@ if (capturing) {
     if (swiftData.jazzcat) {
         var scripts = capturedDoc.querySelectorAll('script');
         var scriptExcludes = swiftData.jazzcat.defaults.concat(swiftData.jazzcat.excludes);
-        var filteredScripts = Mobify.Utils.elementFilter(scripts, scriptExcludes);
+        var filteredScripts = Mobify.Utils.removeElementFilter(scripts, scriptExcludes);
         Mobify.Jazzcat.combineScripts(filteredScripts, {
             doc: capturedDoc
         });
@@ -88,7 +88,7 @@ if (capturing) {
     if (swiftData.ir) {
         var images = capturedDoc.querySelectorAll('script');
         var imageExcludes = swiftData.ir.defaults.concat(swiftData.ir.excludes);
-        var filteredScripts = Mobify.Utils.elementFilter(scripts, scriptExcludes);
+        var filteredScripts = Mobify.Utils.removeElementFilter(scripts, scriptExcludes);
         Mobify.ResizeImages.resize( capturedDoc.querySelectorAll("img"), { 
             projectName: "mobifycom",
         });
