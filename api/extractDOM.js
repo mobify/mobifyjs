@@ -106,7 +106,8 @@ $.extend(html, {
         Mobify.timing.addPoint('Built Passive DOM');
         
         return result;
-    }
+    },
+    makeElement: makeElement
 });
 
 })(Mobify.$, Mobify);

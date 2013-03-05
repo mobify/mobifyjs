@@ -571,6 +571,13 @@
             equal(got, vow);
         });
 
+        test('Mobify.html.makeElement fails on bad body tag', function() {
+            var got = Mobify.html.makeElement('<bodyclass="foo bar">')
+              , vow = document.createElement("bodyclass");
+
+            deepEqual(got, vow, "makeElement fails to get attributes of badly formed 'bodyclass' element");
+        });
+
         module('Mobify.urlmatch');
         // First, some utility functions and variables
         var locationify, urlmatch, testUrlMatch;
