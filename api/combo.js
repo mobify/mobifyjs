@@ -288,7 +288,7 @@ var $ = Mobify.$
          * `document.write`. Prefer loading contents from cache.
          */
         exec: function(url, forceDataURI) {
-            var resource, safeSource;
+            var resource, safeSource, dataURI;
 
             if (resource = httpCache.get(url, true)) {
                 if (resource.text && !forceDataURI) {
@@ -318,13 +318,14 @@ var $ = Mobify.$
                     safeSource = resource.body.replace(/(<\/scr)(ipt\s*>)/ig, '$1\\$2');
                     return document.write('<script data-orig-src="' + url + '">' + safeSource + '<\/scr'+'ipt>');
                 } else {
-                    url = httpCache.utils.dataURI(resource);
+                    dataURI = httpCache.utils.dataURI(resource);
+                    return document.write('<script data-orig-src="' + url + '" src="' + dataURI + '"><\/scr' + 'ipt>');  
                 }
+            } else {
+                // Firefox will choke on closing script tags passed through
+                // the ark.
+                document.write('<script src="' + url + '"><\/scr' + 'ipt>');              
             }
-            
-            // Firefox will choke on closing script tags passed through
-            // the ark.
-            document.write('<script src="' + url + '"><\/scr' + 'ipt>');
         }
 
         /**
