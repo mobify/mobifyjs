@@ -54,7 +54,13 @@ var guillotine = function(captured) {
         var el = document.createElement(match[1]);
 
         $.each($('<div' + match[2])[0].attributes, function(i, attr) {
-            el.setAttribute(attr.nodeName, attr.nodeValue);
+            try{
+                el.setAttribute(attr.nodeName, attr.nodeValue);
+            }
+            catch(e) {
+                console.error("Can't set attribute " + attr.nodeName + " on element " + el.nodeName)
+                console.log(e);
+            }
         });
 
         return el;
