@@ -63,9 +63,9 @@
 
     <textarea id="combineScripts-1">
         <script>var a = ['a']</script>
-        <script x-src="push.js#b"></script>
+        <script x-src="fixtures/push.js#b"></script>
         <script>a.push('c')</script>
-        <script x-src="push.js#d"></script>
+        <script x-src="fixtures/push.js#d"></script>
     </textarea>
 
     <textarea id="combineScripts-2">
@@ -195,10 +195,12 @@
                     }
                 }
               , $scripts = $($('#combineScripts-1').text())
-              , $result = $scripts.combineScripts()
+              , $result
               , html = '';
 
             httpCache.reset(cache);
+            $result = $scripts.combineScripts();
+
             httpCache.save(function(err) {
                 if (err) {
                     return;
@@ -226,7 +228,7 @@
                 iframe.document.write(html);
 
                 function load() {
-                    equal(iframe.window.a.length, 4, 'a = [a, b, c , d]');
+                    deepEqual(iframe.window.a, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
 
                     start();
                 }
