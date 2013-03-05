@@ -23,8 +23,11 @@
             if (obj) {
                 $.each(obj, function(key, value) {
                     noneWritten && console.group(title);
+                    
                     if (typeof key == "number") {
                         console[fn].apply(window, value);
+                    } else if (value instanceof Error) {
+                        console.error(key, value.toString());
                     } else {
                         console[fn](key, value);
                     }
