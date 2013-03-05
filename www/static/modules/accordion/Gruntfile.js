@@ -16,17 +16,17 @@ module.exports = function(grunt) {
             },
             build: {
                 src: 'src/accordion.js',
-                dest: 'build/<%= pkg.name %>.<%= pkg.version %>.min.js'
+                dest: 'build/accordion.min.js'
             }
         },
         cssmin: {
             core: {
                 src: 'src/accordion.css',
-                dest: 'build/accordion.<%= pkg.version %>.min.css'
+                dest: 'build/accordion.min.css'
             },
             style: {
                 src: 'src/accordion-style.css',
-                dest: 'build/accordion-style.<%= pkg.version %>.min.css'
+                dest: 'build/accordion-style.min.css'
             }
         },
         s3: {
@@ -38,11 +38,12 @@ module.exports = function(grunt) {
             upload: [
                 { // build
                     src: "build/*",
-                    dest: "modules/accordion/build/",
+                    dest: "modules/accordion/<%= pkg.version %>/",
                     rel: "build"
                 }
             ]
         }
+        // TODO: upload over a LATEST version and/or create a redirect?
     });
 
     // Load the plugin that provides the "uglify" task.
