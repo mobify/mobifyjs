@@ -188,12 +188,12 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
               , date
               , expires;
 
-            // If `max-age` and `date` are present, and no other no other cache 
+            // If `max-age` and `date` are present, and no other no other cache
             // directives exist, then we are stale if we are older.
             if (cacheControl && (date = Date.parse(headers.date))) {
                 cacheControl = ccParse(cacheControl);
 
-                if ((cacheControl['max-age']) && 
+                if ((cacheControl['max-age']) &&
                     (!cacheControl['private']) &&
                     (!cacheControl['no-store']) &&
                     (!cacheControl['no-cache'])) {
@@ -217,8 +217,6 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
 
 /**
  * combineScripts: Clientside API to the combo service.
- * options:
- *   forceDataURI (default: false) = use a data URI instead of inline script delivery method
  */
 (function(window, document, Mobify) {
 
@@ -284,26 +282,33 @@ var $ = Mobify.$
 
   , combo = Mobify.combo = {
         /**
-         * Emit a <script> tag to execute the contents of `url` using 
+         * Emit a <script> tag to execute the contents of `url` using
          * `document.write`. Prefer loading contents from cache.
          */
-        exec: function(url, forceDataURI) {
-            var resource, safeSource, dataURI;
+        exec: function(url, useDataURI) {
+            var resource = httpCache.get(url, true),
+                out;
 
-            if (resource = httpCache.get(url, true)) {
-                if (resource.text && !forceDataURI) {
+            if (!resource) {
+                out = 'src="' + url + '">';
+            } else {
+                out = 'data-orig-src="' + url + '"';
+
+                if (useDataURI) {
+                    out += ' src="' + httpCache.utils.dataURI(resource) + '">';
+                } else {
                     // Explanation below uses [] to stand for <>.
                     // Inline scripts appear to work faster than data URIs on many OSes
                     // (e.g. Android 2.3.x, iOS 5, likely most of early 2013 device market)
-
+                    //
                     // However, it is not safe to directly convert a remote script into an
-                    // inline one. If there is a closing [/script] tag inside the script,
-                    // the script element will be closed prematurely and content will spill.
-
+                    // inline one. If there is a closing script tag inside the script,
+                    // the script element will be closed prematurely.
+                    //
                     // To guard against this, we need to prevent script element spillage.
                     // This is done by replacing [/script] with [/scr\ipt] inside script
                     // content. This transformation renders closing [/script] inert.
-
+                    //
                     // The transformation is safe. There are three ways for a valid JS file
                     // to end up with a [/script] character sequence:
                     // * Inside a comment - safe to alter
@@ -312,20 +317,13 @@ var $ = Mobify.$
                     // * Inside a regular expression starting with '/script' - '\i' has no
                     //   meaning inside regular expressions, either, so it is treated just
                     //   like 'i' when expression is matched.
-
+                    //
                     // Talk to Roman if you want to know more about this.
-
-                    safeSource = resource.body.replace(/(<\/scr)(ipt\s*>)/ig, '$1\\$2');
-                    return document.write('<script data-orig-src="' + url + '">' + safeSource + '<\/scr'+'ipt>');
-                } else {
-                    dataURI = httpCache.utils.dataURI(resource);
-                    return document.write('<script data-orig-src="' + url + '" src="' + dataURI + '"><\/scr' + 'ipt>');  
+                    out += '>' + resource.body.replace(/(<\/scr)(ipt\s*>)/ig, '$1\\$2');
                 }
-            } else {
-                // Firefox will choke on closing script tags passed through
-                // the ark.
-                document.write('<script src="' + url + '"><\/scr' + 'ipt>');              
             }
+
+            document.write('<script ' + out + '<\/script>');
         }
 
         /**
@@ -334,7 +332,7 @@ var $ = Mobify.$
          */
       , load: function(resources) {
             var resource, i, save = false;
-            
+
             httpCache.load()
 
             if (!resources) return;
