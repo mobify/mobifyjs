@@ -34,7 +34,7 @@ var guillotine = function(captured) {
 
                 // Find the end of <body ... >
                 var parseBodyTag = /^((?:[^>'"]*|'[^']*?'|"[^"]*?")*>)([\s\S]*)$/.exec(match[0]);
-                
+
                 // Will skip this if <body was malformed (e.g. no closing > )
                 if (parseBodyTag) {
                     // Normal termination. Both </head> and <body> were recognized and split out
@@ -47,14 +47,20 @@ var guillotine = function(captured) {
         return captured;
     }
 
-    // Transform a primitive <tag attr="value" ...> into corresponding DOM element
-    // Unlike $('<tag>'), correctly handles <head>, <body> and <html>
+    /**
+     * Transform a primitive <tag attr="value" ...> into corresponding DOM element
+     * Unlike $('<tag>'), correctly handles <head>, <body> and <html>.
+     */
   , makeElement = function(html) {
         var match = html.match(/^<(\w+)([\s\S]*)/i);
         var el = document.createElement(match[1]);
 
         $.each($('<div' + match[2])[0].attributes, function(i, attr) {
-            el.setAttribute(attr.nodeName, attr.nodeValue);
+            try {
+                el.setAttribute(attr.nodeName, attr.nodeValue);
+            } catch(e) {
+                console.error("Can't set attribute " + attr.nodeName + " on element " + el.nodeName);
+            }
         });
 
         return el;
@@ -66,17 +72,17 @@ $.extend(html, {
 
     // 1. Get the original markup from the document.
     // 2. Disable the markup.
-    // 3. Construct the source pseudoDOM.    
+    // 3. Construct the source pseudoDOM.
     extractDOM: function() {
         // Extract escaped markup out of the DOM
         var captured = guillotine(html.extractHTML());
-        
+
         Mobify.timing.addPoint('Recovered Markup');
-        
+
         // Disable attributes that can cause loading of external resources
         var disabledHead = this.disable(captured.headContent)
           , disabledBody = this.disable(captured.bodyContent);
-        
+
         Mobify.timing.addPoint('Disabled Markup');
 
         // Reinflate HTML strings back into declawed DOM nodes.
@@ -96,11 +102,13 @@ $.extend(html, {
         for (div.innerHTML = disabledBody; div.firstChild; bodyEl.appendChild(div.firstChild));
         htmlEl.appendChild(headEl);
         htmlEl.appendChild(bodyEl);
-                
+
         Mobify.timing.addPoint('Built Passive DOM');
-        
+
         return result;
-    }
+    },
+
+    makeElement: makeElement
 });
 
 })(Mobify.$, Mobify);
