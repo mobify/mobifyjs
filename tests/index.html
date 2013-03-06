@@ -142,6 +142,12 @@
     <iframe id="test-unmobify" src="fixtures/unmobify-basic.html"></iframe>
     <a href="fixtures-unmobify/basic.html">BASIC</a>
 
+    <script id="test-mobify-combo-exec" type="text/test">
+/*<\/script>*/
+"<\/script>"
+/<\/script>/
+    </script>
+
     <script>
         var $ = Mobify.$
           , httpCache = Mobify.httpCache
@@ -296,6 +302,51 @@
                 ok(httpCache.get(encodeURI(url)) != undefined, "Missing resource.");
                 start();
             });
+        });
+
+        test('Mobify.combo.exec', 5, function() {
+            var cache = {
+                'cached': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'cached',
+                    'body': 'cached',
+                    'text': true
+                },
+                'cached-with-scripts': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'cached-with-scripts',
+                    'body': getText("#test-mobify-combo-exec"),
+                    'text': true
+                }
+            };
+
+            httpCache.reset(cache);
+
+            var nativeDocumentWrite = document.write
+            document.write = function(s) {
+                wrote = s
+            }
+
+            try {
+                Mobify.combo.exec('cached');
+                equal(wrote, '<script data-orig-src="cached">cached<\/script>');
+
+                Mobify.combo.exec('uncached');
+                equal(wrote, '<script src="uncached"><\/script>');
+
+                Mobify.combo.exec('cached-with-scripts');
+                equal(wrote, '<script data-orig-src=\"cached-with-scripts\">/*<\/scr\\ipt>*/ \"<\/scr\\ipt>\" \/<\/scr\\ipt>\/<\/script>');
+
+                Mobify.combo.exec('cached');
+                equal(wrote, '<script data-orig-src="cached">cached<\/script>');
+
+                Mobify.combo.exec('cached', true);
+                equal(wrote, '<script data-orig-src="cached" src="data:application/x-javascript,cached"><\/script>');
+            } finally {
+                document.write = nativeDocumentWrite;
+            }
         });
 
         asyncTest('httpCache - Eviction on an unused resource', 2, function() {
