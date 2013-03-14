@@ -1,4 +1,4 @@
-var capturing = window.capturing || false;
+var capturing = window.Mobify && window.Mobify.capturing || false;
 
 // Picture Polyfill adjusted to use capturing
 // https://github.com/jansepar/picturefill
