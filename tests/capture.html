@@ -209,6 +209,27 @@
             $("#qunit-fixture").append(iframe);
         });
 
+        test("cloneAttributes", function(){
+            var el = document.createElement("div");
+            Capture.cloneAttributes("<div class=\"test1 test2\"></div>", el);
+
+            equal(el.className, "test1 test2");
+
+            // Regression test cases for messed up attributes
+
+            // Extra stray " character
+            Capture.cloneAttributes("<div class=\"\"test1 test2\"></div>", el);
+
+            equal(el.className, "");
+
+            // No space between div and class attribute
+            Capture.cloneAttributes("<divclass=\"\"test1 test2\"></div>", el);
+
+            equal(el.className, "");   
+
+        })
+        
+
 
     });
 </script>
