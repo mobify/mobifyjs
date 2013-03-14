@@ -63,17 +63,18 @@ You have access to all DOM API methods on the `captured document`.
     var capturedDoc = capture.getCapturedDoc();
     var paragraphs = capturedDoc.querySelectorAll("p");
 
-## window.capturing
+## `capturing` variable
 
-`window.capturing` is an indicator of the state that your code is running. Mobify.js is executed both during capturing, and after capturing.
+`window.Mobify.capturing` is an indicator of the state that your code 
+is running. Mobify.js is executed both during capturing, and after capturing.
 First it stops the original document from rendering (at this time
-`window.capturing` is true). After rendering the captured document,
+`capturing` is true). After rendering the captured document,
 Mobify.js is run again in a non-capturing context (at this time
-`window.capturing` is false).
+`capturing` is false).
 
 **Usage/Example:**
 
-    var capturing = window.capturing || false;
+    var capturing = window.Mobify && window.Mobify.capturing || false;
     if (capturing) {
         console.log("Executing during capturing phase!");
         var capture = Mobify.Capture.init();
@@ -144,7 +145,7 @@ __Note: This method is async__
 
 | Browser                      | Version |
 |------------------------------|---------|
-| Webkit (Safari, Chrome, etc) | ---     |
+| Webkit (Safari, Chrome, etc) | *       |
 | Firefox                      | 4.0+    |
 | Opera                        | 11.0+   |
 | Internet Explorer            | 10+     |
