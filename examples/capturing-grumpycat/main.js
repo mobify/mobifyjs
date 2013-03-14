@@ -1,4 +1,5 @@
-var capturing = window.capturing || false;
+var capturing = window.Mobify && window.Mobify.capturing || false;
+
 if (capturing) {
     console.log("Executing main during capturing phase!")
 
