@@ -80,7 +80,7 @@ function extractHTMLStringFromElement(container) {
         if (tagName == '#comment') return '<!--' + el.textContent + '-->';
         if (tagName == 'plaintext') return el.textContent;
         // Don't allow mobify related scripts to be added to the new document
-        if (tagName == 'script' && ((/mobify/.test(el.src) || /Mobify/.test(el.textContent)))) {
+        if (tagName == 'script' && ((/mobify/.test(el.src) || /mobify/i.test(el.textContent)))) {
             return '';
         }
         return el.outerHTML || el.nodeValue || outerHTML(el);
@@ -98,7 +98,8 @@ function deserializeString(sourceString, dest) {
     cachedDiv.innerHTML = '<div' + match[2];
 
     [].forEach.call(cachedDiv.firstChild.attributes, function(attr) {
-        dest.setAttribute(attr.nodeName, attr.nodeValue);
+            dest.setAttribute(attr.nodeName, attr.nodeValue);
+
     }); 
 
     return dest;
@@ -358,7 +359,7 @@ Capture.prototype.render = function(htmlString) {
     var doc = this.doc;
 
     // Set capturing state to false so that the user main code knows how to execute
-    window.Mobify.capturing = false;
+    if (window.Mobify) window.Mobify.capturing = false;
 
     // Asynchronously render the new document
     setTimeout(function(){
