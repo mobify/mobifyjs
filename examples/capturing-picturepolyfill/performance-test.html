@@ -15,7 +15,7 @@ window.addEventListener("message", function(event){
         // firefox reload won't work after doc.write)
         iframe.parentNode.removeChild(iframe);
         var newIframe = document.createElement("iframe");
-        newIframe.src = "/examples/capturing-mediaquery/";
+        newIframe.src = "/examples/capturing-picturepolyfill/index.html";
         newIframe.setAttribute("style", "display: none;");
         document.getElementsByTagName("body")[0].appendChild(newIframe);
         runs.push(diff);
@@ -29,6 +29,6 @@ window.addEventListener("message", function(event){
     }
 })
 </script>
-<iframe src="/examples/capturing-mediaquery/" style="display: none;"></iframe>
+<iframe src="/examples/capturing-picturepolyfill/index.html" style="display: none;"></iframe>
 </body>
 </html>
