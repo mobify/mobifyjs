@@ -80,7 +80,7 @@ function extractHTMLStringFromElement(container) {
         if (tagName == '#comment') return '<!--' + el.textContent + '-->';
         if (tagName == 'plaintext') return el.textContent;
         // Don't allow mobify related scripts to be added to the new document
-        if (tagName == 'script' && el.getAttribute("class") == "mobify" ){
+        if (tagName == 'script' && ((/mobify/.test(el.src) || /Mobify/.test(el.textContent)))) {
             return '';
         }
         return el.outerHTML || el.nodeValue || outerHTML(el);
@@ -358,7 +358,7 @@ Capture.prototype.render = function(htmlString) {
     var doc = this.doc;
 
     // Set capturing state to false so that the user main code knows how to execute
-    capturing = false;
+    window.Mobify.capturing = false;
 
     // Asynchronously render the new document
     setTimeout(function(){
