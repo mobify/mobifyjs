@@ -1,11 +1,14 @@
 ---
 layout: modules
-title: Mobify.js Carousel Module
+title: Mobify.js Carousel Module for Mobile Websites
+description:
+    Learn about Mobify.js Carousel module, a configurable rotating content
+    carousel for displaying images or arbitrary information on mobile websites.
 ---
 
 <link rel="stylesheet" href="{{ site.baseurl }}/static/modules/carousel/carousel.css">
 <link rel="stylesheet" href="{{ site.baseurl }}/static/modules/carousel/carousel-style.css">
-<style type="text/css">
+<style>
 
 /* styling for this page */
 .m-carousel {
@@ -94,7 +97,7 @@ arbitrary content.
 By default, items are center aligned and their width is determined by
 their content width and/or any styling that restricts their width.
 
-To change the styling of the items, add the following classes to the 
+To change the styling of the items, add the following classes to the
 viewport:
 
 
@@ -168,7 +171,7 @@ Removes the carousel and its event handlers from the DOM.
 
 The viewport emits the following events:
 
-| Name          | Arguments                 | Description                               |   
+| Name          | Arguments                 | Description                               |
 |---------------|---------------------------|-------------------------------------------|
 | beforeSlide   | previousIndex, newIndex   | Fired before the carousel moves.          |
 | afterSlide    | previousIndex, newIndex   | Fired after the carousel begins moving.   |

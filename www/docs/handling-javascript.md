@@ -1,6 +1,6 @@
 ---
 layout: doc
-title: Handling Javascript with Mobify.js
+title: Handling Javascript | Mobify.js Framework Documentation
 ---
 
 # Handling JavaScript with Mobify.js
@@ -97,7 +97,7 @@ execute. Imagine a script that increments the element returned by the
 selector `#counter`:
 
     var counterEl = document.getElementById('counter');
-    counterEl.innerHTML = 
+    counterEl.innerHTML =
         parseInt(counterEl.innerHTML) + 1;
 
 If the element matching the CSS selector \#counter does not exist in the

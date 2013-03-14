@@ -1,6 +1,9 @@
 ---
 layout: page
-title: Contributor License Agreement
+title: Mobify.js Contributor License Agreement
+description:
+    Learn the terms and conditions under which you can contribute changes
+    to Mobify.js open source project.
 ---
 
 # Contributor License Agreement ("Agreement")

@@ -9,7 +9,7 @@ Mobify.UI = Mobify.UI || {};
         'touch': 'ontouchend' in document
     });
 
-})($, document);
+})(Mobify.$, document);
 
 
 
@@ -66,7 +66,7 @@ Mobify.UI.Utils = (function($) {
 
         var el = document.createElement('fakeelement');
         var transitions = {
-            'transition':'transitionEnd',
+            'transition':'transitionEnd transitionend',
             'OTransition':'oTransitionEnd',
             'MSTransition':'msTransitionEnd',
             'MozTransition':'transitionend',

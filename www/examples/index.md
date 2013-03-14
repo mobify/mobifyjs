@@ -1,6 +1,10 @@
 ---
 layout: example
-title: Mobify.js Examples
+title: Mobify.js Framework Examples
+description:
+    Find examples of how Mobify.js can be used to adapt any website to support
+    any device.
+
 ---
 
 # Examples
@@ -13,7 +17,7 @@ All code is available on Github: [github.com/mobify/mobifyjs-demos](https://gith
 
 ## Demo Site - [demostore.mobify.com](http://demostore.mobify.com) {#demostore}
 
-Uncle Merlin's Discount Potions is a Magento store that uses Mobify.js to 
+Uncle Merlin's Discount Potions is a Magento store that uses Mobify.js to
 provide an optimized view for mobile devices.
 
 ### Running the Code:
@@ -34,8 +38,8 @@ provide an optimized view for mobile devices.
 
 ### Changing the Code:
 
-With the development server running, you can make updates to the Demo Store 
-project files with your text editor and then refresh the page to see your 
+With the development server running, you can make updates to the Demo Store
+project files with your text editor and then refresh the page to see your
 changes. Start with these files:
 
 * _src/mobify.konf_ contains the DOM operations to select and adapt the source
@@ -51,6 +55,6 @@ changes. Start with these files:
 
 ## Where to Next?
 
-If you want to understand more about how this stuff works, be sure to check out our 
+If you want to understand more about how this stuff works, be sure to check out our
 [documentation](../docs/), and if you have any questions, head over
 to our [community](../community/) page.
