@@ -44,41 +44,40 @@ Utils.outerHTML = function(el){
     return contents;
 }
 
-Utils.elementFilter = function(obj, excludes, prefix) {
+Utils.elementFilter = function(elements, excludes, prefix) {
     if (!prefix) var prefix = "x-";
-    // if elements are an array of dom elements
-    var elements = obj;
     var srcAttr = prefix + "src";
     return [].filter.call(elements, function(el){
-        if (el.nodeName === "SCRIPT") {
-            var str = el.outerHTML || Utils.outerHTML(el);
+        // Grab the correct string we want to do comparisons against
+        if (el.nodeName === "SCRIPT" && !el.hasAttribute(srcAttr)) {
+            var str = el.innerHTML;
         }
-        else if (el.nodeName === "IMG") {
+        else if (el.nodeName === "IMG" || (el.nodeName === "SCRIPT" && el.hasAttribute(srcAttr))) {
             var str = el.getAttribute(srcAttr);
         }
-        // DO THE STRING COMPARISON STUFF
-        [].forEach.call(excludes, function(exclude){
+        // Iterate through the excludes
+        for (var i=0; i<excludes.length; i++) {
             var filter = false;
-            if (exclude.matchType === "contains" && str.indexOf(exclude.match) == 0) {
+            var exclude = excludes[i];
+            if ((exclude.matchType === "startswith" && str.indexOf(exclude.match) == 0) || 
+                (exclude.matchType === "contains" && str.indexOf(exclude.match) != -1) ||
+                (exclude.matchType === "endswith" && str.indexOf(exclude.match, str.length - exclude.match.length) !== -1) ||
+                (exclude.matchType === "regex" && (new RegExp(exclude.match)).test(str))) {
+
                 filter = true;
             }
-            /*
-            else if (exclude.matchType === "startswith") {
-
-            }
-            else if (exclude.matchType === "endswith") {
-                
-            }
-            else if (exclude.matchType === "regex") {
-                
-            }
-            */
             if (filter == exclude.does) return false;
-        })
+        }
         return true; 
     })
+}
 
-    // if elements are
+Utils.removeBySelector = function(selector) {
+    var els = capturedDoc.querySelectorAll(selector);
+    for (var i=0,ii=els.length; i<ii; i++) {
+        var el = els[i];
+        el.parentNode.removeChild(el);
+    }
 }
 
 return Utils;

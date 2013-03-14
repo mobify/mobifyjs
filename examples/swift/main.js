@@ -18,16 +18,14 @@ if (capturing) {
             "safe": true,
             "defaults": [
                 {
-                    "conditionType": "does"
-                    "condition": true,
+                    "does": true,
                     "matchType": "contains", // contains, startswith, endswith, regex
                     "match": "adsense"
                 }   
             ],
             "excludes": [
                 {
-                    "conditionType": "does"
-                    "condition": true,
+                    "does": false,
                     "matchType": "contains", // contains, startswith, endswith, regex
                     "match": "jquery-ui"
                 }
@@ -36,16 +34,14 @@ if (capturing) {
         "ir": {
             "defaults": [
                 {
-                    "conditionType": "does"
-                    "condition": true,
+                    "does": true,
                     "matchType": "contains", // contains, startswith, endswith, regex
                     "match": "quantcast"
                 }   
             ],
             "excludes": [
-                {   
-                    "conditionType": "does"
-                    "condition": true,
+                {
+                    "does": true,
                     "matchType": "contains", // contains, startswith, endswith, regex
                     "match": "adsense"
                 }
@@ -56,8 +52,8 @@ if (capturing) {
                 {
                     "conditionType": "mediaquery", // mediaquery, javascript
                     "condition": "(max-width: 400px)",
-                    "matchType": "css"
-                    "match": ".main img"
+                    "matchType": "css",
+                    "match": ".main img" // img, div, script, etc, *
                 }
             ]
         }
@@ -69,21 +65,35 @@ if (capturing) {
     // Grab reference to a newly created document
     var capturedDoc = capture.capturedDoc;
 
-    var scripts = capturedDoc.querySelectorAll('script');
-    var jcResult = Mobify.Jazzcat.combineScripts(scripts);
-    for (var i=0,ii=jcResult.length;i<ii;i++) {
-        capturedDoc.body.appendChild(jcResult[i]);
+    // Exclude some DOM elements
+    if (swiftData.dom) {
+        [].forEach.call(swiftData.dom.excludes, function(exclude){
+            if (window.matchMedia && window.matchMedia(exclude.condition)) {
+                Mobify.Utils.removeBySelector(exclude.match);
+            }
+        })
     }
 
-    Mobify.dnsPrefetch(capturedDoc);
-    Mobify.keepWarm();
+    // Concatinate Javascript using Jazzcat
+    if (swiftData.jazzcat) {
+        var scripts = capturedDoc.querySelectorAll('script');
+        var scriptExcludes = swiftData.jazzcat.defaults.concat(swiftData.jazzcat.excludes);
+        var filteredScripts = Mobify.Utils.elementFilter(scripts, scriptExcludes);
+        Mobify.Jazzcat.combineScripts(filteredScripts, {
+            doc: capturedDoc
+        });
+    }
 
     // Resize images using Mobify Image Resizer
-    Mobify.ResizeImages.resize( capturedDoc.querySelectorAll("img"), 
-                                { 
-                                  projectName: "mobifycom",
-                                  maxWidth: 320 
-                                });
+    if (swiftData.ir) {
+        var images = capturedDoc.querySelectorAll('script');
+        var imageExcludes = swiftData.ir.defaults.concat(swiftData.ir.excludes);
+        var filteredScripts = Mobify.Utils.elementFilter(scripts, scriptExcludes);
+        Mobify.ResizeImages.resize( capturedDoc.querySelectorAll("img"), { 
+            projectName: "mobifycom",
+            maxWidth: 320 
+        });
+    }
 
     // Render source DOM to document
     capture.renderCapturedDoc();
