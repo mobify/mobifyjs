@@ -95,7 +95,7 @@ and run it from `www` folder:
     gem install jekyll
     cd www
     jekyll --server --auto
-    
+
 Then navigate to http://localhost:4000/mobifyjs/docs/.
 
 ## Build mobifyjs.com

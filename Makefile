@@ -25,4 +25,8 @@ buildstatic: modules ; \
 	jekyll ; \
 	rm static/downloads/*
 
+serve:
+	cd www ; \
+	jekyll --server --auto
+
 .PHONY: modules
