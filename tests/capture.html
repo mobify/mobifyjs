@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="foo">
+<head>
+  <meta charset="utf-8">
+  <title>Capture.js Tests</title>
+  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/require.js"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
+</head>
+<body>
+
+<div id="qunit"></div>
+
+<div id="qunit-fixture">
+<textarea id="disable-test-fixture">
+<html>
+<head>
+    <link href="/path/to/stylesheet.css">
+    <style media="query"></style>
+</head>
+<body>
+    <img src="/path/to/image.png"></img>
+    <iframe src="/path/to/page.html"></iframe>
+</body>
+</html>
+</textarea>
+
+<textarea id="enable-test-fixture">
+<html>
+<head>
+    <link x-href="/path/to/stylesheet.css">
+    <style x-media="query"></style>
+</head>
+<body>
+    <img x-src="/path/to/image.png"></img>
+    <iframe x-src="/path/to/page.html"></iframe>
+</body>
+</html>
+</textarea>
+
+<div id="foo-element" foo="bar"></div>
+
+
+<script>
+    QUnit.config.autostart = false;
+    require.config({
+        "baseUrl": "../src/",  
+    })
+    require(["../src/capture.js"], function(Capture) {
+        QUnit.start();
+        
+        // Test disabling attributes that cause resource loading
+        test("disable", function() {
+            var html = $("#disable-test-fixture").text();
+            var expectedHtml = "<html>\
+\n<head>\
+\n    <link x-href=\"/path/to/stylesheet.css\">\
+\n    <style media=\"mobify-media\" x-media=\"query\"></style>\
+\n</head>\
+\n<body>\
+\n    <img x-src=\"/path/to/image.png\"></img>\
+\n    <iframe x-src=\"/path/to/page.html\"></iframe>\
+\n</body>\
+\n</html>\
+\n"
+
+            // Needed to pass tests on iOS 4.3 on iPad
+            if (/ip(hone|ad).*4_/i.test(navigator.userAgent)){
+                expectedHtml = "\n" + expectedHtml
+            }
+
+            equal(Capture.disable(html, "x-"), expectedHtml, "Passed!" );
+        });
+
+        // Test enabling attributes that cause resource loading
+        test("enable", function() {
+            var html = $("#enable-test-fixture").text();
+            var expectedHtml = "<html>\
+\n<head>\
+\n    <link href=\"/path/to/stylesheet.css\">\
+\n    <style media=\"query\"></style>\
+\n</head>\
+\n<body>\
+\n\
+\n    <img src=\"/path/to/image.png\"></img>\
+\n    <iframe src=\"/path/to/page.html\"></iframe>\
+\n</body>\
+\n</html>\
+\n"
+            // Needed to pass tests on iOS 4.3 on iPad/iPhone
+            if (/ip(hone|ad).*4_/i.test(navigator.userAgent)){
+                expectedHtml = "\n" + expectedHtml
+            }
+
+            ok(Capture.enable(html, "x-"), expectedHtml, "Passed!" );
+        });
+
+        test("openTag", function(){
+            var element = $("#foo-element");
+            var openTag = Capture.openTag(element);
+            ok((openTag === "<div id=\"foo-element\" foo=\"bar\">") || openTag === "<div foo=\"bar\" id=\"foo-element\">")
+        });
+
+        test("detector", function(){
+            var detector = function (userAgent){
+                // We're enabled for:
+                // - WebKit based browsers
+                // - IE 10
+                // - FireFox 4+
+                // - Opera 11+
+                // - 3DS
+                match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(userAgent);
+             
+                if (!match) {
+                    return false;
+                }
+             
+                // match[1] == Firefox
+                if (match[1] && +match[2] < 4) {
+                    return false;
+                }
+                // match[3] == Opera
+                if (match[3] && +match[4] < 11) {
+                    return false;
+                }
+             
+                return true;
+            };
+
+            ok(detector("Mozilla/5.0 (X11; U; Linux i686; ru; rv:1.9.1.3) Gecko/20091020 Ubuntu/10.04 (lucid) Firefox/4.0.1"), "Firefox 4.0");
+            ok(detector("Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1"), "Firefox 16");
+            ok(detector("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15"), "Chrome");
+            ok(detector("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)"), "IE 10");
+            ok(detector("Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02"), "Opera 12");
+            ok(detector("Opera/9.80 (X11; Linux x86_64; U; Ubuntu/10.10 (maverick); pl) Presto/2.7.62 Version/11.01"), "Opera 11");
+            ok(detector("Mozilla/5.0 (Nintendo 3DS; U; ; en) Version/1.7498.US"), "Nintendo 3DS");
+            ok(!detector("Mozilla/5.0 (X11; U; Linux i686; pl-PL; rv:1.9.0.2) Gecko/20121223 Ubuntu/9.25 (jaunty) Firefox/3.8"), "Firefox 3.8 (not supported)");
+            ok(!detector("Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US))"), "IE 9 (not supported)");
+            ok(!detector("Mozilla/5.0 (Windows; U; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)"), "IE 6 (not supported)");
+            ok(!detector("Opera/9.80 (Windows NT 6.1; U; pl) Presto/2.6.31 Version/10.70"), "Opera 10 (not supported)");
+
+        })
+
+        asyncTest("createDocumentFromSource", function(){
+            var iframe = $("<iframe>", {id: "plaintext-example"});
+            iframe.attr("src", "/tests/fixtures/plaintext-example.html")
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
+                var capture = Capture.init(doc);
+                var capturedDoc = capture.capturedDoc;
+
+                var expectedHtml = "<!DOCTYPE HTML><html class=\"testclass\"><head>\
+\n    \
+\n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\
+\n\
+\n</head><body>\
+\n    <p>Plaintext example page!</p>\
+\n    <script src=\"/path/to/script.js\"><\/script>\
+\n\
+\n\
+\n\
+\n</body></html>";
+
+                var html = capture.escapedHTMLString(capturedDoc);
+                equal(html, expectedHtml, "Passed!");
+                start();
+            });
+            $("#qunit-fixture").append(iframe);
+        });
+
+        asyncTest("scriptsCorrectOrder", function(){
+            var iframe = $("<iframe>", {id: "script-order-test"});
+            iframe.attr("src", "/tests/fixtures/blank-example.html");
+
+            window.addEventListener("message", function(event) {
+                window.messageReceived = true;
+                equal(event.data, "1,2,3,4,5");
+                start();
+            }, true);
+
+            var iframeLoaded = false;
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                var capture = Capture.init(doc);
+                var capturedDoc = capture.capturedDoc;
+
+                var html = "<html><head></head>\
+\n<body>\
+\n<h1>Script order test</h1>\
+\n<script>var verify=[1];</scr" + "ipt>\
+\n<script src=\"/tests/resources/bigscript.js\"><\/script>\
+\n<script>verify.push(3);</scr" + "ipt>\
+\n<script src=\"/tests/resources/smallscript.js\"><\/script>\
+\n<script>verify.push(5);</scr" + "ipt>\
+\n<script>parent.postMessage(verify.join(), \"*\");<\/script>\
+\n</body>\
+\n</html>";
+                if (iframeLoaded == false) {
+                    iframeLoaded = true;
+                    capture.render(html);
+                }
+            });
+            $("#qunit-fixture").append(iframe);
+        });
+
+        test("cloneAttributes", function(){
+            var el = document.createElement("div");
+            Capture.cloneAttributes("<div class=\"test1 test2\"></div>", el);
+
+            equal(el.className, "test1 test2");
+
+            // Regression test cases for messed up attributes
+
+            // Extra stray " character
+            Capture.cloneAttributes("<div class=\"\"test1 test2\"></div>", el);
+
+            equal(el.className, "");
+
+            // No space between div and class attribute
+            Capture.cloneAttributes("<divclass=\"\"test1 test2\"></div>", el);
+
+            equal(el.className, "");   
+
+        })
+        
+
+
+    });
+</script>
+</body>
+</html>

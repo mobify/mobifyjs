@@ -1,80 +1,33 @@
 ---
-layout: base
-title: Mobify.js - Remix Your Site for Mobile and Tablet Devices
+layout: basev2
+title: Mobify.js
 bodyclass: home
 ---
 
 <div class="row-fluid intro">
-    <div class="span5 video-intro">
+    <div class="span6">
         <p class="lead">
-            Remix your HTML, CSS and JavaScript for <strong>better mobile sites</strong>.
+            <span><strong>Take control</strong> of your DOM.</span>
+            <span>Adapt your site for <strong>any device</strong>.</span>
         </p>
         <p class="lead-mini">
-            Mobify.js is an open source client-side web framework that helps you
-            adapt any website to support any device. Powering millions of daily
-            mobile visits to your favourite websites.
-        </p>
-    </div>
+            Mobify.js is an open source library for capturing and manipulating your
+            site's DOM before any resources have downloaded, which enables
+            resource control, conditional loading and more.
 
-    <div class="span6 video-container">
-        <div class="video rounded shaded">
-            <a href="//vimeo.com/45722921" class="play">
-                <i>Play Video</i>
-            </a>
-            <h3>Coding A Mobile Site with Mobify.js</h3>
-            <iframe src="//player.vimeo.com/video/45722921"
-                    frameborder="0"
-                    webkitAllowFullScreen
-                    mozallowfullscreen
-                    allowFullScreen></iframe>
+            Mobify.js powers millions
+            of daily mobile visits to your favourite websites.
+        </p>
+        <div class="cta">
+          <a href="/mobifyjs/v2/docs/" class="btn btn-primary rounded">Get Started Now</a>
         </div>
     </div>
-</div>
-
-<div class="install-client">
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="well install-container rounded shaded">
-                <div class="row-fluid">
-                    <div class="span6">
-                        <div class="install-summary">
-                            <h2>Install the Mobify Client</h2>
-                            <p>
-                                Quick install instructions are on the right.
-                                After you have the client, check out the examples.
-                                Note: the Mobify Client requires Node.js,
-                                <a href="http://nodejs.org/">get it here</a>.
-                            </p>
-
-                            <div class="actions">
-                                <a href="/mobifyjs/examples/"><i class="icon-beaker"></i>See Examples</a>
-
-                                <a href="https://github.com/mobify/mobifyjs">
-                                    <i class="icon-git-fork"></i>Fork on GitHub
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="span6">
-                        <ol class="install-instructions">
-                            <li class="npm"><code>sudo npm -g install mobify-client</code></li>
-                            <li class="init"><code>mobify init myproject &amp;&amp; cd myproject &amp;&amp; mobify preview</code></li>
-                            <li class="tag">
-                                <span>Install Mobify tag</span> <a href="/mobifyjs/docs/#install-the-mobifyjs-tag" class="how">(how?)</a>
-                            </li>
-                            <li class="preview">
-                                <a href="/mobifyjs/docs/#preview-your-mobile-site">Preview your Mobile Site</a>
-                            </li>
-                        </ol>
-                    </div>
-                </div><!-- nested .row -->
-            </div><!-- .well -->
-            <div class="pull-right">
-                <a href="/mobifyjs/docs/">
-                    More detailed installation instructions
-                </a>
-            </div>
+    <div class="span6">
+        <div class="animated">
+            <div class="dom"></div>
+            <div class="desktop"></div>
+            <div class="tablet"></div>
+            <div class="phone"></div>
         </div>
     </div>
 </div>
@@ -105,24 +58,22 @@ bodyclass: home
         <div class="span4 manipulate-dom">
             <p>
                 Take control of your existing DOM on mobile and tablets. Move
-                elements around, replace heavy images and scripts with
-                low-bandwidth optimized versions.
+                elements around, replace heavy images and scripts with low-
+                bandwidth optimized versions.
             </p>
         </div>
         <div class="span4 desktop-content">
             <p>
-                Mobile site content comes directly from your desktop site.
-                As you make changes and add content your mobile site won&#8217;t
-                fall out of sync.
+                Recreate brand new experiences using client-side templating when
+                responsive falls short. As you make changes and add content your
+                mobile site won&#8217;t fall out of sync.
             </p>
         </div>
         <div class="span4 responsive">
             <p>
-                Use Mobify.js on its own, or combine with other industry-leading
-                techniques like Responsive Web Design for even more control.
-                <a href="/mobifyjs/docs/responsive/" class="more">
-                    Learn More &rsaquo;
-                </a>
+                Use Mobify.js to adapt your site to all devices, for both
+                responsive sites and sites that want to go mobile fast with
+                client-side templating.
             </p>
         </div>
     </div><!-- .row-fluid -->
@@ -139,7 +90,6 @@ bodyclass: home
                 Let the team who created Mobify.js help you take your finely-tuned
                 mobile site even further.
             </p>
-
            <p>
                 The Mobify Cloud offers a distributed CDN, mobile workflow
                 management, QA testing, automatic image resizing, smart JavaScript
@@ -147,32 +97,8 @@ bodyclass: home
             </p>
         </div>
         <div class="span4 cta">
-            <a href="https://cloud.mobify.com/" class="btn btn-primary rounded">
-                Try Mobify Cloud for Free
-            </a>
+            <a href="https://cloud.mobify.com/"
+               class="btn btn-primary rounded">Try Mobify Cloud for Free</a>
         </div>
     </div><!-- .row-fluid -->
 </div><!-- .next-level -->
-
-<script>
-    /**
-     * Video popout!
-     */
-    (function() {
-        if (!document.querySelector || !window.addEventListener) {
-            return;
-        }
-
-        var play = document.querySelector("a.play");
-        var container = document.querySelector("div.video-container").parentNode;
-
-        play.addEventListener("click", function(event) {
-            event.preventDefault();
-
-            container.className += " animate-video";
-            setTimeout(function() {
-                container.className += " display-video";
-            }, 500);
-        }, false);
-    })();
-</script>

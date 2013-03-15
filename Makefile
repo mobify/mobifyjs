@@ -1,9 +1,11 @@
 install:
-	git submodule update --init
+	#git submodule update --init
+	npm uninstall -g grunt
+	npm install -g grunt-cli
 	npm install
 
-test:
-	./tests/runner.sh
+test: install
+	grunt test
 
 jenkins:
 	./tests/runner.sh

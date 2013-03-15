@@ -1,3 +1,0 @@
-{#clientTransform}
-    {>"/base/konf/base.konf"/}
-{/clientTransform}

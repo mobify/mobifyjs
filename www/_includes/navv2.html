@@ -1,0 +1,35 @@
+<div class="nav-wrapper">
+    <ul class="nav">
+        <li class="nav-about">
+    {% active_links %}
+            <a href="/mobifyjs/" class="rounded about">About</a>
+    {% endactive_links %}
+        </li>
+        <li class="nav-docs">
+    {% active_links prefix %}
+            <a href="/mobifyjs/v2/docs/" class="rounded">Docs</a>
+        </li>
+        <li class="nav-examples">
+            <a href="/mobifyjs/v2/examples/" class="rounded">Examples</a>
+        </li>
+        <li class="nav-community">
+            <a href="/mobifyjs/v2/community/" class="rounded">Community</a>
+        </li>
+        <li class="dropdown nav-version">
+            <a class="dropdown-toggle rounded" data-toggle="dropdown" href="#">
+                 2.0<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a href="/mobifyjs/v2/docs/">2.0</a></li>
+                <li><a href="/mobifyjs/docs/">1.1</a></li>
+            </ul>
+        </li>
+        <li class="nav-version-mobile">
+            <a class="rounded" href="/mobifyjs/docs/">1.1</a>
+        </li>
+        <li>
+            <a href="//twitter.com/mobifyjs"
+               class="rounded"><i class="icon-twitter"></i></a>
+       	</li>
+    </ul><!-- .nav -->
+    {% endactive_links %}
+</div>

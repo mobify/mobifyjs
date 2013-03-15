@@ -1,0 +1,24 @@
+require(["capture", "resizeImages"], function(Capture, ResizeImages) {
+    var Mobify = window.Mobify = window.Mobify || {};
+    
+    // DECLARE LIBRARIES ATTACHED TO MOBIFY OBJECT HERE
+    Mobify.Capture = Capture;
+    Mobify.ResizeImages = ResizeImages;
+
+    // OPTIONAL: Also add main executable logic to compile library + main
+    //           instead of having seperate main.js file
+    /*
+    var capturing = window.capturing || false;
+    if (capturing) {
+        // Grab reference to a newly created document
+        var capture = new Capture();
+        var capturedDoc = capture.capturedDoc;
+
+        // Resize images using Mobify Image Resizer
+        ResizeImages.resize(capturedDoc, 320);
+        // Render source DOM to document
+        capture.renderCapturedDoc();
+    }*/
+
+}, undefined, true);
+// relPath, forceSync

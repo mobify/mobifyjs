@@ -22,7 +22,7 @@ or you wish to reach our Mobify Cloud support team you can reach us through our
 
 Bugs and feature requests should be submitted to our issue tracker on GitHub:
 
-  - [Issues with the Mobify.js Framework](https://github.com/mobify/mobifyjs/issues)
+  - [Issues with Mobify.js](https://github.com/mobify/mobifyjs/issues)
   - [Issues with the Mobify Client](https://github.com/mobify/mobify-client/issues)
 
 If you're not sure which project to submit your issues to, submit to either and
@@ -30,10 +30,9 @@ we will sort them out.
 
 ## How to Contribute
 
-The development of Mobify.js takes place on GitHub. We have two primary
-repositories dedicated to Mobify.js: the [Mobify.js Framework](https://github.com/mobify/mobifyjs)
-and the [Mobify Client](https://github.com/mobify/mobify-client), which is our
-development tool.
+The development of Mobify.js takes place on GitHub. We have two primary 
+repositories dedicated to Mobify.js: the [Mobify.js library](https://github.com/mobify/mobifyjs) 
+and the [Mobify Client](https://github.com/mobify/mobify-client), which is our development tool.
 
 Contributing changes is straightforward:
 

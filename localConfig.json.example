@@ -1,0 +1,11 @@
+{
+    "saucelabs": {
+        "username": "{SAUCELABS_USERNAME}",
+        "key": "{SAUCELABS_KEY}"
+    },
+    "aws": {
+        "key": "{AWS_KEY}",
+        "secret": "{AWS_SECRET}",
+        "bucket": "{AWS_BUCKET}"
+    }
+}
