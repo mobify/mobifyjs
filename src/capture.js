@@ -4,6 +4,14 @@ define(["utils"], function(Utils) {
 // # Static Variables/Functions
 // ##
 
+// v6 tag backwards compatibility change
+if (window.Mobify && 
+    !window.Mobify.capturing &&
+    document.getElementsByTagName("plaintext").length) 
+{
+            window.Mobify.capturing = true;
+}
+
 var openingScriptRe = /(<script[\s\S]*?>)/gi;
 
 // Inline styles and scripts are disabled using a unknown type.
