@@ -384,6 +384,14 @@ Capture.prototype.renderCapturedDoc = function(options) {
     // To provide our library functionality afterwards, we
     // must re-inject the script.
     var mobifyjsScript = document.getElementById("mobify-js");
+
+    // v6 tag backwards compatibility change
+    if (!mobifyjsScript) {
+        mobifyjsScript = document.getElementsByTagName("script")[0];
+        mobifyjsScript.id = "mobify-js";
+        mobifyjsScript.setAttribute("class", "mobify");
+    }
+
     // Since you can't move nodes from one document to another,
     // we must clone it first using importNode:
     // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
