@@ -368,7 +368,7 @@ Capture.prototype.render = function(htmlString) {
     // Asynchronously render the new document
     setTimeout(function(){
         doc.open();
-        doc.write(htmlString);
+        doc.write(escapedHTMLString);
         doc.close();
     });
 };
