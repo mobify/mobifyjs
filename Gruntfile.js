@@ -57,7 +57,7 @@ module.exports = function(grunt) {
                 }
             },
             // Building experimental swift features
-            full: {
+            swift: {
                 options: {
                     almond: true,
                     mainConfigFile: "./src/config.js",
@@ -67,7 +67,7 @@ module.exports = function(grunt) {
                     out: "./build/mobify-swift-<%= pkg.version %>.js",
                 }
             },
-            fullOptimized: {
+            swiftOptimized: {
                 options: {
                     almond: true,
                     mainConfigFile: "./src/config.js",
@@ -227,6 +227,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build', function() {
         // Then build mobify.js library
         grunt.task.run("requirejs:full", "requirejs:fullOptimized")
+        grunt.task.run("requirejs:swift", "requirejs:swiftOptimized")
         // Build custom library if it exists
         if (grunt.file.exists("mobify-custom.js")) {
             grunt.task.run("requirejs:custom", "requirejs:customOptimized");

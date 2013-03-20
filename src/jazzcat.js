@@ -2,13 +2,11 @@
  * httpCache: An implementation of an in memory HTTP cache that persists data to
  * localStorage.
  */
-define(["capture"], function(Capture) {
+define(["utils", "capture"], function(Utils, Capture) {
 
-  return (function(){
+    var Jazzcat = window.Jazzcat = {};
 
-  var Mobify = window.Mobify;
-
-  var get = function(key, increment) {
+    var get = function(key, increment) {
           // Ignore anchors.
           var resource = cache[key.split('#')[0]];
 
@@ -20,14 +18,14 @@ define(["capture"], function(Capture) {
           return resource;
       }
 
-    , set = function(key, val) {
+    var set = function(key, val) {
           cache[key] = val;
       }
 
       /**
        * Load the persistent cache into memory. Ignore stale resources.
        */
-    , load = function() {
+    var load = function() {
           var data = localStorage.getItem(localStorageKey)
             , key;
 
@@ -48,88 +46,88 @@ define(["capture"], function(Capture) {
           }
       }
 
-      /**
-       * Save the in-memory cache to disk. If the disk is full, use LRU to drop
-       * resources until it will fit on disk.
-       */
-    , save = function(callback) {
-          var resources = {}
-            , resource
-            , attempts = 10
-            , key
-            , serialized
-              // End of time.
-            , lruTime = 9007199254740991
-            , lruKey;
+    /**
+    * Save the in-memory cache to disk. If the disk is full, use LRU to drop
+    * resources until it will fit on disk.
+    */
+    var save = function(callback) {
+        var resources = {}
+        , resource
+        , attempts = 10
+        , key
+        , serialized
+          // End of time.
+        , lruTime = 9007199254740991
+        , lruKey;
 
-          for (key in cache) {
-              if (cache.hasOwnProperty(key)) {
-                  resources[key] = cache[key]
-              }
-          }
+        for (key in cache) {
+            if (cache.hasOwnProperty(key)) {
+                resources[key] = cache[key]
+            }
+        }
 
-          (function persist() {
-              setTimeout(function() {
-                  try {
-                      serialized = JSON.stringify(resources);
-                  } catch(err) {
-                      if (callback) callback(err);
-                      return;
-                  }
+        (function persist() {
+            setTimeout(function() {
+                try {
+                    serialized = JSON.stringify(resources);
+                } catch(err) {
+                    if (callback) callback(err);
+                    return;
+                }
 
-                  try {
-                      localStorage.setItem(localStorageKey, serialized)
-                  } catch(err) {
-                      if (!--attempts) {
-                          if (callback) callback(err);
-                          return;
-                      }
+                try {
+                    localStorage.setItem(localStorageKey, serialized)
+                } catch(err) {
+                    if (!--attempts) {
+                        if (callback) callback(err);
+                        return;
+                    }
 
-                      for (key in resources) {
-                          if (!resources.hasOwnProperty(key)) continue;
-                          resource = resources[key]
+                    for (key in resources) {
+                        if (!resources.hasOwnProperty(key)) continue;
+                        resource = resources[key]
 
-                          // Nominate the LRU.
-                          if (resource.lastUsed) {
-                              if (resource.lastUsed <= lruTime) {
-                                  lruKey = key;
-                                  lruTime = resource.lastUsed;
-                              }
-                          // If a resource has not been used, it's the LRU.
-                          } else {
-                              lruKey = key;
-                              lruTime = 0;
-                              break;
-                          }
-                      }
+                        // Nominate the LRU.
+                        if (resource.lastUsed) {
+                            if (resource.lastUsed <= lruTime) {
+                                lruKey = key;
+                                lruTime = resource.lastUsed;
+                            }
+                        // If a resource has not been used, it's the LRU.
+                        } else {
+                            lruKey = key;
+                            lruTime = 0;
+                            break;
+                        }
+                    }
 
-                      delete resources[lruKey];
-                      persist();
-                      return;
-                  }
+                    delete resources[lruKey];
+                    persist();
+                    return;
+                }
 
-                  if (callback) callback();
+                if (callback) callback();
 
-              }, 0);
-          })();
-      }
+            }, 0);
+        })();
+    };
 
-    , reset = function(val) {
-          cache = val || {};
-      }
+    var reset = function(val) {
+        cache = val || {};
+    };
 
-    , localStorageKey = 'Mobify-Combo-Cache-v1.0'
+    var localStorageKey = 'Mobify-Combo-Cache-v1.0';
 
-      // In memory cache.
-    , cache = {}
+    // In memory cache.
+    var cache = {};
 
-    , httpCache = Mobify.httpCache = {
+    Jazzcat.httpCache = {
           get: get
         , set: set
         , load: load
         , save: save
         , reset: reset
-      };
+    };
 
 
     /**
@@ -166,7 +164,7 @@ define(["capture"], function(Capture) {
             return obj;
         }
 
-      , utils = httpCache.utils = {
+      , utils = Jazzcat.httpCache.utils = {
             /**
              * Returns a data URI for `resource` suitable for executing the script.
              */
@@ -213,174 +211,170 @@ define(["capture"], function(Capture) {
         };
 
 
-        /**
-        * combineScripts: Clientside API to the combo service.
-        */
-        var httpCache = Mobify.httpCache
+      /**
+      * combineScripts: Clientside API to the combo service.
+      */
+      var httpCache = Jazzcat.httpCache;
 
-          , absolutify = document.createElement('a')
+      var absolutify = document.createElement('a')
 
-          , combineScripts = function(scripts) {
-              // Fastfail if there are no scripts or if required modules are missing.
-              if (!scripts.length || !window.localStorage || !window.JSON) {
-                  return scripts;
-              }
+      Jazzcat.combineScripts = function(scripts) {
+            // Fastfail if there are no scripts or if required modules are missing.
+            if (!scripts.length || !window.localStorage || !window.JSON) {
+                return scripts;
+            }
 
-              var url
-                , i
-                , ii
-                , isCached;
+            var url
+              , i
+              , ii
+              , isCached;
 
+          httpCache.load();
 
-              httpCache.load();
+            for (var i = 0, ii=scripts.length; i<ii; i++) {
+                var script = scripts[i];
+                if (!script.hasAttribute(defaults.attribute)) continue;
+                
+                absolutify.href = script.getAttribute(defaults.attribute);
+                url = absolutify.href;
 
-              for (var i = 0, ii=scripts.length; i<ii; i++) {
-                  var script = scripts[i];
-                  if (!script.hasAttribute(defaults.attribute)) continue;
-                  
-                  absolutify.href = script.getAttribute(defaults.attribute);
-                  url = absolutify.href;
-
-                  script.removeAttribute(defaults.attribute);
-                  isCached = !!httpCache.get(url);
-                  script.innerHTML = isCached + ',' + defaults.execCallback
-                      + "('" + url + "'," + (!!opts.forceDataURI) + ");";
-              }
-              
-              return scripts;
-          }
-
-        , defaults = combineScripts.defaults = {
-              selector: 'script'
-            , attribute: 'x-src'
-            , endpoint: '//jazzcat.mobify.com/jsonp/'
-            , execCallback: 'Mobify.jazzcat.exec'
-            , loadCallback: 'Mobify.jazzcat.load'
-          }
-
-        , combo = Mobify.jazzcat = {
-              /**
-               * Emit a <script> tag to execute the contents of `url` using 
-               * `document.write`. Prefer loading contents from cache.
-               */
-              exec: function(url, useDataURI) {
-                  var resource = httpCache.get(url, true),
-                      out;
-
-                  if (!resource) {
-                      out = 'src="' + url + '">';
-                  } else {
-                      out = 'data-orig-src="' + url + '"';
-
-                      if (useDataURI) {
-                          out += ' src="' + httpCache.utils.dataURI(resource) + '">';
-                      } else {
-                          // Explanation below uses [] to stand for <>.
-                          // Inline scripts appear to work faster than data URIs on many OSes
-                          // (e.g. Android 2.3.x, iOS 5, likely most of early 2013 device market)
-                          //
-                          // However, it is not safe to directly convert a remote script into an
-                          // inline one. If there is a closing script tag inside the script,
-                          // the script element will be closed prematurely.
-                          //
-                          // To guard against this, we need to prevent script element spillage.
-                          // This is done by replacing [/script] with [/scr\ipt] inside script
-                          // content. This transformation renders closing [/script] inert.
-                          //
-                          // The transformation is safe. There are three ways for a valid JS file
-                          // to end up with a [/script] character sequence:
-                          // * Inside a comment - safe to alter
-                          // * Inside a string - replacing 'i' with '\i' changes nothing, as
-                          //   backslash in front of characters that need no escaping is ignored.
-                          // * Inside a regular expression starting with '/script' - '\i' has no
-                          //   meaning inside regular expressions, either, so it is treated just
-                          //   like 'i' when expression is matched.
-                          //
-                          // Talk to Roman if you want to know more about this.
-                          out += '>' + resource.body.replace(/(<\/scr)(ipt\s*>)/ig, '$1\\$2');
-                      }
-                  }
-
-                  document.write('<script ' + out + '<\/script>');
-              }
-
-              /**
-               * Callback for loading the httpCache and storing the results of a combo
-               * query.
-               */
-            , load: function(resources) {
-                  var resource, i, ii, save = false;
-                  
-                  httpCache.load()
-
-                  if (!resources) return;
-
-                  for (i = 0,ii=resources.length; i<ii; i++) {
-                      resource = resources[i];
-                      if (resource.status == 'ready') {
-                          save = true;
-                          httpCache.set(encodeURI(resource.url), resource)
-                      }
-                  }
-
-                  if (save) httpCache.save();
-              }
-          }
-
-          , getLoaderScript: function(uncached, loadCallback) {
-              var bootstrap = document.createElement('script')
-              if (uncached.length) {
-                  bootstrap.src = this.getURL(uncached, loadCallback);
-              } else {
-                  bootstrap.innerHTML = loadCallback + '();';
-              }
-              return bootstrap;
-          }
-
-          /**
-           * Returns a URL suitable for use with the combo service. Sorted to generate
-           * consistent URLs.
-           */
-        , getURL = function(urls, callback) {
-              return defaults.endpoint + callback + '/' + JSONURIencode(urls.slice().sort());
-          }
-
-        , JSONURIencode = Mobify.JSONURIencode = function(obj) {
-              return encodeURIComponent(JSON.stringify(obj));
-          };
-
-      // Mobify.cssURL = function(obj) {
-      //     return '//combo.mobify.com/css/' + JSONURIencode(obj)
-      // }
-
-
-      var oldEnable = Capture.enable;
-      var enablingRe = new RegExp("<script[\\s\\S]*?>false,"
-        + defaults.execCallback.replace('.', '\\.')
-        + "\\('([\\s\\S]*?)'\\,(true|false));<\\/script", "gi");
-
-      Capture.enable = function() {
-          var match
-            , bootstrap
-            , firstIndex = -1
-            , uncached = []
-            , htmlStr = oldEnable.apply(capture, arguments);
-
-          while (match = enablingRe.exec(htmlStr)) {
-              if (firstIndex == -1) firstIndex = match.index;
-              uncached.push(match[1]);
-          }
-          if (firstIndex == -1) return htmlStr;
-          
-          bootstrap = combo.getLoaderScript(uncached, defaults.loadCallback);
-
-          return htmlStr.substr(0, firstIndex) + bootstrap.outerHTML + htmlStr.substr(firstIndex);
+                script.removeAttribute(defaults.attribute);
+                isCached = !!httpCache.get(url);
+                script.innerHTML = isCached + ',' + defaults.execCallback
+                    + "('" + url + "'," + (!!opts.forceDataURI) + ");";
+            }
+            
+            return scripts;
       };
 
+      var defaults = Jazzcat.combineScripts.defaults = {
+            selector: 'script'
+          , attribute: 'x-src'
+          , endpoint: '//jazzcat.mobify.com/jsonp/'
+          , execCallback: 'Jazzcat.combo.exec'
+          , loadCallback: 'Jazzcat.combo.load'
+      };
 
-      return combineScripts;
+      Jazzcat.combo = {
+            /**
+             * Emit a <script> tag to execute the contents of `url` using 
+             * `document.write`. Prefer loading contents from cache.
+             */
+            exec: function(url, useDataURI) {
+                var resource = httpCache.get(url, true),
+                    out;
 
-  })();
+                if (!resource) {
+                    out = 'src="' + url + '">';
+                } else {
+                    out = 'data-orig-src="' + url + '"';
 
+                    if (useDataURI) {
+                        out += ' src="' + httpCache.utils.dataURI(resource) + '">';
+                    } else {
+                        // Explanation below uses [] to stand for <>.
+                        // Inline scripts appear to work faster than data URIs on many OSes
+                        // (e.g. Android 2.3.x, iOS 5, likely most of early 2013 device market)
+                        //
+                        // However, it is not safe to directly convert a remote script into an
+                        // inline one. If there is a closing script tag inside the script,
+                        // the script element will be closed prematurely.
+                        //
+                        // To guard against this, we need to prevent script element spillage.
+                        // This is done by replacing [/script] with [/scr\ipt] inside script
+                        // content. This transformation renders closing [/script] inert.
+                        //
+                        // The transformation is safe. There are three ways for a valid JS file
+                        // to end up with a [/script] character sequence:
+                        // * Inside a comment - safe to alter
+                        // * Inside a string - replacing 'i' with '\i' changes nothing, as
+                        //   backslash in front of characters that need no escaping is ignored.
+                        // * Inside a regular expression starting with '/script' - '\i' has no
+                        //   meaning inside regular expressions, either, so it is treated just
+                        //   like 'i' when expression is matched.
+                        //
+                        // Talk to Roman if you want to know more about this.
+                        out += '>' + resource.body.replace(/(<\/scr)(ipt\s*>)/ig, '$1\\$2');
+                    }
+                }
+
+                document.write('<script ' + out + '<\/script>');
+            },
+
+            /**
+             * Callback for loading the httpCache and storing the results of a combo
+             * query.
+             */
+            load: function(resources) {
+                var resource, i, ii, save = false;
+                
+                httpCache.load()
+
+                if (!resources) return;
+
+                for (i = 0,ii=resources.length; i<ii; i++) {
+                    resource = resources[i];
+                    if (resource.status == 'ready') {
+                        save = true;
+                        httpCache.set(encodeURI(resource.url), resource)
+                    }
+                }
+
+                if (save) httpCache.save();
+            },
+
+            getLoaderScript: function(uncached, loadCallback) {
+                var bootstrap = document.createElement('script')
+                if (uncached.length) {
+                    bootstrap.src = Jazzcat.getURL(uncached, loadCallback);
+                } else {
+                    bootstrap.innerHTML = loadCallback + '();';
+                }
+                return bootstrap;
+            }
+        };
+
+        /**
+         * Returns a URL suitable for use with the combo service. Sorted to generate
+         * consistent URLs.
+         */
+        Jazzcat.getURL = function(urls, callback) {
+            return defaults.endpoint + callback + '/' + Jazzcat.JSONURIencode(urls.slice().sort());
+        };
+
+        Jazzcat.JSONURIencode = function(obj) {
+            return encodeURIComponent(JSON.stringify(obj));
+        };
+
+    // Mobify.cssURL = function(obj) {
+    //     return '//combo.mobify.com/css/' + JSONURIencode(obj)
+    // }
+
+
+    var oldEnable = Capture.enable;
+    var enablingRe = new RegExp("<script[\\s\\S]*?>false,"
+      + defaults.execCallback.replace('.', '\\.')
+      + "\\('([\\s\\S]*?)'\\,(true|false));<\\/script", "gi");
+
+    Capture.enable = function() {
+        var match
+        , bootstrap
+        , firstIndex = -1
+        , uncached = []
+        , htmlStr = oldEnable.apply(capture, arguments);
+
+        while (match = enablingRe.exec(htmlStr)) {
+          if (firstIndex == -1) firstIndex = match.index;
+          uncached.push(match[1]);
+        }
+        if (firstIndex == -1) return htmlStr;
+
+        bootstrap = combo.getLoaderScript(uncached, defaults.loadCallback);
+
+        return htmlStr.substr(0, firstIndex) + bootstrap.outerHTML + htmlStr.substr(firstIndex);
+    };
+
+
+    return Jazzcat;
 
 });
