@@ -2,7 +2,7 @@
  * httpCache: An implementation of an in memory HTTP cache that persists data to
  * localStorage.
  */
-define(function() {
+define(["capture"], function(Capture) {
 
   return (function(){
 
@@ -218,59 +218,35 @@ define(function() {
         */
         var httpCache = Mobify.httpCache
 
-        , absolutify = document.createElement('a')
+          , absolutify = document.createElement('a')
 
-        , combineScripts = function(scripts) {
-            // turn scripts into an array
-             scripts = Array.prototype.slice.call(scripts);
-
+          , combineScripts = function(scripts) {
               // Fastfail if there are no scripts or if required modules are missing.
               if (!scripts.length || !window.localStorage || !window.JSON) {
                   return scripts;
               }
 
-              // Takes a list of candidate script elements
-              var uncached = []
-                , combo = false
-                , bootstrap
-                , url
+              var url
                 , i
-                , ii;
+                , ii
+                , isCached;
 
-              for (i=0,ii=scripts.length;i<ii;i++) {
-                var script = scripts[i];
-                script.parentNode.removeChild(script);
-              }
 
               httpCache.load();
 
-              for (var i=0,ii=scripts.length;i<ii;i++) {
-                var script = scripts[i];
-                if (! script.hasAttribute(defaults.attribute)) continue;
-                combo = true; // flag to true if we combine at least one script
-                absolutify.href = script.getAttribute(defaults.attribute);
-                url = absolutify.href;
-                if (!httpCache.get(url)) {
-                    uncached.push(url);
-                }
-                script.removeAttribute(defaults.attribute);
-                script.className += ' x-combo';
-                script.innerHTML = defaults.execCallback + "('" + url + "');";
+              for (var i = 0, ii=scripts.length; i<ii; i++) {
+                  var script = scripts[i];
+                  if (!script.hasAttribute(defaults.attribute)) continue;
+                  
+                  absolutify.href = script.getAttribute(defaults.attribute);
+                  url = absolutify.href;
+
+                  script.removeAttribute(defaults.attribute);
+                  isCached = !!httpCache.get(url);
+                  script.innerHTML = isCached + ',' + defaults.execCallback
+                      + "('" + url + "'," + (!!opts.forceDataURI) + ");";
               }
-
-              if (!combo) {
-                  return scripts;
-              }
-
-              bootstrap = document.createElement('script')
-
-              if (uncached.length) {
-                  bootstrap.src = getURL(uncached, defaults.loadCallback);
-              } else {
-                  bootstrap.innerHTML = defaults.loadCallback + '();';
-              }
-
-              scripts.unshift(bootstrap);                
+              
               return scripts;
           }
 
@@ -287,16 +263,45 @@ define(function() {
                * Emit a <script> tag to execute the contents of `url` using 
                * `document.write`. Prefer loading contents from cache.
                */
-              exec: function(url) {
-                  var resource;
+              exec: function(url, useDataURI) {
+                  var resource = httpCache.get(url, true),
+                      out;
 
-                  if (resource = httpCache.get(url, true)) {
-                      url = httpCache.utils.dataURI(resource);
+                  if (!resource) {
+                      out = 'src="' + url + '">';
+                  } else {
+                      out = 'data-orig-src="' + url + '"';
+
+                      if (useDataURI) {
+                          out += ' src="' + httpCache.utils.dataURI(resource) + '">';
+                      } else {
+                          // Explanation below uses [] to stand for <>.
+                          // Inline scripts appear to work faster than data URIs on many OSes
+                          // (e.g. Android 2.3.x, iOS 5, likely most of early 2013 device market)
+                          //
+                          // However, it is not safe to directly convert a remote script into an
+                          // inline one. If there is a closing script tag inside the script,
+                          // the script element will be closed prematurely.
+                          //
+                          // To guard against this, we need to prevent script element spillage.
+                          // This is done by replacing [/script] with [/scr\ipt] inside script
+                          // content. This transformation renders closing [/script] inert.
+                          //
+                          // The transformation is safe. There are three ways for a valid JS file
+                          // to end up with a [/script] character sequence:
+                          // * Inside a comment - safe to alter
+                          // * Inside a string - replacing 'i' with '\i' changes nothing, as
+                          //   backslash in front of characters that need no escaping is ignored.
+                          // * Inside a regular expression starting with '/script' - '\i' has no
+                          //   meaning inside regular expressions, either, so it is treated just
+                          //   like 'i' when expression is matched.
+                          //
+                          // Talk to Roman if you want to know more about this.
+                          out += '>' + resource.body.replace(/(<\/scr)(ipt\s*>)/ig, '$1\\$2');
+                      }
                   }
-                  
-                  // Firefox will choke on closing script tags passed through
-                  // the ark.
-                  document.write('<script src="' + url + '"><\/scr'+'ipt>');
+
+                  document.write('<script ' + out + '<\/script>');
               }
 
               /**
@@ -322,6 +327,16 @@ define(function() {
               }
           }
 
+          , getLoaderScript: function(uncached, loadCallback) {
+              var bootstrap = document.createElement('script')
+              if (uncached.length) {
+                  bootstrap.src = this.getURL(uncached, loadCallback);
+              } else {
+                  bootstrap.innerHTML = loadCallback + '();';
+              }
+              return bootstrap;
+          }
+
           /**
            * Returns a URL suitable for use with the combo service. Sorted to generate
            * consistent URLs.
@@ -337,6 +352,30 @@ define(function() {
       // Mobify.cssURL = function(obj) {
       //     return '//combo.mobify.com/css/' + JSONURIencode(obj)
       // }
+
+
+      var oldEnable = Capture.enable;
+      var enablingRe = new RegExp("<script[\\s\\S]*?>false,"
+        + defaults.execCallback.replace('.', '\\.')
+        + "\\('([\\s\\S]*?)'\\,(true|false));<\\/script", "gi");
+
+      Capture.enable = function() {
+          var match
+            , bootstrap
+            , firstIndex = -1
+            , uncached = []
+            , htmlStr = oldEnable.apply(capture, arguments);
+
+          while (match = enablingRe.exec(htmlStr)) {
+              if (firstIndex == -1) firstIndex = match.index;
+              uncached.push(match[1]);
+          }
+          if (firstIndex == -1) return htmlStr;
+          
+          bootstrap = combo.getLoaderScript(uncached, defaults.loadCallback);
+
+          return htmlStr.substr(0, firstIndex) + bootstrap.outerHTML + htmlStr.substr(firstIndex);
+      };
 
 
       return combineScripts;
