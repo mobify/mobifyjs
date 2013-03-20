@@ -80,7 +80,7 @@ function extractHTMLStringFromElement(container) {
         if (tagName == '#comment') return '<!--' + el.textContent + '-->';
         if (tagName == 'plaintext') return el.textContent;
         // Don't allow mobify related scripts to be added to the new document
-        if (tagName == 'script' && el.getAttribute("class") == "mobify" ){
+        if (tagName == 'script' && ((/mobify/.test(el.src) || /mobify/i.test(el.textContent)))) {
             return '';
         }
         return el.outerHTML || el.nodeValue || outerHTML(el);
@@ -89,22 +89,6 @@ function extractHTMLStringFromElement(container) {
 
 // cached div used repeatedly to create new elements
 var cachedDiv = document.createElement('div');
-
-/**
- * Transform a string <tag attr="value" ...></tag> into corresponding DOM element
- */
-function deserializeString(sourceString, dest) {
-    var match = sourceString.match(/^<(\w+)([\s\S]*)$/i);
-    cachedDiv.innerHTML = '<div' + match[2];
-
-    [].forEach.call(cachedDiv.firstChild.attributes, function(attr) {
-        dest.setAttribute(attr.nodeName, attr.nodeValue);
-    }); 
-
-    return dest;
-};
-
-
 
 // ##
 // # Constructor
@@ -122,6 +106,23 @@ var Capture = function(doc, prefix) {
 
 var init = Capture.init = function(doc, prefix) {
     return new Capture(doc, prefix);
+};
+
+/**
+ * Grab attributes from a string representation of an elements and clone them into dest element
+ */
+Capture.cloneAttributes = function(sourceString, dest) {
+    var match = sourceString.match(/^<(\w+)([\s\S]*)$/i);
+    cachedDiv.innerHTML = '<div' + match[2];
+    [].forEach.call(cachedDiv.firstChild.attributes, function(attr) {
+        try {
+            dest.setAttribute(attr.nodeName, attr.nodeValue);
+        } catch (e) {
+            console.error("Error copying attributes while capturing: ", e);
+        }
+    }); 
+
+    return dest;
 };
 
 /**
@@ -316,9 +317,9 @@ Capture.prototype.createDocumentFragments = function() {
     var bodyEl = docFrags.bodyEl = htmlEl.lastChild;
 
     // Reconstruct html, body, and head with the same attributes as the original document
-    deserializeString(this.htmlOpenTag, htmlEl);
-    deserializeString(this.headOpenTag, headEl);
-    deserializeString(this.bodyOpenTag, bodyEl);
+    Capture.cloneAttributes(this.htmlOpenTag, htmlEl);
+    Capture.cloneAttributes(this.headOpenTag, headEl);
+    Capture.cloneAttributes(this.bodyOpenTag, bodyEl);
 
     // Set innerHTML of new source DOM body
     bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
@@ -358,7 +359,7 @@ Capture.prototype.render = function(htmlString) {
     var doc = this.doc;
 
     // Set capturing state to false so that the user main code knows how to execute
-    capturing = false;
+    if (window.Mobify) window.Mobify.capturing = false;
 
     // Asynchronously render the new document
     setTimeout(function(){

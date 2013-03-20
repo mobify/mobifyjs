@@ -104,20 +104,27 @@
 
         test("detector", function(){
             var detector = function (userAgent){
-                var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(userAgent)
-                var isCompatible;
-                if (match) {
-                    if (match[1] && (match[1].toLowerCase() === "firefox") && (+match[2] < 4)) {
-                        isCompatible = false;
-                    } else if (match[3] && (match[3].toLowerCase() === "opera") && (+match[4] < 11)) {
-                        isCompatible = false
-                    } else {
-                        isCompatible = true;
-                    }
-                }
-                if (!isCompatible) {
+                // We're enabled for:
+                // - WebKit based browsers
+                // - IE 10
+                // - FireFox 4+
+                // - Opera 11+
+                // - 3DS
+                match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(userAgent);
+             
+                if (!match) {
                     return false;
                 }
+             
+                // match[1] == Firefox
+                if (match[1] && +match[2] < 4) {
+                    return false;
+                }
+                // match[3] == Opera
+                if (match[3] && +match[4] < 11) {
+                    return false;
+                }
+             
                 return true;
             };
 
@@ -201,6 +208,27 @@
             });
             $("#qunit-fixture").append(iframe);
         });
+
+        test("cloneAttributes", function(){
+            var el = document.createElement("div");
+            Capture.cloneAttributes("<div class=\"test1 test2\"></div>", el);
+
+            equal(el.className, "test1 test2");
+
+            // Regression test cases for messed up attributes
+
+            // Extra stray " character
+            Capture.cloneAttributes("<div class=\"\"test1 test2\"></div>", el);
+
+            equal(el.className, "");
+
+            // No space between div and class attribute
+            Capture.cloneAttributes("<divclass=\"\"test1 test2\"></div>", el);
+
+            equal(el.className, "");   
+
+        })
+        
 
 
     });

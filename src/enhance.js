@@ -1,6 +1,6 @@
 // Polyfills the `orientationchange` event.
 // Exposes Touch, OS, HD and Orientation properties
-// x-desktop, x-ios, x-android, x-blackberry, x-webos, x-nokia
+// x-desktop, x-ios, x-android, x-blackberry, x-webos, x-nokia, x-bb10
 // x-notouch, x-touch
 // x-landscape, x-portrait
 // x-sd, x-hd x-hd15 x-hd20
@@ -86,7 +86,7 @@ var $test = $('<div>', {id: 'mc-test'})
   , touch = 'ontouchend' in document
 
     // OS: ios, android, nokia, blackberry, webos, desktop
-  , osMatch = /(ip(od|ad|hone)|android|nokia|blackberry|webos)/gi.exec(navigator.userAgent)
+  , osMatch = /(ip(od|ad|hone)|android|nokia|blackberry|webos|bb10)/gi.exec(navigator.userAgent)
   , os = (osMatch && (osMatch[2] ? 'ios' : osMatch[1].toLowerCase())) || 'desktop'
 
   , tablet = /ipad|android(?!.*mobile)/i.test(navigator.userAgent)

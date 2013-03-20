@@ -1,4 +1,4 @@
-permalink: pretty 
+permalink: pretty
 markdown: kramdown
 
 kramdown:
@@ -6,5 +6,3 @@ kramdown:
     entity_output: symbolic
 
 baseurl: /mobifyjs
-
-

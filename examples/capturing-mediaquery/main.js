@@ -1,4 +1,4 @@
-var capturing = window.capturing || false;
+var capturing = window.Mobify && window.Mobify.capturing || false;
 
 function modifyDom(elements, prefix) {
     for (var i=0; i<elements.length; i++) {

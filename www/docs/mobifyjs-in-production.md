@@ -1,19 +1,19 @@
 ---
 layout: doc
-title: Mobify.js in Production
+title: Mobify.js in Production | Mobify.js Framework Documentation
 ---
 
 # Mobify.js in Production
 
-You have created a mobile site using Mobify.js and you want to go live 
+You have created a mobile site using Mobify.js and you want to go live
 with it, or you want to run it on a testing/staging environment.
 Excellent! There are just a few steps to make that happen.
 
 
 ##  Compiling Files
 
-In development, Mobify.js files are served dynamically by the 
-Mobify Client development server. In production, we'd like to serve 
+In development, Mobify.js files are served dynamically by the
+Mobify Client development server. In production, we'd like to serve
 these files from a static webserver.
 
 Run the `mobify build` command from root project folder to compile the
