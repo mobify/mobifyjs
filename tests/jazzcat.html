@@ -15,11 +15,8 @@
 
 <div id="qunit-fixture">
 
-    <textarea id="requirejs-fixture">
+    <textarea id="requirejs-fixture-1">
         <script>
-            console.log("1");
-            console.log("2");
-            //document.write("<plaintext style=\"display:none\">");
             require.config({
                 "baseUrl": "../src/",  
             })
@@ -28,6 +25,27 @@
                 var scripts = document.getElementsByTagName("textarea")[0].textContent;
                 document.write(scripts);
                 parent.postMessage(a, "*");
+            }, undefined, true);
+        </script>
+    </textarea>
+
+    <textarea id="requirejs-fixture-2">
+        <script>
+            require.config({
+                "baseUrl": "../src/",  
+            })
+            require(["../src/jazzcat.js"], function(Jazzcat) {
+                Jazzcat.httpCache.load();
+                var scripts = document.getElementsByTagName("textarea")[0].textContent;
+                document.write(scripts);
+                setTimeout(function(){
+                    var data = false;
+                    debugger;
+                    if ($) {
+                        data = true;
+                    }
+                    parent.postMessage(data, "*");
+                }, 0);
             }, undefined, true);
         </script>
     </textarea>
@@ -41,7 +59,6 @@
 
     <textarea id="combineScripts-2">
         <script x-src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <script>var a = !!$</script>
     </textarea>
 
 <div id="fixtures">
@@ -121,7 +138,7 @@
                 html += $('#requirejs').reduce(function(memo, el) {
                         return memo + el.outerHTML + '\n';
                     }, '');
-                html += $('#requirejs-fixture').text();
+                html += $('#requirejs-fixture-1').text();
                 html = '<html><body>' + html + '</body></html>';
 
                 var iframeEl = document.createElement('iframe');
@@ -138,34 +155,29 @@
                 iframe.document.write(html);
                 iframe.document.close();
 
-                window.addEventListener("message", function(event){
+                var listener = function(event){
+                    window.removeEventListener("message", listener, false);
                     deepEqual(event.data, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
                     start();
-                });
-
-                // function load() {
-                //     deepEqual(iframe.window.a, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
-
-                //     start();
-                // }
-                // $(iframeEl).on('load', load);
-
+                }
+                window.addEventListener("message", listener, false);
                 
             });
         });
 
         // asyncTest('combo - Cold cache', 1, function() {
-        //     var $scripts = $($('#combineScripts-2').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
-        //       , $result = $scripts.combineScripts()
+        //     var scripts = $($('#combineScripts-2').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
+        //       , $result = Jazzcat.combineScripts(scripts)
         //       , html = '';
 
-        //     html += $('#fixtures').reduce(function(memo, el) {
+        //     html += "<textarea>" + $result.reduce(function(memo, el) {
         //             return memo + el.outerHTML + '\n';
-        //         }, '')
-        //     html += $result.reduce(function(memo, el) {
+        //     }, '') + "</textarea>";
+        //     html += $('#requirejs').reduce(function(memo, el) {
         //             return memo + el.outerHTML + '\n';
-        //     }, '')
-        //     html = '<html><body>' + html + '</body></html>'
+        //         }, '');
+        //     html += $('#requirejs-fixture-2').text();
+        //     html = '<html><body>' + html + '</body></html>';
 
         //     var iframeEl = document.createElement('iframe');
 
@@ -181,17 +193,13 @@
         //     iframe.document.write(html);
         //     iframe.document.close();
 
-        //     function load() {
-        //         ok(iframe.window.a, 'jQuery was loaded');
+        //     var listener = function(event){
+        //         window.removeEventListener("message", listener, false);
+        //         ok(event.data, 'jQuery was loaded');
 
         //         start();
-        //     }
-
-        //     if (iframe.document.readyState == 'complete') {
-        //         load();
-        //     } else {
-        //         $(iframeEl).on('load', load);
-        //     }
+        //     };
+        //     window.addEventListener("message", listener, false);
         // });
 
         asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
