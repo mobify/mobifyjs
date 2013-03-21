@@ -5,7 +5,7 @@
   <title>jazzcat.js Tests</title>
   <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
   <script src="/tests/resources/qunit-1.10.0.js"></script>
-  <script src="/tests/resources/require.js"></script>
+  <script src="/tests/resources/require.js" id="requirejs"></script>
   <script src="/tests/resources/zepto.min.js"></script>
 </head>
 <body>
@@ -14,6 +14,23 @@
 
 
 <div id="qunit-fixture">
+
+    <textarea id="requirejs-fixture">
+        <script>
+            console.log("1");
+            console.log("2");
+            //document.write("<plaintext style=\"display:none\">");
+            require.config({
+                "baseUrl": "../src/",  
+            })
+            require(["../src/jazzcat.js"], function(Jazzcat) {
+                Jazzcat.httpCache.load();
+                var scripts = document.getElementsByTagName("textarea")[0].textContent;
+                document.write(scripts);
+                parent.postMessage(a, "*");
+            }, undefined, true);
+        </script>
+    </textarea>
 
     <textarea id="combineScripts-1">
         <script>var a = ['a']</script>
@@ -89,7 +106,7 @@
               , scripts = $($('#combineScripts-1').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
               , $result
               , html = '';
-            debugger;
+            
             httpCache.reset(cache);
             $result = Jazzcat.combineScripts(scripts);
 
@@ -98,12 +115,13 @@
                     return;
                 }
 
-                html += $('#fixtures').reduce(function(memo, el) {
+                html += "<textarea>" + $result.reduce(function(memo, el) {
+                        return memo + el.outerHTML + '\n';
+                }, '') + "</textarea>";
+                html += $('#requirejs').reduce(function(memo, el) {
                         return memo + el.outerHTML + '\n';
                     }, '');
-                html += $result.reduce(function(memo, el) {
-                        return memo + el.outerHTML + '\n';
-                }, '');
+                html += $('#requirejs-fixture').text();
                 html = '<html><body>' + html + '</body></html>';
 
                 var iframeEl = document.createElement('iframe');
@@ -118,22 +136,28 @@
 
                 iframe.document.open();
                 iframe.document.write(html);
-
-                function load() {
-                    deepEqual(iframe.window.a, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
-
-                    start();
-                }
-                $(iframeEl).on('load', load);
-
                 iframe.document.close();
+
+                window.addEventListener("message", function(event){
+                    deepEqual(event.data, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
+                    start();
+                });
+
+                // function load() {
+                //     deepEqual(iframe.window.a, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
+
+                //     start();
+                // }
+                // $(iframeEl).on('load', load);
+
+                
             });
         });
 
         // asyncTest('combo - Cold cache', 1, function() {
-        //     var $scripts = $($('#combineScripts-2').text())
+        //     var $scripts = $($('#combineScripts-2').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
         //       , $result = $scripts.combineScripts()
-        //       , html = ''
+        //       , html = '';
 
         //     html += $('#fixtures').reduce(function(memo, el) {
         //             return memo + el.outerHTML + '\n';
