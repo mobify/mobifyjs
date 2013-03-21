@@ -40,11 +40,11 @@
                 document.write(scripts);
                 setTimeout(function(){
                     var data = false;
-                    if ($) {
+                    if (jQuery) {
                         data = true;
                     }
                     parent.postMessage(data, "*");
-                }, 0);
+                }, 1000);
             }, undefined, true);
         </script>
     </textarea>
@@ -164,42 +164,42 @@
             });
         });
 
-        // asyncTest('combo - Cold cache', 1, function() {
-        //     var scripts = $($('#combineScripts-2').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
-        //       , $result = Jazzcat.combineScripts(scripts)
-        //       , html = '';
+        asyncTest('combo - Cold cache', 1, function() {
+            var scripts = $($('#combineScripts-2').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
+              , $result = Jazzcat.combineScripts(scripts)
+              , html = '';
 
-        //     html += "<textarea>" + $result.reduce(function(memo, el) {
-        //             return memo + el.outerHTML + '\n';
-        //     }, '') + "</textarea>";
-        //     html += $('#requirejs').reduce(function(memo, el) {
-        //             return memo + el.outerHTML + '\n';
-        //         }, '');
-        //     html += $('#requirejs-fixture-2').text();
-        //     html = '<html><body>' + html + '</body></html>';
+            html += "<textarea>" + $result.reduce(function(memo, el) {
+                    return memo + el.outerHTML + '\n';
+            }, '') + "</textarea>";
+            html += $('#requirejs').reduce(function(memo, el) {
+                    return memo + el.outerHTML + '\n';
+                }, '');
+            html += $('#requirejs-fixture-2').text();
+            html = '<html><body>' + html + '</body></html>';
 
-        //     var iframeEl = document.createElement('iframe');
+            var iframeEl = document.createElement('iframe');
 
-        //     $('body').append(iframeEl);
+            $('body').append(iframeEl);
 
-        //     var iframe = (iframeEl.contentWindow)
-        //                 ? iframeEl.contentWindow
-        //                 : (iframeEl.contentDocument.document)
-        //                     ? iframeEl.contentDocument.document
-        //                     : iframeEl.contentDocument;
+            var iframe = (iframeEl.contentWindow)
+                        ? iframeEl.contentWindow
+                        : (iframeEl.contentDocument.document)
+                            ? iframeEl.contentDocument.document
+                            : iframeEl.contentDocument;
 
-        //     iframe.document.open();
-        //     iframe.document.write(html);
-        //     iframe.document.close();
+            iframe.document.open();
+            iframe.document.write(html);
+            iframe.document.close();
 
-        //     var listener = function(event){
-        //         window.removeEventListener("message", listener, false);
-        //         ok(event.data, 'jQuery was loaded');
+            var listener = function(event){
+                window.removeEventListener("message", listener, false);
+                ok(event.data, 'jQuery was loaded');
 
-        //         start();
-        //     };
-        //     window.addEventListener("message", listener, false);
-        // });
+                start();
+            };
+            window.addEventListener("message", listener, false);
+        });
 
         asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
             var url = "http://127.0.0.1:3000/space invaders.js"
