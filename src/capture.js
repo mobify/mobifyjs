@@ -354,6 +354,12 @@ Capture.prototype.escapedHTMLString = function() {
  * Rewrite the document with a new html string
  */
 Capture.prototype.render = function(htmlString) {
+    if (!htmlString) {
+        var escapedHTMLString = this.escapedHTMLString();
+    } else {
+        var escapedHTMLString = Capture.enable(htmlString);
+    }
+
     var doc = this.doc;
 
     // Set capturing state to false so that the user main code knows how to execute
@@ -362,7 +368,7 @@ Capture.prototype.render = function(htmlString) {
     // Asynchronously render the new document
     setTimeout(function(){
         doc.open();
-        doc.write(htmlString);
+        doc.write(escapedHTMLString);
         doc.close();
     });
 };
@@ -418,7 +424,7 @@ Capture.prototype.renderCapturedDoc = function(options) {
     }
 
 
-    this.render(this.escapedHTMLString());
+    this.render();
 };
 
 return Capture;

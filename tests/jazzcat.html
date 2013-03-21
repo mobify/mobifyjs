@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html class="foo">
+<head>
+  <meta charset="utf-8">
+  <title>jazzcat.js Tests</title>
+  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/require.js" id="requirejs"></script>
+  <script src="/tests/resources/zepto.min.js"></script>
+</head>
+<body>
+
+<div id="qunit"></div>
+
+
+<div id="qunit-fixture">
+
+    <textarea id="requirejs-fixture-1">
+        <script>
+            require.config({
+                "baseUrl": "../src/",  
+            })
+            require(["../src/jazzcat.js"], function(Jazzcat) {
+                Jazzcat.httpCache.load();
+                var scripts = document.getElementsByTagName("textarea")[0].textContent;
+                document.write(scripts);
+                parent.postMessage(a, "*");
+            }, undefined, true);
+        </script>
+    </textarea>
+
+    <textarea id="requirejs-fixture-2">
+        <script>
+            require.config({
+                "baseUrl": "../src/",  
+            })
+            require(["../src/jazzcat.js"], function(Jazzcat) {
+                Jazzcat.httpCache.load();
+                var scripts = document.getElementsByTagName("textarea")[0].textContent;
+                document.write(scripts);
+                setTimeout(function(){
+                    var data = false;
+                    if (jQuery) {
+                        data = true;
+                    }
+                    parent.postMessage(data, "*");
+                }, 1000);
+            }, undefined, true);
+        </script>
+    </textarea>
+
+    <textarea id="combineScripts-1">
+        <script>var a = ['a']</script>
+        <script x-src="http://should.be/cached/push.js#b"></script>
+        <script>a.push('c')</script>
+        <script x-src="http://should.be/cached/push.js#d"></script>
+    </textarea>
+
+    <textarea id="combineScripts-2">
+        <script x-src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    </textarea>
+
+<div id="fixtures">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/require.js"></script>
+  <script src="/tests/resources/zepto.min.js"></script>
+</div>
+
+</div>
+
+<script>
+    QUnit.config.autostart = false;
+    require.config({
+        "baseUrl": "../src/",  
+    })
+    require(["../src/jazzcat.js"], function(Jazzcat) {
+        QUnit.start();
+        var httpCache = Jazzcat.httpCache
+            // Time offsets in seconds
+          , TWO_WEEKS = 14 * 24 * 60 * 60
+          , TEN_MINUTES = 600
+          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
+            // UTC dates
+          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
+          , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
+          , UTC_NOW = (new Date()).toUTCString()
+
+            // I don't fit in `localStorage` in Chrome or Safari...
+            // But I do seem to fit in FF.
+          , LONG_STRING = Array(5000000).join('1')
+
+          , getIframeDocument = function(selector) {
+                return $(selector)[0].contentDocument
+            }
+
+            // Fix <\/script>.
+            // Remove extra whitespace.
+          , getText = function(selector) {
+                return $(selector).html()
+                                  .replace(/\\/g, '')
+                                  .replace(/\s+/g, ' ')
+                                  .trim()
+            }
+
+            // http://stackoverflow.com/questions/1304374/javascript-can-a-constructor-function-create-a-documentelement-object
+          , createDocument = function() {
+                var ns = 'http://www.w3.org/1999/xhtml'
+                return document.implementation.createDocument(ns, 'html', null)
+            };
+
+        asyncTest('combo - Warm cache', 1, function() {
+            var cache = {
+                    'http://should.be/cached/push.js': {
+                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}
+                      , 'status': 'ready'
+                      , 'url': 'http://should.be/cached/push.js'
+                      , 'body': 'var scripts = [].slice.call(document.getElementsByTagName("script"));'
+                             + 'a.push(scripts[scripts.length - 2].innerHTML.split("#")[1][0]);'
+                      , 'text': true
+                    }
+                }
+              , scripts = $($('#combineScripts-1').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
+              , $result
+              , html = '';
+            
+            httpCache.reset(cache);
+            $result = Jazzcat.combineScripts(scripts);
+
+            httpCache.save(function(err) {
+                if (err) {
+                    return;
+                }
+
+                html += "<textarea>" + $result.reduce(function(memo, el) {
+                        return memo + el.outerHTML + '\n';
+                }, '') + "</textarea>";
+                html += $('#requirejs').reduce(function(memo, el) {
+                        return memo + el.outerHTML + '\n';
+                    }, '');
+                html += $('#requirejs-fixture-1').text();
+                html = '<html><body>' + html + '</body></html>';
+
+                var iframeEl = document.createElement('iframe');
+
+                $('body').append(iframeEl);
+
+                var iframe = (iframeEl.contentWindow)
+                            ? iframeEl.contentWindow
+                            : (iframeEl.contentDocument.document)
+                                ? iframeEl.contentDocument.document
+                                : iframeEl.contentDocument;
+
+                iframe.document.open();
+                iframe.document.write(html);
+                iframe.document.close();
+
+                var listener = function(event){
+                    window.removeEventListener("message", listener, false);
+                    deepEqual(event.data, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
+                    start();
+                }
+                window.addEventListener("message", listener, false);
+                
+            });
+        });
+
+        asyncTest('combo - Cold cache', 1, function() {
+            var scripts = $($('#combineScripts-2').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
+              , $result = Jazzcat.combineScripts(scripts)
+              , html = '';
+
+            html += "<textarea>" + $result.reduce(function(memo, el) {
+                    return memo + el.outerHTML + '\n';
+            }, '') + "</textarea>";
+            html += $('#requirejs').reduce(function(memo, el) {
+                    return memo + el.outerHTML + '\n';
+                }, '');
+            html += $('#requirejs-fixture-2').text();
+            html = '<html><body>' + html + '</body></html>';
+
+            var iframeEl = document.createElement('iframe');
+
+            $('body').append(iframeEl);
+
+            var iframe = (iframeEl.contentWindow)
+                        ? iframeEl.contentWindow
+                        : (iframeEl.contentDocument.document)
+                            ? iframeEl.contentDocument.document
+                            : iframeEl.contentDocument;
+
+            iframe.document.open();
+            iframe.document.write(html);
+            iframe.document.close();
+
+            var listener = function(event){
+                window.removeEventListener("message", listener, false);
+                ok(event.data, 'jQuery was loaded');
+
+                start();
+            };
+            window.addEventListener("message", listener, false);
+        });
+
+        asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
+            var url = "http://127.0.0.1:3000/space invaders.js"
+                resources = [{
+                    "url": url,
+                    "headers": {"expires": UTC_TWO_WEEKS_FROM_NOW},
+                    "status": "ready",
+                    "statusCode": 200,
+                    "text": true,
+                    "body": "console.log('Pew!');"
+                }];
+
+
+            httpCache.reset();
+            httpCache.save(function(err) {
+                if (err) throw err;
+
+                Jazzcat.combo.load(resources);
+                ok(httpCache.get(encodeURI(url)) != undefined, "Missing resource.");
+                start();
+            });
+        });
+
+        asyncTest('httpCache - Eviction on an unused resource', 2, function() {
+            httpCache.reset();
+            httpCache.save();
+
+            httpCache.set('unused', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
+
+            httpCache.set('used', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'used'})
+            httpCache.get('used', true)
+
+            httpCache.save(function(err) {
+                if (err) return;
+
+                httpCache.reset();
+                httpCache.load();
+
+                ok(!httpCache.get('unused'), '`unused` was evicted');
+                ok(!!httpCache.get('used'), '`used` was cached');
+
+                start();
+            });
+        });
+
+        asyncTest('httpCache - Least recently used eviction', 2, function() {
+            httpCache.reset();
+            httpCache.save();
+
+            httpCache.set('old', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
+            httpCache.get('old', true)
+
+            setTimeout(function() {
+                httpCache.set('new', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'new'})
+                httpCache.get('new', true)
+
+                httpCache.save(function(err) {
+                    if (err) return;
+
+                    httpCache.reset();
+                    httpCache.load();
+
+                    ok(!httpCache.get('old'), '`old` was evicted');
+                    ok(!!httpCache.get('new'), '`new` was cached');
+
+                    start();
+                });
+            }, 0);
+        });
+
+        test('httpCache.utils.isStale', 8, function() {
+            var isStale = httpCache.utils.isStale
+              , resources = {
+                    'stale-expires': {
+                        'headers': {
+                            'expires': UTC_TWO_WEEKS_AGO
+                        }
+                    }
+
+                  , 'stale-cache-control': {
+                        'headers': {
+                            'date': UTC_TWO_WEEKS_AGO
+                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    }
+
+                  , 'fresh-expires': {
+                        'headers': {
+                            'expires': UTC_TWO_WEEKS_FROM_NOW
+                        }
+                    }
+
+                  , 'fresh-cache-control': {
+                        'headers': {
+                            'date': UTC_NOW
+                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    }
+
+                  , 'no-headers': {
+                        'headers': {}
+                  }
+
+                  , 'undefined-headers': {}
+
+                  , 'invalid-date': {
+                        'headers': {
+                            'date': 'invalid'
+                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    }
+
+                  , 'invalid-expires': {
+                        'headers': {
+                            'expires': 'invalid'
+                        }
+                    }
+                };
+
+            ok(isStale(resources['stale-expires']));
+            ok(isStale(resources['stale-cache-control']));
+            ok(!isStale(resources['fresh-expires']));
+            ok(!isStale(resources['fresh-cache-control']));
+            ok(isStale(resources['no-headers']), 'No cache headers is stale');
+            ok(isStale(resources['undefined-headers']), 'undefined cache headers is stale');
+            ok(isStale(resources['invalid-date']), 'Invalid date is stale');
+            ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
+
+        });
+    });
+</script>
+</body>
+</html>
