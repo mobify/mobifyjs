@@ -127,6 +127,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         , load: load
         , save: save
         , reset: reset
+        , cache: cache
     };
 
 
@@ -270,7 +271,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         exec: function(url, useDataURI) {
             var resource = httpCache.get(url, true),
                 out;
-
+                
             if (!resource) {
                 out = 'src="' + url + '">';
             } else {
@@ -359,10 +360,13 @@ define(["utils", "capture"], function(Utils, Capture) {
 
 
     var oldEnable = Capture.enable;
-    var enablingRe = new RegExp("<script[\\s\\S]*?>false,"
-      + defaults.execCallback.replace('.', '\\.')
+    var enablingRe = new RegExp("<script[^>]*?>(true|false),"
+      + defaults.execCallback.replace(/\./g, '\\.')
       + "\\('([\\s\\S]*?)'\\,(true|false)\\);<\\/script", "gi");
 
+    /**
+     * Overrides enable to replace scripts with bootloaders
+     */
     Capture.enable = function() {
         var match
         , bootstrap
@@ -372,11 +376,11 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         while (match = enablingRe.exec(htmlStr)) {
           if (firstIndex == -1) firstIndex = match.index;
-          uncached.push(match[1]);
+          if (match[1] === "false") uncached.push(match[2]);
         }
         if (firstIndex == -1) return htmlStr;
 
-        bootstrap = combo.getLoaderScript(uncached, defaults.loadCallback);
+        bootstrap = Jazzcat.combo.getLoaderScript(uncached, defaults.loadCallback);
 
         return htmlStr.substr(0, firstIndex) + bootstrap.outerHTML + htmlStr.substr(firstIndex);
     };
