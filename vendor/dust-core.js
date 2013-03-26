@@ -448,6 +448,10 @@ dust.helpers = {
 
   idx: function(chunk, context, bodies) {
     return bodies.block(chunk, context.push(context.stack.index));
+  },
+
+  count: function(chunk, context, bodies) {
+    return bodies.block(chunk, context.push(context.stack.index + 1));
   }
 }
 
