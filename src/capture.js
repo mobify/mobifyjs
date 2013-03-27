@@ -354,10 +354,11 @@ Capture.prototype.escapedHTMLString = function() {
  * Rewrite the document with a new html string
  */
 Capture.prototype.render = function(htmlString) {
+    var escapedHTMLString;
     if (!htmlString) {
-        var escapedHTMLString = this.escapedHTMLString();
+        escapedHTMLString = this.escapedHTMLString();
     } else {
-        var escapedHTMLString = Capture.enable(htmlString);
+        escapedHTMLString = Capture.enable(htmlString);
     }
 
     var doc = this.doc;
