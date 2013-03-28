@@ -21,7 +21,8 @@ module.exports = function(grunt) {
             all: {
               options: {
                 urls: [
-                  'http://localhost:3000/tests/capture.html', 'http://localhost:3000/tests/jazzcat.html',
+                  'http://localhost:3000/tests/capture.html',
+                  'http://localhost:3000/tests/jazzcat.html',
                 ]
               }
             }
@@ -56,24 +57,24 @@ module.exports = function(grunt) {
                     out: "./build/mobify-<%= pkg.version %>.min.js",
                 }
             },
-            // Building experimental swift features
-            swift: {
+            // Building experimental features
+            experimental: {
                 options: {
                     almond: true,
                     mainConfigFile: "./src/config.js",
                     optimize: "none",
                     keepBuildDir: true,
-                    name: "mobify-swift",
-                    out: "./build/mobify-swift-<%= pkg.version %>.js",
+                    name: "mobify-experimental",
+                    out: "./build/mobify-experimental-<%= pkg.version %>.js",
                 }
             },
-            swiftOptimized: {
+            experimentalOptimized: {
                 options: {
                     almond: true,
                     mainConfigFile: "./src/config.js",
                     keepBuildDir: true,
-                    name: "mobify-swift",
-                    out: "./build/mobify-swift-<%= pkg.version %>.min.js",
+                    name: "mobify-experimental",
+                    out: "./build/mobify-experimental-<%= pkg.version %>.min.js",
                 }
             },
             // Building custom Mobify.js library (must copy mobify-custom.js.example -> mobify-custom.js)
@@ -107,7 +108,10 @@ module.exports = function(grunt) {
             all: {
                 username: '<%= localConfig.saucelabs.username %>', // if not provided it'll default to ENV SAUCE_USERNAME (if applicable)
                 key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
-                urls: ['http://localhost:3000/tests/capture.html'],
+                urls: [
+                    'http://localhost:3000/tests/capture.html',
+                    //'http://localhost:3000/tests/jazzcat.html',
+                ],
                 concurrency: 2,
                 tunneled: true,
                 detailedError: true,
@@ -227,7 +231,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build', function() {
         // Then build mobify.js library
         grunt.task.run("requirejs:full", "requirejs:fullOptimized")
-        grunt.task.run("requirejs:swift", "requirejs:swiftOptimized")
+        grunt.task.run("requirejs:experimental", "requirejs:experimentalOptimized")
         // Build custom library if it exists
         if (grunt.file.exists("mobify-custom.js")) {
             grunt.task.run("requirejs:custom", "requirejs:customOptimized");
