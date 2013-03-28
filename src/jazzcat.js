@@ -239,10 +239,10 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         httpCache.load();
 
-        for (var i = 0, ii=scripts.length; i<ii; i++) {
+        for (i = 0, ii=scripts.length; i<ii; i++) {
             var script = scripts[i];
             if (!script.hasAttribute(opts.attribute)) continue;
-            
+
             absolutify.href = script.getAttribute(opts.attribute);
             url = absolutify.href;
 
@@ -258,9 +258,12 @@ define(["utils", "capture"], function(Utils, Capture) {
     var defaults = Jazzcat.combineScripts.defaults = {
             selector: 'script'
           , attribute: 'x-src'
-          , endpoint: '//jazzcat.mobify.com/jsonp/'
+          , proto: '//'
+          , host: 'jazzcat.mobify.com'
+          , endpoint: 'jsonp'
           , execCallback: 'Jazzcat.combo.exec'
           , loadCallback: 'Jazzcat.combo.load'
+          , projectName: ''
     };
 
     Jazzcat.combo = {
@@ -347,7 +350,10 @@ define(["utils", "capture"], function(Utils, Capture) {
      * consistent URLs.
      */
     Jazzcat.getURL = function(urls, callback) {
-        return defaults.endpoint + callback + '/' + Jazzcat.JSONURIencode(urls.slice().sort());
+        return defaults.proto + defaults.host + 
+          (defaults.projectName ? '/project-' + defaults.projectName : '') + 
+          '/' + defaults.endpoint + '/' + callback + '/' + 
+          Jazzcat.JSONURIencode(urls.slice().sort());
     };
 
     Jazzcat.JSONURIencode = function(obj) {
