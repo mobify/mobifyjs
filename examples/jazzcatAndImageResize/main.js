@@ -20,13 +20,15 @@ if (capturing) {
     var capturedDoc = capture.capturedDoc;
 
     var scripts = capturedDoc.querySelectorAll('script');
-    Mobify.Jazzcat.combineScripts(scripts);
+    Mobify.Jazzcat.combineScripts(scripts, {
+        projectName: "mobifytest"
+    });
 
     // Resize images using Mobify Image Resizer
     var images = capturedDoc.querySelectorAll('img');
-    Mobify.ResizeImages.resize( images, { 
-        projectName: "mobifycom",
-    });
+    Mobify.ResizeImages.resize( images, {
+        projectName: "mobifytest"
+    } );
 
     // Render source DOM to document
     capture.renderCapturedDoc();
