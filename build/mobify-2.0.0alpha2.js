@@ -453,39 +453,13 @@ Utils.outerHTML = function(el){
     return contents;
 }
 
-Utils.removeElementFilter = function(elements, excludes, srcAttr) {
-    var srcAttr = srcAttr || "x-src";
-    return [].filter.call(elements, function(el){
-        // Grab the correct string we want to do comparisons against
-        if (el.nodeName === "SCRIPT" && !el.hasAttribute(srcAttr)) {
-            var str = el.innerHTML; // maybe grab innerText/textContent
-        }
-        else if (el.nodeName === "IMG" || (el.nodeName === "SCRIPT" && el.hasAttribute(srcAttr))) {
-            var str = el.getAttribute(srcAttr);
-        }
-        // Iterate through the excludes
-        for (var i=0; i<excludes.length; i++) {
-            var filter = false;
-            var exclude = excludes[i];
-            if ((exclude.matchType === "startswith" && str.indexOf(exclude.match) == 0) || 
-                (exclude.matchType === "contains" && str.indexOf(exclude.match) != -1) ||
-                (exclude.matchType === "endswith" && str.indexOf(exclude.match, str.length - exclude.match.length) !== -1) ||
-                (exclude.matchType === "regex" && (new RegExp(exclude.match)).test(str))) {
-
-                filter = true;
-            }
-            if (filter == exclude.does) return false;
-        }
-        return true; 
-    })
-}
-
 Utils.removeBySelector = function(selector) {
     var els = capturedDoc.querySelectorAll(selector);
     for (var i=0,ii=els.length; i<ii; i++) {
         var el = els[i];
         el.parentNode.removeChild(el);
     }
+    return els;
 }
 
 return Utils;
@@ -1450,11 +1424,29 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
 });
 
-require(["utils", "capture", "resizeImages", "jazzcat"], function(Utils, Capture, ResizeImages, Jazzcat) {
+define('unblockify',["utils"], function(Utils) {
+
+var Unblockify = {}
+
+// Moves scripts to the bottom of the document
+// (only useful in the context of capturing)
+Unblockify.unblock = function(doc, scripts) {
+    var scripts = Utils.removeBySelector("script");
+    for (var i=0,ii=scripts.length; i<ii; i++) {
+        var script = scripts[i];
+        doc.body.appendChild(script);
+    }
+}
+
+return Unblockify;
+
+});
+require(["utils", "capture", "resizeImages", "jazzcat", "unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
     Mobify.Jazzcat = Jazzcat;
+    Mobify.Unblockify = Unblockify;
     Mobify.api = "2.0"; // v6 tag backwards compatibility change
     return Mobify
 
