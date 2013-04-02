@@ -44,8 +44,10 @@ Utils.outerHTML = function(el){
     return contents;
 }
 
-Utils.removeBySelector = function(selector) {
-    var els = capturedDoc.querySelectorAll(selector);
+Utils.removeBySelector = function(selector, doc) {
+    var doc = doc || document;
+
+    var els = doc.querySelectorAll(selector);
     for (var i=0,ii=els.length; i<ii; i++) {
         var el = els[i];
         el.parentNode.removeChild(el);

@@ -6,7 +6,7 @@ if (capturing) {
     // Grab reference to a newly created document
     var capturedDoc = capture.capturedDoc;
 
-    Mobify.Unblockify.unblock(capturedDoc);
+    Mobify.Unblockify.unblock();
 
     // Render source DOM to document
     capture.renderCapturedDoc();

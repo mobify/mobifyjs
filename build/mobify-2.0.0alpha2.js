@@ -453,8 +453,10 @@ Utils.outerHTML = function(el){
     return contents;
 }
 
-Utils.removeBySelector = function(selector) {
-    var els = capturedDoc.querySelectorAll(selector);
+Utils.removeBySelector = function(selector, doc) {
+    var doc = doc || document;
+
+    var els = doc.querySelectorAll(selector);
     for (var i=0,ii=els.length; i<ii; i++) {
         var el = els[i];
         el.parentNode.removeChild(el);
@@ -849,11 +851,11 @@ Capture.prototype.getCapturedDoc = function(options) {
 };
 
 /**
- * Render the captured document
+ * Insert Mobify scripts back into the captured doc
+ * in order for the library to work post-document.write
  */
-Capture.prototype.renderCapturedDoc = function(options) {
+Capture.prototype.insertMobifyScripts = function() {
     var doc = this.capturedDoc;
-
     // After document.open(), all objects will be removed. 
     // To provide our library functionality afterwards, we
     // must re-inject the script.
@@ -879,6 +881,16 @@ Capture.prototype.renderCapturedDoc = function(options) {
         var mainClone = doc.importNode(mainScript, false);
         this.bodyEl.appendChild(mainClone);
     }
+};
+
+/**
+ * Render the captured document
+ */
+Capture.prototype.renderCapturedDoc = function(options) {
+    var doc = this.capturedDoc;
+
+    // Insert the mobify scripts back into the captured doc
+    this.insertMobifyScripts();
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists
@@ -1424,18 +1436,28 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
 });
 
-define('unblockify',["utils"], function(Utils) {
+define('unblockify',["utils", "capture"], function(Utils, Capture) {
 
 var Unblockify = {}
 
-// Moves scripts to the bottom of the document
-// (only useful in the context of capturing)
-Unblockify.unblock = function(doc, scripts) {
-    var scripts = Utils.removeBySelector("script");
-    for (var i=0,ii=scripts.length; i<ii; i++) {
-        var script = scripts[i];
-        doc.body.appendChild(script);
-    }
+// Moves all scripts to the end of body by overriding insertMobifyScripts
+Unblockify.unblock = function() {
+
+    // Grab reference to old insertMobifyScripts method
+    var oldInsert = Capture.prototype.insertMobifyScripts;
+
+    // Override insertMobifyScripts to also move the scripts
+    // to the end of the body
+    Capture.prototype.insertMobifyScripts = function() {
+        oldInsert.call(this);
+
+        var doc = this.capturedDoc;
+        var scripts = scripts || Utils.removeBySelector("script", doc);
+        for (var i=0,ii=scripts.length; i<ii; i++) {
+            var script = scripts[i];
+            doc.body.appendChild(script);
+        }
+    };
 }
 
 return Unblockify;
