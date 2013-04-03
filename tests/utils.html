@@ -35,21 +35,6 @@
     require(["../src/utils.js"], function(Utils) {
         QUnit.start();
         
-        // Test disabling attributes that cause resource loading
-        test("removeElementFilter", function() {
-            var scripts = document.querySelectorAll(".removeElementsFilter script");
-            var imgs = document.querySelectorAll(".removeElementsFilter img");
-
-            // Test "contains"
-            var filteredScripts = Utils.removeElementFilter(scripts, [{
-                "does": true, 
-                "matchType": "contains", 
-                "match": "fake1"
-            }], "src");
-            equal(filteredScripts[0], document.getElementById("scriptinline"), "Contains" );
-        });
-
-
 
     });
 </script>
