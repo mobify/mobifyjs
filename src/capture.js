@@ -382,11 +382,11 @@ Capture.prototype.getCapturedDoc = function(options) {
 };
 
 /**
- * Render the captured document
+ * Insert Mobify scripts back into the captured doc
+ * in order for the library to work post-document.write
  */
-Capture.prototype.renderCapturedDoc = function(options) {
+Capture.prototype.insertMobifyScripts = function() {
     var doc = this.capturedDoc;
-
     // After document.open(), all objects will be removed. 
     // To provide our library functionality afterwards, we
     // must re-inject the script.
@@ -412,6 +412,16 @@ Capture.prototype.renderCapturedDoc = function(options) {
         var mainClone = doc.importNode(mainScript, false);
         this.bodyEl.appendChild(mainClone);
     }
+};
+
+/**
+ * Render the captured document
+ */
+Capture.prototype.renderCapturedDoc = function(options) {
+    var doc = this.capturedDoc;
+
+    // Insert the mobify scripts back into the captured doc
+    this.insertMobifyScripts();
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists

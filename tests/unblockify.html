@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html class="foo">
+<head>
+  <meta charset="utf-8">
+  <title>unblockify.js Tests</title>
+  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/require.js" id="requirejs"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
+</head>
+<body>
+
+<div id="qunit"></div>
+
+
+<div id="qunit-fixture">
+
+</div>
+
+<script>
+    QUnit.config.autostart = false;
+    require.config({
+        "baseUrl": "/src",  
+    })
+    require(["../src/capture.js", "../src/unblockify.js"], function(Capture, Unblockify) {
+        QUnit.start();
+        window.Unblockify = Unblockify;
+
+        asyncTest("unblock", function(){
+            var iframe = $("<iframe>", {id: "unblock-test"});
+            iframe.attr("src", "/tests/fixtures/unblock-example.html");
+
+
+            var iframeLoaded = false;
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                var capture = Capture.init(doc);
+                var capturedDoc = capture.capturedDoc;
+
+                Unblockify.moveScripts(capturedDoc);
+
+                if (iframeLoaded == false) {
+                    iframeLoaded = true;
+                    var expectedHtml = "<html class=\"testclass\"><head>\n    \
+\n    \n    \n    \n\n\
+</head><body>\n\
+    <p>Unblock fixture page!</p>\n\
+\n\n\n\
+<script type=\"text/mobify-script\" x-src=\"/path/to/script1.js\"><\/script><script type=\"text/mobify-script\" x-src=\"/path/to/script2.js\"><\/script><script type=\"text/mobify-script\" x-src=\"/path/to/script3.js\"><\/script></body></html>";
+                    equal(capturedDoc.documentElement.outerHTML, expectedHtml, "Scripts moved to bottom!");
+                    start();
+                }
+            });
+
+            $("#qunit-fixture").append(iframe);
+        });
+        
+    });
+</script>
+</body>
+</html>
