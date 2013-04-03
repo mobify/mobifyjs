@@ -1452,7 +1452,7 @@ Unblockify.unblock = function() {
         oldInsert.call(this);
 
         var doc = this.capturedDoc;
-        var scripts = scripts || Utils.removeBySelector("script", doc);
+        var scripts = Utils.removeBySelector("script", doc);
         for (var i=0,ii=scripts.length; i<ii; i++) {
             var script = scripts[i];
             doc.body.appendChild(script);

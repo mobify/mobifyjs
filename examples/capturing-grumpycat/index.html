@@ -27,7 +27,6 @@ function attachScriptBeforeMobifyTag(src, id, classNames) {
 
 // Prevent the browser from downloading website resources
 document.write('<plaintext style="display:none">');
-
 // On next tick, load library and main executable
 setTimeout(function() {
     var Mobify = window.Mobify = window.Mobify || {};
