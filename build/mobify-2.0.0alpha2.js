@@ -453,39 +453,15 @@ Utils.outerHTML = function(el){
     return contents;
 }
 
-Utils.removeElementFilter = function(elements, excludes, srcAttr) {
-    var srcAttr = srcAttr || "x-src";
-    return [].filter.call(elements, function(el){
-        // Grab the correct string we want to do comparisons against
-        if (el.nodeName === "SCRIPT" && !el.hasAttribute(srcAttr)) {
-            var str = el.innerHTML; // maybe grab innerText/textContent
-        }
-        else if (el.nodeName === "IMG" || (el.nodeName === "SCRIPT" && el.hasAttribute(srcAttr))) {
-            var str = el.getAttribute(srcAttr);
-        }
-        // Iterate through the excludes
-        for (var i=0; i<excludes.length; i++) {
-            var filter = false;
-            var exclude = excludes[i];
-            if ((exclude.matchType === "startswith" && str.indexOf(exclude.match) == 0) || 
-                (exclude.matchType === "contains" && str.indexOf(exclude.match) != -1) ||
-                (exclude.matchType === "endswith" && str.indexOf(exclude.match, str.length - exclude.match.length) !== -1) ||
-                (exclude.matchType === "regex" && (new RegExp(exclude.match)).test(str))) {
+Utils.removeBySelector = function(selector, doc) {
+    var doc = doc || document;
 
-                filter = true;
-            }
-            if (filter == exclude.does) return false;
-        }
-        return true; 
-    })
-}
-
-Utils.removeBySelector = function(selector) {
-    var els = capturedDoc.querySelectorAll(selector);
+    var els = doc.querySelectorAll(selector);
     for (var i=0,ii=els.length; i<ii; i++) {
         var el = els[i];
         el.parentNode.removeChild(el);
     }
+    return els;
 }
 
 return Utils;
@@ -875,11 +851,11 @@ Capture.prototype.getCapturedDoc = function(options) {
 };
 
 /**
- * Render the captured document
+ * Insert Mobify scripts back into the captured doc
+ * in order for the library to work post-document.write
  */
-Capture.prototype.renderCapturedDoc = function(options) {
+Capture.prototype.insertMobifyScripts = function() {
     var doc = this.capturedDoc;
-
     // After document.open(), all objects will be removed. 
     // To provide our library functionality afterwards, we
     // must re-inject the script.
@@ -905,6 +881,16 @@ Capture.prototype.renderCapturedDoc = function(options) {
         var mainClone = doc.importNode(mainScript, false);
         this.bodyEl.appendChild(mainClone);
     }
+};
+
+/**
+ * Render the captured document
+ */
+Capture.prototype.renderCapturedDoc = function(options) {
+    var doc = this.capturedDoc;
+
+    // Insert the mobify scripts back into the captured doc
+    this.insertMobifyScripts();
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists
@@ -1450,11 +1436,44 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
 });
 
-require(["utils", "capture", "resizeImages", "jazzcat"], function(Utils, Capture, ResizeImages, Jazzcat) {
+define('unblockify',["utils", "capture"], function(Utils, Capture) {
+
+var Unblockify = {}
+
+// Moves all scripts to the end of body by overriding insertMobifyScripts
+Unblockify.moveScripts = function(doc) {
+    var scripts = Utils.removeBySelector("script", doc);
+    for (var i=0,ii=scripts.length; i<ii; i++) {
+        var script = scripts[i];
+        doc.body.appendChild(script);
+    }
+};
+
+
+Unblockify.unblock = function() {
+
+    // Grab reference to old insertMobifyScripts method
+    var oldInsert = Capture.prototype.insertMobifyScripts;
+
+    // Override insertMobifyScripts to also move the scripts
+    // to the end of the body
+    Capture.prototype.insertMobifyScripts = function() {
+        oldInsert.call(this);
+
+        var doc = this.capturedDoc;
+        Unblockify.moveScripts(doc);
+    };
+}
+
+return Unblockify;
+
+});
+require(["utils", "capture", "resizeImages", "jazzcat", "unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
     Mobify.Jazzcat = Jazzcat;
+    Mobify.Unblockify = Unblockify;
     Mobify.api = "2.0"; // v6 tag backwards compatibility change
     return Mobify
 
