@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<script>
+	window.define = function(deps, definition) {
+		window.Caches = definition({extend : function(target){
+		    [].slice.call(arguments, 1).forEach(function(source) {
+		        for (var key in source)
+		            if (source[key] !== undefined)
+		                target[key] = source[key];
+		    }); 
+		    return target;
+		}});
+	};
+</script>
+<script src="../../src/caches.js"></script>
+<script>
+	var cache = new Caches.StorageCache();
+	cache.load(function() {
+		window.addEventListener('message', function(ev) {
+			if (ev.source !== parent) return;
+			console.log('received', ev.data);
+
+			var data = ev.data; //method, query, msgid
+			if (data.method === "get") {
+				cache.get(data.query, function(result) {
+					parent.postMessage({msgid: data.msgid, result: result}, '*');
+				});
+			} else if (data.method === "save") {
+				console.log('save', data);
+				cache.set(data.query, function() {
+					cache.save(function() {
+						parent.postMessage({msgid: data.msgid}, '*');
+					});
+				});
+			}
+		}, false);
+
+		parent.postMessage('ready', '*');
+
+	});
+</script>
