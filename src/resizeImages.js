@@ -7,8 +7,8 @@ var absolutify = document.createElement('a')
 // A regex for detecting http(s) URLs.
 var httpRe = /^https?/
 
-// A protocol relative URL for the host ir0.mobify.com.
-var PROTOCOL_AND_HOST = '//ir0.mobify.com'
+// A protocol relative URL for the host ir.mobify.net
+var PROTOCOL_AND_HOST = '//ir.mobify.net'
      
 function getPhysicalScreenSize() {
     
