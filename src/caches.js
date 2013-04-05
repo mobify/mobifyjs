@@ -136,40 +136,46 @@ define(["utils"], function(Utils) {
     IframeCache.prototype = new ObjectCache();
     Utils.extend(IframeCache.prototype, {
         load: function(callback) {
-            var iframe = this.iframe = document.createElement('iframe');
-            iframe.setAttribute('src', Jazzcat.combo.cacheUrl);
-            iframe.style.display = "none";
-
-            // TODO: If there is no body, wait with injection
-            // We will always have the body pre-flood, as plaintext forces creation of one
-            // We might lack it only in post-flood world, which needs an iframe only for
-            // saving request results. So, one could easily asynchronize iframe creation.
-            var body = document.getElementsByTagName('body')[0];
-            body.appendChild(iframe);
             var iframeCache = this;
 
-            window.addEventListener("message", function(ev) {
-                if (ev.source !== iframe.contentWindow) return;
+            // If we do not have a body yet (possible in postflood world), we delay
+            // injection of iframe. We can get away with that because postflood
+            // never needs to do a get(). All get()s are complete already, and only
+            // set() and save() would ever be needed. set() does not need the frame,
+            // while save() is not called by Jazzcat.combo.load until load() fires callback.
+            (function inject() {
+                var body = document.getElementsByTagName('body')[0];
+                if (!body) return setTimeout(inject, 100);
 
-                var data = ev.data;
-                if (data === "ready") return callback(); // Iframe is up and ready
+                var iframe = iframeCache.iframe = document.createElement('iframe');
+                iframe.setAttribute('src', Jazzcat.combo.cacheUrl);
+                iframe.style.display = "none";
 
-                var deferred = iframeCache.inFlight[data.msgid];
-                delete iframeCache.inFlight[data.msgid];
+                body.appendChild(iframe);
 
-                // If iframe sends us a get response, we have (some) resources that we asked for
-                // Now, we need to put those in local object cache via set()
-                // And find/run the original callback by consulting the in-flight request table.
+                window.addEventListener("message", function(ev) {
+                    if (ev.source !== iframe.contentWindow) return;
 
-                // ObjectCache.prototype.get.call(iframeCache, ...) seen below is a poor man's
-                // replacement for super() method call available in other languages/frameworks.
-                if (deferred.message.method === "get") {
-                    ObjectCache.prototype.set.call(iframeCache, data.result, function() {
-                        ObjectCache.prototype.get.call(iframeCache, deferred.params, deferred.callback);
-                    });
-                } else deferred.callback();
+                    var data = ev.data;
+                    if (data === "ready") return callback(); // Iframe is up and ready
 
-            }, false);
+                    var deferred = iframeCache.inFlight[data.msgid];
+                    delete iframeCache.inFlight[data.msgid];
+
+                    // If iframe sends us a get response, we have (some) resources that we asked for
+                    // Now, we need to put those in local object cache via set()
+                    // And find/run the original callback by consulting the in-flight request table.
+
+                    // ObjectCache.prototype.get.call(iframeCache, ...) seen below is a poor man's
+                    // replacement for super() method call available in other languages/frameworks.
+                    if (deferred.message.method === "get") {
+                        ObjectCache.prototype.set.call(iframeCache, data.result, function() {
+                            ObjectCache.prototype.get.call(iframeCache, deferred.params, deferred.callback);
+                        });
+                    } else deferred.callback();
+
+                }, false);
+            })();
         }
       , get: function(params, callback) {
             var iframeCache = this;
