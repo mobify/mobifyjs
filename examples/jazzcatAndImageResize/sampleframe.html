@@ -1,5 +1,10 @@
 <!DOCTYPE HTML>
 <script>
+	// Hack to peel off define() wrappers without full almond loader.
+	// I would much rather inline all scripts directly into this file,
+	// but that would require templating this file on server
+
+	// In the meantime, enhoy the ugliness.
 	window.define = function(deps, definition) {
 		window.Caches = definition({extend : function(target){
 		    [].slice.call(arguments, 1).forEach(function(source) {
@@ -17,15 +22,21 @@
 	cache.load(function() {
 		window.addEventListener('message', function(ev) {
 			if (ev.source !== parent) return;
-			console.log('received', ev.data);
 
-			var data = ev.data; //method, query, msgid
+			// Here, one would insert generated code that would reject requests
+			// unless they come from a whitelisted domain.
+
+			// method = type of request
+			// query = things to load or save
+			// msgid = incrementing identifier used by host page to run callbacks
+			//         as responses arrive from inner frame. Iframe does not care
+			//         for them, they should merely be passed unchanged
+			var data = ev.data; 
 			if (data.method === "get") {
 				cache.get(data.query, function(result) {
 					parent.postMessage({msgid: data.msgid, result: result}, '*');
 				});
 			} else if (data.method === "save") {
-				console.log('save', data);
 				cache.set(data.query, function() {
 					cache.save(function() {
 						parent.postMessage({msgid: data.msgid}, '*');

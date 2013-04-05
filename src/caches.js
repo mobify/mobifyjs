@@ -126,7 +126,7 @@ define(["utils"], function(Utils) {
 
     var IframeCache = Caches.IframeCache = function(url) {
         ObjectCache.apply(this, arguments);
-        this.callbacks = {};
+        this.inFlight = {};
         this.msgid = 0;
         return this;
     };
@@ -140,7 +140,10 @@ define(["utils"], function(Utils) {
             iframe.setAttribute('src', Jazzcat.combo.cacheUrl);
             iframe.style.display = "none";
 
-            // TODO: If there is no body, wait with injection.
+            // TODO: If there is no body, wait with injection
+            // We will always have the body pre-flood, as plaintext forces creation of one
+            // We might lack it only in post-flood world, which needs an iframe only for
+            // saving request results. So, one could easily asynchronize iframe creation.
             var body = document.getElementsByTagName('body')[0];
             body.appendChild(iframe);
             var iframeCache = this;
@@ -149,13 +152,17 @@ define(["utils"], function(Utils) {
                 if (ev.source !== iframe.contentWindow) return;
 
                 var data = ev.data;
+                if (data === "ready") return callback(); // Iframe is up and ready
 
-                if (data === "ready") return callback();
+                var deferred = iframeCache.inFlight[data.msgid];
+                delete iframeCache.inFlight[data.msgid];
 
-                var deferred = iframeCache.callbacks[data.msgid];
-                console.log('deferred', data, deferred, data.msgid);
-                delete iframeCache.callbacks[data.msgid];
+                // If iframe sends us a get response, we have (some) resources that we asked for
+                // Now, we need to put those in local object cache via set()
+                // And find/run the original callback by consulting the in-flight request table.
 
+                // ObjectCache.prototype.get.call(iframeCache, ...) seen below is a poor man's
+                // replacement for super() method call available in other languages/frameworks.
                 if (deferred.message.method === "get") {
                     ObjectCache.prototype.set.call(iframeCache, data.result, function() {
                         ObjectCache.prototype.get.call(iframeCache, deferred.params, deferred.callback);
@@ -164,38 +171,44 @@ define(["utils"], function(Utils) {
 
             }, false);
         }
-      , msg: function(method, params, callback) {
+      , get: function(params, callback) {
+            var iframeCache = this;
+            var addItemsToStore = function(result) {
+                Utils.extend(iframeCache.store, result);
+                callback(result);
+            }
+
             var remoteQuery = {};
             for (var key in params) {
                 if (!(key in this.store)) remoteQuery[key] = params[key];
             }
 
+            // If we have some things not available locally, we need to issue async request
+            // to the remote frame.
             for (var key in remoteQuery) {
-                // Run once if we do not have a parameter cached locally
-                var message = {method: method, query: remoteQuery, msgid: ++this.msgid};
-                this.callbacks[this.msgid] = {message: message, params: params, callback: callback};
+                // Abuse for..in in order to run code when object is NOT empty
+                // return statement ensures that loop body will run just once.
+
+                // params are original call parameters (what the user asked to retrieve)
+                // query is what we ended up asking the frame for - might not include things
+                // we have already on our side
+                var message = {method: 'get', query: remoteQuery, msgid: ++this.msgid};
+                var inFlightCall = {message: message, params: params, callback: addItemsToStore};
+                this.inFlight[this.msgid] = inFlightCall;
                 this.iframe.contentWindow.postMessage(message, '*');
                 return;
             }
 
             // Or answer right away if we do have everything on hand
-            ObjectCache.prototype[method].call(this, params, callback);
-            
+            ObjectCache.prototype.get.call(this, params, addItemsToStore);            
         }
-      , get: function(params, callback) {
-            var iframeCache = this;
-            console.log('get', params);
-            this.msg('get', params, function(result) {
-                Utils.extend(iframeCache.store, result);
-                callback(result);
-            });
-        }
+
       , set: function(params, callback) {
             ObjectCache.prototype.set.apply(this, arguments);
         }    
       , save: function(callback) {
             var message = {method: 'save', query: this.store, msgid: ++this.msgid};
-            this.callbacks[this.msgid] = {message: message, callback: callback};
+            this.inFlight[this.msgid] = {message: message, callback: callback};
             this.iframe.contentWindow.postMessage(message, '*');
         }    
     });

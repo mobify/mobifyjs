@@ -142,22 +142,39 @@ define(["utils", "capture", "caches"], function(Utils, Capture, Caches) {
          * query.
          */
         load: function(resources) {
-            var resource, i, ii, save = false;
+            var resource, i, ii, save = false, isLoaded, needsSave;
             
             if (!resources) return;
+
+
+            // Some fun witchcraft here. The main issue is that load() could finish
+            // immediately for localStorage variant of cache, or could be async if
+            // caching is done via iframe.
+
+            // So, we run the save() right away if load() already finished, or delay it
+            // if load() is taking its sweet time. For delayed load() (iframe) case,
+            // we do set() BEFORE load. That is okay, as iframe load does not actually
+            // deliver any state across until prompted by get(), and postflood is
+            // completely get-free.
+
             httpCache.load(function() {
-                var setObj = {};
-                for (i = 0,ii=resources.length; i<ii; i++) {
-                    resource = resources[i];
-                    if (resource.status == 'ready') {
-                        save = true;
-                        setObj[encodeURI(resource.url)] = resource;
-                    }
+                isLoaded = true;
+                if (needsSave) httpCache.save(function(){});
+            });  
+            var setObj = {};
+            for (i = 0,ii=resources.length; i<ii; i++) {
+                resource = resources[i];
+                if (resource.status == 'ready') {
+                    save = true;
+                    setObj[encodeURI(resource.url)] = resource;
                 }
-                if (save) httpCache.set(setObj, function() {
-                    httpCache.save(function(){});
-                });
-            });           
+            }
+            if (save) httpCache.set(setObj, function() {
+                if (isLoaded) httpCache.save(function(){});
+                else {
+                    needsSave = true;
+                }
+            });
         },
 
         getLoaderScript: function(uncached, loadCallback) {
