@@ -55,23 +55,32 @@ function getPhysicalScreenSize() {
  * Returns a URL suitable for use with the 'ir' service.
  */ 
 var getImageURL = ResizeImages.getImageURL = function(url, options) {
-    options = options || {}
+    var opts;
+    if (options) {
+        opts = Utils.extend(defaults, options);
+    } else {
+        opts = defaults;
+    }
 
     var bits = [PROTOCOL_AND_HOST];
 
-    if (defaults.projectName) {
-        var projectId = "project-" + defaults.projectName;
+    if (opts.projectName) {
+        var projectId = "project-" + opts.projectName;
         bits.push(projectId);
     }
 
-    if (options.format) {
+    if (options.cacheHours) {
+        bits.push('c' + options.cacheHours);
+    }
+
+    if (opts.format) {
         bits.push(options.format + (options.quality || ''));
     }
 
-    if (options.maxWidth) {
+    if (opts.maxWidth) {
         bits.push(options.maxWidth)
 
-        if (options.maxHeight) {
+        if (opts.maxHeight) {
             bits.push(options.maxHeight);
         }
     }
