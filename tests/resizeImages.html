@@ -39,11 +39,12 @@
                 projectName: 'test1',
                 prefix: 'x-',
                 maxWidth: 320,
+                maxHeight: 480,
             });
 
             var src = $('#resizeImages img').attr('x-src');
 
-            equal(src, "//ir.mobify.net/project-test1/320/874/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+            equal(src, "//ir.mobify.net/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
             var src = $('#resizeImages-non-http img').attr('x-src');
 

@@ -23,6 +23,7 @@ module.exports = function(grunt) {
                 urls: [
                   'http://localhost:3000/tests/capture.html',
                   'http://localhost:3000/tests/jazzcat.html',
+                  'http://localhost:3000/tests/resizeImages.html',
                   'http://localhost:3000/tests/unblockify.html',
                 ]
               }
