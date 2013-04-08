@@ -44,7 +44,7 @@
 
             var src = $('#resizeImages img').attr('x-src');
 
-            equal(src, "//ir.mobify.net/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+            equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
             var src = $('#resizeImages-non-http img').attr('x-src');
 
@@ -64,7 +64,7 @@
                 quality: '95',
             });
 
-            expectedUrl = '//ir.mobify.net/project-test1/c8/png95/320/480/http://test/image.jpg';
+            expectedUrl = '//ir0.mobify.com/project-test1/c8/png95/320/480/http://test/image.jpg';
 
             equal(url, expectedUrl);
         });
