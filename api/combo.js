@@ -127,7 +127,7 @@ var get = function(key, increment) {
       , load: load
       , save: save
       , reset: reset
-    }
+    };
 
 })(this, Mobify);
 
@@ -157,9 +157,9 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
 
         directives.split(',').forEach(function(directive) {
             if (match = ccDirectives.exec(directive)) {
-                obj[match[1]] = true
+                obj[match[1]] = true;
             } else if (match = ccMaxAge.exec(directive)) {
-                obj[match[1]] = parseInt(match[2])
+                obj[match[1]] = parseInt(match[2]);
             }
         });
 
@@ -171,7 +171,7 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
          * Returns a data URI for `resource` suitable for executing the script.
          */
         dataURI: function(resource) {
-            var contentType = resource.headers['content-type'] || 'application/x-javascript'
+            var contentType = resource.headers['content-type'] || 'application/x-javascript';
             return 'data:' + contentType + (!resource.text
                  ? (';base64,' + resource.body)
                  : (',' + encodeURIComponent(resource.body)));
@@ -242,7 +242,7 @@ var $ = Mobify.$
         httpCache.load();
 
         $scripts.filter('[' + defaults.attribute + ']').each(function() {
-            combo = true
+            combo = true;
             absolutify.href = this.getAttribute(defaults.attribute);
             url = absolutify.href;
 
@@ -275,7 +275,7 @@ var $ = Mobify.$
   , defaults = combineScripts.defaults = {
         selector: 'script'
       , attribute: 'x-src'
-      , endpoint: '//jazzcat.mobify.com/jsonp/'
+      , endpoint: '//jazzcat.mobify.net/jsonp/'
       , execCallback: 'Mobify.combo.exec'
       , loadCallback: 'Mobify.combo.load'
     }
@@ -366,7 +366,7 @@ $.fn.combineScripts = function(opts) {
 }
 
 Mobify.cssURL = function(obj) {
-    return '//combo.mobify.com/css/' + JSONURIencode(obj)
+    return '//jazzcat.mobify.net/css/' + JSONURIencode(obj)
 }
 
 })(this, document, Mobify);
