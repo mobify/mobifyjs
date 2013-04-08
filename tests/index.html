@@ -491,12 +491,12 @@
             expect(2);
 
             var got = Mobify.getImageURL('http://test/image.jpg')
-              , vow = '//ir0.mobify.com/http://test/image.jpg';
+              , vow = '//ir.mobify.net/http://test/image.jpg';
 
             equal(got, vow);
 
             got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
-            vow = '//ir0.mobify.com/320/http://test/image.jpg';
+            vow = '//ir.mobify.net/320/http://test/image.jpg';
 
             equal(got, vow);
         });
@@ -505,7 +505,7 @@
             var url = 'http://test/image.jpg';
             var result1 = Mobify.getImageURL(url, {maxWidth: '320', cacheHours: '8'});
             var result2 = Mobify.getImageURL(url, {maxWidth: 320, cacheHours: 8});
-            var expected = '//ir0.mobify.com/c8/320/' + url;
+            var expected = '//ir.mobify.net/c8/320/' + url;
             equal(result1, expected);
             equal(result2, expected);
         });
@@ -517,7 +517,7 @@
                 Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
 
                 got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
-                vow = "//ir0.mobify.com/project-testing/320/http://test/image.jpg";
+                vow = "//ir.mobify.net/project-testing/320/http://test/image.jpg";
 
                 equal(got, vow);
             } finally {
@@ -533,7 +533,7 @@
 
                 got = Mobify.getImageURL('http://test/image.jpg',
                     {maxWidth: 320, cacheHours:8});
-                vow = "//ir0.mobify.com/project-testing/c8/320/http://test/image.jpg";
+                vow = "//ir.mobify.net/project-testing/c8/320/http://test/image.jpg";
 
                 equal(got, vow);
             } finally {

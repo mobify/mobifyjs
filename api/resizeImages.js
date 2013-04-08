@@ -80,7 +80,7 @@ var $ = Mobify.$
     }
 
   , defaults = resizeImages.defaults = {
-        host: '//ir0.mobify.com'
+        host: '//ir.mobify.net'
       , selector: 'img[x-src]'
       , attribute: 'x-src'
       , projectName: Mobify.config.projectName || ''
