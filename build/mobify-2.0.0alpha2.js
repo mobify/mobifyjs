@@ -920,8 +920,8 @@ var absolutify = document.createElement('a')
 // A regex for detecting http(s) URLs.
 var httpRe = /^https?/
 
-// A protocol relative URL for the host ir.mobify.net
-var PROTOCOL_AND_HOST = '//ir.mobify.net'
+// A protocol relative URL for the host ir0.mobify.com
+var PROTOCOL_AND_HOST = '//ir0.mobify.com'
      
 function getPhysicalScreenSize() {
     
@@ -1308,7 +1308,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             selector: 'script'
           , attribute: 'x-src'
           , proto: '//'
-          , host: 'jazzcat.mobify.net'
+          , host: 'jazzcat.mobify.com'
           , endpoint: 'jsonp'
           , execCallback: 'Jazzcat.combo.exec'
           , loadCallback: 'Jazzcat.combo.load'
