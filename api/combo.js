@@ -275,9 +275,12 @@ var $ = Mobify.$
   , defaults = combineScripts.defaults = {
         selector: 'script'
       , attribute: 'x-src'
-      , endpoint: '//jazzcat.mobify.com/jsonp/'
+      , proto: '//'
+      , host: 'jazzcat.mobify.com'
+      , endpoint: 'jsonp'
       , execCallback: 'Mobify.combo.exec'
       , loadCallback: 'Mobify.combo.load'
+      , projectName: Mobify.config.projectName || ''
     }
 
   , combo = Mobify.combo = {
@@ -353,8 +356,11 @@ var $ = Mobify.$
      * Returns a URL suitable for use with the combo service. Sorted to generate
      * consistent URLs.
      */
-  , getURL = function(urls, callback) {
-        return defaults.endpoint + callback + '/' + JSONURIencode(urls.slice().sort());
+  , getURL = Mobify.combo.getURL = function(urls, callback) {
+        return defaults.proto + defaults.host + 
+          (defaults.projectName ? '/project-' + defaults.projectName : '') + 
+          '/' + defaults.endpoint + '/' + callback + '/' +
+          JSONURIencode(urls.slice().sort());
     }
 
   , JSONURIencode = Mobify.JSONURIencode = function(obj) {
@@ -365,8 +371,11 @@ $.fn.combineScripts = function(opts) {
     return combineScripts.call(window, this, opts)
 }
 
+// expose defaults for testing
+$.fn.combineScripts.defaults = combineScripts.defaults;
+
 Mobify.cssURL = function(obj) {
-    return '//combo.mobify.com/css/' + JSONURIencode(obj)
+    return '//jazzcat.mobify.com/css/' + JSONURIencode(obj)
 }
 
 })(this, document, Mobify);
