@@ -259,7 +259,7 @@ define(["utils", "capture"], function(Utils, Capture) {
             selector: 'script'
           , attribute: 'x-src'
           , proto: '//'
-          , host: 'jazzcat.mobify.net'
+          , host: 'jazzcat.mobify.com'
           , endpoint: 'jsonp'
           , execCallback: 'Jazzcat.combo.exec'
           , loadCallback: 'Jazzcat.combo.load'
