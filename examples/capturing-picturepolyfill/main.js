@@ -9,13 +9,14 @@ if (capturing) {
     console.log("Executing main during capturing phase!")
 
     // Grab reference to a newly created document
-    var capture = Mobify.Capture.init();
-    var capturedDoc = capture.capturedDoc;
-    // Execute polyfill on captured document
-    polyfillPictureElement(window, capturedDoc, capture.prefix);
-    
-    // Render source DOM to document
-    capture.renderCapturedDoc();
+    Mobify.Capture.init(function(capture){
+        var capturedDoc = capture.capturedDoc;
+        // Execute polyfill on captured document
+        polyfillPictureElement(window, capturedDoc, capture.prefix);
+        
+        // Render source DOM to document
+        capture.renderCapturedDoc();
+    });
 
 } else {
     console.log("Executing main in post-capturing phase!");

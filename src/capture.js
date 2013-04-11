@@ -92,7 +92,7 @@ var cachedDiv = document.createElement('div');
 // # Constructor
 // ##
 var Capture = function(doc, prefix) {
-    this.doc = doc || document;
+    this.doc = doc;
     this.prefix = prefix || "x-";
 
     var capturedStringFragments = this.createDocumentFragmentsStrings();
@@ -102,8 +102,32 @@ var Capture = function(doc, prefix) {
     Utils.extend(this, capturedDOMFragments);
 };
 
-var init = Capture.init = function(doc, prefix) {
-    return new Capture(doc, prefix);
+var init = Capture.init = function(callback, doc, prefix) {
+    var doc = doc || document;
+
+    var createCapture = function(callback, doc, prefix) {
+        var capture = new Capture(doc, prefix);
+        callback(capture);
+    }
+    // iOS 4.3, some Android 2.X.X have a non-typical "loaded" readyState,
+    // which is an acceptable readyState to start capturing on, because
+    // the data is fully loaded from the server at that state.
+    if (/complete|interactive|loaded/.test(doc.readyState)) {
+        createCapture(callback, doc, prefix);
+    }
+    // We may be in "loading" state by the time we get here, meaning we are
+    // not ready to capture. Next step after "loading" is "interactive",
+    // which is a valid state to start capturing on, and thus when ready
+    // state changes once, we know we are good to start capturing.
+    else {
+        var created = false;
+        doc.addEventListener("readystatechange", function() {
+            if (!created) {
+                created = true;
+                createCapture(callback, doc, prefix);
+            }
+        }, false);
+    }
 };
 
 /**
