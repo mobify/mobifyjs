@@ -378,7 +378,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         , bootstrap
         , firstIndex = -1
         , uncached = []
-        , htmlStr = oldEnable.apply(capture, arguments);
+        , htmlStr = oldEnable.apply(Capture, arguments);
 
         while (match = enablingRe.exec(htmlStr)) {
           if (firstIndex == -1) firstIndex = match.index;
