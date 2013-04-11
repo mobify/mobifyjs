@@ -94,7 +94,7 @@ var cachedDiv = document.createElement('div');
 // # Constructor
 // ##
 var Capture = function(doc, prefix) {
-    this.doc = doc || document;
+    this.doc = doc;
     this.prefix = prefix || "x-";
 
     var capturedStringFragments = this.createDocumentFragmentsStrings();
@@ -104,8 +104,25 @@ var Capture = function(doc, prefix) {
     Utils.extend(this, capturedDOMFragments);
 };
 
-var init = Capture.init = function(doc, prefix) {
-    return new Capture(doc, prefix);
+var init = Capture.init = function(callback, doc, prefix) {
+    var doc = doc || document;
+
+    var createCapture = function(callback, doc, prefix) {
+        var capture = new Capture(doc, prefix);
+        callback(capture);
+    }
+    if (/complete|interactive/.test(document.readyState)) {
+        createCapture(callback, doc, prefix);
+    }
+    else {
+        var created = false;
+        doc.addEventListener("readystatechange", function() {
+            if (!created) {
+                created = true;
+                createCapture(callback, doc, prefix);
+            }
+        }, false);
+    }
 };
 
 /**

@@ -151,10 +151,10 @@
                 // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
                 var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
 
-                var capture = Capture.init(doc);
-                var capturedDoc = capture.capturedDoc;
+                var capture = Capture.init(function(capture) {
+                    var capturedDoc = capture.capturedDoc;
 
-                var expectedHtml = "<!DOCTYPE HTML><html class=\"testclass\"><head>\
+                    var expectedHtml = "<!DOCTYPE HTML><html class=\"testclass\"><head>\
 \n    \
 \n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\
 \n\
@@ -166,9 +166,10 @@
 \n\
 \n</body></html>";
 
-                var html = capture.escapedHTMLString(capturedDoc);
-                equal(html, expectedHtml, "Passed!");
-                start();
+                    var html = capture.escapedHTMLString(capturedDoc);
+                    equal(html, expectedHtml, "Passed!");
+                    start();
+                }, doc);
             });
             $("#qunit-fixture").append(iframe);
         });
@@ -187,10 +188,10 @@
             iframe.load(function(){
                 var doc = this.contentDocument;
 
-                var capture = Capture.init(doc);
-                var capturedDoc = capture.capturedDoc;
+                Capture.init(function(capture){
+                    var capturedDoc = capture.capturedDoc;
 
-                var html = "<html><head></head>\
+                    var html = "<html><head></head>\
 \n<body>\
 \n<h1>Script order test</h1>\
 \n<script>var verify=[1];</scr" + "ipt>\
@@ -201,10 +202,11 @@
 \n<script>parent.postMessage(verify.join(), \"*\");<\/script>\
 \n</body>\
 \n</html>";
-                if (iframeLoaded == false) {
-                    iframeLoaded = true;
-                    capture.render(html);
-                }
+                    if (iframeLoaded == false) {
+                        iframeLoaded = true;
+                        capture.render(html);
+                    }
+                }, doc);
             });
             $("#qunit-fixture").append(iframe);
         });
