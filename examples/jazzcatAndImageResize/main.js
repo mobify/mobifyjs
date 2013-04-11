@@ -6,11 +6,6 @@ if (capturing) {
     // Grab reference to a newly created document
     var capturedDoc = capture.capturedDoc;
 
-    var scripts = capturedDoc.querySelectorAll('script');
-    Mobify.Jazzcat.combineScripts(scripts, {
-        projectName: "mobifytest"
-    });
-
     // Resize images using Mobify Image Resizer
     var images = capturedDoc.querySelectorAll('img');
     Mobify.ResizeImages.resize( images, {
@@ -18,5 +13,14 @@ if (capturing) {
     } );
 
     // Render source DOM to document
-    capture.renderCapturedDoc();
+
+    var scripts = capturedDoc.querySelectorAll('script');
+    Mobify.Jazzcat.combineScripts(scripts, {
+        projectName: "mobifytest",
+        storageSpace: "sampleframe.html",
+        callback: function() {
+            capture.renderCapturedDoc();
+        }
+    });    
+    
 }
