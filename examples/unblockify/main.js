@@ -1,13 +1,14 @@
 var capturing = window.Mobify && window.Mobify.capturing || false;
 if (capturing) {
     // Initiate capture
-    var capture = Mobify.Capture.init();
+    Mobify.Capture.init(function(capture){
+        // Grab reference to a newly created document
+        var capturedDoc = capture.capturedDoc;
 
-    // Grab reference to a newly created document
-    var capturedDoc = capture.capturedDoc;
+        Mobify.Unblockify.unblock();
 
-    Mobify.Unblockify.unblock();
+        // Render source DOM to document
+        capture.renderCapturedDoc();
+    });
 
-    // Render source DOM to document
-    capture.renderCapturedDoc();
 }
