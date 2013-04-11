@@ -111,7 +111,10 @@ var init = Capture.init = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
         callback(capture);
     }
-    if (/complete|interactive/.test(document.readyState)) {
+    // iOS 4.3, some Android 2.X.X have a non-typical "loaded" readyState,
+    // which is an acceptable readyState to start capturing on, because
+    // the data is fully loaded from the server at that state.
+    if (/complete|interactive|loaded/.test(doc.readyState)) {
         createCapture(callback, doc, prefix);
     }
     else {

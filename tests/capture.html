@@ -151,7 +151,7 @@
                 // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
                 var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
 
-                var capture = Capture.init(function(capture) {
+                Capture.init(function(capture) {
                     var capturedDoc = capture.capturedDoc;
 
                     var expectedHtml = "<!DOCTYPE HTML><html class=\"testclass\"><head>\
@@ -165,7 +165,6 @@
 \n\
 \n\
 \n</body></html>";
-
                     var html = capture.escapedHTMLString(capturedDoc);
                     equal(html, expectedHtml, "Passed!");
                     start();
