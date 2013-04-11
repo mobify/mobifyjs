@@ -33,16 +33,17 @@ if (capturing) {
     console.log("Executing main during capturing phase!")
 
     // Grab reference to a newly created document
-    var capture = Mobify.Capture.init();
-    var capturedDoc = capture.capturedDoc;
+    Mobify.Capture.init(function(capture){
+        var capturedDoc = capture.capturedDoc;
 
-    // Grab all element with the media attribute and remove them if their media
-    // query does not match
-    var mediaElements = capturedDoc.querySelectorAll("[media]");
-    modifyDom(mediaElements, capture.prefix);
-    
-    // Render source DOM to document
-    capture.renderCapturedDoc();
+        // Grab all element with the media attribute and remove them if their media
+        // query does not match
+        var mediaElements = capturedDoc.querySelectorAll("[media]");
+        modifyDom(mediaElements, capture.prefix);
+        
+        // Render source DOM to document
+        capture.renderCapturedDoc();
+    });
 
 } else {
     console.log("Executing main in post-capturing phase!");
