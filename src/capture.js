@@ -117,6 +117,10 @@ var init = Capture.init = function(callback, doc, prefix) {
     if (/complete|interactive|loaded/.test(doc.readyState)) {
         createCapture(callback, doc, prefix);
     }
+    // We may be in "loading" state by the time we get here, meaning we are
+    // not ready to capture. Next step after "loading" is "interactive",
+    // which is a valid state to start capturing on, and thus when ready
+    // state changes once, we know we are good to start capturing.
     else {
         var created = false;
         doc.addEventListener("readystatechange", function() {

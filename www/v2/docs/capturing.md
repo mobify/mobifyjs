@@ -35,6 +35,7 @@ properties prepended with a prefix to prevent resources from loading.
 
     // Change src of first script
     Mobify.Capture.init(function(capture){
+        var capturedDoc = capture.capturedDoc;
         var script = capturedDoc.getElementsByTagName("script")[0];
         // Must use x-src, not src
         script.setAttribute("x-src", "/path/to/script.js");
