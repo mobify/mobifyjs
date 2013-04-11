@@ -11,11 +11,14 @@ If you have not already, please refer to the  [quickstart guide](/mobifyjs/v2/do
 * TOC
 {:toc}
 
-## `Capture.init([document], [prefix="x-"])`
+## `Capture.init(callback, [document], [prefix="x-"])`
+
+__callback__ gets a `capture` object upon completion of capturing.
 
 __document__ and __prefix__ are optional.
 
-Creates a new instance of a `capture` object, which will parse the
+Creates a new instance of a `capture` object and passes it to the 
+callback upon completion, which will parse the
 existing document in order to create an entirely new `captured document`,
 which is an exact replica of the original document, but with certain
 properties prepended with a prefix to prevent resources from loading.
@@ -31,11 +34,12 @@ properties prepended with a prefix to prevent resources from loading.
 **Example**
 
     // Change src of first script
-    var capture = Mobify.Capture.init();
-    var script = capturedDoc.getElementsByTagName("script")[0];
-    // Must use x-src, not src
-    script.setAttribute("x-src", "/path/to/script.js");
-    capture.renderCapturedDoc();
+    Mobify.Capture.init(function(capture){
+        var script = capturedDoc.getElementsByTagName("script")[0];
+        // Must use x-src, not src
+        script.setAttribute("x-src", "/path/to/script.js");
+        capture.renderCapturedDoc();
+    });
 
 ### Useful properties
 
@@ -59,9 +63,10 @@ You have access to all DOM API methods on the `captured document`.
 
 **Usage/Example:**
 
-    var capture = Mobify.Capture.init();
-    var capturedDoc = capture.getCapturedDoc();
-    var paragraphs = capturedDoc.querySelectorAll("p");
+    Mobify.Capture.init(function(capture){
+        var capturedDoc = capture.getCapturedDoc();
+        var paragraphs = capturedDoc.querySelectorAll("p");
+    });
 
 ## `capturing` variable
 
@@ -77,8 +82,9 @@ Mobify.js is run again in a non-capturing context (at this time
     var capturing = window.Mobify && window.Mobify.capturing || false;
     if (capturing) {
         console.log("Executing during capturing phase!");
-        var capture = Mobify.Capture.init();
-        capture.renderCapturedDoc();
+        Mobify.Capture.init(function(capture){
+            capture.renderCapturedDoc();
+        });
     else {
         console.log("Executing during post-capturing phase!");
     }
@@ -92,8 +98,9 @@ alternative to `capturedDoc.outerHTML`.
 
 **Usage/Example:**
 
-    var capture = Mobify.Capture.init();
-    var htmlString = capture.escapedHTMLString();
+    Mobify.Capture.init(function(capture){
+        var htmlString = capture.escapedHTMLString();
+    });
 
 ## `render(htmlString)`
 
@@ -102,8 +109,9 @@ with the htmlString.
 
 **Usage/Example:**
 
-    var capture = Mobify.Capture.init();
-    capture.render("<html><body><h1>Test!</h1></body></html>");
+    Mobify.Capture.init(function(capture){
+        capture.render("<html><body><h1>Test!</h1></body></html>");
+    });
 
 __Note: This method is async__
 
@@ -113,14 +121,15 @@ Writes out the captured document to the original document.
 
 **Usage/Example:**
 
-    var capture = Mobify.Capture.init();
-    // Removes all scripts
-    var scripts = capturedDoc.getElementsByTagName("script");
-    for (var i = 0; i < scripts.length; i++) {
-        var script = scripts[i];
-        script.parentNode.removeChild(script);
-    }
-    capture.renderCapturedDoc();
+    Mobify.Capture.init(function(capture){
+        // Removes all scripts
+        var scripts = capturedDoc.getElementsByTagName("script");
+        for (var i = 0; i < scripts.length; i++) {
+            var script = scripts[i];
+            script.parentNode.removeChild(script);
+        }
+        capture.renderCapturedDoc();
+    });
 
 __Note: This method is async__
 
@@ -132,13 +141,14 @@ __Note: This method is async__
 
 **Usage/Example:**
 
-    var capture = Mobify.Capture.init();
-    if (/ipad/i.test(navigator.userAgent)) {
-        // Do a bunch of stuff...
-    } else {
-        // If not iPad, just restore everything back to normal
-        capture.restore();
-    }
+    var capture = Mobify.Capture.init(function(capture){
+        if (/ipad/i.test(navigator.userAgent)) {
+            // Do a bunch of stuff...
+        } else {
+            // If not iPad, just restore everything back to normal
+            capture.restore();
+        }
+    });
 
 ## Browser Support
 
