@@ -175,23 +175,33 @@ module.exports = function(grunt) {
             }
         },
         s3: {
-            key: '<%= localConfig.aws.key %>',
-            secret: '<%= localConfig.aws.secret %>',
-            bucket: '<%= localConfig.aws.bucket %>',
-            access: "public-read",
-            headers: { "Cache-Control": "max-age=1200" },
-            upload: [
-                { // build
-                    src: "build/**/*",
-                    dest: "mobifyjs/build/",
-                    rel: "build"
-                },
-                { // examples
-                    src: "examples/**/*",
-                    dest: "mobifyjs/examples/",
-                    rel: "examples"
-                }
-            ]
+            options: {
+                key: '<%= localConfig.aws.key %>',
+                secret: '<%= localConfig.aws.secret %>',
+                bucket: '<%= localConfig.aws.bucket %>',
+                access: "public-read",
+                headers: { "Cache-Control": "max-age=1200" },
+            },
+            build: {
+                upload: [
+                    { // build
+                        src: "build/**/*",
+                        dest: "mobifyjs/build/",
+                        rel: "build",
+                        gzip: true
+                    }
+                ]
+            },
+            examples: {
+                upload: [
+                    { // examples
+                        src: "examples/**/*",
+                        dest: "mobifyjs/examples/",
+                        rel: "examples",
+                        gzip: true
+                    }
+                ]
+            }
         }
     });
 
