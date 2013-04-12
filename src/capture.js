@@ -15,7 +15,7 @@ var tagDisablers = {
 var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 
 // Map of all attributes we should disable (to prevent resources from downloading)
-var disablingMap = { 
+var disablingMap = {
     img:    ['src'],
     iframe: ['src'],
     script: ['src', 'type'],
@@ -34,7 +34,7 @@ for (var tagName in disablingMap) {
 
     targetAttributes.forEach(function(value) {
         attributesToEnable[value] = true;
-    }); 
+    });
 
     // <space><attr>='...'|"..."
     attributeDisablingRes[tagName] = new RegExp(
@@ -69,7 +69,7 @@ function outerHTML(el){
 }
 
 /**
- * Helper method for looping through and grabbing strings of elements 
+ * Helper method for looping through and grabbing strings of elements
  * in the captured DOM after plaintext insertion
  */
 function extractHTMLStringFromElement(container) {
@@ -144,7 +144,7 @@ Capture.cloneAttributes = function(sourceString, dest) {
         } catch (e) {
             console.error("Error copying attributes while capturing: ", e);
         }
-    }); 
+    });
 
     return dest;
 };
@@ -155,7 +155,7 @@ Capture.cloneAttributes = function(sourceString, dest) {
  * comments.
  * Not declared on the prototype so it can be used as a static method.
  */
-Capture.disable = function(htmlStr, prefix) {   
+Capture.disable = function(htmlStr, prefix) {
     var self = this;
     // Disables all attributes in disablingMap by prepending prefix
     var disableAttributes = (function(){
@@ -287,7 +287,7 @@ Capture.prototype.getDoctype = function() {
 
             // Find the end of <body ... >
             var parseBodyTag = /^((?:[^>'"]*|'[^']*?'|"[^"]*?")*>)([\s\S]*)$/.exec(captured.bodyContent);
-            
+
             // Will skip this if <body was malformed (e.g. no closing > )
             if (parseBodyTag) {
                 // Normal termination. Both </head> and <body> were recognized and split out
@@ -300,22 +300,28 @@ Capture.prototype.getDoctype = function() {
     return captured;
 };
 
-/** 
- * Gather escaped content from the DOM, unescaped it, and then use 
+/**
+ * Gather escaped content from the DOM, unescaped it, and then use
  * `document.write` to revert to the original page.
  */
 Capture.prototype.restore = function() {
-    if (/complete|loaded/.test(document.readyState)) {
-        document.removeEventListener('DOMContentLoaded', this.restorer, false);
+    var self = this;
+    var doc = self.doc;
 
-        var self = this;
+    var restore = function() {
+        doc.removeEventListener('DOMContentLoaded', restore, false);
+
         setTimeout(function() {
-            document.open();
-            document.write(self.all());
-            document.close();
+            doc.open();
+            doc.write(self.all());
+            doc.close();
         }, 15);
+    };
+
+    if (/complete|loaded/.test(doc.readyState)) {
+        restore();
     } else {
-        document.addEventListener('DOMContentLoaded', this.restorer, false);
+        doc.addEventListener('DOMContentLoaded', restore, false);
     }
 };
 
@@ -349,7 +355,7 @@ Capture.prototype.createDocumentFragments = function() {
     bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
     var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
 
-    // On FF4, and potentially other browsers, you cannot modify <head> 
+    // On FF4, and potentially other browsers, you cannot modify <head>
     // using innerHTML. In that case, do a manual copy of each element
     try {
         headEl.innerHTML = disabledHeadContent;
@@ -406,7 +412,7 @@ Capture.prototype.getCapturedDoc = function(options) {
 Capture.prototype.renderCapturedDoc = function(options) {
     var doc = this.capturedDoc;
 
-    // After document.open(), all objects will be removed. 
+    // After document.open(), all objects will be removed.
     // To provide our library functionality afterwards, we
     // must re-inject the script.
     var mobifyjsScript = document.getElementById("mobify-js");
