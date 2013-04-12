@@ -1,11 +1,41 @@
+<!doctype html>
 <html>
 <head>
-    <!-- It's important to have `window.Mobify` here so this script isn't written out again. -->
-    <script>window.Mobify ; parent.postMessage("capture", "*");</script>
+    <script>
+        /**
+         * Wow, a crazy test that supports both standalone and iframe'd loading!
+         */
+        (function() {
+            var restore = function(Capture) {
+                Capture.init(function(capture) {
+                    capture.restore();
+                }, document);
+            };
+
+            // Standalone
+            if (window == parent) {
+                var script = document.createElement("script");
+                script.src = "/build/mobify-2.0.0alpha1.min.js";
+                script.onload = function() {
+                    restore(Mobify.Capture);
+                };
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(script, s);
+
+            // Iframed
+            } else {
+                parent.require(["../src/capture.js"], function(Capture) {
+                    restore(Capture);
+                });
+            }
+        })();
+    </script>
     <plaintext>
 </head>
 <body>
-</body>
+    <p>If things worked, you should "Complete!" below:</p>
     <!-- SPLIT -->
+    <h1 id="complete">Complete!</h1>h1>
     <script>parent.postMessage("complete", "*");</script>
+</body>
 </html>

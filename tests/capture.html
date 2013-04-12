@@ -43,7 +43,10 @@
 
 
 <script>
+    // http://api.qunitjs.com/QUnit.config/
     QUnit.config.autostart = false;
+    QUnit.config.testTimeout = 30 * 1000;
+
     require.config({
         "baseUrl": "../src/",
     })
@@ -228,7 +231,7 @@
 
             equal(el.className, "");
 
-        })
+        });
 
         /**
          * Ensure the complete document is captured.
@@ -241,21 +244,12 @@
             var $iframe = $("<iframe>", opts);
             var el = $iframe[0];
 
-            // Begin capturing on message. Restoring should send a "complete" message.
+            // Begin capturing on message. Restoring sends "complete".
             $(window).on("message", function onMessage(event) {
                 event = event.originalEvent;
                 if (event.source != el.contentWindow) return;
-
-                if (event.data == 'capture') {
-                    return Capture.init(function(capture) {
-                        capture.restore();
-                    }, el.contentDocument);
-                }
-
-                if (event.data == 'complete') {
-                    $(window).unbind("message", onMessage);
-                    start();
-                }
+                $(window).unbind("message", onMessage);
+                start();
             });
 
             $("#qunit-fixture").append($iframe);
