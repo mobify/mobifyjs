@@ -142,6 +142,8 @@
     <iframe id="test-unmobify" src="fixtures/unmobify-basic.html"></iframe>
     <a href="fixtures-unmobify/basic.html">BASIC</a>
 
+    <iframe id="test-reset-v6" src="fixtures/reset-v6.html"></iframe>
+
     <script>
         var $ = Mobify.$
           , httpCache = Mobify.httpCache
@@ -695,9 +697,21 @@
         // });
         //
         // test('Mobify.unmobify', function() {
-        //     var doc = getIframeDocument('#test-unmobify')
-        //     Mobify.unmobify(doc)
-        //     ok(true)
+        //     var doc = getIframeDocument('#test-unmobify');
+        //     debugger;
+        //     Mobify.unmobify(doc);
+        //     ok(false, ('wtftobegin' + Mobify.unmobify + 'wtf!!!'));
+            
+        //     // ok(true)
         // });
+        test('tag v6 reset', function() {
+            var doc = getIframeDocument('#test-reset-v6');
+            ok(doc.getElementById('testforme'), 'Unmobified element not found');
+        });
+        test('tag v6 reset sticky cookie set', function() {
+            var doc = getIframeDocument('#test-reset-v6');
+            ok(/mobify-js=0; mobify-path=\/\/cdn.mobify.com\/unmobify.js/.test(doc.cookie), 'stickcookie not set:' + doc.cookie);
+        });
+
     </script>
 </body>
