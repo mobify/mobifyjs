@@ -35,22 +35,23 @@
             iframe.load(function(){
                 var doc = this.contentDocument;
 
-                var capture = Capture.init(doc);
-                var capturedDoc = capture.capturedDoc;
+                var capture = Capture.init(function(capture){
+                    var capturedDoc = capture.capturedDoc;
 
-                Unblockify.moveScripts(capturedDoc);
+                    Unblockify.moveScripts(capturedDoc);
 
-                if (iframeLoaded == false) {
-                    iframeLoaded = true;
-                    var expectedHtml = "<html class=\"testclass\"><head>\n    \
+                    if (iframeLoaded == false) {
+                        iframeLoaded = true;
+                        var expectedHtml = "<html class=\"testclass\"><head>\n    \
 \n    \n    \n    \n\n\
 </head><body>\n\
     <p>Unblock fixture page!</p>\n\
 \n\n\n\
 <script type=\"text/mobify-script\" x-src=\"/path/to/script1.js\"><\/script><script type=\"text/mobify-script\" x-src=\"/path/to/script2.js\"><\/script><script type=\"text/mobify-script\" x-src=\"/path/to/script3.js\"><\/script></body></html>";
-                    equal(capturedDoc.documentElement.outerHTML, expectedHtml, "Scripts moved to bottom!");
-                    start();
-                }
+                        equal(capturedDoc.documentElement.outerHTML, expectedHtml, "Scripts moved to bottom!");
+                        start();
+                    }
+                }, doc);
             });
 
             $("#qunit-fixture").append(iframe);
