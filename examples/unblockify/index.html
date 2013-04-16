@@ -1,22 +1,23 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<script>
-(function(window, document, detector, mobifyjsUrl, mainUrl) {
 
+<!-- START MOBIFY TAG -->
+<script class="mobify" id="mobify-tag">
+(function(window, document, detector, mobifyjsUrl, mainUrl) {
 // If Mobify has been defined already, or if the detector fails,
 // exit
 if (this.Mobify || !detector()) {
     return;
 }
 
-// Start Mobify object with initial timestamp when loaded.
-// Uncomment when needed for performance testing.
+// Start Mobify object with initial timestamp when loaded
 window.Mobify = {points: [+new Date]};
+
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     var attachedScript = document.createElement('script');
-    var mobifyTagScript = document.getElementsByTagName('script')[0];
+    var mobifyTagScript = document.getElementById('mobify-tag');
 
     attachedScript.src = src;
     attachedScript.id = id;
@@ -27,10 +28,10 @@ function attachScriptBeforeMobifyTag(src, id, classNames) {
 
 // Prevent the browser from downloading website resources
 document.write('<plaintext style="display:none">');
+
 // On next tick, load library and main executable
 setTimeout(function() {
-    var Mobify = window.Mobify = window.Mobify || {};
-    Mobify.capturing = true;
+    window.capturing = true;
     var mobifyjsScript = attachScriptBeforeMobifyTag(mobifyjsUrl, "mobify-js", "mobify");
     mobifyjsScript.onload = function(){
         if (mainUrl) {
@@ -67,54 +68,28 @@ setTimeout(function() {
         return true;
     },
     // path to mobify.js
-    '/mobifyjs/build/mobify-2.0.0alpha2.js',
+    '/mobifyjs/build/mobify-2.0.0alpha3.js',
 
     // path to main executable 
-    '/mobifyjs/examples/capturing-grumpycat/main.js'
+    '/mobifyjs/examples/unblockify/main.js'  
 );
-</script>
-<!-- END MOBIFY TAG -->
-<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
-<title>Mobify.js image gallary example</title>
-</head>
-<body class="foo">
-<div class="header"></div>
-<div class="example">
-    <p>The original img srcs were swapped out for a couple of grumpy cats.
-    Open your web inspector and note the original imgs did not load.
-    Also note, they were plain old img elements (no data&ndash;src tricks).
-    <a href="#" id="swap">Click here to download and view the original images from the source html.</a></p>
-    <div class="img">
-        <img src="/mobifyjs/examples/assets/images/leaves-big.jpg" width="100%">
-    </div>
-    <div class="img">
-        <img src="/mobifyjs/examples/assets/images/office-big.jpg" width="100%">
-    </div>
 
-</div>
-<script>
-// Grab the total time since starting capturing and send it
-// to the parent for testing in performance.html
-var end = +new Date;
-var begin;
-if (window.Mobify.points) {
-    begin = window.Mobify.points[0];
-} else {
-    var pointEl = document.getElementById("mobify-point");
-    begin = pointEl.innerText || pointEl.textContent;
-}
-var diff = end - begin;
-parent.postMessage(diff, "*");
 </script>
-<script>
-var swapEl = document.getElementById("swap");
-var images = document.getElementsByTagName("img");
-swapEl.onclick = function(event) {
-    for (var i=0; i<images.length; i++) {
-        images[i].setAttribute("src", images[i].getAttribute("old-src"));
-    }
-    event.preventDefault();
+
+
+<style>
+body {
+    background-color: teal;
 }
-</script>
+</style>
+<title>Mobify.js unblockify example</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" class="grabMe"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js" class="grabMe"></script>
+<script src="//ajax.googleapis.com/ajax/libs/webfont/1.1.2/webfont.js" class="grabMe"></script>
+</head>
+
+<body class="foo">
+    <h1>Scripts are now at the bottom of body!</h1>
 </body>
+
 </html>

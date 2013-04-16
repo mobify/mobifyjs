@@ -11,3 +11,7 @@
     - [`renderCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#rendercaptureddoc)
     - [`restore()`]({{ site.baseurl }}/v2/docs/capturing/#restore)
     - [Browser Support]({{ site.baseurl }}/v2/docs/capturing/#browser-support)
+  - [Image Resizer]({{ site.baseurl }}/v2/docs/image-resizer)
+    - [resize]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesresizeimgelements-options)
+    - [getImageURL]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesgetimageurlurl-options)
+    - [Browser Support]({{ site.baseurl }}/v2/docs/image-resizer/#browser-support)
