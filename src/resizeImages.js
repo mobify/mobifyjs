@@ -106,10 +106,12 @@ ResizeImages.resize = function(imgs, options) {
     var screenSize = getPhysicalScreenSize();
     var width = opts.maxWidth || screenSize.width;
     var height = opts.maxHeight || screenSize.height;
-    if (dpr) {
-        opts.maxWidth = Math.ceil(width * dpr);
-        opts.maxHeight = Math.ceil(height * dpr);
+    if (dpr && !opts.maxWidth && !opts.maxHeight) { 
+        width = width * dpr;
+        height = height * dpr;
     }
+    opts.maxWidth = Math.ceil(width);
+    opts.maxHeight = Math.ceil(height);
 
     var attr;
     for(var i=0; i<imgs.length; i++) {

@@ -5,151 +5,66 @@ title: Mobify.js Documentation
 
 # Image Resizer
 
-To use the Capturing API, you must first install the Mobify.js tag on your site.
+To use the Image Resizer API, you must first install the Mobify.js tag on your site.
 If you have not already, please refer to the  [quickstart guide](/mobifyjs/v2/docs/) to get setup.
 
 * TOC
 {:toc}
 
-## `Capture.init(callback, [document], [prefix="x-"])`
+## `ResizeImages.resize(imgElements, [options])`
 
-__callback__ gets a `capture` object upon completion of capturing.
+__imgElements__ must be an array of image elements to resize.
 
-__document__ and __prefix__ are optional.
+__options__ are optional.
 
-Creates a new instance of a `capture` object and passes it to the 
-callback upon completion, which will parse the
-existing document in order to create an entirely new `captured document`,
-which is an exact replica of the original document, but with certain
-properties prepended with a prefix to prevent resources from loading.
+Rewrites the `src` of every image on the page based on the options
+passed. By default, images are requested through `ir0.mobify.com`,
+maximum width is determined by the width of the device, format of
+the image is maintained, and the image is cached forever.
 
-### Modified elements/attributes
+**Options**
 
-- element: **img**, attributes: **src**
-- element: **iframe**, attributes: **src**
-- element: **script**, attributes: **src, type**
-- element: **link**, attributes: **href**
-- element: **style**, attributes: **media**
+- `attribute`: `img` resource attribute to modify. Defaults to "x-src". "x-" is the default escape prefix used in [Capturing](/mobifyjs/v2/docs/capturing/)
+- `projectName`: The project slug of the project on Mobify Cloud. Defaults to ""
+- `cacheHours`: Sets the length of time for the image(s) to be cached on the CDN. Defaults to forever.
+- `format`: Format of the image(s) being resized. Defaults to original format, except gifs, which are converted to pngs.
+- `maxWidth`: Width of the image(s) being resized. Defaults to automatically determine width of device.
+- `maxHeight`: Height of the image(s) being resized. Only usable when maxWidth is specified.
 
 **Example**
 
-    // Change src of first script
     Mobify.Capture.init(function(capture){
         var capturedDoc = capture.capturedDoc;
-        var script = capturedDoc.getElementsByTagName("script")[0];
-        // Must use x-src, not src
-        script.setAttribute("x-src", "/path/to/script.js");
+        // Resize images using Mobify Image Resizer
+        var images = capturedDoc.querySelectorAll('img');
+        Mobify.ResizeImages.resize( images, {
+            projectName: "mobifytest",
+            cacheHours: "2",
+        } );
         capture.renderCapturedDoc();
     });
 
-### Useful properties
+## `ResizeImages.getImageURL(url, [options])`
 
-- `capture.doc` - Original document being captured
-- `capture.prefix` - Prefix used to prevent resource loading
-- `capture.doctype` - Doctype of captured document
-- `capture.htmlOpenTag` - String of opening &lt;html&gt; tag
-- `capture.headOpenTag` - String of opening &lt;head&gt; tag
-- `capture.bodyOpenTag` - String of opening &lt;body&gt; tag
-- `capture.htmlEl` - Reference to html element of captured doc
-- `capture.headEl` - Reference to head element of captured doc
-- `capture.bodyEl` - Reference to body element of captured doc
-- `capture.capturedDoc` - Captured document object
+__url__ is the image URL being modifed.
 
-## `getCapturedDoc()`
+__options__ are optional.
 
-Returns a reference to the `captured document` inside of a `capture`
-object.
+This method takes a URL and modifies it based on the options passed. It is executed
+by `ResizeImages.resize` for each element. It can be overridden to use this API
+for a different image resizing service (such as src.sencha.io).
 
-You have access to all DOM API methods on the `captured document`.
+**Options**
+
+The same as `ResizeImages.resize` options.
 
 **Usage/Example:**
 
-    Mobify.Capture.init(function(capture){
-        var capturedDoc = capture.getCapturedDoc();
-        var paragraphs = capturedDoc.querySelectorAll("p");
-    });
+    // Override getImageURL to use the src.sencha.io backend
+    Mobify.ResizeImages.getImageURL = function(url, options) {
+        return "http://src.sencha.io/" + options.maxWidth + "/" + url  
+    };
 
-## `capturing` variable
-
-`window.Mobify.capturing` is an indicator of the state that your code 
-is running. Mobify.js is executed both during capturing, and after capturing.
-First it stops the original document from rendering (at this time
-`capturing` is true). After rendering the captured document,
-Mobify.js is run again in a non-capturing context (at this time
-`capturing` is false).
-
-**Usage/Example:**
-
-    var capturing = window.Mobify && window.Mobify.capturing || false;
-    if (capturing) {
-        console.log("Executing during capturing phase!");
-        Mobify.Capture.init(function(capture){
-            capture.renderCapturedDoc();
-        });
-    else {
-        console.log("Executing during post-capturing phase!");
-    }
-
-
-## `escapedHTMLString()`
-
-Returns a string representation of the `captured document`, but with
-all resources enabled (prefix removed). Can be considered an
-alternative to `capturedDoc.outerHTML`.
-
-**Usage/Example:**
-
-    Mobify.Capture.init(function(capture){
-        var htmlString = capture.escapedHTMLString();
-    });
-
-## `render(htmlString)`
-
-Opens the original `document` and renders it from a clean slate
-with the htmlString.
-
-**Usage/Example:**
-
-    Mobify.Capture.init(function(capture){
-        capture.render("<html><body><h1>Test!</h1></body></html>");
-    });
-
-__Note: This method is async__
-
-## `renderCapturedDoc()`
-
-Writes out the captured document to the original document.
-
-**Usage/Example:**
-
-    Mobify.Capture.init(function(capture){
-        // Removes all scripts
-        var scripts = capturedDoc.getElementsByTagName("script");
-        for (var i = 0; i < scripts.length; i++) {
-            var script = scripts[i];
-            script.parentNode.removeChild(script);
-        }
-        capture.renderCapturedDoc();
-    });
-
-__Note: This method is async__
-
-## `restore()`
-
-Restores the original document after using capturing.
-
-__Note: This method is async__
-
-**Usage/Example:**
-
-    var capture = Mobify.Capture.init(function(capture){
-        if (/ipad/i.test(navigator.userAgent)) {
-            // Do a bunch of stuff...
-        } else {
-            // If not iPad, just restore everything back to normal
-            capture.restore();
-        }
-    });
 
 ## Browser Support
 
