@@ -17,29 +17,51 @@ __imgElements__ must be an array of image elements to resize.
 
 __options__ are optional.
 
-Rewrites the `src` of every image on the page based on the options
-passed. By default, images are requested through `ir0.mobify.com`,
-maximum width is determined by the width of the device, format of
-the image is maintained, and the image is cached forever.
+Rewrites the `src` of every image in the array `imgElements` on the page based 
+on the options passed. By default, images are requested through mobfy's image 
+resizing web service, `ir0.mobify.com`, maximum dimensions are based on the 
+size of the device, taking into account is pixel density, output format of 
+images are maintained (except for gifs), and the requested image is cached 
+indefinitely.
 
 **Options**
 
-- `attribute`: `img` resource attribute to modify. Defaults to "x-src". "x-" is the default escape prefix used in [Capturing](/mobifyjs/v2/docs/capturing/)
+- `attribute`: `img` element attribute to manipulate. Defaults to "x-src". "x-" is the default escape prefix used in [Capturing](/mobifyjs/v2/docs/capturing/)
 - `projectName`: The project slug of the project on Mobify Cloud. Defaults to ""
 - `cacheHours`: Sets the length of time for the image(s) to be cached on the CDN. Defaults to forever.
-- `format`: Format of the image(s) being resized. Defaults to original format, except gifs, which are converted to pngs.
-- `maxWidth`: Width of the image(s) being resized. Defaults to automatically determine width of device.
-- `maxHeight`: Height of the image(s) being resized. Only usable when maxWidth is specified.
+- `format`: Output format of the image(s) being resized. Defaults to original format, except gifs, which are converted to pngs.
+- `maxWidth`: Maximum width of the image(s) being resized (in CSS pixes). Defaults to automatically determine width of device.
+- `maxHeight`: Maximum height of the image(s) being resized (in CSS pixels). Only usable when maxWidth is specified.
 
 **Example**
+
+Automatic image resizing:
 
     Mobify.Capture.init(function(capture){
         var capturedDoc = capture.capturedDoc;
         // Resize images using Mobify Image Resizer
         var images = capturedDoc.querySelectorAll('img');
         Mobify.ResizeImages.resize( images, {
-            projectName: "mobifytest",
             cacheHours: "2",
+        } );
+        capture.renderCapturedDoc();
+    });
+
+Specify custom width:
+
+    Mobify.Capture.init(function(capture){
+        var capturedDoc = capture.capturedDoc;
+        // Resize images using Mobify Image Resizer
+        var images = capturedDoc.querySelectorAll('img');
+
+        var maxWidth;
+        if (window.matchMedia( "(min-width: 768px) and (max-width : 1024px)" ).matches) {
+            maxWidth = 500;
+        };
+
+        Mobify.ResizeImages.resize( images, {
+            cacheHours: 2,
+            maxWidth: maxWidth
         } );
         capture.renderCapturedDoc();
     });
