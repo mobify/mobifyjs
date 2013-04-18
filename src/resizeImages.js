@@ -104,12 +104,21 @@ ResizeImages.resize = function(imgs, options) {
     var dpr = window.devicePixelRatio;
 
     var screenSize = getPhysicalScreenSize();
+
+    // If maxHeight/maxWidth are not specified, use screen dimentions
+    // in device pixels
     var width = opts.maxWidth || screenSize.width;
     var height = opts.maxHeight || screenSize.height;
-    if (dpr && !opts.maxWidth && !opts.maxHeight) { 
+
+    // Otherwise, compute device pixels
+    if (dpr && opts.maxWidth) { 
         width = width * dpr;
-        height = height * dpr;
+        if (opts.maxHeight) {
+            height = height * dpr;
+        }
     }
+
+    // Doing rounding for non-integer device pixel ratios
     opts.maxWidth = Math.ceil(width);
     opts.maxHeight = Math.ceil(height);
 

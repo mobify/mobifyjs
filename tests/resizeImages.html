@@ -51,6 +51,27 @@
             equal(src, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
         });
 
+        test('resize images - high dpr', function() {
+            var images = document.querySelectorAll('img');
+
+            window.devicePixelRatio = 2;
+
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                prefix: 'x-',
+                maxWidth: 320,
+                maxHeight: 480,
+            });
+
+            var src = $('#resizeImages img').attr('x-src');
+
+            equal(src, "//ir0.mobify.com/project-test1/640/960/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+
+            var src = $('#resizeImages-non-http img').attr('x-src');
+
+            equal(src, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
+        });
+
 
         test('get image url', function() {
 
