@@ -129,7 +129,7 @@ ResizeImages.resize = function(imgs, options) {
             absolutify.href = attr;
             var url = absolutify.href;
             if (httpRe.test(url)) {
-                img.setAttribute('x-src', getImageURL(url, opts));
+                img.setAttribute(opts.attribute, getImageURL(url, opts));
             }
         }
     }
