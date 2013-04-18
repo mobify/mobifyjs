@@ -19,6 +19,14 @@
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
+    <div id="resizeImages-high-dpr">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
+    <div id="resizeImages-no-projectName">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
     <div id="resizeImages-non-http">
         <img x-src="gopher://archie.ftp.mailto/somanyprotocols" />
     </div>
@@ -37,8 +45,22 @@
     require(["../src/resizeImages.js"], function(ResizeImages) {
         QUnit.start();
 
+        test('resize images - no projectName', function() {
+            var images = document.querySelectorAll('#resizeImages-no-projectName img');
+
+            ResizeImages.resize(images, {
+                maxWidth: 320,
+                maxHeight: 480,
+            });
+
+            var src = $('#resizeImages-no-projectName img').attr('x-src');
+
+            equal(src, "//ir0.mobify.com/project-oss-localhost/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+
+        });
+
         test('resize images', function() {
-            var images = document.querySelectorAll('img');
+            var images = document.querySelectorAll('#resizeImages img');
             ResizeImages.resize(images, {
                 projectName: 'test1',
                 maxWidth: 320,
@@ -48,15 +70,22 @@
             var src = $('#resizeImages img').attr('x-src');
 
             equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+        });
 
-            
+        test('resize images - non-http', function() {
+            var images = document.querySelectorAll('#resizeImages-non-http img');
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                maxWidth: 320,
+                maxHeight: 480,
+            });   
             var src = $('#resizeImages-non-http img').attr('x-src');
 
             equal(src, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
         });
 
         test('resize images - high dpr', function() {
-            var images = document.querySelectorAll('img');
+            var images = document.querySelectorAll('#resizeImages-high-dpr img');
 
             window.devicePixelRatio = 2;
 
@@ -66,15 +95,14 @@
                 maxHeight: 480,
             });
 
-            var src = $('#resizeImages img').attr('x-src');
+            var src = $('#resizeImages-high-dpr img').attr('x-src');
 
             equal(src, "//ir0.mobify.com/project-test1/640/960/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
         });
 
-
         test('resize images - different attribute', function() {
-            var images = document.querySelectorAll('img');
+            var images = document.querySelectorAll('#resizeImages-different-attribute img');
 
             window.devicePixelRatio = 2;
 
@@ -90,6 +118,7 @@
             equal(src, "//ir0.mobify.com/project-test1/640/960/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
         });
+
 
         test('get image url', function() {
 

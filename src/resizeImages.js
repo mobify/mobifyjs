@@ -137,7 +137,7 @@ ResizeImages.resize = function(imgs, options) {
 }
 
 var defaults = {
-      projectName: "",
+      projectName: "oss-" + encodeURI(location.hostname),
       attribute: "x-src"
 };
 
