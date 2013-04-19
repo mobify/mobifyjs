@@ -442,6 +442,16 @@ Utils.values = function(obj) {
     return result;
 };
 
+Utils.clone = function(obj) {
+    var target = {};
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i)) {
+          target[i] = obj[i];
+        }
+    }
+    return target;
+}
+
 /**
  * outerHTML polyfill - https://gist.github.com/889005
  */
@@ -947,10 +957,10 @@ var httpRe = /^https?/
 // A protocol relative URL for the host ir0.mobify.com
 var PROTOCOL_AND_HOST = '//ir0.mobify.com'
      
-function getPhysicalScreenSize() {
+function getPhysicalScreenSize(devicePixelRatio) {
     
     function multiplyByPixelRatio(sizes) {
-        var dpr = window.devicePixelRatio || 1;
+        var dpr = devicePixelRatio || 1;
 
         sizes.width = Math.round(sizes.width * dpr);
         sizes.height = Math.round(sizes.height * dpr);
@@ -992,11 +1002,9 @@ function getPhysicalScreenSize() {
  * Returns a URL suitable for use with the 'ir' service.
  */ 
 var getImageURL = ResizeImages.getImageURL = function(url, options) {
-    var opts;
+    var opts = Utils.clone(defaults);
     if (options) {
-        opts = Utils.extend(defaults, options);
-    } else {
-        opts = defaults;
+        Utils.extend(opts, options);
     }
 
     var bits = [PROTOCOL_AND_HOST];
@@ -1032,15 +1040,14 @@ var getImageURL = ResizeImages.getImageURL = function(url, options) {
  * resized.
  */
 ResizeImages.resize = function(imgs, options) {
-    var opts;
+    var opts = Utils.clone(defaults);
     if (options) {
-        opts = Utils.extend(defaults, options);
-    } else {
-        opts = defaults;
+        Utils.extend(opts, options);
     }
-    var dpr = window.devicePixelRatio;
 
-    var screenSize = getPhysicalScreenSize();
+    var dpr = opts.devicePixelRatio || window.devicePixelRatio;
+
+    var screenSize = getPhysicalScreenSize(dpr);
 
     // If maxHeight/maxWidth are not specified, use screen dimentions
     // in device pixels
@@ -1075,7 +1082,7 @@ ResizeImages.resize = function(imgs, options) {
 
 var defaults = {
       projectName: "oss-" + encodeURI(location.hostname),
-      attribute: "x-src"
+      attribute: "x-src",
 };
 
 return ResizeImages;

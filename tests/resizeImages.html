@@ -61,6 +61,7 @@
 
         test('resize images', function() {
             var images = document.querySelectorAll('#resizeImages img');
+
             ResizeImages.resize(images, {
                 projectName: 'test1',
                 maxWidth: 320,
@@ -87,12 +88,11 @@
         test('resize images - high dpr', function() {
             var images = document.querySelectorAll('#resizeImages-high-dpr img');
 
-            window.devicePixelRatio = 2;
-
             ResizeImages.resize(images, {
                 projectName: 'test1',
                 maxWidth: 320,
                 maxHeight: 480,
+                devicePixelRatio: 2,
             });
 
             var src = $('#resizeImages-high-dpr img').attr('x-src');
@@ -103,9 +103,7 @@
 
         test('resize images - different attribute', function() {
             var images = document.querySelectorAll('#resizeImages-different-attribute img');
-
-            window.devicePixelRatio = 2;
-
+            
             ResizeImages.resize(images, {
                 projectName: 'test1',
                 maxWidth: 320,
@@ -115,7 +113,7 @@
 
             var src = $('#resizeImages-different-attribute img').attr('data-src');
 
-            equal(src, "//ir0.mobify.com/project-test1/640/960/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+            equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
         });
 
