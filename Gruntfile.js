@@ -112,7 +112,7 @@ module.exports = function(grunt) {
                 key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                 urls: [
                     'http://localhost:3000/tests/capture.html',
-                    //'http://localhost:3000/tests/jazzcat.html',
+                    'http://localhost:3000/tests/resizeImages.html',
                 ],
                 concurrency: 2,
                 tunneled: true,
