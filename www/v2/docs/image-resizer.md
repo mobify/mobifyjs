@@ -37,6 +37,7 @@ amounts of traffic, feel free to visit our
 - `format`: Output format of the image(s) being resized. Defaults to original format, except gifs, which are converted to pngs.
 - `maxWidth`: Maximum width of the image(s) being resized (in CSS pixes). Defaults to automatically determine width of device.
 - `maxHeight`: Maximum height of the image(s) being resized (in CSS pixels). Only usable when maxWidth is specified.
+- `devicePixelRatio`: Override the default devicePixelRatio. Defaults to window.devicePixelRatio.
 
 **Example**
 
