@@ -33,6 +33,16 @@ Utils.values = function(obj) {
     return result;
 };
 
+Utils.clone = function(obj) {
+    var target = {};
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i)) {
+          target[i] = obj[i];
+        }
+    }
+    return target;
+}
+
 /**
  * outerHTML polyfill - https://gist.github.com/889005
  */
