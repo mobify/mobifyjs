@@ -24,6 +24,11 @@ size of the device, taking into account is pixel density, output format of
 images are maintained (except for gifs), and the requested image is cached 
 indefinitely.
 
+Our image resizing service backend service is free to use up to a certain number
+of views per month. If you plan on using this service on a website with high 
+amounts of traffic, feel free to visit our 
+[pricing page](http://www.mobify.com/pricing/) for more detail.
+
 **Options**
 
 - `attribute`: `img` element attribute to manipulate. Defaults to "x-src". "x-" is the default escape prefix used in [Capturing](/mobifyjs/v2/docs/capturing/)
