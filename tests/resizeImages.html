@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
   <script src="/tests/resources/qunit-1.10.0.js"></script>
   <script src="/tests/resources/require.js" id="requirejs"></script>
-  <script src="/tests/resources/zepto.min.js"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
 </head>
 <body>
 
@@ -19,8 +19,20 @@
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
+    <div id="resizeImages-high-dpr">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
+    <div id="resizeImages-no-projectName">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
     <div id="resizeImages-non-http">
         <img x-src="gopher://archie.ftp.mailto/somanyprotocols" />
+    </div>
+
+    <div id="resizeImages-different-attribute">
+        <img data-src="http://www.mobify.com/i/phone-tablet.png"/>
     </div>
 
 </div>
@@ -33,11 +45,25 @@
     require(["../src/resizeImages.js"], function(ResizeImages) {
         QUnit.start();
 
+        test('resize images - no projectName', function() {
+            var images = document.querySelectorAll('#resizeImages-no-projectName img');
+
+            ResizeImages.resize(images, {
+                maxWidth: 320,
+                maxHeight: 480,
+            });
+
+            var src = $('#resizeImages-no-projectName img').attr('x-src');
+
+            equal(src, "//ir0.mobify.com/project-oss-localhost/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+
+        });
+
         test('resize images', function() {
-            var images = document.querySelectorAll('img');
+            var images = document.querySelectorAll('#resizeImages img');
+
             ResizeImages.resize(images, {
                 projectName: 'test1',
-                prefix: 'x-',
                 maxWidth: 320,
                 maxHeight: 480,
             });
@@ -45,10 +71,50 @@
             var src = $('#resizeImages img').attr('x-src');
 
             equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+        });
 
+        test('resize images - non-http', function() {
+            var images = document.querySelectorAll('#resizeImages-non-http img');
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                maxWidth: 320,
+                maxHeight: 480,
+            });   
             var src = $('#resizeImages-non-http img').attr('x-src');
 
             equal(src, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
+        });
+
+        test('resize images - high dpr', function() {
+            var images = document.querySelectorAll('#resizeImages-high-dpr img');
+
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                maxWidth: 320,
+                maxHeight: 480,
+                devicePixelRatio: 2,
+            });
+
+            var src = $('#resizeImages-high-dpr img').attr('x-src');
+
+            equal(src, "//ir0.mobify.com/project-test1/640/960/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+
+        });
+
+        test('resize images - different attribute', function() {
+            var images = document.querySelectorAll('#resizeImages-different-attribute img');
+            
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                maxWidth: 320,
+                maxHeight: 480,
+                attribute: "data-src"
+            });
+
+            var src = $('#resizeImages-different-attribute img').attr('data-src');
+
+            equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+
         });
 
 
