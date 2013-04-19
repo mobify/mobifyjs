@@ -7,15 +7,11 @@ if (capturing) {
         var capturedDoc = capture.capturedDoc;
 
         var scripts = capturedDoc.querySelectorAll('script');
-        Mobify.Jazzcat.combineScripts(scripts, {
-            projectName: "mobifytest"
-        });
+        Mobify.Jazzcat.combineScripts( scripts );
 
         // Resize images using Mobify Image Resizer
         var images = capturedDoc.querySelectorAll('img');
-        Mobify.ResizeImages.resize( images, {
-            projectName: "mobifytest"
-        } );
+        Mobify.ResizeImages.resize( images );
 
         // Render source DOM to document
         capture.renderCapturedDoc();
