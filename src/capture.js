@@ -316,7 +316,7 @@ Capture.prototype.restore = function() {
         }, 15);
     };
 
-    if (/complete|loaded/.test(doc.readyState)) {
+    if (/complete|interactive|loaded/.test(doc.readyState)) {
         restore();
     } else {
         doc.addEventListener('DOMContentLoaded', restore, false);
