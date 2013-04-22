@@ -22,7 +22,7 @@ more.
 <pre id="mobify-tag"><code class="javascript">&lt;script>(function(a,b,c,d,e){function f(a,c,d){var e=b.createElement("script"),f=b.getElementsByTagName("script")[0];return e.src=a,e.id=c,e.setAttribute("class",d),f.parentNode.insertBefore(e,f),e}!this.Mobify&&c()&&(b.write('&lt;plaintext style="display:none">'),setTimeout(function(){var b=a.Mobify=a.Mobify||{};b.capturing=!0;var c=f(d,"mobify-js","mobify");c.onload=function(){e&&f(e,"mobify-js-main","mobify")}}))})(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&4>+match[2]?!1:match[3]&&11>+match[4]?!1:!0:!1},
 
 // path to mobify library
-"//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha2.min.js",
+"//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha3.min.js",
 // path to main executable
 "/PATH/TO/main.js");
 &lt;/script></code></pre>
