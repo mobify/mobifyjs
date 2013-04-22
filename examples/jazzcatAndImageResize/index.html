@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+
+<!-- START MOBIFY TAG -->
+<script class="mobify" id="mobify-tag">
+(function(window, document, detector, mobifyjsUrl, mainUrl) {
+// If Mobify has been defined already, or if the detector fails,
+// exit
+if (this.Mobify || !detector()) {
+    return;
+}
+
+// Start Mobify object with initial timestamp when loaded
+window.Mobify = {points: [+new Date]};
+
+
+function attachScriptBeforeMobifyTag(src, id, classNames) {
+    var attachedScript = document.createElement('script');
+    var mobifyTagScript = document.getElementById('mobify-tag');
+
+    attachedScript.src = src;
+    attachedScript.id = id;
+    attachedScript.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
+    return attachedScript;
+}
+
+// Prevent the browser from downloading website resources
+document.write('<plaintext style="display:none">');
+
+// On next tick, load library and main executable
+setTimeout(function() {
+    window.capturing = true;
+    var mobifyjsScript = attachScriptBeforeMobifyTag(mobifyjsUrl, "mobify-js", "mobify");
+    mobifyjsScript.onload = function(){
+        if (mainUrl) {
+            attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+        }
+        // TODO: If main fails to load, load capture.restore
+    };
+
+});
+
+})( window, document,
+    // detector function
+    function (){
+        var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
+        var isCompatible;
+        if (match) {
+            if (match[1] && (match[1].toLowerCase() === "firefox") && (+match[2] < 4)) {
+                isCompatible = false;
+            } else if (match[3] && (match[3].toLowerCase() === "opera") && (+match[4] < 11)) {
+                isCompatible = false
+            } else {
+                isCompatible = true;
+            }
+        }
+        if (!isCompatible) {
+            return false;
+        }
+        return true;
+    },
+    // path to mobify.js
+    //'http://cloud.dev:8000/projects/jan8-jansepar-1/swift/mobify.js'
+
+    
+    '/mobifyjs/build/mobify-2.0.0alpha3.js',
+
+    // path to main executable 
+    '/mobifyjs/examples/jazzcatAndImageResize/main.js'  
+);
+
+</script>
+
+
+<style>
+body {
+    background-color: teal;
+}
+</style>
+<title>Mobify.js Jazzcat and Image Resize example</title>
+<link rel="stylesheet" href="//www.mobify.com/static/css/core.css?5edff398d55a1d2b08f1c91a9a9b331c">
+<link rel="stylesheet" href="//www.mobify.com/static/css/core.css?e6s">
+</head>
+<body class="foo">
+<img src="http://4.bp.blogspot.com/-MzZCzWI_6Xc/UIUQp1qPfzI/AAAAAAAAHpA/OTwHCJSWFAY/s1600/cats_animals_kittens_cat_kitten_cute_desktop_1680x1050_hd-wallpaper-753974.jpeg">
+<div class="removeme"><p>I should be removed!</p></div>
+
+<p>
+    <a href="http://www.dailypuppy.com/">Check out some cute puppies! </a>
+</p>
+<p>
+    <a href="http://www.dailykitten.com/">And kittens!</a>
+</p>
+
+<script>
+// Grab the total time since starting capturing and send it
+// to the parent for testing in performance.html
+var end = +new Date;
+var begin;
+if (window.Mobify.points) {
+    begin = window.Mobify.points[0];
+} else {
+    begin = document.getElementById("mobify-point").innerText;
+}
+var diff = end - begin;
+parent.postMessage(diff, "*");
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" class="grabMe"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js" class="grabMe"></script>
+<script src="//ajax.googleapis.com/ajax/libs/webfont/1.1.2/webfont.js" class="grabMe"></script>
+
+
+</body>
+</html>
