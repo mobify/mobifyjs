@@ -93,6 +93,15 @@ The same as `ResizeImages.resize` options.
         return "http://src.sencha.io/" + options.maxWidth + "/" + url  
     };
 
+## ir0.mobify.com
+
+Mobify's image resizing backend that can manipulate the width, height, file
+format, and quality of any image. All requests through this service are cached on Mobify's CDN.
+
+The image resizer API in Mobify.js uses this service by default for image
+manipulation.
+
+Visit [http://ir0.mobify.com](http://ir0.mobify.com) to see full REST API.
 
 ## Browser Support
 

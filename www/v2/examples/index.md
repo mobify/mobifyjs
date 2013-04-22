@@ -7,6 +7,32 @@ title: Mobify.js Examples
 
 ----
 
+## Manual Image Resizing
+
+This example uses the [Image Resizer API](/mobifyjs/v2/docs/image-resizer/)
+in Mobify.js to scale large images to be 320 pixel in width. The key thing to
+note is that the markup is completely semantic (no use of special `data-`
+attributes), yet through the use of Capturing, we are able to restrict the
+page to only download the resized images.
+
+The following markup:
+
+    <div class="images">
+        <img src="/mobifyjs/examples/assets/images/forest.jpg">
+        <img src="/mobifyjs/examples/assets/images/mountains.jpg">
+    </div>
+
+is modified into this on the fly:
+
+    <div class="images">
+        <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/forest.jpg">
+        <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/mountains.jpg">
+    </div>
+
+The original image assets do not download.
+
+The API can also be used to automatically detect browser width.
+
 ## Capturing - Picture Polyfill
 
 The Picture element is the official W3C HTML extension for 
