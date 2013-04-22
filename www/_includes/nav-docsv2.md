@@ -11,3 +11,8 @@
     - [`renderCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#rendercaptureddoc)
     - [`restore()`]({{ site.baseurl }}/v2/docs/capturing/#restore)
     - [Browser Support]({{ site.baseurl }}/v2/docs/capturing/#browser-support)
+  - [Image Resizer]({{ site.baseurl }}/v2/docs/image-resizer)
+    - [`resize`]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesresizeimgelements-options)
+    - [`getImageURL`]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesgetimageurlurl-options)
+    - [ir0.mobify.com]({{ site.baseurl }}/v2/docs/image-resizer/#ir0mobifycom)
+    - [Browser Support]({{ site.baseurl }}/v2/docs/image-resizer/#browser-support)

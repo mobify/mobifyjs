@@ -4,6 +4,14 @@ define(["utils"], function(Utils) {
 // # Static Variables/Functions
 // ##
 
+// v6 tag backwards compatibility change
+if (window.Mobify && 
+    !window.Mobify.capturing &&
+    document.getElementsByTagName("plaintext").length) 
+{
+            window.Mobify.capturing = true;
+}
+
 var openingScriptRe = /(<script[\s\S]*?>)/gi;
 
 // Inline styles and scripts are disabled using a unknown type.
@@ -57,16 +65,6 @@ function escapeQuote(s) {
     return s.replace('"', '&quot;');
 }
 
-/**
- * outerHTML polyfill - https://gist.github.com/889005
- */
-function outerHTML(el){
-    var div = document.createElement('div');
-    div.appendChild(el.cloneNode(true));
-    var contents = div.innerHTML;
-    div = null;
-    return contents;
-}
 
 /**
  * Helper method for looping through and grabbing strings of elements
@@ -83,7 +81,7 @@ function extractHTMLStringFromElement(container) {
         if (tagName == 'script' && ((/mobify/.test(el.src) || /mobify/i.test(el.textContent)))) {
             return '';
         }
-        return el.outerHTML || el.nodeValue || outerHTML(el);
+        return el.outerHTML || el.nodeValue || Utils.outerHTML(el);
     }).join('');
 }
 
@@ -377,7 +375,7 @@ Capture.prototype.createDocumentFragments = function() {
  */
 Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
-    var html = Capture.enable(doc.documentElement.outerHTML || outerHTML(doc.documentElement), this.prefix);
+    var html = Capture.enable(doc.documentElement.outerHTML || Utils.outerHTML(doc.documentElement), this.prefix);
     var htmlWithDoctype = this.doctype + html;
     return htmlWithDoctype;
 };
@@ -386,6 +384,13 @@ Capture.prototype.escapedHTMLString = function() {
  * Rewrite the document with a new html string
  */
 Capture.prototype.render = function(htmlString) {
+    var escapedHTMLString;
+    if (!htmlString) {
+        escapedHTMLString = this.escapedHTMLString();
+    } else {
+        escapedHTMLString = Capture.enable(htmlString);
+    }
+
     var doc = this.doc;
 
     // Set capturing state to false so that the user main code knows how to execute
@@ -394,7 +399,7 @@ Capture.prototype.render = function(htmlString) {
     // Asynchronously render the new document
     setTimeout(function(){
         doc.open();
-        doc.write(htmlString);
+        doc.write(escapedHTMLString);
         doc.close();
     });
 };
@@ -407,15 +412,24 @@ Capture.prototype.getCapturedDoc = function(options) {
 };
 
 /**
- * Render the captured document
+ * Insert Mobify scripts back into the captured doc
+ * in order for the library to work post-document.write
  */
-Capture.prototype.renderCapturedDoc = function(options) {
+Capture.prototype.insertMobifyScripts = function() {
     var doc = this.capturedDoc;
 
     // After document.open(), all objects will be removed.
     // To provide our library functionality afterwards, we
     // must re-inject the script.
     var mobifyjsScript = document.getElementById("mobify-js");
+
+    // v6 tag backwards compatibility change
+    if (!mobifyjsScript) {
+        mobifyjsScript = document.getElementsByTagName("script")[0];
+        mobifyjsScript.id = "mobify-js";
+        mobifyjsScript.setAttribute("class", "mobify");
+    }
+
     // Since you can't move nodes from one document to another,
     // we must clone it first using importNode:
     // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
@@ -429,6 +443,16 @@ Capture.prototype.renderCapturedDoc = function(options) {
         var mainClone = doc.importNode(mainScript, false);
         this.bodyEl.appendChild(mainClone);
     }
+};
+
+/**
+ * Render the captured document
+ */
+Capture.prototype.renderCapturedDoc = function(options) {
+    var doc = this.capturedDoc;
+
+    // Insert the mobify scripts back into the captured doc
+    this.insertMobifyScripts();
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists
@@ -442,7 +466,7 @@ Capture.prototype.renderCapturedDoc = function(options) {
     }
 
 
-    this.render(this.escapedHTMLString());
+    this.render();
 };
 
 return Capture;
