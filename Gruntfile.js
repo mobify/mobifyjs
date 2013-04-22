@@ -1,5 +1,5 @@
 // http://stackoverflow.com/questions/13567312/working-project-structure-that-uses-grunt-js-to-combine-javascript-files-using-r
-
+var fs = require("fs");
 
 /*global module:false*/
 module.exports = function(grunt) {
@@ -7,9 +7,9 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        localConfig: (function(){ 
-                        try { 
-                            return grunt.file.readJSON('localConfig.json') 
+        localConfig: (function(){
+                        try {
+                            return grunt.file.readJSON('localConfig.json')
                         } catch(e) {
                             return {};
                         }
@@ -34,9 +34,33 @@ module.exports = function(grunt) {
                 options: {
                     hostname: '0.0.0.0',
                     port: 3000,
-                    base: '.'
+                    base: '.',
+                    middleware: function(connect, options) {
+                        /**
+                         * A "slow" response which is served in two chunks.
+                         */
+                        var splitPath = '/tests/fixtures/split.html';
+                        var split = fs.readFileSync(__dirname + splitPath, 'utf8').split('<!-- SPLIT -->')
+
+                        var splitHandler = function(req, res, next) {
+                            if (req.url != splitPath) return next();
+
+                            res.writeHead(200, {'Content-Type': 'text/html'});
+                            res.write(split[0]);
+
+                            setTimeout(function() {
+                                res.write(split[1]);
+                                res.end();
+                            }, 5000);
+                        };
+
+                        return [
+                            splitHandler,
+                            connect.static(__dirname)
+                        ];
+                    }
                 }
-            }
+            },
         },
         requirejs: {
             // Building full Mobify.js library
@@ -101,7 +125,7 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            files: ["src/**/*.js", 
+            files: ["src/**/*.js",
                   "mobify-custom.js"
             ],
             tasks: ['build'],
@@ -147,7 +171,7 @@ module.exports = function(grunt) {
                 },
                 { // Lowest known working version of FF
                     browserName: 'firefox',
-                    version: '4.0' 
+                    version: '4.0'
                 },
                 { // Highest known working version of FF on Windows
                     browserName: 'firefox',
@@ -191,7 +215,7 @@ module.exports = function(grunt) {
                     // Return true or false, passes or fails the test
                     // Returning undefined does not alter the test result
 
-                    // For async return, call 
+                    // For async return, call
                     var done = this.async();
                     setTimeout(function(){
                         // Return to this test after 1000 milliseconds

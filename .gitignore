@@ -6,3 +6,4 @@ node_modules
 node_modules
 *.zip
 build/mobify-experimental*
+report.xml
