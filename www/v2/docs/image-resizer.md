@@ -24,6 +24,9 @@ size of the device, taking into account is pixel density, output format of
 images are maintained (except for gifs), and the requested image is cached 
 indefinitely.
 
+The image resizer backend must have access to the images in order to resize them. If your development server is not accessible on the publicly, 
+`ir.mobify.com` will serve a 302 redirect back to the original image location.
+
 Our image resizing service backend service is free to use up to a certain number
 of views per month. If you plan on using this service on a website with high 
 amounts of traffic, feel free to visit our 

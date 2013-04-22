@@ -15,6 +15,8 @@ note is that the markup is completely semantic (no use of special `data-`
 attributes), yet through the use of Capturing, we are able to restrict the
 page to only download the resized images.
 
+* [Manual Image Resizing Example](http://cdn.mobify.com/mobifyjs/examples/resizeImages/index.html){: target='_blank' }
+
 The following markup:
 
     <div class="images">
@@ -32,6 +34,12 @@ is modified into this on the fly:
 The original image assets do not download.
 
 The API can also be used to automatically detect browser width.
+
+You can find the source code here:
+
+* [index.html](https://github.com/mobify/mobifyjs/tree/v2.0/examples/resizeImages/index.html
+){: target='_blank' }
+* [main.js](https://github.com/mobify/mobifyjs/tree/v2.0/examples/resizeImages/mobify+main.js){: target='_blank' }
 
 ## Capturing - Picture Polyfill
 
