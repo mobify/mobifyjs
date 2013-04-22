@@ -5,6 +5,5 @@ node_modules
 *.bak
 node_modules
 *.zip
-build
 
 report.xml
