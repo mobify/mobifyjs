@@ -23,9 +23,10 @@
 
 
     /* 
-     * All rendering engines (aside from Webkit) remove all objects
-     * after the flood (document.write) - we reinject the library 
-     * into the new document to ensure you can still use it post-flood
+     * Most browsers create a new global javascript namespace in the new document, 
+     * except webkit, which preserves the namespace as it was before the call to 
+     * document.open(). We reinject the library to ensure Mobify can be used
+     * after the namespace is cleared.
      */
     asyncTest("mobify survives flood", function() {
         var opts = {
