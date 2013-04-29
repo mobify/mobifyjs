@@ -1538,5 +1538,5 @@ require(["utils", "capture", "resizeImages", "jazzcat", "unblockify"], function(
 
 }, undefined, true);
 // relPath, forceSync;
-define("mobify-full", function(){});
+define("mobify-library", function(){});
 }());
