@@ -1527,6 +1527,7 @@ return Unblockify;
 
 });
 require(["utils", "capture", "resizeImages", "jazzcat", "unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
+    var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
