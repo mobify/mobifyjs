@@ -398,7 +398,7 @@ Capture.prototype.render = function(htmlString) {
 
     // Asynchronously render the new document
     setTimeout(function(){
-        doc.open();
+        doc.open("text/html", "replace");
         doc.write(escapedHTMLString);
         doc.close();
     });
@@ -456,7 +456,7 @@ Capture.prototype.renderCapturedDoc = function(options) {
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists
-    if (window.Mobify.points) {
+    if (window.Mobify && window.Mobify.points) {
         var body = this.bodyEl;
         var date = doc.createElement("div");
         date.id = "mobify-point";

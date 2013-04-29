@@ -58,6 +58,8 @@ To create a custom build, run the following:
 Then, run `grunt preview` as normal. The output of the custom build will be
 located in `./build/custom`.
 
+**Note: We use a `mobifyjs` symlink to resolve paths so they can be the same locally as they are on the CDN. This can be problematic for Windows.**
+
 ### Tests
 
 Tests for Mobify.js are written in QUnit. To run them individually, run
