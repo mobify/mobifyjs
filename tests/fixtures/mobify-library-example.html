@@ -12,7 +12,7 @@ if (this.Mobify || !detector()) {
 
 // Start Mobify object with initial timestamp when loaded.
 // Uncomment when needed for performance testing.
-window.Mobify = {points: [+new Date]};
+// window.Mobify = {points: [+new Date]};
 
 function attachScriptBeforeMobifyTag(src, id, classNames) {
     var attachedScript = document.createElement('script');
@@ -27,6 +27,7 @@ function attachScriptBeforeMobifyTag(src, id, classNames) {
 
 // Prevent the browser from downloading website resources
 document.write('<plaintext style="display:none">');
+
 // On next tick, load library and main executable
 setTimeout(function() {
     var Mobify = window.Mobify = window.Mobify || {};
@@ -51,10 +52,11 @@ setTimeout(function() {
         // - Opera 11+
         // - 3DS
         match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
-
+     
         if (!match) {
             return false;
         }
+     
         // match[1] == Firefox
         if (match[1] && +match[2] < 4) {
             return false;
@@ -67,54 +69,17 @@ setTimeout(function() {
         return true;
     },
     // path to mobify.js
-    '/mobifyjs/build/mobify-2.0.0alpha3.js',
+    '/mobifyjs/build/mobify-2.0.0alpha3.min.js',
 
     // path to main executable 
-    '/mobifyjs/examples/capturing-grumpycat/main.js'
+    '/tests/fixtures/main.js'
 );
 </script>
 <!-- END MOBIFY TAG -->
-<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
-<title>Mobify.js image gallary example</title>
 </head>
-<body class="foo">
-<div class="header"></div>
-<div class="example">
-    <p>The original img srcs were swapped out for a couple of grumpy cats.
-    Open your web inspector and note the original imgs did not load.
-    Also note, they were plain old img elements (no data&ndash;src tricks).
-    <a href="#" id="swap">Click here to download and view the original images from the source html.</a></p>
-    <div class="img">
-        <img src="/mobifyjs/examples/assets/images/leaves-big.jpg" width="100%">
-    </div>
-    <div class="img">
-        <img src="/mobifyjs/examples/assets/images/office-big.jpg" width="100%">
-    </div>
-
-</div>
+<body>
 <script>
-// Grab the total time since starting capturing and send it
-// to the parent for testing in performance.html
-var end = +new Date;
-var begin;
-if (window.Mobify.points) {
-    begin = window.Mobify.points[0];
-} else {
-    var pointEl = document.getElementById("mobify-point");
-    begin = pointEl.innerText || pointEl.textContent;
-}
-var diff = end - begin;
-parent.postMessage(diff, "*");
-</script>
-<script>
-var swapEl = document.getElementById("swap");
-var images = document.getElementsByTagName("img");
-swapEl.onclick = function(event) {
-    for (var i=0; i<images.length; i++) {
-        images[i].setAttribute("src", images[i].getAttribute("old-src"));
-    }
-    event.preventDefault();
-}
+    parent.postMessage("finished", "*")
 </script>
 </body>
 </html>
