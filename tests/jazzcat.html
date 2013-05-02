@@ -80,8 +80,7 @@
           , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
           , UTC_NOW = (new Date()).toUTCString()
 
-            // String long enough that too big to store in 
-            // Chrome, Webkit, and Firefox
+            // Too big for localStorage in Chrome, Webkit, and Firefox
           , LONG_STRING = Array(10000000).join('1')
 
           , getIframeDocument = function(selector) {
