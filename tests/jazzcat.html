@@ -16,56 +16,49 @@
 <div id="qunit-fixture">
 
     <textarea id="requirejs-fixture-1">
+        <!-- Bring in Mobify.js to synchronously load jazzcat -->
+        <script src="/build/mobify.js"></script>
         <script>
-            require.config({
-                "baseUrl": "../src/",  
-            })
-            require(["../src/jazzcat.js"], function(Jazzcat) {
-                Jazzcat.httpCache.load();
-                var scripts = document.getElementsByTagName("textarea")[0].textContent;
-                var temp = document.createElement("div");
-                temp.innerHTML = scripts;
-                document.write("<html><head></head></html>")
-                for (var i=0; i < temp.childNodes.length; i++) {
-                    var scriptEl = temp.childNodes[i];
-                    if (scriptEl.nodeName !== "SCRIPT") return;
-                    // Ughhhh.
-                    document.getElementsByTagName("head")[0].appendChild(scriptEl);
-                    eval(scriptEl.innerHTML);
-                }
-                document.close()
-                parent.postMessage(a, "*");
-            }, undefined, true);
+            Jazzcat.httpCache.load();
+            var scripts = document.getElementsByTagName("textarea")[0].textContent;
+            var temp = document.createElement("div");
+            temp.innerHTML = scripts;
+            for (var i=0; i < temp.childNodes.length; i++) {
+                var scriptEl = temp.childNodes[i];
+                if (scriptEl.nodeName !== "SCRIPT") continue;
+                // Ughhhh.
+                document.getElementsByTagName("head")[0].appendChild(scriptEl);
+                eval(scriptEl.innerHTML);
+            }
+            document.close()
+            parent.postMessage(a, "*");
         </script>
     </textarea>
 
     <textarea id="requirejs-fixture-2">
+        <!-- Bring in Mobify.js to synchronously load jazzcat -->
+        <script src="/build/mobify.js"></script>
         <script>
-            require.config({
-                "baseUrl": "../src/",  
-            })
-            require(["../src/jazzcat.js"], function(Jazzcat) {
-                Jazzcat.httpCache.load();
-                var scripts = document.getElementsByTagName("textarea")[0].textContent;
-                var temp = document.createElement("div");
-                temp.innerHTML = scripts;
-                document.write("<html><head></head></html>")
-                for (var i=0; i < temp.childNodes.length; i++) {
-                    var scriptEl = temp.childNodes[i];
-                    if (scriptEl.nodeName !== "SCRIPT") return;
-                    // Ughhhh.
-                    document.getElementsByTagName("head")[0].appendChild(scriptEl);
-                    eval(scriptEl.innerHTML);
+
+            Jazzcat.httpCache.load();
+            var scripts = document.getElementsByTagName("textarea")[0].textContent;
+            var temp = document.createElement("div");
+            temp.innerHTML = scripts;
+            for (var i=0; i < temp.childNodes.length; i++) {
+                var scriptEl = temp.childNodes[i];
+                if (scriptEl.nodeName !== "SCRIPT") continue;
+                // Ughhhh.
+                document.getElementsByTagName("head")[0].appendChild(scriptEl);
+                eval(scriptEl.innerHTML);
+            }
+            document.close();
+            setTimeout(function(){
+                var data = false;
+                if (window.jQuery) {
+                    data = true;
                 }
-                document.close();
-                setTimeout(function(){
-                    var data = false;
-                    if (window.jQuery) {
-                        data = true;
-                    }
-                    parent.postMessage(data, "*");
-                }, 3000);
-            }, undefined, true);
+                parent.postMessage(data, "*");
+            }, 3000);
         </script>
     </textarea>
 
@@ -160,9 +153,9 @@
                 html += "<textarea>" + $result.map(function(el){
                     return el.outerHTML + "\n";
                 }).join("") + "</textarea>";
-                html += $('#requirejs')[0].outerHTML;
+                //html += $('#requirejs')[0].outerHTML;
                 html += $('#requirejs-fixture-1').text();
-                
+
                 html = '<html><body>' + html + '</body></html>';
 
                 var iframeEl = document.createElement('iframe');
@@ -198,7 +191,6 @@
             html += "<textarea>" + $result.map(function(el){
                     return el.outerHTML + "\n";
                 }).join("") + "</textarea>";
-            html += $('#requirejs')[0].outerHTML;
             html += $('#requirejs-fixture-2').text();
             html = '<html><body>' + html + '</body></html>';
             
