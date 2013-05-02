@@ -1114,35 +1114,35 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
           }
 
           return resource;
-      }
+    };
 
     var set = function(key, val) {
           cache[key] = val;
-      }
+    };
 
       /**
        * Load the persistent cache into memory. Ignore stale resources.
        */
     var load = function() {
-          var data = localStorage.getItem(localStorageKey)
-            , key;
+        var data = localStorage.getItem(localStorageKey)
+          , key;
 
-          if (data === null) {
-              return;
-          }
+        if (data === null) {
+            return;
+        }
 
-          try {
-              data = JSON.parse(data)
-          } catch(err) {
-              return;
-          }
+        try {
+            data = JSON.parse(data);
+        } catch(err) {
+            return;
+        }
 
-          for (key in data) {
-              if (data.hasOwnProperty(key) && !httpCache.utils.isStale(data[key])) {
+        for (key in data) {
+            if (data.hasOwnProperty(key) && !httpCache.utils.isStale(data[key])) {
                   set(key, data[key]);
-              }
-          }
-      }
+            }
+        }
+    };
 
     /**
     * Save the in-memory cache to disk. If the disk is full, use LRU to drop
@@ -1160,7 +1160,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
         for (key in cache) {
             if (cache.hasOwnProperty(key)) {
-                resources[key] = cache[key]
+                resources[key] = cache[key];
             }
         }
 
@@ -1174,16 +1174,16 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 }
 
                 try {
-                    localStorage.setItem(localStorageKey, serialized)
+                    localStorage.setItem(localStorageKey, serialized);
                 } catch(err) {
                     if (!--attempts) {
                         if (callback) callback(err);
                         return;
                     }
 
-                    for (key in resources) {
+                    for (var key in resources) {
                         if (!resources.hasOwnProperty(key)) continue;
-                        resource = resources[key]
+                        resource = resources[key];
 
                         // Nominate the LRU.
                         if (resource.lastUsed) {
@@ -1236,8 +1236,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     * Regular expressions for cache-control directives.
     * See http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
     */
-    var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
-    var ccMaxAge = /^\s*(max-age)\s*=\s*(\d+)\s*$/
+    var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/;
+    var ccMaxAge = /^\s*(max-age)\s*=\s*(\d+)\s*$/;
 
     /**
      * Returns an object representing a parsed HTTP 1.1 Cache-Control directive.
@@ -1254,9 +1254,9 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
         directives.split(',').forEach(function(directive) {
             if (match = ccDirectives.exec(directive)) {
-                obj[match[1]] = true
+                obj[match[1]] = true;
             } else if (match = ccMaxAge.exec(directive)) {
-                obj[match[1]] = parseInt(match[2])
+                obj[match[1]] = parseInt(match[2]);
             }
         });
 
@@ -1268,10 +1268,11 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
          * Returns a data URI for `resource` suitable for executing the script.
          */
         dataURI: function(resource) {
-            var contentType = resource.headers['content-type'] || 'application/x-javascript'
-            return 'data:' + contentType + (!resource.text
-                 ? (';base64,' + resource.body)
-                 : (',' + encodeURIComponent(resource.body)));
+            var contentType = resource.headers['content-type'] ||
+              'application/x-javascript';
+            return 'data:' + contentType + (!resource.text ? 
+              (';base64,' + resource.body) : 
+              (',' + encodeURIComponent(resource.body)));
         },
 
         /**
@@ -1290,7 +1291,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             if (cacheControl && (date = Date.parse(headers.date))) {
                 cacheControl = ccParse(cacheControl);
 
-                if ((cacheControl['max-age']) && 
+                if ((cacheControl['max-age']) &&
                     (!cacheControl['private']) &&
                     (!cacheControl['no-store']) &&
                     (!cacheControl['no-cache'])) {
@@ -1315,7 +1316,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
       */
     var httpCache = Jazzcat.httpCache;
 
-    var absolutify = document.createElement('a')
+    var absolutify = document.createElement('a');
 
     Jazzcat.combineScripts = function(scripts, options) {
         var opts;
@@ -1346,10 +1347,10 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
             script.removeAttribute(opts.attribute);
             isCached = !!httpCache.get(url);
-            script.innerHTML = isCached + ',' + opts.execCallback
-                + "('" + url + "'," + (!!opts.forceDataURI) + ");";
+            script.innerHTML = isCached + ',' + opts.execCallback +
+              "('" + url + "'," + (!!opts.forceDataURI) + ");";
         }
-        
+
         return scripts;
     };
 
@@ -1372,7 +1373,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         exec: function(url, useDataURI) {
             var resource = httpCache.get(url, true),
                 out;
-                
+
             if (!resource) {
                 out = 'src="' + url + '">';
             } else {
@@ -1421,8 +1422,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
          */
         load: function(resources) {
             var resource, i, ii, save = false;
-            
-            httpCache.load()
+
+            httpCache.load();
 
             if (!resources) return;
 
@@ -1430,7 +1431,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 resource = resources[i];
                 if (resource.status == 'ready') {
                     save = true;
-                    httpCache.set(encodeURI(resource.url), resource)
+                    httpCache.set(encodeURI(resource.url), resource);
                 }
             }
 
@@ -1438,7 +1439,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         },
 
         getLoaderScript: function(uncached, loadCallback) {
-            var bootstrap = document.createElement('script')
+            var bootstrap = document.createElement('script');
             if (uncached.length) {
                 bootstrap.src = Jazzcat.getURL(uncached, loadCallback);
             } else {
@@ -1453,9 +1454,9 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * consistent URLs.
      */
     Jazzcat.getURL = function(urls, callback) {
-        return defaults.proto + defaults.host + 
-          (defaults.projectName ? '/project-' + defaults.projectName : '') + 
-          '/' + defaults.endpoint + '/' + callback + '/' + 
+        return defaults.proto + defaults.host +
+          (defaults.projectName ? '/project-' + defaults.projectName : '') +
+          '/' + defaults.endpoint + '/' + callback + '/' +
           Jazzcat.JSONURIencode(urls.slice().sort());
     };
 
@@ -1469,9 +1470,9 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
 
     var oldEnable = Capture.enable;
-    var enablingRe = new RegExp("<script[^>]*?>(true|false),"
-      + defaults.execCallback.replace(/\./g, '\\.')
-      + "\\('([\\s\\S]*?)'\\,(true|false)\\);<\\/script", "gi");
+    var enablingRe = new RegExp("<script[^>]*?>(true|false)," +
+      defaults.execCallback.replace(/\./g, '\\.') +
+      "\\('([\\s\\S]*?)'\\,(true|false)\\);<\\/script", "gi");
 
     /**
      * Overrides enable to replace scripts with bootloaders
@@ -1494,9 +1495,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         return htmlStr.substr(0, firstIndex) + bootstrap.outerHTML + htmlStr.substr(firstIndex);
     };
 
-
     return Jazzcat;
-
 });
 
 define('unblockify',["utils", "capture"], function(Utils, Capture) {
