@@ -1407,6 +1407,11 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 }
             }
 
+            // document.write is used to ensure scripts are executed in order, as opposed
+            // to "as fast as possible"
+            // http://hsivonen.iki.fi/script-execution/
+            // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
+            // This call seems to do nothing in Opera 11/12
             document.write('<script ' + out + '<\/script>');
         },
 
