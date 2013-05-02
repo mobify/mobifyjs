@@ -15,7 +15,7 @@
 
 <div id="qunit-fixture">
 
-    <textarea id="requirejs-fixture-1">
+    <textarea id="fixture-1">
         <!-- Bring in Mobify.js to synchronously load jazzcat -->
         <script src="/build/mobify.js"></script>
         <script>
@@ -35,7 +35,7 @@
         </script>
     </textarea>
 
-    <textarea id="requirejs-fixture-2">
+    <textarea id="fixture-2">
         <!-- Bring in Mobify.js to synchronously load jazzcat -->
         <script src="/build/mobify.js"></script>
         <script>
@@ -153,8 +153,7 @@
                 html += "<textarea>" + $result.map(function(el){
                     return el.outerHTML + "\n";
                 }).join("") + "</textarea>";
-                //html += $('#requirejs')[0].outerHTML;
-                html += $('#requirejs-fixture-1').text();
+                html += $('#fixture-1').text();
 
                 html = '<html><body>' + html + '</body></html>';
 
@@ -191,7 +190,8 @@
             html += "<textarea>" + $result.map(function(el){
                     return el.outerHTML + "\n";
                 }).join("") + "</textarea>";
-            html += $('#requirejs-fixture-2').text();
+            html += $('#fixture-2').text();
+            
             html = '<html><body>' + html + '</body></html>';
             
             var iframeEl = document.createElement('iframe');
