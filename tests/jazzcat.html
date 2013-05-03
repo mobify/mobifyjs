@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
   <script src="/tests/resources/qunit-1.10.0.js"></script>
   <script src="/tests/resources/require.js" id="requirejs"></script>
-  <script src="/tests/resources/zepto.min.js"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
 </head>
 <body>
 
@@ -15,49 +15,44 @@
 
 <div id="qunit-fixture">
 
-    <textarea id="requirejs-fixture-1">
+    <textarea id="fixture-1">
+        <!-- Bring in Mobify.js to synchronously load jazzcat -->
+        <script src="/build/mobify.js"></script>
         <script>
-            require.config({
-                "baseUrl": "../src/",  
-            })
-            require(["../src/jazzcat.js"], function(Jazzcat) {
-                Jazzcat.httpCache.load();
-                var scripts = document.getElementsByTagName("textarea")[0].textContent;
-                document.write(scripts);
-                parent.postMessage(a, "*");
-            }, undefined, true);
+            Jazzcat.httpCache.load();
+            var scripts = document.getElementsByTagName("textarea")[0].textContent;
+            document.write(scripts);
+            parent.postMessage(a, "*");
         </script>
     </textarea>
 
-    <textarea id="requirejs-fixture-2">
+    <textarea id="fixture-2">
+        <!-- Bring in Mobify.js to synchronously load jazzcat -->
+        <script src="/build/mobify.js"></script>
         <script>
-            require.config({
-                "baseUrl": "../src/",  
-            })
-            require(["../src/jazzcat.js"], function(Jazzcat) {
-                Jazzcat.httpCache.load();
-                var scripts = document.getElementsByTagName("textarea")[0].textContent;
-                document.write(scripts);
-                setTimeout(function(){
-                    var data = false;
-                    if (jQuery) {
-                        data = true;
-                    }
-                    parent.postMessage(data, "*");
-                }, 3000);
-            }, undefined, true);
+
+            Jazzcat.httpCache.load();
+            var scripts = document.getElementsByTagName("textarea")[0].textContent;
+            document.write(scripts);
+            setTimeout(function(){
+                var data = false;
+                if (window.jQuery) {
+                    data = true;
+                }
+                parent.postMessage(data, "*");
+            }, 3000);
         </script>
     </textarea>
 
     <textarea id="combineScripts-1">
-        <script>var a = ['a']</script>
-        <script x-src="http://should.be/cached/push.js#b"></script>
+        <script>var a = window.a = ['a']</script>
+        <script x-src="http://should.be/cached/push-b.js"></script>
         <script>a.push('c')</script>
-        <script x-src="http://should.be/cached/push.js#d"></script>
+        <script x-src="http://should.be/cached/push-d.js"></script>
     </textarea>
 
     <textarea id="combineScripts-2">
-        <script x-src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script x-src="/tests/resources/jquery-1.7.1.js"></script>
     </textarea>
 
 <div id="fixtures">
@@ -85,9 +80,8 @@
           , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
           , UTC_NOW = (new Date()).toUTCString()
 
-            // I don't fit in `localStorage` in Chrome or Safari...
-            // But I do seem to fit in FF.
-          , LONG_STRING = Array(5000000).join('1')
+            // Too big for localStorage in Chrome, Webkit, and Firefox
+          , LONG_STRING = Array(10000000).join('1')
 
           , getIframeDocument = function(selector) {
                 return $(selector)[0].contentDocument
@@ -108,21 +102,28 @@
                 return document.implementation.createDocument(ns, 'html', null)
             };
 
-        asyncTest('combo - Warm cache', 1, function() {
+        asyncTest('combineScripts - Warm cache', 1, function() {
             var cache = {
-                    'http://should.be/cached/push.js': {
+                    'http://should.be/cached/push-b.js': {
                         'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}
                       , 'status': 'ready'
-                      , 'url': 'http://should.be/cached/push.js'
-                      , 'body': 'var scripts = [].slice.call(document.getElementsByTagName("script"));'
-                             + 'a.push(scripts[scripts.length - 2].innerHTML.split("#")[1][0]);'
+                      , 'url': 'http://should.be/cached/push-b.js'
+                      , 'body': 'window.a.push("b")'
+                      , 'text': true
+                    },
+                    'http://should.be/cached/push-d.js': {
+                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}
+                      , 'status': 'ready'
+                      , 'url': 'http://should.be/cached/push-d.js'
+                      , 'body': 'window.a.push("d")'
                       , 'text': true
                     }
                 }
               , scripts = $($('#combineScripts-1').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
               , $result
               , html = '';
-            
+
+
             httpCache.reset(cache);
             $result = Jazzcat.combineScripts(scripts);
 
@@ -130,14 +131,11 @@
                 if (err) {
                     return;
                 }
+                html += "<textarea>" + $result.map(function(el){
+                    return el.outerHTML + "\n";
+                }).join("") + "</textarea>";
+                html += $('#fixture-1').text();
 
-                html += "<textarea>" + $result.reduce(function(memo, el) {
-                        return memo + el.outerHTML + '\n';
-                }, '') + "</textarea>";
-                html += $('#requirejs').reduce(function(memo, el) {
-                        return memo + el.outerHTML + '\n';
-                    }, '');
-                html += $('#requirejs-fixture-1').text();
                 html = '<html><body>' + html + '</body></html>';
 
                 var iframeEl = document.createElement('iframe');
@@ -152,6 +150,7 @@
 
                 iframe.document.open();
                 iframe.document.write(html);
+
                 iframe.document.close();
 
                 var listener = function(event){
@@ -164,20 +163,18 @@
             });
         });
 
-        asyncTest('combo - Cold cache', 1, function() {
+        asyncTest('combineScripts - Cold cache', 1, function() {
             var scripts = $($('#combineScripts-2').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
               , $result = Jazzcat.combineScripts(scripts)
               , html = '';
 
-            html += "<textarea>" + $result.reduce(function(memo, el) {
-                    return memo + el.outerHTML + '\n';
-            }, '') + "</textarea>";
-            html += $('#requirejs').reduce(function(memo, el) {
-                    return memo + el.outerHTML + '\n';
-                }, '');
-            html += $('#requirejs-fixture-2').text();
+            html += "<textarea>" + $result.map(function(el){
+                    return el.outerHTML + "\n";
+                }).join("") + "</textarea>";
+            html += $('#fixture-2').text();
+            
             html = '<html><body>' + html + '</body></html>';
-
+            
             var iframeEl = document.createElement('iframe');
 
             $('body').append(iframeEl);
@@ -237,7 +234,7 @@
 
                 httpCache.reset();
                 httpCache.load();
-
+                
                 ok(!httpCache.get('unused'), '`unused` was evicted');
                 ok(!!httpCache.get('used'), '`used` was cached');
 
