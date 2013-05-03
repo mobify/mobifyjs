@@ -21,16 +21,7 @@
         <script>
             Jazzcat.httpCache.load();
             var scripts = document.getElementsByTagName("textarea")[0].textContent;
-            var temp = document.createElement("div");
-            temp.innerHTML = scripts;
-            for (var i=0; i < temp.childNodes.length; i++) {
-                var scriptEl = temp.childNodes[i];
-                if (scriptEl.nodeName !== "SCRIPT") continue;
-                // Ughhhh.
-                document.getElementsByTagName("head")[0].appendChild(scriptEl);
-                eval(scriptEl.innerHTML);
-            }
-            document.close()
+            document.write(scripts);
             parent.postMessage(a, "*");
         </script>
     </textarea>
@@ -42,16 +33,7 @@
 
             Jazzcat.httpCache.load();
             var scripts = document.getElementsByTagName("textarea")[0].textContent;
-            var temp = document.createElement("div");
-            temp.innerHTML = scripts;
-            for (var i=0; i < temp.childNodes.length; i++) {
-                var scriptEl = temp.childNodes[i];
-                if (scriptEl.nodeName !== "SCRIPT") continue;
-                // Ughhhh.
-                document.getElementsByTagName("head")[0].appendChild(scriptEl);
-                eval(scriptEl.innerHTML);
-            }
-            document.close();
+            document.write(scripts);
             setTimeout(function(){
                 var data = false;
                 if (window.jQuery) {
