@@ -228,8 +228,15 @@ define(["utils", "capture"], function(Utils, Capture) {
             opts = defaults;
         }
 
+        var disabledCookies = false;
+        try {
+            window.localStorage;
+        } catch (e) {
+            disabledCookies = true;
+        }
+
         // Fastfail if there are no scripts or if required modules are missing.
-        if (!scripts.length || !window.localStorage || !window.JSON) {
+        if (disabledCookies || !scripts.length || !window.localStorage || !window.JSON) {
             return scripts;
         }
 
