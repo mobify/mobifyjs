@@ -11,12 +11,12 @@ Utils.extend = function(target){
         for (var key in source)
             if (source[key] !== undefined)
                 target[key] = source[key];
-    }); 
+    });
     return target;
 };
 
 Utils.keys = function(obj) {
-    var result = []; 
+    var result = [];
     for (var key in obj) {
         if (obj.hasOwnProperty(key))
             result.push(key);
