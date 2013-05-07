@@ -420,25 +420,25 @@ Utils.extend = function(target){
         for (var key in source)
             if (source[key] !== undefined)
                 target[key] = source[key];
-    }); 
+    });
     return target;
 };
 
 Utils.keys = function(obj) {
-    var result = []; 
+    var result = [];
     for (var key in obj) {
         if (obj.hasOwnProperty(key))
             result.push(key);
-    }   
+    }
     return result;
-};  
+};
 
 Utils.values = function(obj) {
-    var result = []; 
+    var result = [];
     for (var key in obj) {
       if (obj.hasOwnProperty(key))
           result.push(obj[key]);
-    }   
+    }
     return result;
 };
 
@@ -464,14 +464,14 @@ Utils.outerHTML = function(el){
 };
 
 Utils.removeBySelector = function(selector, doc) {
-    var doc = doc || document;
-    
+    doc = doc || document;
+
     var els = doc.querySelectorAll(selector);
     return Utils.removeElements(els, doc);
 };
 
 Utils.removeElements = function(elements, doc) {
-    var doc = doc || document;
+    doc = doc || document;
 
     for (var i=0,ii=elements.length; i<ii; i++) {
         var el = elements[i];
@@ -1325,15 +1325,29 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     var absolutify = document.createElement('a');
 
     Jazzcat.combineScripts = function(scripts, options) {
-        var opts;
+        var opts, localStorageTest;
+
         if (options) {
             opts = Utils.extend(defaults, options);
         } else {
             opts = defaults;
         }
 
+        // localStorage detection as seen in such great libraries as Modernizr
+        // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
+        localStorageTest = function() {
+            var mod = 'modernizr';
+            try {
+                localStorage.setItem(mod, mod);
+                localStorage.removeItem(mod);
+                return true;
+            } catch(e) {
+                return false;
+            }
+        };
+
         // Fastfail if there are no scripts or if required modules are missing.
-        if (!scripts.length || !window.localStorage || !window.JSON) {
+        if (!scripts.length || !localStorageTest() || !window.JSON) {
             return scripts;
         }
 
@@ -1532,7 +1546,7 @@ Unblockify.unblock = function(scripts) {
         var doc = this.capturedDoc;
         Unblockify.moveScripts(scripts, doc);
     };
-}
+};
 
 return Unblockify;
 

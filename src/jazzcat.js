@@ -221,15 +221,29 @@ define(["utils", "capture"], function(Utils, Capture) {
     var absolutify = document.createElement('a');
 
     Jazzcat.combineScripts = function(scripts, options) {
-        var opts;
+        var opts, localStorageTest;
+
         if (options) {
             opts = Utils.extend(defaults, options);
         } else {
             opts = defaults;
         }
 
+        // localStorage detection as seen in such great libraries as Modernizr
+        // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
+        localStorageTest = function() {
+            var mod = 'modernizr';
+            try {
+                localStorage.setItem(mod, mod);
+                localStorage.removeItem(mod);
+                return true;
+            } catch(e) {
+                return false;
+            }
+        };
+
         // Fastfail if there are no scripts or if required modules are missing.
-        if (!scripts.length || !window.localStorage || !window.JSON) {
+        if (!scripts.length || !localStorageTest() || !window.JSON) {
             return scripts;
         }
 
