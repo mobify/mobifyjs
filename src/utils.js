@@ -55,14 +55,14 @@ Utils.outerHTML = function(el){
 };
 
 Utils.removeBySelector = function(selector, doc) {
-    var doc = doc || document;
-    
+    doc = doc || document;
+
     var els = doc.querySelectorAll(selector);
     return Utils.removeElements(els, doc);
 };
 
 Utils.removeElements = function(elements, doc) {
-    var doc = doc || document;
+    doc = doc || document;
 
     for (var i=0,ii=elements.length; i<ii; i++) {
         var el = elements[i];
