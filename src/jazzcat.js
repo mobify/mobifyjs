@@ -223,6 +223,12 @@ define(["utils", "capture"], function(Utils, Capture) {
     Jazzcat.combineScripts = function(scripts, options) {
         var opts, localStorageTest;
 
+        if (options) {
+            opts = Utils.extend(defaults, options);
+        } else {
+            opts = defaults;
+        }
+
         // localStorage detection as seen in such great libraries as Modernizr
         // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
         localStorageTest = function() {
@@ -235,12 +241,6 @@ define(["utils", "capture"], function(Utils, Capture) {
                 return false;
             }
         };
-
-        if (options) {
-            opts = Utils.extend(defaults, options);
-        } else {
-            opts = defaults;
-        }
 
         // Fastfail if there are no scripts or if required modules are missing.
         if (!scripts.length || !localStorageTest() || !window.JSON) {
