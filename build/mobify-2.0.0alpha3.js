@@ -450,7 +450,7 @@ Utils.clone = function(obj) {
         }
     }
     return target;
-}
+};
 
 /**
  * outerHTML polyfill - https://gist.github.com/889005
@@ -461,18 +461,24 @@ Utils.outerHTML = function(el){
     var contents = div.innerHTML;
     div = null;
     return contents;
-}
+};
 
 Utils.removeBySelector = function(selector, doc) {
     var doc = doc || document;
-
+    
     var els = doc.querySelectorAll(selector);
-    for (var i=0,ii=els.length; i<ii; i++) {
-        var el = els[i];
+    return Utils.removeElements(els, doc);
+};
+
+Utils.removeElements = function(elements, doc) {
+    var doc = doc || document;
+
+    for (var i=0,ii=elements.length; i<ii; i++) {
+        var el = elements[i];
         el.parentNode.removeChild(el);
     }
-    return els;
-}
+    return elements;
+};
 
 return Utils;
 
@@ -1503,8 +1509,10 @@ define('unblockify',["utils", "capture"], function(Utils, Capture) {
 var Unblockify = {}
 
 // Moves all scripts to the end of body by overriding insertMobifyScripts
-Unblockify.moveScripts = function(doc) {
-    var scripts = Utils.removeBySelector("script", doc);
+Unblockify.moveScripts = function(scripts, doc) {
+    // Remove elements from the document
+    Utils.removeElements(scripts, doc);
+
     for (var i=0,ii=scripts.length; i<ii; i++) {
         var script = scripts[i];
         doc.body.appendChild(script);
@@ -1512,8 +1520,7 @@ Unblockify.moveScripts = function(doc) {
 };
 
 
-Unblockify.unblock = function() {
-
+Unblockify.unblock = function(scripts) {
     // Grab reference to old insertMobifyScripts method
     var oldInsert = Capture.prototype.insertMobifyScripts;
 
@@ -1523,7 +1530,7 @@ Unblockify.unblock = function() {
         oldInsert.call(this);
 
         var doc = this.capturedDoc;
-        Unblockify.moveScripts(doc);
+        Unblockify.moveScripts(scripts, doc);
     };
 }
 

@@ -3,8 +3,10 @@ define(["utils", "capture"], function(Utils, Capture) {
 var Unblockify = {}
 
 // Moves all scripts to the end of body by overriding insertMobifyScripts
-Unblockify.moveScripts = function(doc) {
-    var scripts = Utils.removeBySelector("script", doc);
+Unblockify.moveScripts = function(scripts, doc) {
+    // Remove elements from the document
+    Utils.removeElements(scripts, doc);
+
     for (var i=0,ii=scripts.length; i<ii; i++) {
         var script = scripts[i];
         doc.body.appendChild(script);
@@ -12,8 +14,7 @@ Unblockify.moveScripts = function(doc) {
 };
 
 
-Unblockify.unblock = function() {
-
+Unblockify.unblock = function(scripts) {
     // Grab reference to old insertMobifyScripts method
     var oldInsert = Capture.prototype.insertMobifyScripts;
 
@@ -23,7 +24,7 @@ Unblockify.unblock = function() {
         oldInsert.call(this);
 
         var doc = this.capturedDoc;
-        Unblockify.moveScripts(doc);
+        Unblockify.moveScripts(scripts, doc);
     };
 }
 

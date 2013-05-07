@@ -41,7 +41,7 @@ Utils.clone = function(obj) {
         }
     }
     return target;
-}
+};
 
 /**
  * outerHTML polyfill - https://gist.github.com/889005
@@ -52,18 +52,24 @@ Utils.outerHTML = function(el){
     var contents = div.innerHTML;
     div = null;
     return contents;
-}
+};
 
 Utils.removeBySelector = function(selector, doc) {
     var doc = doc || document;
-
+    
     var els = doc.querySelectorAll(selector);
-    for (var i=0,ii=els.length; i<ii; i++) {
-        var el = els[i];
+    return Utils.removeElements(els, doc);
+};
+
+Utils.removeElements = function(elements, doc) {
+    var doc = doc || document;
+
+    for (var i=0,ii=elements.length; i<ii; i++) {
+        var el = elements[i];
         el.parentNode.removeChild(el);
     }
-    return els;
-}
+    return elements;
+};
 
 return Utils;
 
