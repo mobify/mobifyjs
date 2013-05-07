@@ -20,16 +20,16 @@ Utils.keys = function(obj) {
     for (var key in obj) {
         if (obj.hasOwnProperty(key))
             result.push(key);
-    }   
+    }
     return result;
-};  
+};
 
 Utils.values = function(obj) {
-    var result = []; 
+    var result = [];
     for (var key in obj) {
       if (obj.hasOwnProperty(key))
           result.push(obj[key]);
-    }   
+    }
     return result;
 };
 
