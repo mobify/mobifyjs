@@ -26,7 +26,7 @@ Unblockify.unblock = function(scripts) {
         var doc = this.capturedDoc;
         Unblockify.moveScripts(scripts, doc);
     };
-}
+};
 
 return Unblockify;
 
