@@ -1325,22 +1325,23 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     var absolutify = document.createElement('a');
 
     Jazzcat.combineScripts = function(scripts, options) {
-        var opts;
+        var opts, localStorage;
         if (options) {
             opts = Utils.extend(defaults, options);
         } else {
             opts = defaults;
         }
 
-        var disabledCookies = false;
         try {
-            window.localStorage;
+            // throws when cookies are disabled on chrome, will be undefined if 
+            // localStorage isn't present
+            localStorage = window.localStorage;
         } catch (e) {
-            disabledCookies = true;
+            localStorage = false;
         }
 
         // Fastfail if there are no scripts or if required modules are missing.
-        if (disabledCookies || !scripts.length || !window.localStorage || !window.JSON) {
+        if (!scripts.length || !localStorage || !window.JSON) {
             return scripts;
         }
 
