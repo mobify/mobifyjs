@@ -54,7 +54,7 @@
     <p>Unblock fixture page!</p>\n\
 \n\n\n\
 <script type=\"text/mobify-script\" x-src=\"/path/to/script2.js\"><\/script><script type=\"text/mobify-script\" x-src=\"/path/to/script3.js\"><\/script></body></html>";
-                        equal(capturedDoc.documentElement.outerHTML, expectedHtml, "Scripts moved to bottom!");
+                        equal(capturedDoc.documentElement.outerHTML, expectedHtml, "Scripts moved to bottom, filtered-out script left in place");
                         start();
                     }
                 }, doc);
