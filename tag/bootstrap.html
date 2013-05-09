@@ -2,8 +2,9 @@
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
 // If Mobify has been defined already, or if the detector fails,
-// exit
-if (this.Mobify || !detector()) {
+// or capturing is off, exit
+var optOut = /mobify-enabled=false/.test(location.hash + '; ' + document.cookie)
+if (this.Mobify || !detector() || optOut) {
     return;
 }
 
@@ -20,7 +21,6 @@ function attachScriptBeforeMobifyTag(script, src, id, classNames) {
     mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
 }
 
-// Prevent the browser from downloading website resources
 document.write('<plaintext style="display:none">');
 
 // On next tick, load library and main executable
@@ -31,9 +31,18 @@ setTimeout(function() {
     mobifyjsScript.onload = function(){
         if (mainUrl) {
             var mainScript = document.createElement('script');
+            mainScript.onerror = function() {
+                // reload the page without Mobify
+                document.cookie = 'mobify-enabled=false';
+                window.location = window.location.href;
+            };
             attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
         }
-        // TODO: If main fails to load, load capture.restore
+    };
+    mobifyjsScript.onerror = function() {
+        // reload the page without Mobify
+        document.cookie = 'mobify-enabled=false';
+        window.location = window.location.href;
     };
     attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
 

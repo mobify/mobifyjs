@@ -5,8 +5,9 @@
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
 // If Mobify has been defined already, or if the detector fails,
-// exit
-if (this.Mobify || !detector()) {
+// or capturing is off, exit
+var optOut = /mobify-enabled=false/.test(location.hash + '; ' + document.cookie)
+if (this.Mobify || !detector() || optOut) {
     return;
 }
 
@@ -23,7 +24,6 @@ function attachScriptBeforeMobifyTag(script, src, id, classNames) {
     mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
 }
 
-// Prevent the browser from downloading website resources
 document.write('<plaintext style="display:none">');
 
 // On next tick, load library and main executable
@@ -31,13 +31,25 @@ setTimeout(function() {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.capturing = true;
     var mobifyjsScript = document.createElement('script');
+    var errorHandler = function() {
+        var now = new Date();
+        // 30 minutes
+        var time = now.getTime() + 1800000;
+        now.setTime(time);
+        document.cookie = 'mobify-enabled=false' +
+                '; expires=' + now.toGMTString() +
+                '; path=/';
+        // Reload the page (location.reload fails in certain cases)
+        window.location = window.location.href;
+    };
     mobifyjsScript.onload = function(){
         if (mainUrl) {
             var mainScript = document.createElement('script');
+            mainScript.onerror = errorHandler;
             attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
         }
-        // TODO: If main fails to load, load capture.restore
     };
+    mobifyjsScript.onerror = errorHandler;
     attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
 
 });
@@ -65,7 +77,7 @@ setTimeout(function() {
         if (match[3] && +match[4] < 11) {
             return false;
         }
-     
+
         return true;
     },
     // path to mobify.js
@@ -99,11 +111,13 @@ setTimeout(function() {
 // to the parent for testing in performance.html
 var end = +new Date;
 var begin;
-if (window.Mobify.points) {
+if (window.Mobify && window.Mobify.points) {
     begin = window.Mobify.points[0];
 } else {
     var pointEl = document.getElementById("mobify-point");
-    begin = pointEl.innerText || pointEl.textContent;
+    if (pointEl) {
+        begin = pointEl.innerText || pointEl.textContent;
+    }
 }
 var diff = end - begin;
 parent.postMessage(diff, "*");
