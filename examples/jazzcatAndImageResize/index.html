@@ -1,29 +1,26 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-
-<!-- START MOBIFY TAG -->
-<script class="mobify" id="mobify-tag">
+<script>
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
+
 // If Mobify has been defined already, or if the detector fails,
 // exit
 if (this.Mobify || !detector()) {
     return;
 }
 
-// Start Mobify object with initial timestamp when loaded
+// Start Mobify object with initial timestamp when loaded.
+// Uncomment when needed for performance testing.
 window.Mobify = {points: [+new Date]};
 
+function attachScriptBeforeMobifyTag(script, src, id, classNames) {
+    var mobifyTagScript = document.getElementsByTagName('script')[0];
 
-function attachScriptBeforeMobifyTag(src, id, classNames) {
-    var attachedScript = document.createElement('script');
-    var mobifyTagScript = document.getElementById('mobify-tag');
-
-    attachedScript.src = src;
-    attachedScript.id = id;
-    attachedScript.setAttribute("class", classNames);
-    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
-    return attachedScript;
+    script.src = src;
+    script.id = id;
+    script.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
 }
 
 // Prevent the browser from downloading website resources
@@ -31,41 +28,48 @@ document.write('<plaintext style="display:none">');
 
 // On next tick, load library and main executable
 setTimeout(function() {
-    window.capturing = true;
-    var mobifyjsScript = attachScriptBeforeMobifyTag(mobifyjsUrl, "mobify-js", "mobify");
+    var Mobify = window.Mobify = window.Mobify || {};
+    Mobify.capturing = true;
+    var mobifyjsScript = document.createElement('script');
     mobifyjsScript.onload = function(){
         if (mainUrl) {
-            attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+            var mainScript = document.createElement('script');
+            attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
         }
         // TODO: If main fails to load, load capture.restore
     };
+    attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
 
 });
 
 })( window, document,
     // detector function
     function (){
-        var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent)
-        var isCompatible;
-        if (match) {
-            if (match[1] && (match[1].toLowerCase() === "firefox") && (+match[2] < 4)) {
-                isCompatible = false;
-            } else if (match[3] && (match[3].toLowerCase() === "opera") && (+match[4] < 11)) {
-                isCompatible = false
-            } else {
-                isCompatible = true;
-            }
-        }
-        if (!isCompatible) {
+        // We're enabled for:
+        // - WebKit based browsers
+        // - IE 10
+        // - FireFox 4+
+        // - Opera 11+
+        // - 3DS
+        match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
+     
+        if (!match) {
             return false;
         }
+     
+        // match[1] == Firefox
+        if (match[1] && +match[2] < 4) {
+            return false;
+        }
+        // match[3] == Opera
+        if (match[3] && +match[4] < 11) {
+            return false;
+        }
+     
         return true;
     },
     // path to mobify.js
-    //'http://cloud.dev:8000/projects/jan8-jansepar-1/swift/mobify.js'
-
-    
-    '/mobifyjs/build/mobify-2.0.0alpha3.js',
+    '/mobifyjs/build/mobify.min.js',
 
     // path to main executable 
     '/mobifyjs/examples/jazzcatAndImageResize/main.js'  

@@ -19,7 +19,7 @@ more.
 1. Install the Mobify.js tag on your site. It must be placed **immediately** after
    the opening <head> tag: [Unminified version on Github](https://github.com/mobify/mobifyjs/blob/v2.0/tag/bootstrap.html){: target='_blank' }
 
-<pre id="mobify-tag"><code class="javascript">&lt;script>(function(a,b,c,d,e){function f(a,c,d){var e=b.createElement("script"),f=b.getElementsByTagName("script")[0];return e.src=a,e.id=c,e.setAttribute("class",d),f.parentNode.insertBefore(e,f),e}!this.Mobify&&c()&&(b.write('&lt;plaintext style="display:none">'),setTimeout(function(){var b=a.Mobify=a.Mobify||{};b.capturing=!0;var c=f(d,"mobify-js","mobify");c.onload=function(){e&&f(e,"mobify-js-main","mobify")}}))})(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&4>+match[2]?!1:match[3]&&11>+match[4]?!1:!0:!1},
+<pre id="mobify-tag"><code class="javascript">&lt;script>(function(a,b,c,d,e){function f(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=c,a.id=d,a.setAttribute("class",e),f.parentNode.insertBefore(a,f)}!this.Mobify&&c()&&(b.write('&lt;plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var g=b.createElement("script");g.onload=function(){if(e){var a=b.createElement("script");f(a,e,"mobify-js-main","mobify")}},f(g,d,"mobify-js","mobify")}))})(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&4>+match[2]?!1:match[3]&&11>+match[4]?!1:!0:!1},
 
 // path to mobify library
 "//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha3.min.js",
