@@ -15,15 +15,13 @@ if (this.Mobify || !detector()) {
 // Uncomment when needed for performance testing.
 window.Mobify = {points: [+new Date]};
 
-function attachScriptBeforeMobifyTag(src, id, classNames) {
-    var attachedScript = document.createElement('script');
+function attachScriptBeforeMobifyTag(script, src, id, classNames) {
     var mobifyTagScript = document.getElementsByTagName('script')[0];
 
-    attachedScript.src = src;
-    attachedScript.id = id;
-    attachedScript.setAttribute("class", classNames);
-    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
-    return attachedScript;
+    script.src = src;
+    script.id = id;
+    script.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
 }
 
 // Prevent the browser from downloading website resources
@@ -33,13 +31,15 @@ document.write('<plaintext style="display:none">');
 setTimeout(function() {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.capturing = true;
-    var mobifyjsScript = attachScriptBeforeMobifyTag(mobifyjsUrl, "mobify-js", "mobify");
+    var mobifyjsScript = document.createElement('script');
     mobifyjsScript.onload = function(){
         if (mainUrl) {
-            attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+            var mainScript = document.createElement('script');
+            attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
         }
         // TODO: If main fails to load, load capture.restore
     };
+    attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
 
 });
 
@@ -53,10 +53,11 @@ setTimeout(function() {
         // - Opera 11+
         // - 3DS
         match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
-
+     
         if (!match) {
             return false;
         }
+     
         // match[1] == Firefox
         if (match[1] && +match[2] < 4) {
             return false;
@@ -65,15 +66,11 @@ setTimeout(function() {
         if (match[3] && +match[4] < 11) {
             return false;
         }
-
-        if (/resize=false/.test(location.href)){
-            return false;
-        }
      
         return true;
     },
 
-    // path to main executable 
+    // mobify.js + main executable (combined for improved performance)
     '/mobifyjs/examples/resizeImages/mobify+main.js'
 );
 </script>
