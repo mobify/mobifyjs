@@ -11,15 +11,13 @@ if (this.Mobify || !detector()) {
 // Uncomment when needed for performance testing.
 // window.Mobify = {points: [+new Date]};
 
-function attachScriptBeforeMobifyTag(src, id, classNames) {
-    var attachedScript = document.createElement('script');
+function attachScriptBeforeMobifyTag(script, src, id, classNames) {
     var mobifyTagScript = document.getElementsByTagName('script')[0];
 
-    attachedScript.src = src;
-    attachedScript.id = id;
-    attachedScript.setAttribute("class", classNames);
-    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
-    return attachedScript;
+    script.src = src;
+    script.id = id;
+    script.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
 }
 
 // Prevent the browser from downloading website resources
@@ -29,13 +27,15 @@ document.write('<plaintext style="display:none">');
 setTimeout(function() {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.capturing = true;
-    var mobifyjsScript = attachScriptBeforeMobifyTag(mobifyjsUrl, "mobify-js", "mobify");
+    var mobifyjsScript = document.createElement('script');
     mobifyjsScript.onload = function(){
         if (mainUrl) {
-            attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
+            var mainScript = document.createElement('script');
+            attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
         }
         // TODO: If main fails to load, load capture.restore
     };
+    attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
 
 });
 
@@ -66,9 +66,11 @@ setTimeout(function() {
         return true;
     },
     // path to mobify.js
-    '//cdn.mobify.com/mobifyjs/mobify-2.0.0alpha1.min.js',
+    '/mobifyjs/build/mobify.min.js',
 
     // path to main executable 
     '/PATH/TO/main.js'
+
+    // Or combine both scripts for better performance
 );
 </script>
