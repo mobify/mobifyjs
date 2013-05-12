@@ -10,7 +10,7 @@ if (this.Mobify || !detector() || optOut) {
 
 // Start Mobify object with initial timestamp when loaded.
 // Uncomment when needed for performance testing.
-// window.Mobify = {points: [+new Date]};
+//window.Mobify = {points: [+new Date]};
 
 function attachScriptBeforeMobifyTag(script, src, id, classNames) {
     var mobifyTagScript = document.getElementsByTagName('script')[0];
@@ -28,22 +28,25 @@ setTimeout(function() {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.capturing = true;
     var mobifyjsScript = document.createElement('script');
+    var errorHandler = function() {
+        var now = new Date();
+        // 30 minutes
+        var time = now.getTime() + 1800000;
+        now.setTime(time);
+        document.cookie = 'mobify-enabled=false' +
+                '; expires=' + now.toGMTString() +
+                '; path=/';
+        // Reload the page (location.reload fails in certain cases)
+        window.location = window.location.href;
+    };
     mobifyjsScript.onload = function(){
         if (mainUrl) {
             var mainScript = document.createElement('script');
-            mainScript.onerror = function() {
-                // reload the page without Mobify
-                document.cookie = 'mobify-enabled=false';
-                window.location = window.location.href;
-            };
+            mainScript.onerror = errorHandler;
             attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
         }
     };
-    mobifyjsScript.onerror = function() {
-        // reload the page without Mobify
-        document.cookie = 'mobify-enabled=false';
-        window.location = window.location.href;
-    };
+    mobifyjsScript.onerror = errorHandler;
     attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
 
 });
