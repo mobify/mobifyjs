@@ -6,8 +6,8 @@
 
 // if mobify=(1|0) is set in hash or cookie, force mobify on/off.
 var match = /mobify=(\d)/.exec(location.hash + '; ' + document.cookie);
-if (match) {
-    if (!parseInt(match[1])) return;
+if (match && match[1]) {
+    if (!+match[1]) return;
 }
 // else do not run mobify if Mobify object exists, or detector fails.
 else if (this.Mobify || !detector()) {
