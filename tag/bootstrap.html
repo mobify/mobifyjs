@@ -1,16 +1,19 @@
 <script>
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
-// If Mobify has been defined already, or if the detector fails,
-// or capturing is off, exit
-var optOut = /mobify-enabled=false/.test(location.hash + '; ' + document.cookie)
-if (this.Mobify || !detector() || optOut) {
+// if mobify=(1|0) is set in hash or cookie, force mobify on/off.
+var match = /mobify=(\d)/.exec(location.hash + '; ' + document.cookie);
+if (match) {
+    if (!parseInt(match[1])) return;
+}
+// else do not run mobify if Mobify object exists, or detector fails.
+else if (this.Mobify || !detector()) {
     return;
 }
 
 // Start Mobify object with initial timestamp when loaded.
 // Uncomment when needed for performance testing.
-//window.Mobify = {points: [+new Date]};
+window.Mobify = {points: [+new Date]};
 
 function attachScriptBeforeMobifyTag(script, src, id, classNames) {
     var mobifyTagScript = document.getElementsByTagName('script')[0];
@@ -30,13 +33,12 @@ setTimeout(function() {
     var mobifyjsScript = document.createElement('script');
     var errorHandler = function() {
         var now = new Date();
-        // 30 minutes
-        var time = now.getTime() + 1800000;
-        now.setTime(time);
-        document.cookie = 'mobify-enabled=false' +
+        // Set now to 30 minutes ahead
+        now.setTime(now.getTime() + 1800000);
+        document.cookie = 'mobify=0' +
                 '; expires=' + now.toGMTString() +
                 '; path=/';
-        // Reload the page (location.reload fails in certain cases)
+        // Reload the page (location.reload has problems in FF)
         window.location = window.location.href;
     };
     mobifyjsScript.onload = function(){
@@ -74,7 +76,7 @@ setTimeout(function() {
         if (match[3] && +match[4] < 11) {
             return false;
         }
-     
+
         return true;
     },
     // path to mobify.js
