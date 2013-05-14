@@ -95,6 +95,7 @@
             httpCache.save(function(err) {
                 if (err) throw err;
 
+                // Setup "Capturing" like execution phase.
                 var html = '';
                 html += "<textarea>" + results.map(function(el) {
                     return el.outerHTML + "\n";
@@ -262,15 +263,16 @@
             equal(Jazzcat.getURL(urls, callback), expected);
 
             // projectName qux
-            Jazzcat.combineScripts.defaults.projectName = "qux";
-            callback = "bar";
-            expected = "//jazzcat.mobify.com/project-qux/jsonp/bar/%5B%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fangularjs%2F1.0.5%2Fangular.min.js%22%2C%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fjquery%2F1.9.1%2Fjquery.min.js%22%5D";
+            try {
+                Jazzcat.combineScripts.defaults.projectName = "qux";
+                callback = "bar";
+                expected = "//jazzcat.mobify.com/project-qux/jsonp/bar/%5B%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fangularjs%2F1.0.5%2Fangular.min.js%22%2C%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fjquery%2F1.9.1%2Fjquery.min.js%22%5D";
 
-            equal(Jazzcat.getURL(urls, callback), expected);
-
+                equal(Jazzcat.getURL(urls, callback), expected);
             // Reset projectName
-            Jazzcat.combineScripts.defaults.projectName = ""
-
+            } finally {
+                Jazzcat.combineScripts.defaults.projectName = ""
+            }
         });
     });
 </script>
