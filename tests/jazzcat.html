@@ -13,202 +13,148 @@
 <div id="qunit"></div>
 
 
-<div id="qunit-fixture">
+<!-- Fixtures -->
 
-    <textarea id="fixture-1">
-        <!-- Bring in Mobify.js to synchronously load jazzcat -->
-        <script src="/build/mobify.js"></script>
-        <script>
-            Jazzcat.httpCache.load();
-            var scripts = document.getElementsByTagName("textarea")[0].textContent;
-            document.write(scripts);
-            parent.postMessage(a, "*");
-        </script>
-    </textarea>
+<div id="qunit-fixture"></div>
 
-    <textarea id="fixture-2">
-        <!-- Bring in Mobify.js to synchronously load jazzcat -->
-        <script src="/build/mobify.js"></script>
-        <script>
 
-            Jazzcat.httpCache.load();
-            var scripts = document.getElementsByTagName("textarea")[0].textContent;
-            document.write(scripts);
-            setTimeout(function(){
-                var data = false;
-                if (window.jQuery) {
-                    data = true;
-                }
-                parent.postMessage(data, "*");
-            }, 3000);
-        </script>
-    </textarea>
+<!-- Fixtures for ensuring `combineScripts` executes scripts in the right order. -->
+<textarea id="combineScripts-source">
+    <script>var a = window.a = ['a']</script>
+    <script x-src="http://should.be/cached/push-b.js"></script>
+    <script>a.push('c')</script>
+    <script x-src="http://should.be/cached/push-d.js"></script>
+</textarea>
 
-    <textarea id="combineScripts-1">
-        <script>var a = window.a = ['a']</script>
-        <script x-src="http://should.be/cached/push-b.js"></script>
-        <script>a.push('c')</script>
-        <script x-src="http://should.be/cached/push-d.js"></script>
-    </textarea>
+<textarea id="combineScripts-loader">
+    <script src="/build/mobify.js"></script>
+    <script>
+        Jazzcat.httpCache.load();
+        var scripts = document.getElementsByTagName("textarea")[0].textContent;
+        document.write(scripts);
+        parent.postMessage(a, "*");
+    </script>
+</textarea>
 
-    <textarea id="combineScripts-2">
-        <script x-src="/tests/resources/jquery-1.7.1.js"></script>
-    </textarea>
+<textarea id="combineScripts-coldcache-source">
+    <script x-src="/tests/resources/jquery-1.7.1.js"></script>
+</textarea>
 
-<div id="fixtures">
-  <script src="/tests/resources/qunit-1.10.0.js"></script>
-  <script src="/tests/resources/require.js"></script>
-  <script src="/tests/resources/zepto.min.js"></script>
-</div>
+<textarea id="combineScripts-coldcache-loader">
+    <script src="/build/mobify.js"></script>
+    <script>
+        Jazzcat.httpCache.load();
+        var scripts = document.getElementsByTagName("textarea")[0].textContent;
+        document.write(scripts);
+        document.write('<script>parent.postMessage(!!window.jQuery, "*");<\/script>');
+    </script>
+</textarea>
 
-</div>
-
+<!-- Tests -->
 <script>
     QUnit.config.autostart = false;
-    require.config({
-        "baseUrl": "../src/",  
-    })
-    require(["../src/jazzcat.js"], function(Jazzcat) {
+    require.config({"baseUrl": "../src/"});
+    require(["capture", "jazzcat"], function(Capture, Jazzcat) {
         QUnit.start();
-        var httpCache = Jazzcat.httpCache
-            // Time offsets in seconds
-          , TWO_WEEKS = 14 * 24 * 60 * 60
-          , TEN_MINUTES = 600
-          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
-            // UTC dates
-          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
-          , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
-          , UTC_NOW = (new Date()).toUTCString()
 
-            // Too big for localStorage in Chrome, Webkit, and Firefox
-          , LONG_STRING = Array(10000000).join('1')
+        var httpCache = Jazzcat.httpCache;
 
-          , getIframeDocument = function(selector) {
-                return $(selector)[0].contentDocument
-            }
+        // Time offsets in seconds.
+        var TWO_WEEKS = 14 * 24 * 60 * 60;
+        var TEN_MINUTES = 600;
 
-            // Fix <\/script>.
-            // Remove extra whitespace.
-          , getText = function(selector) {
-                return $(selector).html()
-                                  .replace(/\\/g, '')
-                                  .replace(/\s+/g, ' ')
-                                  .trim()
-            }
+        // UTC dates.
+        var UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString();
+        var UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString();
+        var UTC_NOW = (new Date()).toUTCString();
 
-            // http://stackoverflow.com/questions/1304374/javascript-can-a-constructor-function-create-a-documentelement-object
-          , createDocument = function() {
-                var ns = 'http://www.w3.org/1999/xhtml'
-                return document.implementation.createDocument(ns, 'html', null)
-            };
+        // Too big for localStorage in Chrome, Webkit, and Firefox
+        var LONG_STRING = Array(10000000).join('1')
 
         asyncTest('combineScripts - Warm cache', 1, function() {
-            var cache = {
-                    'http://should.be/cached/push-b.js': {
-                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}
-                      , 'status': 'ready'
-                      , 'url': 'http://should.be/cached/push-b.js'
-                      , 'body': 'window.a.push("b")'
-                      , 'text': true
-                    },
-                    'http://should.be/cached/push-d.js': {
-                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}
-                      , 'status': 'ready'
-                      , 'url': 'http://should.be/cached/push-d.js'
-                      , 'body': 'window.a.push("d")'
-                      , 'text': true
-                    }
+            httpCache.reset({
+                'http://should.be/cached/push-b.js': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'http://should.be/cached/push-b.js',
+                    'body': 'window.a.push("b")',
+                    'text': true
+                },
+                'http://should.be/cached/push-d.js': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'http://should.be/cached/push-d.js',
+                    'body': 'window.a.push("d")',
+                    'text': true
                 }
-              , scripts = $($('#combineScripts-1').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
-              , $result
-              , html = '';
+            });
 
-
-            httpCache.reset(cache);
-            $result = Jazzcat.combineScripts(scripts);
+            var scripts = $($("#combineScripts-source").text()).filter("script").toArray();
+            var results = Jazzcat.combineScripts(scripts);
 
             httpCache.save(function(err) {
-                if (err) {
-                    return;
-                }
-                html += "<textarea>" + $result.map(function(el){
+                if (err) throw err;
+
+                var html = '';
+                html += "<textarea>" + results.map(function(el) {
                     return el.outerHTML + "\n";
                 }).join("") + "</textarea>";
-                html += $('#fixture-1').text();
-
+                html += $('#combineScripts-loader').text();
                 html = '<html><body>' + html + '</body></html>';
 
-                var iframeEl = document.createElement('iframe');
+                // `contentWindow` is attached once the iframe is in the document.
+                var $iframe = $('<iframe>').appendTo('#qunit-fixture');
+                var el = $iframe[0];
 
-                $('body').append(iframeEl);
-
-                var iframe = (iframeEl.contentWindow)
-                            ? iframeEl.contentWindow
-                            : (iframeEl.contentDocument.document)
-                                ? iframeEl.contentDocument.document
-                                : iframeEl.contentDocument;
-
-                iframe.document.open();
-                iframe.document.write(html);
-
-                iframe.document.close();
-
-                var listener = function(event){
-                    window.removeEventListener("message", listener, false);
+                $(window).one("message", function(event) {
+                    event = event.originalEvent;
+                    if (event.source != el.contentWindow) return;
                     deepEqual(event.data, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
                     start();
-                }
-                window.addEventListener("message", listener, false);
-                
+                });
+
+                el.contentDocument.open();
+                el.contentDocument.write(html);
+                el.contentDocument.close();
             });
         });
 
         asyncTest('combineScripts - Cold cache', 1, function() {
-            var scripts = $($('#combineScripts-2').text()).toArray().filter(function(script){ return script.nodeName === "SCRIPT" })
-              , $result = Jazzcat.combineScripts(scripts)
-              , html = '';
+            var scripts = $($("#combineScripts-coldcache-source").text()).filter("script").toArray();
+            var results = Jazzcat.combineScripts(scripts);
 
-            html += "<textarea>" + $result.map(function(el){
+            var html = '';
+            html += "<textarea>" + results.map(function(el) {
                     return el.outerHTML + "\n";
                 }).join("") + "</textarea>";
-            html += $('#fixture-2').text();
-            
+            html += $('#combineScripts-coldcache-loader').text();
             html = '<html><body>' + html + '</body></html>';
-            
-            var iframeEl = document.createElement('iframe');
 
-            $('body').append(iframeEl);
+            var $iframe = $('<iframe>').appendTo('#qunit-fixture');
+            var el = $iframe[0];
 
-            var iframe = (iframeEl.contentWindow)
-                        ? iframeEl.contentWindow
-                        : (iframeEl.contentDocument.document)
-                            ? iframeEl.contentDocument.document
-                            : iframeEl.contentDocument;
-
-            iframe.document.open();
-            iframe.document.write(html);
-            iframe.document.close();
-
-            var listener = function(event){
-                window.removeEventListener("message", listener, false);
+            $(window).one("message", function(event) {
+                event = event.originalEvent;
+                if (event.source != el.contentWindow) return;
                 ok(event.data, 'jQuery was loaded');
-
                 start();
-            };
-            window.addEventListener("message", listener, false);
+            });
+
+            el.contentDocument.open();
+            el.contentDocument.write(html);
+            el.contentDocument.close();
         });
 
         asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
-            var url = "http://127.0.0.1:3000/space invaders.js"
-                resources = [{
-                    "url": url,
-                    "headers": {"expires": UTC_TWO_WEEKS_FROM_NOW},
-                    "status": "ready",
-                    "statusCode": 200,
-                    "text": true,
-                    "body": "console.log('Pew!');"
-                }];
-
+            var url = "http://127.0.0.1:3000/space invaders.js";
+            var resources = [{
+                "url": url,
+                "headers": {"expires": UTC_TWO_WEEKS_FROM_NOW},
+                "status": "ready",
+                "statusCode": 200,
+                "text": true,
+                "body": "console.log('Pew!');"
+            }];
 
             httpCache.reset();
             httpCache.save(function(err) {
@@ -225,16 +171,15 @@
             httpCache.save();
 
             httpCache.set('unused', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
-
             httpCache.set('used', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'used'})
             httpCache.get('used', true)
 
             httpCache.save(function(err) {
-                if (err) return;
+                if (err) throw err;
 
                 httpCache.reset();
                 httpCache.load();
-                
+
                 ok(!httpCache.get('unused'), '`unused` was evicted');
                 ok(!!httpCache.get('used'), '`used` was cached');
 
@@ -254,7 +199,7 @@
                 httpCache.get('new', true)
 
                 httpCache.save(function(err) {
-                    if (err) return;
+                    if (err) throw err;
 
                     httpCache.reset();
                     httpCache.load();
@@ -268,53 +213,32 @@
         });
 
         test('httpCache.utils.isStale', 8, function() {
-            var isStale = httpCache.utils.isStale
-              , resources = {
-                    'stale-expires': {
-                        'headers': {
-                            'expires': UTC_TWO_WEEKS_AGO
-                        }
+            var isStale = httpCache.utils.isStale;
+            var resources = {
+                'stale-expires': {'headers': {'expires': UTC_TWO_WEEKS_AGO}},
+                'stale-cache-control': {
+                    'headers': {
+                        'date': UTC_TWO_WEEKS_AGO,
+                        'cache-control': 'public,max-age=' + TEN_MINUTES
                     }
-
-                  , 'stale-cache-control': {
-                        'headers': {
-                            'date': UTC_TWO_WEEKS_AGO
-                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
-                        }
+                },
+                'fresh-expires': {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}},
+                'fresh-cache-control': {
+                    'headers': {
+                        'date': UTC_NOW,
+                        'cache-control': 'public,max-age=' + TEN_MINUTES
                     }
-
-                  , 'fresh-expires': {
-                        'headers': {
-                            'expires': UTC_TWO_WEEKS_FROM_NOW
-                        }
+                },
+                'no-headers': {'headers': {}},
+                'undefined-headers': {},
+                'invalid-date': {
+                    'headers': {
+                        'date': 'invalid',
+                        'cache-control': 'public,max-age=' + TEN_MINUTES
                     }
-
-                  , 'fresh-cache-control': {
-                        'headers': {
-                            'date': UTC_NOW
-                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
-                        }
-                    }
-
-                  , 'no-headers': {
-                        'headers': {}
-                  }
-
-                  , 'undefined-headers': {}
-
-                  , 'invalid-date': {
-                        'headers': {
-                            'date': 'invalid'
-                          , 'cache-control': 'public,max-age=' + TEN_MINUTES
-                        }
-                    }
-
-                  , 'invalid-expires': {
-                        'headers': {
-                            'expires': 'invalid'
-                        }
-                    }
-                };
+                },
+                'invalid-expires': {'headers': {'expires': 'invalid'}}
+            };
 
             ok(isStale(resources['stale-expires']));
             ok(isStale(resources['stale-cache-control']));
@@ -325,15 +249,15 @@
             ok(isStale(resources['invalid-date']), 'Invalid date is stale');
             ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
         });
-        
+
         test('getUrl - generates urls with project parameter', function() {
-            var expected, urls, callback;
-            
             // No projectName set
-            urls = ["//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"
-              , "//ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.min.js"];
-            callback = "foo";
-            expected = "//jazzcat.mobify.com/jsonp/foo/%5B%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fangularjs%2F1.0.5%2Fangular.min.js%22%2C%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fjquery%2F1.9.1%2Fjquery.min.js%22%5D";
+            var urls = [
+                "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js",
+                "//ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.min.js"
+            ];
+            var callback = "foo";
+            var expected = "//jazzcat.mobify.com/jsonp/foo/%5B%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fangularjs%2F1.0.5%2Fangular.min.js%22%2C%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fjquery%2F1.9.1%2Fjquery.min.js%22%5D";
 
             equal(Jazzcat.getURL(urls, callback), expected);
 
