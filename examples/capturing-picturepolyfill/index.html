@@ -4,9 +4,14 @@
 <script>
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
-// If Mobify has been defined already, or if the detector fails,
-// exit
-if (this.Mobify || !detector()) {
+// if mobify=(1|0) override is set in hash or cookie, force mobify on/off.
+var override = /((; )|#|&|^)mobify=(\d)/.exec(location.hash + '; ' + document.cookie);
+if (override && override[1]) {
+    // if mobify=0, do not run mobify.
+    if (!+override[1]) return;
+}
+// else do not run mobify if Mobify object exists, or detector fails.
+else if (this.Mobify || !detector()) {
     return;
 }
 
@@ -23,7 +28,6 @@ function attachScriptBeforeMobifyTag(script, src, id, classNames) {
     mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
 }
 
-// Prevent the browser from downloading website resources
 document.write('<plaintext style="display:none">');
 
 // On next tick, load library and main executable
@@ -31,13 +35,24 @@ setTimeout(function() {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.capturing = true;
     var mobifyjsScript = document.createElement('script');
+    var errorHandler = function() {
+        var now = new Date();
+        // Set now to 30 minutes ahead
+        now.setTime(now.getTime() + 1800000);
+        document.cookie = 'mobify=0' +
+                '; expires=' + now.toGMTString() +
+                '; path=/';
+        // Reload the page (location.reload has problems in FF)
+        window.location = window.location.href;
+    };
     mobifyjsScript.onload = function(){
         if (mainUrl) {
             var mainScript = document.createElement('script');
+            mainScript.onerror = errorHandler;
             attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
         }
-        // TODO: If main fails to load, load capture.restore
     };
+    mobifyjsScript.onerror = errorHandler;
     attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
 
 });
@@ -65,9 +80,10 @@ setTimeout(function() {
         if (match[3] && +match[4] < 11) {
             return false;
         }
-     
+
         return true;
     },
+
     // path to mobify.js
     '/mobifyjs/build/mobify.min.js',
 
