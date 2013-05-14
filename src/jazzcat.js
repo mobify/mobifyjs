@@ -220,8 +220,39 @@ define(["utils", "capture"], function(Utils, Capture) {
 
     var absolutify = document.createElement('a');
 
+    // localStorage detection as seen in such great libraries as Modernizr
+    // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
+    // Exposing on Jazzcat for use in qunit tests
+    Jazzcat.localStorageTest = function() {
+        var mod = 'modernizr';
+        try {
+            localStorage.setItem(mod, mod);
+            localStorage.removeItem(mod);
+            return true;
+        } catch(e) {
+            return false;
+        }
+    };
+
+    // Make Jazzcat for Firefox <= 11 and Opera 11/12 a noop.
+    // All other older Opera browsers are filtered out in the Mobify tag.
+    // These browsers have problems with document.write after a document.write
+    // Exposing on Jazzcat for use in qunit tests
+    Jazzcat.isIncompatibleBrowser = function() {
+        var match = /(firefox)[\/\s](\d+)|(opera[\s\S]*version[\/\s](11|12))/i.exec(navigator.userAgent);
+        // match[1] == Firefox <= 11
+        if (match && match[1] && +match[2] < 12) {
+            return true;
+        }
+        // match[3] == Opera 11|12
+        if (match && match[3]) {
+            return true;
+        }
+        return false;
+    };
+
     Jazzcat.combineScripts = function(scripts, options) {
-        var opts, localStorageTest;
+        var opts;
 
         if (options) {
             opts = Utils.extend(defaults, options);
@@ -229,21 +260,8 @@ define(["utils", "capture"], function(Utils, Capture) {
             opts = defaults;
         }
 
-        // localStorage detection as seen in such great libraries as Modernizr
-        // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
-        localStorageTest = function() {
-            var mod = 'modernizr';
-            try {
-                localStorage.setItem(mod, mod);
-                localStorage.removeItem(mod);
-                return true;
-            } catch(e) {
-                return false;
-            }
-        };
-
         // Fastfail if there are no scripts or if required modules are missing.
-        if (!scripts.length || !localStorageTest() || !window.JSON) {
+        if (!scripts.length || Jazzcat.localStorageTest() || !window.JSON || Jazzcat.isIncompatibleBrowser()) {
             return scripts;
         }
 

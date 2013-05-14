@@ -71,6 +71,8 @@
         // Too big for localStorage in Chrome, Webkit, and Firefox
         var LONG_STRING = Array(10000000).join('1')
 
+        var jazzcatNoop = Jazzcat.localStorageTest() || Jazzcat.isIncompatibleBrowser();
+
         asyncTest('combineScripts - Warm cache', 1, function() {
             httpCache.reset({
                 'http://should.be/cached/push-b.js': {
@@ -91,6 +93,12 @@
 
             var scripts = $($("#combineScripts-source").text()).filter("script").toArray();
             var results = Jazzcat.combineScripts(scripts);
+
+            if (!/Jazzcat/.test(results[1].innerHTML) && jazzcatNoop) {
+                ok(true, "Jazzcat not supported on this browser.");
+                start();
+                return;
+            }
 
             httpCache.save(function(err) {
                 if (err) throw err;
@@ -122,6 +130,12 @@
         asyncTest('combineScripts - Cold cache', 1, function() {
             var scripts = $($("#combineScripts-coldcache-source").text()).filter("script").toArray();
             var results = Jazzcat.combineScripts(scripts);
+            
+            if (!/Jazzcat/.test(results[0].innerHTML) && jazzcatNoop) {
+                ok(true, "Jazzcat not supported on this browser.");
+                start();
+                return;
+            }
 
             var html = '';
             html += "<textarea>" + results.map(function(el) {
@@ -167,6 +181,18 @@
         });
 
         asyncTest('httpCache - Eviction on an unused resource', 2, function() {
+            // Opt out of this test for Opera (which isn't compatible with
+            // jazzcat anyways) because the localstorage warning won't 
+            // dismiss on Saucelabs
+            if (jazzcatNoop) {
+                // Must do two asserts due to number of tests
+                // being specified in asyncTest
+                ok(true, "Jazzcat not supported on this browser.");
+                ok(true, "Jazzcat not supported on this browser.");
+                start();
+                return;
+            }
+
             httpCache.reset();
             httpCache.save();
 
@@ -188,6 +214,18 @@
         });
 
         asyncTest('httpCache - Least recently used eviction', 2, function() {
+            // Opt out of this test for Opera (which isn't compatible with
+            // jazzcat anyways) because the localstorage warning won't 
+            // dismiss on Saucelabs
+            if (jazzcatNoop) {
+                // Must do two asserts due to number of tests
+                // being specified in asyncTest
+                ok(true, "Jazzcat not supported on this browser.");
+                ok(true, "Jazzcat not supported on this browser.");
+                start();
+                return;
+            }
+
             httpCache.reset();
             httpCache.save();
 
