@@ -50,6 +50,34 @@
     </script>
 </textarea>
 
+<textarea id="test-exec-cached">
+    <html>
+        <head>
+            <script src="/build/mobify.js"></script>
+            <script>Jazzcat.combo.load()</script>
+            <script>Jazzcat.combo.exec("/tests/fixtures/cached.js")</script>
+        </head>
+        <body></body>
+    </html>
+</textarea>
+
+<textarea id="test-exec-uncached">
+    <html>
+        <head>
+            <script src="/build/mobify.js"></script>
+            <!-- window.loadedOverNetwork should be set to true if  `uncached.js` loads. -->
+            <script>window.loadedOverNetwork = false;</script>
+            <script>Jazzcat.combo.load()</script>
+            <script>Jazzcat.combo.exec("/tests/fixtures/uncached.js")</script>
+            <script>parent.postMessage(window.loadedOverNetwork, '*');</script>
+        </head>
+        <body></body>
+    </html>
+</textarea>
+
+
+
+
 <!-- Tests -->
 <script>
     QUnit.config.autostart = false;
@@ -143,6 +171,60 @@
             el.contentDocument.open();
             el.contentDocument.write(html);
             el.contentDocument.close();
+        });
+
+        asyncTest('Jazzcat.combo.exec - Uncached scripts are loaded over the network', 1, function() {
+            var html = $('#test-exec-uncached').text();
+            var $iframe = $('<iframe>').appendTo('#qunit-fixture');
+            var el = $iframe[0];
+
+            $(window).one("message", function(event) {
+                event = event.originalEvent;
+                if (event.source != el.contentWindow) return;
+                ok(event.data, "Uncached script was not loaded correctly.");
+                start();
+            });
+
+            // Empty the cache.
+            httpCache.reset()
+            httpCache.save(function(err) {
+                if (err) throw err;
+
+                el.contentDocument.open();
+                el.contentDocument.write(html);
+                el.contentDocument.close();
+            });
+        });
+
+        asyncTest('Jazzcat.combo.exec - Cached scripts are loaded from cache', 1, function() {
+            var html = $('#test-exec-cached').text();
+            var $iframe = $('<iframe>').appendTo('#qunit-fixture');
+            var el = $iframe[0];
+
+            $(window).one("message", function(event) {
+                event = event.originalEvent;
+                if (event.source != el.contentWindow) return;
+                ok(event.data, "Loaded cached script over network.");
+                start();
+            });
+
+            httpCache.reset()
+            httpCache.save(function(err) {
+                if (err) throw err;
+
+                Jazzcat.combo.load([{
+                    "url": "/tests/fixtures/cached.js",
+                    "headers": {"expires": UTC_TWO_WEEKS_FROM_NOW},
+                    "status": "ready",
+                    "statusCode": 200,
+                    "text": true,
+                    "body": "parent.postMessage('You win!', '*');"
+                }]);
+
+                el.contentDocument.open();
+                el.contentDocument.write(html);
+                el.contentDocument.close();
+            });
         });
 
         asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
