@@ -1328,7 +1328,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     // localStorage detection as seen in such great libraries as Modernizr
     // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
     // Exposing on Jazzcat for use in qunit tests
-    Jazzcat.localStorageTest = function() {
+    Jazzcat.supportsLocalStorage = function() {
         var mod = 'modernizr';
         try {
             localStorage.setItem(mod, mod);
@@ -1375,7 +1375,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      */
     Jazzcat.combineScripts = function(scripts, options) {
         // Fastfail if there are no scripts or if required features are missing.
-        if (!scripts.length || !Jazzcat.localStorageTest() || !window.JSON || Jazzcat.isIncompatibleBrowser()) {
+        if (!scripts.length || !Jazzcat.supportsLocalStorage() || !window.JSON || Jazzcat.isIncompatibleBrowser()) {
             return scripts;
         }
 

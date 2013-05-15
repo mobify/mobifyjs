@@ -71,7 +71,7 @@
         // Too big for localStorage in Chrome, Webkit, and Firefox
         var LONG_STRING = Array(10000000).join('1')
 
-        var jazzcatNoop = !Jazzcat.localStorageTest() || Jazzcat.isIncompatibleBrowser();
+        var jazzcatNoop = !Jazzcat.supportsLocalStorage() || Jazzcat.isIncompatibleBrowser();
 
         asyncTest('combineScripts - Warm cache', 1, function() {
             httpCache.reset({
