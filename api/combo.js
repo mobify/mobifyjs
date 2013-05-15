@@ -281,6 +281,8 @@ var $ = Mobify.$
     }
 
   , combo = Mobify.combo = {
+        // a copy of document.write in case it is reassigned by other scripts
+        _docWrite: document.write,
         /**
          * Emit a <script> tag to execute the contents of `url` using
          * `document.write`. Prefer loading contents from cache.
@@ -323,7 +325,7 @@ var $ = Mobify.$
                 }
             }
 
-            document.write('<script ' + out + '<\/script>');
+            Mobify.combo._docWrite.call(document, '<script ' + out + '<\/script>');
         }
 
         /**
