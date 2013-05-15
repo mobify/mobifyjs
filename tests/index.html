@@ -148,6 +148,10 @@
 /<\/script>/
     </script>
 
+    <script id="test-mobify-combo-exec-document-write-override" type="text/test">
+    document.write = function() {console.log("moo!");};
+    </script>
+
     <script>
         var $ = Mobify.$
           , httpCache = Mobify.httpCache
@@ -306,7 +310,7 @@
             });
         });
 
-        test('Mobify.combo.exec', 5, function() {
+        test('Mobify.combo.exec', 6, function() {
             var cache = {
                 'cached': {
                     'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
@@ -320,6 +324,13 @@
                     'status': 'ready',
                     'url': 'cached-with-scripts',
                     'body': getText("#test-mobify-combo-exec"),
+                    'text': true
+                },
+                'override-document-write': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status' : 'ready',
+                    'url': 'override-document-write',
+                    'body': getText("#test-mobify-combo-exec-document-write-override"),
                     'text': true
                 }
             };
@@ -346,6 +357,13 @@
 
                 Mobify.combo.exec('cached', true);
                 equal(wrote, '<script data-orig-src="cached" src="data:application/x-javascript,cached"><\/script>');
+
+                // test execing a functiont hat overrides a document.write
+                Mobify.combo.exec('override-document-write');
+                equal(wrote, '<script data-orig-src="override-document-write">document.write = function() {console.log("moo!");};<\/script>');
+                // restore regular old document.write after this exec
+                document.write = Mobify.combo._docWrite;
+
             } finally {
                 Mobify.combo._docWrite = origDocWrite;
             }
