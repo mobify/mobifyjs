@@ -326,8 +326,8 @@
 
             httpCache.reset(cache);
 
-            var nativeDocumentWrite = document.write
-            document.write = function(s) {
+            var origDocWrite = Mobify.combo._docWrite
+            Mobify.combo._docWrite = function(s) {
                 wrote = s
             }
 
@@ -347,7 +347,7 @@
                 Mobify.combo.exec('cached', true);
                 equal(wrote, '<script data-orig-src="cached" src="data:application/x-javascript,cached"><\/script>');
             } finally {
-                document.write = nativeDocumentWrite;
+                Mobify.combo._docWrite = origDocWrite;
             }
         });
 
