@@ -50,6 +50,18 @@
     </script>
 </textarea>
 
+<!-- fixtures for `Jazzcat.combo.exec` tests -->
+
+<script id="test-jazzcat-combo-exec" type="text/test">
+/*<\/script>*/
+"<\/script>"
+/<\/script>/
+</script>
+
+<script id="test-jazzcat-combo-exec-document-write-override" type="text/test">
+document.write = function() {console.log("moo!");};
+</script>
+
 <!-- Tests -->
 <script>
     QUnit.config.autostart = false;
@@ -69,7 +81,16 @@
         var UTC_NOW = (new Date()).toUTCString();
 
         // Too big for localStorage in Chrome, Webkit, and Firefox
-        var LONG_STRING = Array(10000000).join('1')
+        var LONG_STRING = Array(10000000).join('1');
+
+        // Fix <\/script>.
+        // Remove extra whitespace.
+        var getText = function(selector) {
+            return $(selector).html()
+                              .replace(/\\/g, '')
+                              .replace(/\s+/g, ' ')
+                              .trim()
+        };
 
         asyncTest('combineScripts - Warm cache', 1, function() {
             httpCache.reset({
@@ -273,6 +294,63 @@
             } finally {
                 Jazzcat.combineScripts.defaults.projectName = ""
             }
+        });
+
+        test('exec - creates script nodes as expected', 5, function() {
+            var cache = {
+                'cached': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'cached',
+                    'body': 'cached',
+                    'text': true
+                },
+                'cached-with-scripts': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'cached-with-scripts',
+                    'body': getText("#test-jazzcat-combo-exec"),
+                    'text': true
+                },
+                'override-document-write': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status' : 'ready',
+                    'url': 'override-document-write',
+                    'body': getText("#test-jazzcat-combo-exec-document-write-override"),
+                    'text': true
+                }
+            };
+
+            httpCache.reset(cache);
+
+            var origDocWrite = Jazzcat.combo._docWrite
+            Jazzcat.combo._docWrite = function(s) {
+                wrote = s
+            }
+
+            try {
+                Jazzcat.combo.exec('cached');
+                equal(wrote, '<script data-orig-src="cached">cached<\/script>');
+
+                Jazzcat.combo.exec('uncached');
+                equal(wrote, '<script src="uncached"><\/script>');
+
+                Jazzcat.combo.exec('cached-with-scripts');
+                equal(wrote, '<script data-orig-src=\"cached-with-scripts\">/*<\/scr\\ipt>*/ \"<\/scr\\ipt>\" \/<\/scr\\ipt>\/<\/script>');
+
+                Jazzcat.combo.exec('cached');
+                equal(wrote, '<script data-orig-src="cached">cached<\/script>');
+
+                // test execing a functiont hat overrides a document.write
+                Jazzcat.combo.exec('override-document-write');
+                equal(wrote, '<script data-orig-src="override-document-write">document.write = function() {console.log("moo!");};<\/script>');
+                // restore regular old document.write after this exec
+                document.write = Jazzcat.combo._docWrite;
+
+            } finally {
+                Jazzcat.combo._docWrite = origDocWrite;
+            }
+
         });
     });
 </script>

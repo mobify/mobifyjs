@@ -290,6 +290,8 @@ define(["utils", "capture"], function(Utils, Capture) {
     };
 
     Jazzcat.combo = {
+        // Our own reference to document.write in case it is reassigned later
+        _docWrite: document.write,
         /**
          * Execute the script at `url` using `document.write`. If the scripts
          * can't be retrieved from the cache, load it using an external script.
@@ -332,7 +334,7 @@ define(["utils", "capture"], function(Utils, Capture) {
             // http://hsivonen.iki.fi/script-execution/
             // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
             // This call seems to do nothing in Opera 11/12
-            document.write('<script ' + out + '<\/script>');
+            Jazzcat.combo._docWrite.call(document, '<script ' + out + '<\/script>');
         },
 
         /**
