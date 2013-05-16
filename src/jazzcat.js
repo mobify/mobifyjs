@@ -393,21 +393,23 @@ define(["utils", "capture"], function(Utils, Capture) {
         return encodeURIComponent(JSON.stringify(obj));
     };
 
-    var enablingRe = new RegExp("<script[^>]*?>(true|false)," +
+    // Used to find Jazzcat calls in an HTML string.
+    var execRe = new RegExp("<script[^>]*?>(true|false)," +
       defaults.execCallback.replace(/\./g, '\\.') +
       "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
 
     /**
-     * Insert the Jazzcat loader script before the first uncached script in
-     * some html markup string.
+     * Insert the loader before the first Jazzcat call in the HTML string
+     * `html`.
      */
-    Jazzcat.htmlWithJazzcatLoader = function(html) {
+    Jazzcat.insertLoaderIntoHTMLString = function(html) {
         var match;
         var bootstrap;
         var firstIndex = -1;
         var uncached = [];
 
-        while (match = enablingRe.exec(html)) {
+        // Find the first Jazzcat call and gather all the uncached scripts.
+        while (match = execRe.exec(html)) {
             if (firstIndex == -1) firstIndex = match.index;
             if (match[1] === "false") uncached.push(match[2]);
         };
@@ -418,7 +420,7 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         bootstrap = Jazzcat.getLoaderScript(uncached, defaults.loadCallback);
 
-        return html.substr(0, firstIndex) + bootstrap.outerHTML + html.substr(firstIndex);
+        return html.substr(0, firstIndex) + Utils.outerHTML(bootstrap) + html.substr(firstIndex);
     };
 
     /**
@@ -428,7 +430,7 @@ define(["utils", "capture"], function(Utils, Capture) {
     var oldEnable = Capture.enable;
     Capture.enable = function() {
         var htmlStr = oldEnable.apply(Capture, arguments);
-        return Jazzcat.htmlWithJazzcatLoader(htmlStr);
+        return Jazzcat.insertLoaderIntoHTMLString(htmlStr);
     };
 
     return Jazzcat;
