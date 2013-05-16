@@ -18,11 +18,11 @@
 <div id="qunit-fixture"></div>
 
 
-<!-- Fixtures for ensuring `combineScripts` executes scripts in the right order. -->
 <textarea id="htmlWithJazzcatLoader">
     <script x-src="http://www.example.com/jquery.js"></script>
 </textarea>
 
+<!-- Fixtures for ensuring `combineScripts` executes scripts in the right order. -->
 <textarea id="combineScripts-source">
     <script>var a = window.a = ['a']</script>
     <script x-src="http://should.be/cached/push-b.js"></script>
