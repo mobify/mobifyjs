@@ -19,7 +19,7 @@
 
 
 <!-- Fixtures for ensuring `combineScripts` executes scripts in the right order. -->
-<textarea id="combineScripts-transform">
+<textarea id="htmlWithJazzcatLoader">
     <script x-src="http://www.example.com/jquery.js"></script>
 </textarea>
 
@@ -151,7 +151,7 @@
         });
 
         test('htmlWithJazzcatLoader', function(){
-            var scripts = $($("#combineScripts-transform").text()).filter("script").toArray();
+            var scripts = $($("#htmlWithJazzcatLoader").text()).filter("script").toArray();
             var results = Jazzcat.combineScripts(scripts);
 
             var html = '<body>' + results[0].outerHTML + '</body>';
