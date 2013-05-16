@@ -17,6 +17,10 @@
 
 <div id="qunit-fixture"></div>
 
+<textarea id="insertLoaderIntoHTMLString">
+    <script x-src="http://cached/"></script>
+    <script x-src="http://uncached/"></script>
+</textarea>
 
 <!-- Fixtures for ensuring `combineScripts` executes scripts in the right order. -->
 <textarea id="combineScripts-source">
@@ -54,7 +58,7 @@
 <script>
     QUnit.config.autostart = false;
     require.config({"baseUrl": "../src/"});
-    require(["capture", "jazzcat"], function(Capture, Jazzcat) {
+    require(["capture", "jazzcat", "utils"], function(Capture, Jazzcat, Utils) {
         QUnit.start();
 
         var httpCache = Jazzcat.httpCache;
@@ -71,7 +75,7 @@
         // Too big for localStorage in Chrome, Webkit, and Firefox
         var LONG_STRING = Array(10000000).join('1')
 
-        var jazzcatNoop = !Jazzcat.supportsLocalStorage() || Jazzcat.isIncompatibleBrowser();
+        var jazzcatNoop = Jazzcat.isIncompatibleBrowser();
 
         asyncTest('combineScripts - Warm cache', 1, function() {
             httpCache.reset({
@@ -165,6 +169,39 @@
             el.contentDocument.close();
         });
 
+        asyncTest('insertLoaderIntoHTMLString', 1, function() {
+            httpCache.reset({
+                'http://cached/': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'body': 'cached',
+                    'text': true
+                }
+            });
+
+            httpCache.save(function() {
+                var scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
+                var results = Jazzcat.combineScripts(scripts);
+
+                // If the script wasn't rewritten by Jazzcat, and Jazzcat 
+                // shouldn't be run on the current browser, pass test
+                if (!/Jazzcat/.test(results[0].innerHTML) && jazzcatNoop) {
+                    ok(true, "Jazzcat not supported on this browser.");
+                    start();
+                    return;
+                }
+
+                var html = scripts.reduce(function(html, script) {
+                    return html + Utils.outerHTML(script);
+                }, '')
+
+                var result = Jazzcat.insertLoaderIntoHTMLString(html);
+                var expected = '<script src="//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D"><\/script><script>true,Jazzcat.combo.exec(\'http://cached/\');<\/script><script>false,Jazzcat.combo.exec(\'http://uncached/\');<\/script>';
+                equal(result, expected, "Loader inserted successfully")
+                start();
+            });
+        })
+
         asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
             var url = "http://127.0.0.1:3000/space invaders.js";
             var resources = [{
@@ -185,6 +222,8 @@
                 start();
             });
         });
+
+
 
         asyncTest('httpCache - Eviction on an unused resource', 2, function() {
             // Opt out of this test for Opera (which isn't compatible with
