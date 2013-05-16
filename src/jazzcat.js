@@ -401,7 +401,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      * Insert the Jazzcat loader script before the first uncached script in
      * some html markup string.
      */
-    Jazzcat.insertJazzcatLoader = function(html) {
+    Jazzcat.htmlWithJazzcatLoader = function(html) {
         var match;
         var bootstrap;
         var firstIndex = -1;
@@ -428,7 +428,7 @@ define(["utils", "capture"], function(Utils, Capture) {
     var oldEnable = Capture.enable;
     Capture.enable = function() {
         var htmlStr = oldEnable.apply(Capture, arguments);
-        return Jazzcat.insertJazzcatLoader(htmlStr);
+        return Jazzcat.htmlWithJazzcatLoader(htmlStr);
     };
 
     return Jazzcat;
