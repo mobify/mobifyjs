@@ -415,7 +415,7 @@ define('utils',[], function() {
 
 var Utils = {};
 
-Utils.extend = function(target) {
+Utils.extend = function(target){
     [].slice.call(arguments, 1).forEach(function(source) {
         for (var key in source)
             if (source[key] !== undefined)
@@ -1499,34 +1499,44 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         return encodeURIComponent(JSON.stringify(obj));
     };
 
-    var oldEnable = Capture.enable;
-    var enablingRe = new RegExp("<script[^>]*?>(true|false)," +
+    // Used to find Jazzcat calls in an HTML string.
+    var execRe = new RegExp("<script[^>]*?>(true|false)," +
       defaults.execCallback.replace(/\./g, '\\.') +
-      "\\('([\\s\\S]*?)'\\,(true|false)\\);<\\/script", "gi");
+      "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
 
     /**
-     * Overrides `Capture.enable` to insert a Jazzcat bootloader to fetch all
-     * uncached scripts from the Jazzcat service before executing any Jazzcat calls.
+     * Insert the loader before the first Jazzcat call in the HTML string
+     * `html`.
      */
-    Capture.enable = function() {
+    Jazzcat.insertLoaderIntoHTMLString = function(html) {
         var match;
         var bootstrap;
         var firstIndex = -1;
         var uncached = [];
-        var htmlStr = oldEnable.apply(Capture, arguments);
 
-        while (match = enablingRe.exec(htmlStr)) {
+        // Find the first Jazzcat call and gather all the uncached scripts.
+        while (match = execRe.exec(html)) {
             if (firstIndex == -1) firstIndex = match.index;
             if (match[1] === "false") uncached.push(match[2]);
         };
 
         if (firstIndex == -1) {
-            return htmlStr;
+            return html;
         }
 
         bootstrap = Jazzcat.getLoaderScript(uncached, defaults.loadCallback);
 
-        return htmlStr.substr(0, firstIndex) + bootstrap.outerHTML + htmlStr.substr(firstIndex);
+        return html.substr(0, firstIndex) + Utils.outerHTML(bootstrap) + html.substr(firstIndex);
+    };
+
+    /**
+     * Overrides `Capture.enable` to insert a Jazzcat bootloader to fetch all
+     * uncached scripts from the Jazzcat service before executing any Jazzcat calls.
+     */
+    var oldEnable = Capture.enable;
+    Capture.enable = function() {
+        var htmlStr = oldEnable.apply(Capture, arguments);
+        return Jazzcat.insertLoaderIntoHTMLString(htmlStr);
     };
 
     return Jazzcat;
