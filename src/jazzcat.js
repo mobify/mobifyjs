@@ -217,10 +217,6 @@ define(["utils", "capture"], function(Utils, Capture) {
 
     var absolutify = document.createElement('a');
 
-    var Jazzcat = window.Jazzcat = {
-        httpCache: httpCache
-    };
-
     // localStorage detection as seen in such great libraries as Modernizr
     // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
     // Exposing on Jazzcat for use in qunit tests
@@ -233,6 +229,10 @@ define(["utils", "capture"], function(Utils, Capture) {
         } catch(e) {
             return false;
         }
+    };
+
+    var Jazzcat = window.Jazzcat = {
+        httpCache: httpCache
     };
 
     // No support for Firefox <= 11, Opera 11/12, browsers without
