@@ -280,7 +280,6 @@ var $ = Mobify.$
       , endpoint: 'jsonp'
       , execCallback: 'Mobify.combo.exec'
       , loadCallback: 'Mobify.combo.load'
-      , projectName: Mobify.config.projectName || ''
     }
 
   , combo = Mobify.combo = {
@@ -359,8 +358,9 @@ var $ = Mobify.$
      * consistent URLs.
      */
   , getURL = Mobify.combo.getURL = function(urls, callback) {
+        var projectName = Mobify.config.projectName || '';
         return defaults.proto + defaults.host + 
-          (defaults.projectName ? '/project-' + defaults.projectName : '') + 
+          (projectName ? '/project-' + projectName : '') + 
           '/' + defaults.endpoint + '/' + callback + '/' +
           JSONURIencode(urls.slice().sort());
     }
