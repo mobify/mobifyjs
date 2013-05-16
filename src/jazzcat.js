@@ -233,7 +233,9 @@ define(["utils", "capture"], function(Utils, Capture) {
     var absolutify = document.createElement('a');
 
     var Jazzcat = window.Jazzcat = {
-        httpCache: httpCache
+        httpCache: httpCache,
+        // Cache a reference to `document.write` in case it is reassigned.
+        write: document.write
     };
 
     /**
@@ -290,8 +292,6 @@ define(["utils", "capture"], function(Utils, Capture) {
     };
 
     Jazzcat.combo = {
-        // Our own reference to document.write in case it is reassigned later
-        _docWrite: document.write,
         /**
          * Execute the script at `url` using `document.write`. If the scripts
          * can't be retrieved from the cache, load it using an external script.
@@ -334,7 +334,7 @@ define(["utils", "capture"], function(Utils, Capture) {
             // http://hsivonen.iki.fi/script-execution/
             // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
             // This call seems to do nothing in Opera 11/12
-            Jazzcat.combo._docWrite.call(document, '<script ' + out + '<\/script>');
+            Jazzcat.write.call(document, '<script ' + out + '<\/script>');
         },
 
         /**
