@@ -19,6 +19,10 @@
 
 
 <!-- Fixtures for ensuring `combineScripts` executes scripts in the right order. -->
+<textarea id="combineScripts-transform">
+    <script x-src="http://www.example.com/jquery.js"></script>
+</textarea>
+
 <textarea id="combineScripts-source">
     <script>var a = window.a = ['a']</script>
     <script x-src="http://should.be/cached/push-b.js"></script>
@@ -146,6 +150,18 @@
             el.contentDocument.close();
         });
 
+        test('insertJazzcatLoader', function(){
+            var scripts = $($("#combineScripts-transform").text()).filter("script").toArray();
+            var results = Jazzcat.combineScripts(scripts);
+
+            var html = '<body>' + results[0].outerHTML + '</body>';
+            var htmlWithLoader = Jazzcat.insertJazzcatLoader(html);
+            var expected = '<body><script src="//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Fwww.example.com%2Fjquery.js%22%5D"><\/script><script>false,Jazzcat.combo.exec(\'http://www.example.com/jquery.js\');<\/script></body>';
+
+
+            equal(htmlWithLoader, expected, "Loader inserted successfully")
+        })
+
         asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
             var url = "http://127.0.0.1:3000/space invaders.js";
             var resources = [{
@@ -166,6 +182,8 @@
                 start();
             });
         });
+
+
 
         asyncTest('httpCache - Eviction on an unused resource', 2, function() {
             httpCache.reset();
