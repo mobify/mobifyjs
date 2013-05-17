@@ -54,6 +54,30 @@
     </script>
 </textarea>
 
+<textarea id="test-jazzcat-combo-exec">
+    /*</script>*/
+    "</script>"
+    /</script>/
+</textarea>
+
+<textarea id="test-jazzcat-combo-exec-document-write-override">
+    <script src="/build/mobify.js"></script>
+    <script>
+        document.write = function() {
+            parent.postMessage(false, "*");
+        };
+
+        Jazzcat.combo.load([{
+            "url": "cached",
+            "status": "ready",
+            "statusCode": 200,
+            "text": true,
+            "body": "parent.postMessage(true, '*');"
+        }]);
+        Jazzcat.combo.exec('cached');
+    </script>
+</textarea>
+
 <!-- Tests -->
 <script>
     QUnit.config.autostart = false;
@@ -73,7 +97,16 @@
         var UTC_NOW = (new Date()).toUTCString();
 
         // Too big for localStorage in Chrome, Webkit, and Firefox
-        var LONG_STRING = Array(10000000).join('1')
+        var LONG_STRING = Array(10000000).join('1');
+
+        // Fix <\/script>.
+        // Remove extra whitespace.
+        var getText = function(selector) {
+            return $(selector).val()
+                              .replace(/\\/g, '')
+                              .replace(/\s+/g, ' ')
+                              .trim();
+        };
 
         var jazzcatNoop = Jazzcat.isIncompatibleBrowser();
 
@@ -355,6 +388,64 @@
             } finally {
                 Jazzcat.combineScripts.defaults.projectName = ""
             }
+        });
+
+        test('Jazzcat.combo.exec - writes scripts as expected', 3, function() {
+            httpCache.reset({
+                'cached': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'cached',
+                    'body': 'cached',
+                    'text': true
+                },
+                'cached-with-scripts': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'cached-with-scripts',
+                    'body': getText("#test-jazzcat-combo-exec"),
+                    'text': true
+                }
+            });
+
+
+            var origWrite = Jazzcat.write
+            var result;
+
+            Jazzcat.write = function(s) {
+                result = s;
+            }
+
+            try {
+                Jazzcat.combo.exec('uncached');
+                equal(result, '<script src="uncached"><\/script>');
+
+                Jazzcat.combo.exec('cached');
+                equal(result, '<script data-orig-src="cached">cached<\/script>');
+
+                Jazzcat.combo.exec('cached-with-scripts');
+                equal(result, '<script data-orig-src=\"cached-with-scripts\">/*<\/scr\\ipt>*/ \"<\/scr\\ipt>\" \/<\/scr\\ipt>\/<\/script>');
+            } finally {
+                Jazzcat.write = origWrite;
+            }
+        });
+
+        asyncTest('Jazzcat.combo.exec - test document.write override', function() {
+            var html = $("#test-jazzcat-combo-exec-document-write-override").val();
+
+            var $iframe = $('<iframe>').appendTo('#qunit-fixture');
+            var el = $iframe[0];
+
+            $(window).one("message", function(event) {
+                event = event.originalEvent;
+                if (event.source != el.contentWindow) return;
+                ok(event.data, 'document.write was overriden');
+                start();
+            });
+
+            el.contentDocument.open();
+            el.contentDocument.write(html);
+            el.contentDocument.close();
         });
     });
 </script>

@@ -1321,10 +1321,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
     var absolutify = document.createElement('a');
 
-    var Jazzcat = window.Jazzcat = {
-        httpCache: httpCache
-    };
-
     // localStorage detection as seen in such great libraries as Modernizr
     // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
     // Exposing on Jazzcat for use in qunit tests
@@ -1339,16 +1335,19 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         }
     };
 
-    // Jazzcat doesn't work in Firefox <= 11, Opera 11/12, browsers without
-    // window.JSON, and and browsers without localstorage
+    var Jazzcat = window.Jazzcat = {
+        httpCache: httpCache,
+        // Cache a reference to `document.write` in case it is reassigned.
+        write: document.write
+    };
+
+    // No support for Firefox <= 11, Opera 11/12, browsers without
+    // window.JSON, and browsers without localstorage.
     // All other unsupported browsers filtered by mobify.js tag.
     Jazzcat.isIncompatibleBrowser = function() {
-        // All other older Opera browsers are filtered out in the Mobify tag.
-        // These browsers have problems with document.write after a document.write
-        // Exposing on Jazzcat for use in qunit tests
         var match = /(firefox)[\/\s](\d+)|(opera[\s\S]*version[\/\s](11|12))/i.exec(navigator.userAgent);
-            
         // match[1] == Firefox <= 11, // match[3] == Opera 11|12
+        // These browsers have problems with document.write after a document.write
         if ((match && match[1] && +match[2] < 12) || (match && match[3])
             || (!supportsLocalStorage())
             || (!window.JSON)) {
@@ -1454,7 +1453,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             // http://hsivonen.iki.fi/script-execution/
             // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
             // This call seems to do nothing in Opera 11/12
-            document.write('<script ' + out + '<\/script>');
+            Jazzcat.write.call(document, '<script ' + out + '<\/script>');
         },
 
         /**
