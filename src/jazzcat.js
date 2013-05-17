@@ -183,14 +183,14 @@ define(["utils", "capture"], function(Utils, Capture) {
         var cacheControl = headers['cache-control'];
         var now = Date.now();
         var date;
-        var cacheOverrideTime;
+        var overrideTime;
 
         // If a cache override parameter is present, see if the age of the 
         // response is less than the override, cacheOverrideTime is in minutes
-        if ((httpCacheOptions.cacheOverrideTime !== undefined) && 
-            (cacheOverrideTime = httpCacheOptions.cachOverrideTime) &&
+        if ((httpCacheOptions.overrideTime !== undefined) && 
+          (overrideTime = httpCacheOptions.overrideTime) &&
           (date = Date.parse(headers.date))) {
-            return (now > (date + (cacheOverrideTime * 60 * 1000)));
+            return (now > (date + (overrideTime * 60 * 1000)));
         }
 
         // If `max-age` and `date` are present, and no other cache
@@ -279,7 +279,7 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         if (options && options.cacheOverrideTime) {
             Utils.extend(httpCache.options,
-              {cacheOverrideTime: options.cacheOverrideTime});
+              {overrideTime: options.cacheOverrideTime});
         }
 
         options = Utils.extend({}, defaults, options || {});
