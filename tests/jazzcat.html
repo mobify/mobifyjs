@@ -95,6 +95,7 @@
         var UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString();
         var UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString();
         var UTC_NOW = (new Date()).toUTCString();
+        var UTC_BEGINNING_OF_TIME = (new Date(0)).toUTCString();
 
         // Too big for localStorage in Chrome, Webkit, and Firefox
         var LONG_STRING = Array(10000000).join('1');
@@ -107,6 +108,37 @@
                               .replace(/\s+/g, ' ')
                               .trim();
         };
+
+        test('httpCache.utils.isStale', function() {
+            var headers = {
+                'staleCacheControl': {
+                    'date': UTC_TWO_WEEKS_AGO,
+                    'cache-control': "max-age=" + TEN_MINUTES
+                }, 
+                'staleExpires': {
+                    'date': UTC_TWO_WEEKS_AGO,
+                    'expires': UTC_BEGINNING_OF_TIME
+                },
+                'freshCacheControl': {
+                    'date': UTC_NOW,
+                    'cache-control': "max-age=" + TEN_MINUTES
+                },
+                'freshExpires': {
+                    'date': UTC_NOW,
+                    'expires': UTC_TWO_WEEKS_FROM_NOW
+                }
+            }
+
+            var isStale = httpCache.utils.isStale;
+
+            // stale
+            ok(isStale({headers: headers['staleCacheControl']}));
+            ok(isStale({headers: headers['staleExpires']}));
+
+            // fresh
+            ok(!httpCache.utils.isStale({headers: headers['freshCacheControl']}));
+            ok(!httpCache.utils.isStale({headers: headers['freshExpires']}));
+        });
 
         asyncTest('combineScripts - Warm cache', 1, function() {
             httpCache.reset({
