@@ -29,6 +29,8 @@ define(["utils", "capture"], function(Utils, Capture) {
 
     var localStorageKey = 'Mobify-Combo-Cache-v1.0';
 
+    var httpCacheOptions = {};
+
     /**
      * Reset the cache, optionally to `val`. Useful for testing.
      */
@@ -181,8 +183,17 @@ define(["utils", "capture"], function(Utils, Capture) {
         var cacheControl = headers['cache-control'];
         var now = Date.now();
         var date;
+        var cacheOverrideTime;
 
-        // If `max-age` and `date` are present, and no other no other cache
+        // If a cache override parameter is present, see if the age of the 
+        // response is less than the override, cacheOverrideTime is in minutes
+        if ((httpCacheOptions.cacheOverrideTime !== undefined) && 
+            (cacheOverrideTime = httpCacheOptions.cachOverrideTime) &&
+          (date = Date.parse(headers.date))) {
+            return (now > (date + (cacheOverrideTime * 60 * 1000)));
+        }
+
+        // If `max-age` and `date` are present, and no other cache
         // directives exist, then we are stale if we are older.
         if (cacheControl && (date = Date.parse(headers.date))) {
             cacheControl = ccParse(cacheControl);
@@ -212,7 +223,8 @@ define(["utils", "capture"], function(Utils, Capture) {
         save: save,
         reset: reset,
         cache: cache,
-        utils: {isStale: isStale}
+        utils: {isStale: isStale},
+        options: httpCacheOptions
     };
 
     /**
@@ -263,9 +275,14 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         var script;
         var url;
-        var i = 0
+        var i = 0;
 
-        options = Utils.extend(defaults, options || {});
+        if (options && options.cacheOverrideTime) {
+            Utils.extend(httpCache.options,
+              {cacheOverrideTime: options.cacheOverrideTime});
+        }
+
+        options = Utils.extend({}, defaults, options || {});
 
         httpCache.load();
 
