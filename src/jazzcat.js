@@ -240,8 +240,8 @@ define(["utils", "capture"], function(Utils, Capture) {
     // No support for Firefox <= 11, Opera 11/12, browsers without
     // window.JSON, and browsers without localstorage.
     // All other unsupported browsers filtered by mobify.js tag.
-    Jazzcat.isIncompatibleBrowser = function() {
-        var match = /(firefox)[\/\s](\d+)|(opera[\s\S]*version[\/\s](11|12))/i.exec(navigator.userAgent);
+    Jazzcat.isIncompatibleBrowser = function(userAgent) {
+        var match = /(firefox)[\/\s](\d+)|(opera[\s\S]*version[\/\s](11|12))/i.exec(userAgent || navigator.userAgent);
         // match[1] == Firefox <= 11, // match[3] == Opera 11|12
         // These browsers have problems with document.write after a document.write
         if ((match && match[1] && +match[2] < 12) || (match && match[3])

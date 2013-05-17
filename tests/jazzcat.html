@@ -110,6 +110,13 @@
 
         var jazzcatNoop = Jazzcat.isIncompatibleBrowser();
 
+        test('isIncompatibleBrowser', function() {
+            ok(Jazzcat.isIncompatibleBrowser("Mozilla/5.0 (X11; U; Linux i686; ru; rv:1.9.1.3) Gecko/20091020 Ubuntu/10.04 (lucid) Firefox/4.0.1") === true, "Firefox 4.0");
+            ok(Jazzcat.isIncompatibleBrowser("Opera/9.80 (X11; Linux x86_64; U; Ubuntu/10.10 (maverick); pl) Presto/2.7.62 Version/11.01") === true, "Opera 11");
+            ok(Jazzcat.isIncompatibleBrowser("Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1") === false, "Firefox 16");
+            ok(Jazzcat.isIncompatibleBrowser("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15") === false, "Chrome");
+        });
+
         asyncTest('combineScripts - Warm cache', 1, function() {
             httpCache.reset({
                 'http://should.be/cached/push-b.js': {
