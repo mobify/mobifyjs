@@ -7,7 +7,7 @@ if (capturing) {
         var capturedDoc = capture.capturedDoc;
 
         var scripts = capturedDoc.querySelectorAll('script');
-        Mobify.Jazzcat.combineScripts( scripts );
+        Mobify.Jazzcat.combineScripts(capture, scripts);
 
         // Resize images using Mobify Image Resizer
         var images = capturedDoc.querySelectorAll('img');
