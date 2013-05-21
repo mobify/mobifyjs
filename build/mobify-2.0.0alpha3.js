@@ -1500,53 +1500,13 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         return encodeURIComponent(JSON.stringify(obj));
     };
 
-    // Used to find Jazzcat calls in an HTML string.
-    //var execRe = new RegExp("<script[^>]+data-(parent|cached)\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>" +
-    var headRe = new RegExp("<script[^>]+data-cached=['\"](true|false)['\"][^>]*data-parent=['\"](head)['\"][^>]*>" +
-      defaults.execCallback.replace(/\./g, '\\.') +
-      "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
-    var bodyRe = new RegExp("<script[^>]+data-cached=['\"](true|false)['\"][^>]*data-parent=['\"](body)['\"][^>]*>" +
-      defaults.execCallback.replace(/\./g, '\\.') +
-      "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
-
-    // Jazzcat.insertLoaderIntoHTMLString = function(html) {
-    //     var match;
-    //     var insert = {
-    //         head: {
-    //             firstIndex: -1,
-    //             uncached: []
-    //         },
-    //         body: {
-    //             firstIndex: -1,
-    //             uncached: []
-    //         }
-    //     };
-
-
-    //     // Find the first Jazzcat call and gather all the uncached scripts.
-    //     while (match = execRe.exec(html)) {
-    //         var parent = match[2];
-    //         var firstIndex = insert[parent].firstIndex;
-    //         if (firstIndex == -1) insert[parent].firstIndex = match.index;
-    //         if (match[1] === "false") insert[parent].uncached.push(match[3]);
-    //     }
-
-    //     function bootstrap(parent) {
-    //         return insert[parent].firstIndex ? Jazzcat.getLoaderScript(insert[parent].uncached, defaults.loadCallback) : "";
-    //     }
-    //     var headBootstrap = bootstrap("head");
-    //     var bodyBootstrap = bootstrap("body");
-
-    //     var html = html.substr(0, insert["head"].firstIndex) +
-    //             Utils.outerHTML(headBootstrap) +
-    //             html.substr(insert["head"].firstIndex, insert["body"].firstIndex) +
-    //             Utils.outerHTML(bodyBootstrap) +
-    //             html.substr(insert["body"].firstIndex);
-
-    //     debugger;
-
-    //     return html;
-    // };
+    // Regex generator used to find Jazzcat calls in an HTML string.
+    // Generates regexp based on parent, which should either be head or body.
+    var jazzcatReGen = function(parent) {
+        return new RegExp("<script[^>]+data-cached=['\"](true|false)['\"][^>]*data-parent=['\"](" + parent + ")['\"][^>]*>" +
+            defaults.execCallback.replace(/\./g, '\\.') +
+            "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
+    };
 
     Jazzcat.insertLoaderIntoHTMLString = function(html, execRe) {
         var match;
@@ -1577,9 +1537,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     var oldEnable = Capture.enable;
     Capture.enable = function() {
         var html = oldEnable.apply(Capture, arguments);
-        html = Jazzcat.insertLoaderIntoHTMLString(html, bodyRe);
-        html = Jazzcat.insertLoaderIntoHTMLString(html, headRe);
-        debugger;
+        html = Jazzcat.insertLoaderIntoHTMLString(html, jazzcatReGen("head"));
+        html = Jazzcat.insertLoaderIntoHTMLString(html, jazzcatReGen("body"));
         return html;
     };
 
