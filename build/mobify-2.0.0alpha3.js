@@ -1359,10 +1359,17 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * Note that this only the first part of the Jazzcat transformation. The
      * bootloader script is inserted by the overriden `Capture.enabled` function.
      */
-    Jazzcat.combineScripts = function(capture, scripts, options) {
+    Jazzcat.combineScripts = function(scripts, doc, options) {
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || !window.JSON || !supportsLocalStorage()) {
             return scripts;
+        }
+        if (!doc) {
+            doc = document;
+        }
+        if (doc && !doc.getElementById) {
+            options = doc;
+            doc = document;
         }
 
         var script;
@@ -1380,7 +1387,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             url = absolutify.href;
             script.innerHTML = options.execCallback + "('" + url + "');";
             script.setAttribute("data-cached", !!httpCache.get(url));
-            script.setAttribute("data-parent", capture.headEl.contains(script) ? "head" : "body");
+            script.setAttribute("data-parent", doc.head.contains(script) ? "head" : "body");
         }
 
         return scripts;
@@ -1500,24 +1507,26 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         return encodeURIComponent(JSON.stringify(obj));
     };
 
-    // Regex generator used to find Jazzcat calls in an HTML string.
+    // Regex generator used to match Jazzcat calls in an HTML string.
     // Generates regexp based on parent, which should either be head or body.
-    var jazzcatReGen = function(parent) {
-        return new RegExp("<script[^>]+data-cached=['\"](true|false)['\"][^>]*data-parent=['\"](" + parent + ")['\"][^>]*>" +
+    var execReGenerator = function(parent) {
+        return new RegExp("<script[^>]+data-cached=['\"](true|false)['\"][^>]*data-parent=['\"]" +
+            parent + "['\"][^>]*>" +
             defaults.execCallback.replace(/\./g, '\\.') +
             "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
     };
 
-    Jazzcat.insertLoaderIntoHTMLString = function(html, execRe) {
+    Jazzcat.insertLoaderIntoHTMLString = function(html, parent) {
         var match;
         var bootstrap;
         var firstIndex = -1;
         var uncached = [];
 
         // Find the first Jazzcat call and gather all the uncached scripts.
+        var execRe = execReGenerator(parent);
         while (match = execRe.exec(html)) {
             if (firstIndex == -1) firstIndex = match.index;
-            if (match[1] === "false") uncached.push(match[3]);
+            if (match[1] === "false") uncached.push(match[2]);
         };
 
         if (firstIndex == -1) {
@@ -1537,8 +1546,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     var oldEnable = Capture.enable;
     Capture.enable = function() {
         var html = oldEnable.apply(Capture, arguments);
-        html = Jazzcat.insertLoaderIntoHTMLString(html, jazzcatReGen("head"));
-        html = Jazzcat.insertLoaderIntoHTMLString(html, jazzcatReGen("body"));
+        html = Jazzcat.insertLoaderIntoHTMLString(html, "head");
+        html = Jazzcat.insertLoaderIntoHTMLString(html, "body");
         return html;
     };
 
