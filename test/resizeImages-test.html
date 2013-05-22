@@ -220,16 +220,12 @@
     <script src="/lib/jquery-latest.js"></script>
     <script src="/lib/underscore.js"></script>
     <script>Mobify = {config: {}, $: $, _: _}; debug = console</script>
-    <script src="/api/util.js"></script>
+    <script src="/api/resizeImages.js"></script>
     <script>
 
-test('Mobify.URLHash', function(t) {
-    Mobify.URLHash('http://test/image.jpg')
-});
-
 test('Mobify.getImageURL', function() {
-    equal(Mobify.getImageURL('http://test/1.jpg'), '//ir3.mobify.com/http://test/1.jpg')
-    equal(Mobify.getImageURL('http://test/1.jpg', {maxWidth: 320}), '//ir3.mobify.com/320/http://test/1.jpg')
+    equal(Mobify.getImageURL('http://test/1.jpg'), '//ir0.mobify.com/http://test/1.jpg')
+    equal(Mobify.getImageURL('http://test/1.jpg', {maxWidth: 320}), '//ir0.mobify.com/320/http://test/1.jpg')
 });
 
 test('$.fn.resizeImages', function() {
@@ -250,8 +246,6 @@ test('$.fn.resizeImages speed', function() {
     console.log(+new Date - start)
     
 });
-
-
 
     </script>
 <body>
