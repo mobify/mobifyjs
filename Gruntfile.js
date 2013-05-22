@@ -271,6 +271,6 @@ module.exports = function(grunt) {
     });
     grunt.registerTask('default', 'build');
     grunt.registerTask('deploy', ['build', 's3']);
-    grunt.registerTask('saucelabs', ['connect', 'saucelabs-qunit']);
+    grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('preview', ['connect', 'watch']);
 };
