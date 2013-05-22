@@ -264,7 +264,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      *
      *   After:
      *
-     *   <script>true,Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
+     *   <script>true,"body",Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
      *   <script>$(function() { alert("helo joe"); })</script>
      *
      * Note that this only the first part of the Jazzcat transformation. The
@@ -274,13 +274,6 @@ define(["utils", "capture"], function(Utils, Capture) {
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || Jazzcat.isIncompatibleBrowser()) {
             return scripts;
-        }
-        if (!doc) {
-            doc = document;
-        }
-        if (doc && !doc.getElementById) {
-            options = doc;
-            doc = document;
         }
 
         var script;
@@ -296,10 +289,17 @@ define(["utils", "capture"], function(Utils, Capture) {
             script.removeAttribute(options.attribute);
             absolutify.href = url;
             url = absolutify.href;
-            script.innerHTML = !!httpCache.get(url) +
+
+            // Rewriting script to grab contents from localstorage
+            // ex. <script>true,"body",Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
+                                
+                                // true or false depending if the script is cached
+            script.innerHTML = !!httpCache.get(url) + 
                                 ",\"" +
+                                // head or body
                                 (script.parentNode === doc.head ? "head" : "body") +
                                 "\"," +
+                                // Jazzcat callback to be executed when new document is written
                                 options.execCallback +
                                 "('" + url + "');";
         }

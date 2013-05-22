@@ -130,7 +130,7 @@
             test('combineScripts - noop', function() {
                 var scripts = $($("#combineScripts-source").text()).filter("script").toArray();
 
-                var results = Jazzcat.combineScripts(scripts);
+                var results = Jazzcat.combineScripts(scripts, document);
 
                 ok(!/Jazzcat/.test(results[0].innerHTML), "Jazzcat does not affect incompatible browsers");
             });
@@ -157,7 +157,7 @@
 
                 var scripts = $($("#combineScripts-source").text()).filter("script").toArray();
 
-                var results = Jazzcat.combineScripts(scripts);
+                var results = Jazzcat.combineScripts(scripts, document);
 
                 httpCache.save(function(err) {
                     if (err) throw err;
@@ -189,7 +189,7 @@
 
             asyncTest('combineScripts - Cold cache', 1, function() {
                 var scripts = $($("#combineScripts-coldcache-source").text()).filter("script").toArray();
-                var results = Jazzcat.combineScripts(scripts);
+                var results = Jazzcat.combineScripts(scripts, document);
 
                 var html = '';
                 html += "<textarea>" + results.map(function(el) {
