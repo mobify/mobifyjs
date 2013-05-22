@@ -18,8 +18,13 @@
 <div id="qunit-fixture"></div>
 
 <textarea id="insertLoaderIntoHTMLString">
-    <script x-src="http://cached/"></script>
-    <script x-src="http://uncached/"></script>
+    <head>
+        <script x-src="http://cached/"></script>
+    </head>
+    <body>
+        <script x-src="http://cached/"></script>
+        <script x-src="http://uncached/"></script>
+    </body>
 </textarea>
 
 <!-- Fixtures for ensuring `combineScripts` executes scripts in the right order. -->
@@ -194,16 +199,25 @@
             });
 
             httpCache.save(function() {
-                var scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
-                var results = Jazzcat.combineScripts(scripts);
+                var doc = document.implementation.createHTMLDocument("");
+                doc.documentElement.innerHTML = $("#insertLoaderIntoHTMLString").text();
+                var scripts = doc.getElementsByTagName("script");
 
-                var html = scripts.reduce(function(html, script) {
-                    return html + Utils.outerHTML(script);
-                }, '')
+                var results = Jazzcat.combineScripts(scripts, doc);
+                var html = doc.documentElement.outerHTML;
 
-                var result = Jazzcat.insertLoaderIntoHTMLString(html, "body");
-                var expected = '<script src="//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D"><\/script><script>true,"body",Jazzcat.combo.exec(\'http://cached/\');<\/script><script>false,"body",Jazzcat.combo.exec(\'http://uncached/\');<\/script>';
-                equal(result, expected, "Loader inserted successfully")
+                html = Jazzcat.insertLoaderIntoHTMLString(html, "head");
+                html = Jazzcat.insertLoaderIntoHTMLString(html, "body");
+                
+                var expected = '<html><head>\
+\n        <script>Jazzcat.combo.load();<\/script><script>true,"head",Jazzcat.combo.exec(\'http://cached/\');<\/script>\
+\n    </head>\
+\n    <body>\
+\n        <script src="//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D"><\/script><script>true,"body",Jazzcat.combo.exec(\'http://cached/\');<\/script>\
+\n        <script>false,"body",Jazzcat.combo.exec(\'http://uncached/\');<\/script>\
+\n    \
+\n</body></html>';
+                equal(html, expected, "Loader inserted successfully")
                 start();
             });
         })
