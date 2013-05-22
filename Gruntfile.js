@@ -129,8 +129,9 @@ module.exports = function(grunt) {
                     'http://localhost:3000/tests/mobify-library.html',
                     'http://localhost:3000/tests/capture.html',
                     'http://localhost:3000/tests/resizeImages.html',
+                    'http://localhost:3000/tests/jazzcat.html',
                 ],
-                concurrency: 2,
+                concurrency: 4,
                 tunneled: true,
                 detailedError: true,
                 browsers: [
