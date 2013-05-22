@@ -29,6 +29,8 @@ define(["utils", "capture"], function(Utils, Capture) {
 
     var localStorageKey = 'Mobify-Combo-Cache-v1.0';
 
+    var httpCacheOptions = {};
+
     /**
      * Reset the cache, optionally to `val`. Useful for testing.
      */
@@ -181,8 +183,18 @@ define(["utils", "capture"], function(Utils, Capture) {
         var cacheControl = headers['cache-control'];
         var now = Date.now();
         var date;
+        var overrideTime;
 
-        // If `max-age` and `date` are present, and no other no other cache
+        // If a cache override parameter is present, see if the age of the 
+        // response is less than the override, cacheOverrideTime is in minutes, 
+        // turn it off by setting it to false
+        if ((httpCacheOptions.overrideTime !== undefined) &&
+          (overrideTime = httpCacheOptions.overrideTime) &&
+          (date = Date.parse(headers.date))) {
+            return (now > (date + (overrideTime * 60 * 1000)));
+        }
+
+        // If `max-age` and `date` are present, and no other cache
         // directives exist, then we are stale if we are older.
         if (cacheControl && (date = Date.parse(headers.date))) {
             cacheControl = ccParse(cacheControl);
@@ -212,7 +224,8 @@ define(["utils", "capture"], function(Utils, Capture) {
         save: save,
         reset: reset,
         cache: cache,
-        utils: {isStale: isStale}
+        utils: {isStale: isStale},
+        options: httpCacheOptions
     };
 
     var absolutify = document.createElement('a');
@@ -271,6 +284,11 @@ define(["utils", "capture"], function(Utils, Capture) {
      * bootloader script is inserted by the overriden `Capture.enabled` function.
      */
     Jazzcat.combineScripts = function(scripts, options) {
+        if (options && options.cacheOverrideTime !== undefined) {
+            Utils.extend(httpCache.options,
+              {overrideTime: options.cacheOverrideTime});
+        }
+
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || Jazzcat.isIncompatibleBrowser()) {
             return scripts;
@@ -278,9 +296,9 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         var script;
         var url;
-        var i = 0
+        var i = 0;
 
-        options = Utils.extend(defaults, options || {});
+        options = Utils.extend({}, defaults, options || {});
 
         httpCache.load();
 

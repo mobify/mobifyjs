@@ -89,12 +89,67 @@
 
         // Time offsets in seconds.
         var TWO_WEEKS = 14 * 24 * 60 * 60;
+        var FOUR_WEEKS = 2 * TWO_WEEKS;
         var TEN_MINUTES = 600;
 
         // UTC dates.
         var UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString();
         var UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString();
         var UTC_NOW = (new Date()).toUTCString();
+        var UTC_BEGINNING_OF_TIME = (new Date(0)).toUTCString();
+
+        var resourceFixtures = {
+            'stale-expires': {
+                'headers': {
+                    'date': UTC_TWO_WEEKS_AGO,
+                    'expires': UTC_TWO_WEEKS_AGO
+                }
+            },
+            'stale-cache-control': {
+                'headers': {
+                    'date': UTC_TWO_WEEKS_AGO,
+                    'cache-control': 'public,max-age=' + TEN_MINUTES
+                }
+            },
+            'fresh-expires': {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}},
+            'fresh-cache-control': {
+                'headers': {
+                    'date': UTC_NOW,
+                    'cache-control': 'public,max-age=' + TEN_MINUTES
+                }
+            },
+            'old-fresh-cache-control': {
+                'headers': {
+                    'date': UTC_TWO_WEEKS_AGO,
+                    'cache-control': 'public,max-age=' + FOUR_WEEKS
+                }
+            },
+            'no-headers': {'headers': {}},
+            'undefined-headers': {},
+            'invalid-date': {
+                'headers': {
+                    'date': 'invalid',
+                    'cache-control': 'public,max-age=' + TEN_MINUTES
+                }
+            },
+            'invalid-expires': {'headers': {'expires': 'invalid'}},
+            'uncacheable': {
+                'headers': {
+                    'date': UTC_NOW,
+                    'cache-control': 'no-cache'
+                }
+            },
+            'new-no-cache-headers': {
+                'headers': {
+                    'date': UTC_NOW
+                }
+            },
+            'old-no-cache-headers': {
+                'headers': {
+                    'date': UTC_TWO_WEEKS_AGO
+                }
+            },
+        };
 
         // Too big for localStorage in Chrome, Webkit, and Firefox
         var LONG_STRING = Array(10000000).join('1');
@@ -235,7 +290,18 @@
                     equal(result, expected, "Loader inserted successfully")
                     start();
                 });
-            })
+            });
+
+            test('combineScripts - override cache time', function() {
+                var isStale = httpCache.utils.isStale;
+                
+                // override cache time to 10 minutes
+                Jazzcat.combineScripts([], {cacheOverrideTime: 10});
+                strictEqual(isStale(resourceFixtures['new-no-cache-headers']), false, 'fresh with no cache headers and cache time override');
+                // disable override
+                Jazzcat.combineScripts([], {cacheOverrideTime: false});
+                strictEqual(isStale(resourceFixtures['new-no-cache-headers']), true, 'stale with no cache headers and cache time override turned off');
+            });
 
             asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
                 var url = "http://127.0.0.1:3000/space invaders.js";
@@ -311,7 +377,6 @@
                 var $iframe = $('<iframe>').appendTo('#qunit-fixture');
                 var el = $iframe[0];
                 $(window).one("message", function(event) {
-                    debugger;
                     event = event.originalEvent;
                     if (event.source != el.contentWindow) return;
                     ok(event.data, 'document.write was overriden');
@@ -321,6 +386,56 @@
                 el.contentDocument.open();
                 el.contentDocument.write(html);
                 el.contentDocument.close();
+            });
+
+            test('httpCache.utils.isStale', 8, function() {
+                var isStale = httpCache.utils.isStale;
+
+
+                ok(isStale(resourceFixtures['stale-expires']));
+                ok(isStale(resourceFixtures['stale-cache-control']));
+                ok(!isStale(resourceFixtures['fresh-expires']));
+                ok(!isStale(resourceFixtures['fresh-cache-control']));
+                ok(isStale(resourceFixtures['no-headers']),
+                  'No cache headers is stale');
+                ok(isStale(resourceFixtures['undefined-headers']),
+                  'undefined cache headers is stale');
+                ok(isStale(resourceFixtures['invalid-date']),
+                  'Invalid date is stale');
+                ok(isStale(resourceFixtures['invalid-expires']),
+                  'Invalid expires is stale');
+            });
+
+            test('isStale with cacheOverride', function() {
+                var isStale = httpCache.utils.isStale;
+
+                // setup
+                Utils.extend(httpCache.options, {overrideTime: 10});
+
+                // should be fresh
+                ok(!isStale(resourceFixtures['new-no-cache-headers']),
+                  'fresh with no cache headers');
+                ok(!isStale(resourceFixtures['fresh-cache-control']),
+                  'fresh with new response');
+                ok(!isStale(resourceFixtures['uncacheable']),
+                  'fresh with otherwise uncacheable fresh response');
+
+                // should be stale
+                ok(isStale(resourceFixtures['old-no-cache-headers']),
+                  'stale old response');
+                ok(isStale(resourceFixtures['old-fresh-cache-control']),
+                  'stale old response with fresh cache-control');
+                ok(isStale(resourceFixtures['stale-expires']),
+                  'stale old response with expires');
+                ok(isStale(resourceFixtures['stale-cache-control']),
+                  'stale old response with cache control');
+                ok(isStale(resourceFixtures['undefined-headers']),
+                  'stale with no headers');
+                ok(isStale(resourceFixtures['invalid-expires']),
+                  'stale with no date header and invalid expires');
+
+                // tear down
+                delete httpCache.options['overrideTime']
             });
 
             test('httpCache.utils.isStale', 8, function() {
