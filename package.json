@@ -11,7 +11,8 @@
     "grunt-contrib-qunit": "~0.2.0",
     "grunt-contrib-connect": "~0.1.0",
     "grunt-saucelabs": "3.0.8",
-    "grunt-s3": "0.2.0-alpha"
+    "grunt-s3": "0.2.0-alpha",
+    "grunt-contrib-uglify": "~0.2.0"
   },
   "engine": ">= 0.10.1",
   "repository": {
