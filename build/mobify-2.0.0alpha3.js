@@ -1385,9 +1385,12 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             script.removeAttribute(options.attribute);
             absolutify.href = url;
             url = absolutify.href;
-            script.innerHTML = options.execCallback + "('" + url + "');";
-            script.setAttribute("data-cached", !!httpCache.get(url));
-            script.setAttribute("data-parent", doc.head.contains(script) ? "head" : "body");
+            script.innerHTML = !!httpCache.get(url) +
+                                ",\"" +
+                                (doc.head.contains(script) ? "head" : "body") +
+                                "\"," +
+                                options.execCallback +
+                                "('" + url + "');";
         }
 
         return scripts;
@@ -1506,12 +1509,12 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     Jazzcat.JSONURIencode = function(obj) {
         return encodeURIComponent(JSON.stringify(obj));
     };
-
+    
     // Regex generator used to match Jazzcat calls in an HTML string.
     // Generates regexp based on parent, which should either be head or body.
     var execReGenerator = function(parent) {
-        return new RegExp("<script[^>]+data-cached=['\"](true|false)['\"][^>]*data-parent=['\"]" +
-            parent + "['\"][^>]*>" +
+        return new RegExp("<script[^>]*?>(true|false),['\"]" +
+            parent + "['\"]," +
             defaults.execCallback.replace(/\./g, '\\.') +
             "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
     };
@@ -1524,6 +1527,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
         // Find the first Jazzcat call and gather all the uncached scripts.
         var execRe = execReGenerator(parent);
+
         while (match = execRe.exec(html)) {
             if (firstIndex == -1) firstIndex = match.index;
             if (match[1] === "false") uncached.push(match[2]);
