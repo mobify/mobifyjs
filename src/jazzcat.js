@@ -467,7 +467,12 @@ define(["utils", "capture"], function(Utils, Capture) {
     var oldEnable = Capture.enable;
     Capture.enable = function() {
         var html = oldEnable.apply(Capture, arguments);
-        // Insert seperate loaders for head and body
+        // Since bootloader jazzcat script must be placed before the first external script,
+        // two seperate bootloader scripts are inserted - one for scripts in the head,
+        // and one for scripts in the body. If there was only one jazzcat request for
+        // all the concatinated scripts in the document, it could cause every script to
+        // load in the head, which would block rendering. Therefore, we concatinate scripts
+        // in the head and body seperately.
         html = Jazzcat.insertLoaderIntoHTMLString(html, "head");
         html = Jazzcat.insertLoaderIntoHTMLString(html, "body");
         return html;
