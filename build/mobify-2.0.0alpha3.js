@@ -1510,8 +1510,10 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         return encodeURIComponent(JSON.stringify(obj));
     };
     
-    // Regex generator used to match Jazzcat calls in an HTML string.
-    // Generates regexp based on parent, which should either be head or body.
+    /**
+     * Regex generator used to match Jazzcat calls in an HTML string.
+     * Generates regexp based on parent, which should either be head or body.
+     */
     var execReGenerator = function(parent) {
         return new RegExp("<script[^>]*?>(true|false),['\"]" +
             parent + "['\"]," +
@@ -1519,6 +1521,10 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
     };
 
+    /**
+     * Inserts one Jazzcat loader script into the document, either for
+     * scripts in the body, or scripts in the head (specified by parent arg)
+     */
     Jazzcat.insertLoaderIntoHTMLString = function(html, parent) {
         var match;
         var bootstrap;
@@ -1550,6 +1556,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     var oldEnable = Capture.enable;
     Capture.enable = function() {
         var html = oldEnable.apply(Capture, arguments);
+        // Insert seperate loaders for head and body
         html = Jazzcat.insertLoaderIntoHTMLString(html, "head");
         html = Jazzcat.insertLoaderIntoHTMLString(html, "body");
         return html;
