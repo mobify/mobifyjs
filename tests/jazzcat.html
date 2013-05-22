@@ -108,8 +108,6 @@
                               .trim();
         };
 
-        var jazzcatNoop = Jazzcat.isIncompatibleBrowser();
-
         test('isIncompatibleBrowser', function() {
             // Unsupported browsers
             ok(Jazzcat.isIncompatibleBrowser("Opera/9.80 (X11; Linux x86_64; U; Ubuntu/10.10 (maverick); pl) Presto/2.7.62 Version/11.01") === true, "Opera 11");
@@ -126,55 +124,86 @@
             ok(Jazzcat.isIncompatibleBrowser("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:22.0) Gecko/20130328 Firefox/22.0") === false, "Firefox 22.0");
         });
 
-        asyncTest('combineScripts - Warm cache', 1, function() {
-            httpCache.reset({
-                'http://should.be/cached/push-b.js': {
-                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
-                    'status': 'ready',
-                    'url': 'http://should.be/cached/push-b.js',
-                    'body': 'window.a.push("b")',
-                    'text': true
-                },
-                'http://should.be/cached/push-d.js': {
-                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
-                    'status': 'ready',
-                    'url': 'http://should.be/cached/push-d.js',
-                    'body': 'window.a.push("d")',
-                    'text': true
-                }
+        if (Jazzcat.isIncompatibleBrowser()){
+
+            test('combineScripts - noop', function() {
+                var scripts = $($("#combineScripts-source").text()).filter("script").toArray();
+
+                var results = Jazzcat.combineScripts(scripts);
+
+                ok(!/Jazzcat/.test(results[0].innerHTML), "Jazzcat does not effect incompatible browsers");
             });
 
-            var scripts = $($("#combineScripts-source").text()).filter("script").toArray();
+        } else {
 
-            var results = Jazzcat.combineScripts(scripts);
+            asyncTest('combineScripts - Warm cache', 1, function() {
+                httpCache.reset({
+                    'http://should.be/cached/push-b.js': {
+                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                        'status': 'ready',
+                        'url': 'http://should.be/cached/push-b.js',
+                        'body': 'window.a.push("b")',
+                        'text': true
+                    },
+                    'http://should.be/cached/push-d.js': {
+                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                        'status': 'ready',
+                        'url': 'http://should.be/cached/push-d.js',
+                        'body': 'window.a.push("d")',
+                        'text': true
+                    }
+                });
 
-            // If the script wasn't rewritten by Jazzcat, and Jazzcat 
-            // shouldn't be run on the current browser, pass test
-            if (!/Jazzcat/.test(results[1].innerHTML) && jazzcatNoop) {
-                ok(true, "Jazzcat not supported on this browser.");
-                start();
-                return;
-            }
+                var scripts = $($("#combineScripts-source").text()).filter("script").toArray();
 
-            httpCache.save(function(err) {
-                if (err) throw err;
+                var results = Jazzcat.combineScripts(scripts);
 
-                // Setup "Capturing" like execution phase.
+                httpCache.save(function(err) {
+                    if (err) throw err;
+
+                    // Setup "Capturing" like execution phase.
+                    var html = '';
+                    html += "<textarea>" + results.map(function(el) {
+                        return el.outerHTML + "\n";
+                    }).join("") + "</textarea>";
+                    html += $('#combineScripts-loader').text();
+                    html = '<html><body>' + html + '</body></html>';
+
+                    // `contentWindow` is attached once the iframe is in the document.
+                    var $iframe = $('<iframe>').appendTo('#qunit-fixture');
+                    var el = $iframe[0];
+
+                    $(window).one("message", function(event) {
+                        event = event.originalEvent;
+                        if (event.source != el.contentWindow) return;
+                        deepEqual(event.data, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
+                        start();
+                    });
+
+                    el.contentDocument.open();
+                    el.contentDocument.write(html);
+                    el.contentDocument.close();
+                });
+            });
+
+            asyncTest('combineScripts - Cold cache', 1, function() {
+                var scripts = $($("#combineScripts-coldcache-source").text()).filter("script").toArray();
+                var results = Jazzcat.combineScripts(scripts);
+
                 var html = '';
                 html += "<textarea>" + results.map(function(el) {
-                    return el.outerHTML + "\n";
-                }).join("") + "</textarea>";
-                html += $('#combineScripts-loader').text();
+                        return el.outerHTML + "\n";
+                    }).join("") + "</textarea>";
+                html += $('#combineScripts-coldcache-loader').text();
                 html = '<html><body>' + html + '</body></html>';
 
-                // `contentWindow` is attached once the iframe is in the document.
                 var $iframe = $('<iframe>').appendTo('#qunit-fixture');
                 var el = $iframe[0];
 
                 $(window).one("message", function(event) {
                     event = event.originalEvent;
                     if (event.source != el.contentWindow) return;
-                    deepEqual(event.data, ['a', 'b', 'c', 'd'], 'a = [a, b, c , d]');
+                    ok(event.data, 'jQuery was loaded');
                     start();
                 });
 
@@ -182,100 +211,53 @@
                 el.contentDocument.write(html);
                 el.contentDocument.close();
             });
-        });
 
-        asyncTest('combineScripts - Cold cache', 1, function() {
-            var scripts = $($("#combineScripts-coldcache-source").text()).filter("script").toArray();
-            var results = Jazzcat.combineScripts(scripts);
-            
-            // If the script wasn't rewritten by Jazzcat, and Jazzcat 
-            // shouldn't be run on the current browser, pass test
-            if (!/Jazzcat/.test(results[0].innerHTML) && jazzcatNoop) {
-                ok(true, "Jazzcat not supported on this browser.");
-                start();
-                return;
-            }
+            asyncTest('insertLoaderIntoHTMLString', 1, function() {
+                httpCache.reset({
+                    'http://cached/': {
+                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                        'status': 'ready',
+                        'body': 'cached',
+                        'text': true
+                    }
+                });
 
-            var html = '';
-            html += "<textarea>" + results.map(function(el) {
-                    return el.outerHTML + "\n";
-                }).join("") + "</textarea>";
-            html += $('#combineScripts-coldcache-loader').text();
-            html = '<html><body>' + html + '</body></html>';
+                httpCache.save(function() {
+                    var scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
+                    var results = Jazzcat.combineScripts(scripts);
 
-            var $iframe = $('<iframe>').appendTo('#qunit-fixture');
-            var el = $iframe[0];
+                    var html = scripts.reduce(function(html, script) {
+                        return html + Utils.outerHTML(script);
+                    }, '')
 
-            $(window).one("message", function(event) {
-                event = event.originalEvent;
-                if (event.source != el.contentWindow) return;
-                ok(event.data, 'jQuery was loaded');
-                start();
-            });
-
-            el.contentDocument.open();
-            el.contentDocument.write(html);
-            el.contentDocument.close();
-        });
-
-        asyncTest('insertLoaderIntoHTMLString', 1, function() {
-            httpCache.reset({
-                'http://cached/': {
-                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
-                    'status': 'ready',
-                    'body': 'cached',
-                    'text': true
-                }
-            });
-
-            httpCache.save(function() {
-                var scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
-                var results = Jazzcat.combineScripts(scripts);
-
-                // If the script wasn't rewritten by Jazzcat, and Jazzcat 
-                // shouldn't be run on the current browser, pass test
-                if (!/Jazzcat/.test(results[0].innerHTML) && jazzcatNoop) {
-                    ok(true, "Jazzcat not supported on this browser.");
+                    var result = Jazzcat.insertLoaderIntoHTMLString(html);
+                    var expected = '<script src="//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D"><\/script><script>true,Jazzcat.combo.exec(\'http://cached/\');<\/script><script>false,Jazzcat.combo.exec(\'http://uncached/\');<\/script>';
+                    equal(result, expected, "Loader inserted successfully")
                     start();
-                    return;
-                }
+                });
+            })
 
-                var html = scripts.reduce(function(html, script) {
-                    return html + Utils.outerHTML(script);
-                }, '')
+            asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
+                var url = "http://127.0.0.1:3000/space invaders.js";
+                var resources = [{
+                    "url": url,
+                    "headers": {"expires": UTC_TWO_WEEKS_FROM_NOW},
+                    "status": "ready",
+                    "statusCode": 200,
+                    "text": true,
+                    "body": "console.log('Pew!');"
+                }];
 
-                var result = Jazzcat.insertLoaderIntoHTMLString(html);
-                var expected = '<script src="//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D"><\/script><script>true,Jazzcat.combo.exec(\'http://cached/\');<\/script><script>false,Jazzcat.combo.exec(\'http://uncached/\');<\/script>';
-                equal(result, expected, "Loader inserted successfully")
-                start();
+                httpCache.reset();
+                httpCache.save(function(err) {
+                    if (err) throw err;
+
+                    Jazzcat.combo.load(resources);
+                    ok(httpCache.get(encodeURI(url)) != undefined, "Missing resource.");
+                    start();
+                });
             });
-        })
 
-        asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
-            var url = "http://127.0.0.1:3000/space invaders.js";
-            var resources = [{
-                "url": url,
-                "headers": {"expires": UTC_TWO_WEEKS_FROM_NOW},
-                "status": "ready",
-                "statusCode": 200,
-                "text": true,
-                "body": "console.log('Pew!');"
-            }];
-
-            httpCache.reset();
-            httpCache.save(function(err) {
-                if (err) throw err;
-
-                Jazzcat.combo.load(resources);
-                ok(httpCache.get(encodeURI(url)) != undefined, "Missing resource.");
-                start();
-            });
-        });
-
-        // Opt out of these test for Opera (which isn't compatible with
-        // jazzcat anyways) because the localstorage warning won't 
-        // dismiss on Saucelabs
-        if (!jazzcatNoop) {
             asyncTest('httpCache - Eviction on an unused resource', 2, function() {
                 httpCache.reset();
                 httpCache.save();
@@ -298,17 +280,6 @@
             });
 
             asyncTest('httpCache - Least recently used eviction', 2, function() {
-                // Opt out of this test for Opera (which isn't compatible with
-                // jazzcat anyways) because the localstorage warning won't 
-                // dismiss on Saucelabs
-                if (jazzcatNoop) {
-                    // Must do two asserts due to number of tests
-                    // being specified in asyncTest
-                    ok(true, "Jazzcat not supported on this browser.");
-                    ok(true, "Jazzcat not supported on this browser.");
-                    start();
-                    return;
-                }
 
                 httpCache.reset();
                 httpCache.save();
@@ -352,109 +323,109 @@
                 el.contentDocument.close();
             });
 
-        }
+            test('httpCache.utils.isStale', 8, function() {
+                var isStale = httpCache.utils.isStale;
+                var resources = {
+                    'stale-expires': {'headers': {'expires': UTC_TWO_WEEKS_AGO}},
+                    'stale-cache-control': {
+                        'headers': {
+                            'date': UTC_TWO_WEEKS_AGO,
+                            'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    },
+                    'fresh-expires': {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}},
+                    'fresh-cache-control': {
+                        'headers': {
+                            'date': UTC_NOW,
+                            'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    },
+                    'no-headers': {'headers': {}},
+                    'undefined-headers': {},
+                    'invalid-date': {
+                        'headers': {
+                            'date': 'invalid',
+                            'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    },
+                    'invalid-expires': {'headers': {'expires': 'invalid'}}
+                };
 
-        test('httpCache.utils.isStale', 8, function() {
-            var isStale = httpCache.utils.isStale;
-            var resources = {
-                'stale-expires': {'headers': {'expires': UTC_TWO_WEEKS_AGO}},
-                'stale-cache-control': {
-                    'headers': {
-                        'date': UTC_TWO_WEEKS_AGO,
-                        'cache-control': 'public,max-age=' + TEN_MINUTES
-                    }
-                },
-                'fresh-expires': {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}},
-                'fresh-cache-control': {
-                    'headers': {
-                        'date': UTC_NOW,
-                        'cache-control': 'public,max-age=' + TEN_MINUTES
-                    }
-                },
-                'no-headers': {'headers': {}},
-                'undefined-headers': {},
-                'invalid-date': {
-                    'headers': {
-                        'date': 'invalid',
-                        'cache-control': 'public,max-age=' + TEN_MINUTES
-                    }
-                },
-                'invalid-expires': {'headers': {'expires': 'invalid'}}
-            };
+                ok(isStale(resources['stale-expires']));
+                ok(isStale(resources['stale-cache-control']));
+                ok(!isStale(resources['fresh-expires']));
+                ok(!isStale(resources['fresh-cache-control']));
+                ok(isStale(resources['no-headers']), 'No cache headers is stale');
+                ok(isStale(resources['undefined-headers']), 'undefined cache headers is stale');
+                ok(isStale(resources['invalid-date']), 'Invalid date is stale');
+                ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
+            });
 
-            ok(isStale(resources['stale-expires']));
-            ok(isStale(resources['stale-cache-control']));
-            ok(!isStale(resources['fresh-expires']));
-            ok(!isStale(resources['fresh-cache-control']));
-            ok(isStale(resources['no-headers']), 'No cache headers is stale');
-            ok(isStale(resources['undefined-headers']), 'undefined cache headers is stale');
-            ok(isStale(resources['invalid-date']), 'Invalid date is stale');
-            ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
-        });
-
-        test('getUrl - generates urls with project parameter', function() {
-            // No projectName set
-            var urls = [
-                "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js",
-                "//ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.min.js"
-            ];
-            var callback = "foo";
-            var expected = "//jazzcat.mobify.com/jsonp/foo/%5B%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fangularjs%2F1.0.5%2Fangular.min.js%22%2C%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fjquery%2F1.9.1%2Fjquery.min.js%22%5D";
-
-            equal(Jazzcat.getURL(urls, callback), expected);
-
-            // projectName qux
-            try {
-                Jazzcat.combineScripts.defaults.projectName = "qux";
-                callback = "bar";
-                expected = "//jazzcat.mobify.com/project-qux/jsonp/bar/%5B%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fangularjs%2F1.0.5%2Fangular.min.js%22%2C%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fjquery%2F1.9.1%2Fjquery.min.js%22%5D";
+            test('getUrl - generates urls with project parameter', function() {
+                // No projectName set
+                var urls = [
+                    "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js",
+                    "//ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.min.js"
+                ];
+                var callback = "foo";
+                var expected = "//jazzcat.mobify.com/jsonp/foo/%5B%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fangularjs%2F1.0.5%2Fangular.min.js%22%2C%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fjquery%2F1.9.1%2Fjquery.min.js%22%5D";
 
                 equal(Jazzcat.getURL(urls, callback), expected);
-            // Reset projectName
-            } finally {
-                Jazzcat.combineScripts.defaults.projectName = ""
-            }
-        });
 
-        test('Jazzcat.combo.exec - writes scripts as expected', 3, function() {
-            httpCache.reset({
-                'cached': {
-                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
-                    'status': 'ready',
-                    'url': 'cached',
-                    'body': 'cached',
-                    'text': true
-                },
-                'cached-with-scripts': {
-                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
-                    'status': 'ready',
-                    'url': 'cached-with-scripts',
-                    'body': getText("#test-jazzcat-combo-exec"),
-                    'text': true
+                // projectName qux
+                try {
+                    Jazzcat.combineScripts.defaults.projectName = "qux";
+                    callback = "bar";
+                    expected = "//jazzcat.mobify.com/project-qux/jsonp/bar/%5B%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fangularjs%2F1.0.5%2Fangular.min.js%22%2C%22%2F%2Fajax.googleapis.com%2Fajax%2Flibs%2Fjquery%2F1.9.1%2Fjquery.min.js%22%5D";
+
+                    equal(Jazzcat.getURL(urls, callback), expected);
+                // Reset projectName
+                } finally {
+                    Jazzcat.combineScripts.defaults.projectName = ""
                 }
             });
 
+            test('Jazzcat.combo.exec - writes scripts as expected', 3, function() {
+                httpCache.reset({
+                    'cached': {
+                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                        'status': 'ready',
+                        'url': 'cached',
+                        'body': 'cached',
+                        'text': true
+                    },
+                    'cached-with-scripts': {
+                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                        'status': 'ready',
+                        'url': 'cached-with-scripts',
+                        'body': getText("#test-jazzcat-combo-exec"),
+                        'text': true
+                    }
+                });
 
-            var origWrite = Jazzcat.write
-            var result;
 
-            Jazzcat.write = function(s) {
-                result = s;
-            }
+                var origWrite = Jazzcat.write
+                var result;
 
-            try {
-                Jazzcat.combo.exec('uncached');
-                equal(result, '<script src="uncached"><\/script>');
+                Jazzcat.write = function(s) {
+                    result = s;
+                }
 
-                Jazzcat.combo.exec('cached');
-                equal(result, '<script data-orig-src="cached">cached<\/script>');
+                try {
+                    Jazzcat.combo.exec('uncached');
+                    equal(result, '<script src="uncached"><\/script>');
 
-                Jazzcat.combo.exec('cached-with-scripts');
-                equal(result, '<script data-orig-src=\"cached-with-scripts\">/*<\/scr\\ipt>*/ \"<\/scr\\ipt>\" \/<\/scr\\ipt>\/<\/script>');
-            } finally {
-                Jazzcat.write = origWrite;
-            }
-        });
+                    Jazzcat.combo.exec('cached');
+                    equal(result, '<script data-orig-src="cached">cached<\/script>');
+
+                    Jazzcat.combo.exec('cached-with-scripts');
+                    equal(result, '<script data-orig-src=\"cached-with-scripts\">/*<\/scr\\ipt>*/ \"<\/scr\\ipt>\" \/<\/scr\\ipt>\/<\/script>');
+                } finally {
+                    Jazzcat.write = origWrite;
+                }
+            });
+
+        }
     });
 </script>
 </body>
