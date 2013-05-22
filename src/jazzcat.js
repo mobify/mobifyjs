@@ -63,6 +63,11 @@ define(["utils", "capture"], function(Utils, Capture) {
     var load = function() {
         var data = localStorage.getItem(localStorageKey)
         var key;
+        var staleOptions;
+
+        if (httpCacheOptions.overrideTimestaleOptions) {
+            staleOptions = {overrideTime: httpCacheOptions.overrideTime};
+        }
 
         if (!data) {
             return;
@@ -75,7 +80,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         }
 
         for (key in data) {
-            if (data.hasOwnProperty(key) && !isStale(data[key])) {
+            if (data.hasOwnProperty(key) && !isStale(data[key], staleOptions)) {
                 set(key, data[key]);
             }
         }
@@ -178,7 +183,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      * Returns `true` if `resource` is stale by HTTP/1.1 caching rules.
      * Treats invalid headers as stale.
      */
-    var isStale = function(resource) {
+    var isStale = function(resource, options) {
         var headers = resource.headers || {};
         var cacheControl = headers['cache-control'];
         var now = Date.now();
@@ -188,8 +193,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         // If a cache override parameter is present, see if the age of the 
         // response is less than the override, cacheOverrideTime is in minutes, 
         // turn it off by setting it to false
-        if ((httpCacheOptions.overrideTime !== undefined) &&
-          (overrideTime = httpCacheOptions.overrideTime) &&
+        if (options && (overrideTime = options.overrideTime) &&
           (date = Date.parse(headers.date))) {
             return (now > (date + (overrideTime * 60 * 1000)));
         }
