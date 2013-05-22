@@ -283,7 +283,7 @@ define(["utils", "capture"], function(Utils, Capture) {
             url = absolutify.href;
             script.innerHTML = !!httpCache.get(url) +
                                 ",\"" +
-                                (doc.head.contains(script) ? "head" : "body") +
+                                (script.parentNode === doc.head ? "head" : "body") +
                                 "\"," +
                                 options.execCallback +
                                 "('" + url + "');";
