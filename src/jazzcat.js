@@ -186,8 +186,9 @@ define(["utils", "capture"], function(Utils, Capture) {
         var overrideTime;
 
         // If a cache override parameter is present, see if the age of the 
-        // response is less than the override, cacheOverrideTime is in minutes
-        if ((httpCacheOptions.overrideTime !== undefined) && 
+        // response is less than the override, cacheOverrideTime is in minutes, 
+        // turn it off by setting it to false
+        if ((httpCacheOptions.overrideTime !== undefined) &&
           (overrideTime = httpCacheOptions.overrideTime) &&
           (date = Date.parse(headers.date))) {
             return (now > (date + (overrideTime * 60 * 1000)));
@@ -283,6 +284,11 @@ define(["utils", "capture"], function(Utils, Capture) {
      * bootloader script is inserted by the overriden `Capture.enabled` function.
      */
     Jazzcat.combineScripts = function(scripts, options) {
+        if (options && options.cacheOverrideTime !== undefined) {
+            Utils.extend(httpCache.options,
+              {overrideTime: options.cacheOverrideTime});
+        }
+
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || Jazzcat.isIncompatibleBrowser()) {
             return scripts;
@@ -291,11 +297,6 @@ define(["utils", "capture"], function(Utils, Capture) {
         var script;
         var url;
         var i = 0;
-
-        if (options && options.cacheOverrideTime) {
-            Utils.extend(httpCache.options,
-              {overrideTime: options.cacheOverrideTime});
-        }
 
         options = Utils.extend({}, defaults, options || {});
 

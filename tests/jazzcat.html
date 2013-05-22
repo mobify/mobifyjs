@@ -290,7 +290,18 @@
                     equal(result, expected, "Loader inserted successfully")
                     start();
                 });
-            })
+            });
+
+            test('combineScripts - override cache time', function() {
+                var isStale = httpCache.utils.isStale;
+                
+                // override cache time to 10 minutes
+                Jazzcat.combineScripts([], {cacheOverrideTime: 10});
+                strictEqual(isStale(resourceFixtures['new-no-cache-headers']), false, 'fresh with no cache headers and cache time override');
+                // disable override
+                Jazzcat.combineScripts([], {cacheOverrideTime: false});
+                strictEqual(isStale(resourceFixtures['new-no-cache-headers']), true, 'stale with no cache headers and cache time override turned off');
+            });
 
             asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
                 var url = "http://127.0.0.1:3000/space invaders.js";
