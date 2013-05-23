@@ -1540,27 +1540,38 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * Inserts one Jazzcat loader script into the document, either for
      * scripts in the body, or scripts in the head (specified by parent arg)
      */
-    Jazzcat.insertLoaderIntoHTMLString = function(html, parent) {
-        var match;
-        var bootstrap;
-        var firstIndex = -1;
-        var uncached = [];
+    Jazzcat.insertLoadersIntoHTMLString = function(html) {
+        var insert = function(html, parent) {
+            var match;
+            var bootstrap;
+            var firstIndex = -1;
+            var uncached = [];
 
-        // Find the first Jazzcat call and gather all the uncached scripts.
-        var execRe = execReGenerator(parent);
+            // Find the first Jazzcat call and gather all the uncached scripts.
+            var execRe = execReGenerator(parent);
 
-        while (match = execRe.exec(html)) {
-            if (firstIndex == -1) firstIndex = match.index;
-            if (match[1] === "false") uncached.push(match[2]);
+            while (match = execRe.exec(html)) {
+                if (firstIndex == -1) firstIndex = match.index;
+                if (match[1] === "false") uncached.push(match[2]);
+            };
+
+            if (firstIndex == -1) {
+                return html;
+            }
+
+            bootstrap = Jazzcat.getLoaderScript(uncached, defaults.loadCallback);
+
+            return html.substr(0, firstIndex) + Utils.outerHTML(bootstrap) + html.substr(firstIndex);
         };
-
-        if (firstIndex == -1) {
-            return html;
-        }
-
-        bootstrap = Jazzcat.getLoaderScript(uncached, defaults.loadCallback);
-
-        return html.substr(0, firstIndex) + Utils.outerHTML(bootstrap) + html.substr(firstIndex);
+        // Since bootloader jazzcat script must be placed before the first external script,
+        // two seperate bootloader scripts are inserted - one for scripts in the head,
+        // and one for scripts in the body. If there was only one jazzcat request for
+        // all the concatinated scripts in the document, it could cause every script to
+        // load in the head, which would block rendering. Therefore, we concatinate scripts
+        // in the head and body seperately.
+        html = insert(html, "head");
+        html = insert(html, "body");
+        return html;
     };
 
 
@@ -1571,9 +1582,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     var oldEnable = Capture.enable;
     Capture.enable = function() {
         var html = oldEnable.apply(Capture, arguments);
-        // Insert seperate loaders for head and body
-        html = Jazzcat.insertLoaderIntoHTMLString(html, "head");
-        html = Jazzcat.insertLoaderIntoHTMLString(html, "body");
+        html = Jazzcat.insertLoadersIntoHTMLString(html);
         return html;
     };
 
