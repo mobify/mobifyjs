@@ -1500,12 +1500,16 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * Returns a script suitable for loading `urls` from Jazzcat, calling the
      * function `jsonpCallback` on complete.
      */
-    Jazzcat.getLoaderScript = function(urls, jsonpCallback) {
+    Jazzcat.getLoaderScript = function(urls, jsonpCallback, totalInserted) {
         var bootstrap = document.createElement('script');
         if (urls.length) {
             bootstrap.src = Jazzcat.getURL(urls, jsonpCallback);
         } else {
-            bootstrap.innerHTML = jsonpCallback + '();';
+            if (totalInserted === 0) {
+                bootstrap.innerHTML = jsonpCallback + '();';
+            } else {
+                return ''
+            }
         }
         return bootstrap;
     };
@@ -1541,6 +1545,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * scripts in the body, or scripts in the head (specified by parent arg)
      */
     Jazzcat.insertLoadersIntoHTMLString = function(html) {
+        var totalInserted = 0;
+
         var insert = function(html, parent) {
             var match;
             var bootstrap;
@@ -1559,9 +1565,12 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 return html;
             }
 
-            bootstrap = Jazzcat.getLoaderScript(uncached, defaults.loadCallback);
+            bootstrap = Jazzcat.getLoaderScript(uncached, defaults.loadCallback, totalInserted);
+            totalInserted++;
 
-            return html.substr(0, firstIndex) + Utils.outerHTML(bootstrap) + html.substr(firstIndex);
+            var bootstrapString = (bootstrap.nodeType ? Utils.outerHTML(bootstrap) : bootstrap)
+
+            return html.substr(0, firstIndex) + bootstrapString + html.substr(firstIndex);
         };
         // Since bootloader jazzcat script must be placed before the first external script,
         // two seperate bootloader scripts are inserted - one for scripts in the head,

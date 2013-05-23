@@ -214,7 +214,7 @@
                 el.contentDocument.close();
             });
 
-            asyncTest('insertLoaderIntoHTMLString', 4, function() {
+            asyncTest('insertLoaderIntoHTMLString', 5, function() {
                 httpCache.reset({
                     'http://cached/': {
                         'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
@@ -273,6 +273,14 @@
                     expected = "<html><head><title></title><script>Jazzcat.combo.load();<\/script><script>true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script>true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script><script>false,\"body\",Jazzcat.combo.exec('http://uncached/');<\/script></body></html>";
 
                     equal(html, expected, "Both head and body, scripts not all cached");
+
+                    var html = getHTMLWithLoader(function(){
+                        doc.body.appendChild(cachedBody);
+                        doc.head.appendChild(cachedHead);
+                    });
+                    expected = "<html><head><title></title><script>Jazzcat.combo.load();<\/script><script>true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body><script>true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script></body></html>";
+
+                    equal(html, expected, "Both head and body, both cached");
 
 
                     var html = getHTMLWithLoader(function(){
