@@ -250,14 +250,14 @@
                         return html;
                     }
 
-                    var html = resetDocument(function(){
+                    var html = getHTMLWithLoader(function(){
                         doc.body.appendChild(cachedBody);
                     });
                     var expected = "<html><head><title></title></head><body><script>Jazzcat.combo.load();<\/script><script>true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script></body></html>";
                     equal(html, expected, "Only in body, script cached");
 
 
-                    var html = resetDocument(function(){
+                    var html = getHTMLWithLoader(function(){
                         doc.body.appendChild(cachedBody);
                         doc.body.appendChild(uncachedBody);
                     })
@@ -265,7 +265,7 @@
                     equal(html, expected, "Only in body, scripts not all cached");
 
 
-                    var html = resetDocument(function(){
+                    var html = getHTMLWithLoader(function(){
                         doc.body.appendChild(cachedBody);
                         doc.body.appendChild(uncachedBody);
                         doc.head.appendChild(cachedHead);
@@ -275,7 +275,7 @@
                     equal(html, expected, "Both head and body, scripts not all cached");
 
 
-                    var html = resetDocument(function(){
+                    var html = getHTMLWithLoader(function(){
                         doc.head.appendChild(uncachedHead);
                         doc.head.appendChild(cachedHead);
                     });
