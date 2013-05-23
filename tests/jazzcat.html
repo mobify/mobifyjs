@@ -229,8 +229,10 @@
                     var doc, cachedHead, cachedBody, uncachedHead, uncachedBody;
 
 
-                    // Start with a fresh slate for each test run
-                    function resetDocument(appendFunc) {
+                    // Returns HTML suitable for use with `insertLoaderIntoHTMLString`.
+                    // `insertLoaderIntoHTMLString` operates on the HTML string
+                    // output of a document which has been run through `combineScripts`.
+                    function getHTMLWithLoader(appendFunc) {
                         var scripts, combine, results, html, expected;
                         // Create new document every time because
                         // doc.body.innerHTML breaks on iOS 4.3
