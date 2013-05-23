@@ -226,67 +226,64 @@
 
 
                 httpCache.save(function() {
-                    var doc, cachedHead, cachedBody, uncachedHead, uncachedBody;
-
-
                     // Returns HTML suitable for use with `insertLoaderIntoHTMLString`.
                     // `insertLoaderIntoHTMLString` operates on the HTML string
                     // output of a document which has been run through `combineScripts`.
-                    function getHTMLWithLoader(appendFunc) {
-                        var scripts, combine, results, html, expected;
-                        // Create new document every time because
-                        // doc.body.innerHTML breaks on iOS 4.3
+                    function generateScripts(appendFunc) {
+                        var scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
+
+                        return { 
+                            cachedHead: scripts[0],
+                            uncachedHead: scripts[1],
+                            cachedBody: scripts[2],
+                            uncachedBody: scripts[3]
+                        }
+                    };
+
+                    function getHTMLWithLoader(headScripts, bodyScripts) {
+                        var doc, combine, results, html;
                         doc = document.implementation.createHTMLDocument("");
-                        scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
-                        cachedHead = scripts[0];
-                        uncachedHead = scripts[1];
-                        cachedBody = scripts[2];
-                        uncachedBody = scripts[3]; 
-                        appendFunc();
+                        headScripts.forEach(function(el){
+                            doc.head.appendChild(el);
+                        });
+                        bodyScripts.forEach(function(el){
+                            doc.body.appendChild(el);
+                        });
                         combine = doc.getElementsByTagName("script");
                         results = Jazzcat.combineScripts(combine, doc);
                         html = Utils.outerHTML(doc.documentElement);
                         html = Jazzcat.insertLoadersIntoHTMLString(html);
                         return html;
-                    }
+                    };
 
-                    var html = getHTMLWithLoader(function(){
-                        doc.body.appendChild(cachedBody);
-                    });
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([],
+                                                 [scripts.cachedBody]);
                     var expected = "<html><head><title></title></head><body><script>Jazzcat.combo.load();<\/script><script>true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script></body></html>";
                     equal(html, expected, "Only in body, script cached");
 
-
-                    var html = getHTMLWithLoader(function(){
-                        doc.body.appendChild(cachedBody);
-                        doc.body.appendChild(uncachedBody);
-                    })
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([], [scripts.cachedBody, scripts.uncachedBody]);
                     expected = "<html><head><title></title></head><body><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script>true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script><script>false,\"body\",Jazzcat.combo.exec('http://uncached/');<\/script></body></html>";
                     equal(html, expected, "Only in body, scripts not all cached");
 
-
-                    var html = getHTMLWithLoader(function(){
-                        doc.body.appendChild(cachedBody);
-                        doc.body.appendChild(uncachedBody);
-                        doc.head.appendChild(cachedHead);
-                    });
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([scripts.cachedHead],
+                                                 [scripts.cachedBody, scripts.uncachedBody]);
                     expected = "<html><head><title></title><script>Jazzcat.combo.load();<\/script><script>true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script>true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script><script>false,\"body\",Jazzcat.combo.exec('http://uncached/');<\/script></body></html>";
 
                     equal(html, expected, "Both head and body, scripts not all cached");
 
-                    var html = getHTMLWithLoader(function(){
-                        doc.body.appendChild(cachedBody);
-                        doc.head.appendChild(cachedHead);
-                    });
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([scripts.cachedHead],
+                                                 [scripts.cachedBody]);
                     expected = "<html><head><title></title><script>Jazzcat.combo.load();<\/script><script>true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body><script>true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script></body></html>";
 
                     equal(html, expected, "Both head and body, both cached");
 
-
-                    var html = getHTMLWithLoader(function(){
-                        doc.head.appendChild(uncachedHead);
-                        doc.head.appendChild(cachedHead);
-                    });
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([scripts.uncachedHead, scripts.cachedHead],
+                                                 []);
                     expected = "<html><head><title></title><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script>false,\"head\",Jazzcat.combo.exec('http://uncached/');<\/script><script>true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body></body></html>";
                     equal(html, expected, "Only in head, scripts not all cached");
 
