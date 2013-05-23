@@ -229,7 +229,7 @@
                     // Returns HTML suitable for use with `insertLoaderIntoHTMLString`.
                     // `insertLoaderIntoHTMLString` operates on the HTML string
                     // output of a document which has been run through `combineScripts`.
-                    function generateScripts(appendFunc) {
+                    function generateScripts() {
                         var scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
 
                         return { 
