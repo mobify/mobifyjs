@@ -1079,6 +1079,10 @@ ResizeImages.resize = function(imgs, options) {
     opts.maxWidth = Math.ceil(width);
     opts.maxHeight = Math.ceil(height);
 
+    if (!opts.format && opts.webp) {
+        opts.format = "webp";
+    }
+
     var attr;
     for(var i=0; i<imgs.length; i++) {
         var img = imgs[i];
@@ -1096,7 +1100,19 @@ ResizeImages.resize = function(imgs, options) {
 var defaults = {
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
       attribute: "x-src",
+      webp: false,
 };
+
+// webp feature detect
+// https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
+(function(){
+    var image = new Image();
+    image.onload = function() {
+        defaults.webp = (image.width == 4);
+    };
+    image.src = 'data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAAAQAgCdASoEAAQAAAcIhYWIhYSIgIIADA1gAAUAAAEAAAEAAP7%2F2fIAAAAA';
+
+})();
 
 return ResizeImages;
 
