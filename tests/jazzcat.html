@@ -226,9 +226,6 @@
 
 
                 httpCache.save(function() {
-                    // Returns HTML suitable for use with `insertLoaderIntoHTMLString`.
-                    // `insertLoaderIntoHTMLString` operates on the HTML string
-                    // output of a document which has been run through `combineScripts`.
                     function generateScripts() {
                         var scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
 
@@ -240,6 +237,9 @@
                         }
                     };
 
+                    // Generates a html string that has loaders inserted into
+                    // the correct places, based on the scripts passed into
+                    // the arguments, which are mutated by combineScripts.
                     function getHTMLWithLoader(headScripts, bodyScripts) {
                         var doc, combine, results, html;
                         doc = document.implementation.createHTMLDocument("");
