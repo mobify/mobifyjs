@@ -201,7 +201,7 @@
                 ok(isStale(resourceFixtures['invalid-expires']), 'Invalid expires is stale');
             });
 
-            test('isStale with cacheOverride', function() {
+            test('httpCache.isStale with cacheOverride', function() {
                 var isStale = httpCache.utils.isStale;
                 var staleOptions = {overrideTime: 10};
 
