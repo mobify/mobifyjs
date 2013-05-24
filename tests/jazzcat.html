@@ -18,8 +18,11 @@
 <div id="qunit-fixture"></div>
 
 <textarea id="insertLoaderIntoHTMLString">
-    <script x-src="http://cached/"></script>
-    <script x-src="http://uncached/"></script>
+        <script x-src="http://cached/" class="combine"></script>
+        <script x-src="http://uncached/" class="combine"></script>
+        <script x-src="http://cached/" class="combine"></script>
+        <script x-src="http://uncached/" class="combine"></script>
+        <script x-src="http://excluded/"></script>
 </textarea>
 
 <!-- Fixtures for ensuring `combineScripts` executes scripts in the right order. -->
@@ -129,7 +132,7 @@
             test('combineScripts - noop', function() {
                 var scripts = $($("#combineScripts-source").text()).filter("script").toArray();
 
-                var results = Jazzcat.combineScripts(scripts);
+                var results = Jazzcat.combineScripts(scripts, document);
 
                 ok(!/Jazzcat/.test(results[0].innerHTML), "Jazzcat does not affect incompatible browsers");
             });
@@ -156,7 +159,7 @@
 
                 var scripts = $($("#combineScripts-source").text()).filter("script").toArray();
 
-                var results = Jazzcat.combineScripts(scripts);
+                var results = Jazzcat.combineScripts(scripts, document);
 
                 httpCache.save(function(err) {
                     if (err) throw err;
@@ -188,7 +191,7 @@
 
             asyncTest('combineScripts - Cold cache', 1, function() {
                 var scripts = $($("#combineScripts-coldcache-source").text()).filter("script").toArray();
-                var results = Jazzcat.combineScripts(scripts);
+                var results = Jazzcat.combineScripts(scripts, document);
 
                 var html = '';
                 html += "<textarea>" + results.map(function(el) {
@@ -212,7 +215,7 @@
                 el.contentDocument.close();
             });
 
-            asyncTest('insertLoaderIntoHTMLString', 1, function() {
+            asyncTest('insertLoaderIntoHTMLString', 6, function() {
                 httpCache.reset({
                     'http://cached/': {
                         'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
@@ -222,20 +225,80 @@
                     }
                 });
 
+
                 httpCache.save(function() {
-                    var scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
-                    var results = Jazzcat.combineScripts(scripts);
+                    function generateScripts() {
+                        var scripts = $($("#insertLoaderIntoHTMLString").text()).filter("script").toArray();
 
-                    var html = scripts.reduce(function(html, script) {
-                        return html + Utils.outerHTML(script);
-                    }, '')
+                        return { 
+                            cachedHead: scripts[0],
+                            uncachedHead: scripts[1],
+                            cachedBody: scripts[2],
+                            uncachedBody: scripts[3],
+                            excluded: scripts[4],
+                        }
+                    };
 
-                    var result = Jazzcat.insertLoaderIntoHTMLString(html);
-                    var expected = '<script src="//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D"><\/script><script>true,Jazzcat.combo.exec(\'http://cached/\');<\/script><script>false,Jazzcat.combo.exec(\'http://uncached/\');<\/script>';
-                    equal(result, expected, "Loader inserted successfully")
+                    // Generates a html string that has loaders inserted into
+                    // the correct places, based on the scripts passed into
+                    // the arguments, which are mutated by combineScripts.
+                    function getHTMLWithLoader(headScripts, bodyScripts) {
+                        var doc, combine, results, html;
+                        doc = document.implementation.createHTMLDocument("");
+                        headScripts.forEach(function(el){
+                            doc.head.appendChild(el);
+                        });
+                        bodyScripts.forEach(function(el){
+                            doc.body.appendChild(el);
+                        });
+                        combine = doc.querySelectorAll("script.combine");
+                        results = Jazzcat.combineScripts(combine, doc);
+                        html = Utils.outerHTML(doc.documentElement);
+                        html = Jazzcat.insertLoadersIntoHTMLString(html);
+                        return html;
+                    };
+
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([],
+                                                 [scripts.cachedBody]);
+                    var expected = "<html><head><title></title></head><body><script>Jazzcat.httpCache.load();<\/script><script class=\"combine\">true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script></body></html>";
+                    equal(html, expected, "Only in body, script cached");
+
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([], 
+                                                 [scripts.cachedBody, scripts.uncachedBody]);
+                    expected = "<html><head><title></title></head><body><script>Jazzcat.httpCache.load();<\/script><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script class=\"combine\">true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script><script class=\"combine\">false,\"body\",Jazzcat.combo.exec('http://uncached/');<\/script></body></html>";
+                    equal(html, expected, "Only in body, scripts not all cached");
+
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([scripts.cachedHead],
+                                                 [scripts.cachedBody, scripts.uncachedBody]);
+                    expected = "<html><head><title></title><script>Jazzcat.httpCache.load();<\/script><script class=\"combine\">true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script class=\"combine\">true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script><script class=\"combine\">false,\"body\",Jazzcat.combo.exec('http://uncached/');<\/script></body></html>";
+
+                    equal(html, expected, "Both head and body, scripts not all cached");
+
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([scripts.cachedHead],
+                                                 [scripts.cachedBody]);
+                    expected = "<html><head><title></title><script>Jazzcat.httpCache.load();<\/script><script class=\"combine\">true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body><script class=\"combine\">true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script></body></html>";
+
+                    equal(html, expected, "Both head and body, both cached");
+
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([scripts.uncachedHead, scripts.cachedHead],
+                                                 []);
+                    expected = "<html><head><title></title><script>Jazzcat.httpCache.load();<\/script><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script class=\"combine\">false,\"head\",Jazzcat.combo.exec('http://uncached/');<\/script><script class=\"combine\">true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body></body></html>";
+                    equal(html, expected, "Only in head, scripts not all cached");
+
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([scripts.excluded, scripts.cachedHead],
+                                                 [scripts.cachedBody]);
+                    expected = "<html><head><title></title><script x-src=\"http://excluded/\"><\/script><script>Jazzcat.httpCache.load();<\/script><script class=\"combine\">true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body><script class=\"combine\">true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script></body></html>";
+                    equal(html, expected, "Excluded script in head");
+
                     start();
                 });
-            })
+            });
 
             asyncTest('Jazzcat.combo.load - Encoded Urls are cached', 1, function() {
                 var url = "http://127.0.0.1:3000/space invaders.js";
@@ -311,7 +374,6 @@
                 var $iframe = $('<iframe>').appendTo('#qunit-fixture');
                 var el = $iframe[0];
                 $(window).one("message", function(event) {
-                    debugger;
                     event = event.originalEvent;
                     if (event.source != el.contentWindow) return;
                     ok(event.data, 'document.write was overriden');
