@@ -484,7 +484,7 @@ define(["utils", "capture"], function(Utils, Capture) {
                 addedCacheLoader = true;
             }
 
-            //var bootstrapString = (bootstrap.nodeType ? Utils.outerHTML(bootstrap) : bootstrap)
+            // Transform all bootstrap scripts into a string
             var bootstrapString = bootstrap.map(function(script, index) {
                 return Utils.outerHTML(script);
             }).join('');
