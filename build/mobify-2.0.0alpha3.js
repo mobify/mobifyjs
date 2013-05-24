@@ -1476,6 +1476,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             var i = 0;
             var save = false;
 
+            httpCache.load();
+
             // All the resources are already in the cache.
             if (!resources) {
                 return;
@@ -1495,37 +1497,21 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     };
 
     /**
-     * Private helper that returns a script node that when run, loads the 
-     * httpCache from localStorage.
+     * Returns a script suitable for loading `urls` from Jazzcat, calling the
+     * function `jsonpCallback` on complete.
      */
-    var _getLoadFromCacheScript = function() {
-        var loadFromCacheScript = document.createElement('script');
-        loadFromCacheScript.innerHTML = "Jazzcat.httpCache.load();"
-        return loadFromCacheScript;
-    };
-
-    /**
-     * Returns an array of scripts suitable for loading Jazzcat's localStorage 
-     * cache and loading any uncached scripts through the jazzcat service. Takes
-     * a list of URLs to load via the service (possibly empty), the name of the 
-     * jsonp callback used in loading the service's response and a boolean of 
-     * whether we expect the cache to have been loaded from localStorage by this 
-     * point.
-     */
-    Jazzcat.getLoaderScripts = function(urls, jsonpCallback, cacheLoaded) {
-        var loadFromCacheScript;
-        var loadFromServiceScript;
-        var result = [];
-        if (!cacheLoaded) {
-            loadFromCacheScript = _getLoadFromCacheScript();
-            result.push(loadFromCacheScript);
+    Jazzcat.getLoaderScript = function(urls, jsonpCallback, totalInserted) {
+        var bootstrap = document.createElement('script');
+        if (urls.length) {
+            bootstrap.src = Jazzcat.getURL(urls, jsonpCallback);
+        } else {
+            if (totalInserted === 0) {
+                bootstrap.innerHTML = jsonpCallback + '();';
+            } else {
+                return ''
+            }
         }
-        if (urls && urls.length) {
-            loadFromServiceScript = document.createElement('script');
-            loadFromServiceScript.src = Jazzcat.getURL(urls, jsonpCallback);
-            result.push(loadFromServiceScript);
-        }
-        return result;
+        return bootstrap;
     };
 
     /**
@@ -1559,8 +1545,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * scripts in the body, or scripts in the head (specified by parent arg)
      */
     Jazzcat.insertLoadersIntoHTMLString = function(html) {
-        var addedCacheLoader = false;
-        
+        var totalInserted = 0;
+
         var insert = function(html, parent) {
             var match;
             var bootstrap;
@@ -1579,23 +1565,14 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 return html;
             }
 
-            bootstrap = Jazzcat.getLoaderScripts(uncached, defaults.loadCallback, addedCacheLoader);
-        
-            // If we had not added the cache loader, and any scripts come back 
-            // from the getLaoderScripts method, we can expect that we have now 
-            // added it
-            if (!addedCacheLoader && bootstrap.length > 0) {
-                addedCacheLoader = true;
-            }
+            bootstrap = Jazzcat.getLoaderScript(uncached, defaults.loadCallback, totalInserted);
+            totalInserted++;
 
-            // Transform all bootstrap scripts into strings
-            var bootstrapString = bootstrap.map(function(script, index) {
-                return Utils.outerHTML(script);
-            }).join('');
+            var bootstrapString = (bootstrap.nodeType ? Utils.outerHTML(bootstrap) : bootstrap)
 
             return html.substr(0, firstIndex) + bootstrapString + html.substr(firstIndex);
         };
-        // Since bootloader jazzcat scripts must be placed before the first external script,
+        // Since bootloader jazzcat script must be placed before the first external script,
         // two seperate bootloader scripts are inserted - one for scripts in the head,
         // and one for scripts in the body. If there was only one jazzcat request for
         // all the concatinated scripts in the document, it could cause every script to
