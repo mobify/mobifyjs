@@ -139,6 +139,91 @@
 
         } else {
 
+            test('httpCache.utils.isStale', 8, function() {
+                var isStale = httpCache.utils.isStale;
+                var resources = {
+                    'stale-expires': {'headers': {'expires': UTC_TWO_WEEKS_AGO}},
+                    'stale-cache-control': {
+                        'headers': {
+                            'date': UTC_TWO_WEEKS_AGO,
+                            'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    },
+                    'fresh-expires': {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}},
+                    'fresh-cache-control': {
+                        'headers': {
+                            'date': UTC_NOW,
+                            'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    },
+                    'no-headers': {'headers': {}},
+                    'undefined-headers': {},
+                    'invalid-date': {
+                        'headers': {
+                            'date': 'invalid',
+                            'cache-control': 'public,max-age=' + TEN_MINUTES
+                        }
+                    },
+                    'invalid-expires': {'headers': {'expires': 'invalid'}}
+                };
+
+                ok(isStale(resources['stale-expires']));
+                ok(isStale(resources['stale-cache-control']));
+                ok(!isStale(resources['fresh-expires']));
+                ok(!isStale(resources['fresh-cache-control']));
+                ok(isStale(resources['no-headers']), 'No cache headers is stale');
+                ok(isStale(resources['undefined-headers']), 'undefined cache headers is stale');
+                ok(isStale(resources['invalid-date']), 'Invalid date is stale');
+                ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
+            });
+
+            asyncTest('httpCache - Eviction on an unused resource', 2, function() {
+                httpCache.reset();
+                httpCache.save();
+
+                httpCache.set('unused', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
+                httpCache.set('used', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'used'})
+                httpCache.get('used', true)
+
+                httpCache.save(function(err) {
+                    if (err) throw err;
+
+                    httpCache.reset();
+                    httpCache.load();
+
+                    ok(!httpCache.get('unused'), '`unused` was evicted');
+                    ok(!!httpCache.get('used'), '`used` was cached');
+
+                    start();
+                });
+            });
+
+            asyncTest('httpCache - Least recently used eviction', 2, function() {
+
+                httpCache.reset();
+                httpCache.save();
+
+                httpCache.set('old', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
+                httpCache.get('old', true)
+
+                setTimeout(function() {
+                    httpCache.set('new', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'new'})
+                    httpCache.get('new', true)
+
+                    httpCache.save(function(err) {
+                        if (err) throw err;
+
+                        httpCache.reset();
+                        httpCache.load();
+
+                        ok(!httpCache.get('old'), '`old` was evicted');
+                        ok(!!httpCache.get('new'), '`new` was cached');
+
+                        start();
+                    });
+                }, 0);
+            });
+
             asyncTest('combineScripts - Warm cache', 1, function() {
                 httpCache.reset({
                     'http://should.be/cached/push-b.js': {
@@ -321,53 +406,6 @@
                 });
             });
 
-            asyncTest('httpCache - Eviction on an unused resource', 2, function() {
-                httpCache.reset();
-                httpCache.save();
-
-                httpCache.set('unused', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
-                httpCache.set('used', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'used'})
-                httpCache.get('used', true)
-
-                httpCache.save(function(err) {
-                    if (err) throw err;
-
-                    httpCache.reset();
-                    httpCache.load();
-
-                    ok(!httpCache.get('unused'), '`unused` was evicted');
-                    ok(!!httpCache.get('used'), '`used` was cached');
-
-                    start();
-                });
-            });
-
-            asyncTest('httpCache - Least recently used eviction', 2, function() {
-
-                httpCache.reset();
-                httpCache.save();
-
-                httpCache.set('old', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
-                httpCache.get('old', true)
-
-                setTimeout(function() {
-                    httpCache.set('new', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'new'})
-                    httpCache.get('new', true)
-
-                    httpCache.save(function(err) {
-                        if (err) throw err;
-
-                        httpCache.reset();
-                        httpCache.load();
-
-                        ok(!httpCache.get('old'), '`old` was evicted');
-                        ok(!!httpCache.get('new'), '`new` was cached');
-
-                        start();
-                    });
-                }, 0);
-            });
-
             asyncTest('Jazzcat.combo.exec - test document.write override', function() {
                 var html = $("#test-jazzcat-combo-exec-document-write-override").val();
 
@@ -383,44 +421,6 @@
                 el.contentDocument.open();
                 el.contentDocument.write(html);
                 el.contentDocument.close();
-            });
-
-            test('httpCache.utils.isStale', 8, function() {
-                var isStale = httpCache.utils.isStale;
-                var resources = {
-                    'stale-expires': {'headers': {'expires': UTC_TWO_WEEKS_AGO}},
-                    'stale-cache-control': {
-                        'headers': {
-                            'date': UTC_TWO_WEEKS_AGO,
-                            'cache-control': 'public,max-age=' + TEN_MINUTES
-                        }
-                    },
-                    'fresh-expires': {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}},
-                    'fresh-cache-control': {
-                        'headers': {
-                            'date': UTC_NOW,
-                            'cache-control': 'public,max-age=' + TEN_MINUTES
-                        }
-                    },
-                    'no-headers': {'headers': {}},
-                    'undefined-headers': {},
-                    'invalid-date': {
-                        'headers': {
-                            'date': 'invalid',
-                            'cache-control': 'public,max-age=' + TEN_MINUTES
-                        }
-                    },
-                    'invalid-expires': {'headers': {'expires': 'invalid'}}
-                };
-
-                ok(isStale(resources['stale-expires']));
-                ok(isStale(resources['stale-cache-control']));
-                ok(!isStale(resources['fresh-expires']));
-                ok(!isStale(resources['fresh-cache-control']));
-                ok(isStale(resources['no-headers']), 'No cache headers is stale');
-                ok(isStale(resources['undefined-headers']), 'undefined cache headers is stale');
-                ok(isStale(resources['invalid-date']), 'Invalid date is stale');
-                ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
             });
 
             test('getUrl - generates urls with project parameter', function() {
