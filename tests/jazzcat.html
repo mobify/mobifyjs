@@ -264,7 +264,7 @@
 
                     var scripts = generateScripts();
                     var html = getHTMLWithLoader([], [scripts.cachedBody, scripts.uncachedBody]);
-                    expected = "<html><head><title></title></head><body><script>Jazzcat.httpCache.load();<\/script>\n<script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script>true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script><script>false,\"body\",Jazzcat.combo.exec('http://uncached/');<\/script></body></html>";
+                    expected = "<html><head><title></title></head><body><script>Jazzcat.httpCache.load();<\/script><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script>true,\"body\",Jazzcat.combo.exec('http://cached/');<\/script><script>false,\"body\",Jazzcat.combo.exec('http://uncached/');<\/script></body></html>";
                     equal(html, expected, "Only in body, scripts not all cached");
 
                     var scripts = generateScripts();
@@ -284,7 +284,7 @@
                     var scripts = generateScripts();
                     var html = getHTMLWithLoader([scripts.uncachedHead, scripts.cachedHead],
                                                  []);
-                    expected = "<html><head><title></title><script>Jazzcat.httpCache.load();<\/script>\n<script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script>false,\"head\",Jazzcat.combo.exec('http://uncached/');<\/script><script>true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body></body></html>";
+                    expected = "<html><head><title></title><script>Jazzcat.httpCache.load();<\/script><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script>false,\"head\",Jazzcat.combo.exec('http://uncached/');<\/script><script>true,\"head\",Jazzcat.combo.exec('http://cached/');<\/script></head><body></body></html>";
                     equal(html, expected, "Only in head, scripts not all cached");
 
                     start();

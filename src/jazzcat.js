@@ -487,7 +487,7 @@ define(["utils", "capture"], function(Utils, Capture) {
             //var bootstrapString = (bootstrap.nodeType ? Utils.outerHTML(bootstrap) : bootstrap)
             var bootstrapString = bootstrap.map(function(script, index) {
                 return Utils.outerHTML(script);
-            }).join('\n');
+            }).join('');
 
             return html.substr(0, firstIndex) + bootstrapString + html.substr(firstIndex);
         };
