@@ -60,13 +60,13 @@ define(["utils", "capture"], function(Utils, Capture) {
     /**
      * Load the cache into memory, skipping stale resources.
      */
-    var load = function() {
+    var load = function(options) {
         var data = localStorage.getItem(localStorageKey)
         var key;
         var staleOptions;
 
-        if (httpCacheOptions.overrideTimestaleOptions) {
-            staleOptions = {overrideTime: httpCacheOptions.overrideTime};
+        if (options && options.overrideTime) {
+            staleOptions = {overrideTime: options.overrideTime};
         }
 
         if (!data) {
@@ -304,9 +304,10 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         options = Utils.extend({}, defaults, options || {});
 
-        httpCache.load();
+        httpCache.load(httpCache.options);
+
         while (script = scripts[i++]) {
-            url = script.getAttribute(options.attribute)
+            url = script.getAttribute(options.attribute);
             if (!url) continue;
             script.removeAttribute(options.attribute);
             absolutify.href = url;
@@ -418,7 +419,11 @@ define(["utils", "capture"], function(Utils, Capture) {
      */
     var _getLoadFromCacheScript = function() {
         var loadFromCacheScript = document.createElement('script');
-        loadFromCacheScript.innerHTML = "Jazzcat.httpCache.load();"
+        loadFromCacheScript.innerHTML = (httpCache.options.overrideTime ?
+          "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
+          "Jazzcat.httpCache.load();" );
+
+        //loadFromCacheScript.innerHTML = "Jazzcat.httpCache.load();"
         return loadFromCacheScript;
     };
 
