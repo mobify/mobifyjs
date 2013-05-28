@@ -119,18 +119,25 @@ ResizeImages.resize = function(imgs, options) {
     opts.maxWidth = Math.ceil(width);
     opts.maxHeight = Math.ceil(height);
 
-    var attr;
-    for(var i=0; i<imgs.length; i++) {
-        var img = imgs[i];
-        if (attr = img.getAttribute(opts.attribute)) {
-            absolutify.href = attr;
-            var url = absolutify.href;
-            if (httpRe.test(url)) {
-                img.setAttribute(opts.attribute, getImageURL(url, opts));
+    if (Object.prototype.toString.call(imgs) == '[object String]') {
+        var html = imgs.replace(/(<img [^>]*src=['"])(.*?[^\\])(['"][^>]*\/>)/ig, function(match, p1, p2, p3, offset, string) {
+            return p1 +  getImageURL(p2, opts) + p3;
+        });
+        return html;
+    } else {
+        var attr;
+        for(var i=0; i<imgs.length; i++) {
+            var img = imgs[i];
+            if (attr = img.getAttribute(opts.attribute)) {
+                absolutify.href = attr;
+                var url = absolutify.href;
+                if (httpRe.test(url)) {
+                    img.setAttribute(opts.attribute, getImageURL(url, opts));
+                }
             }
         }
+        return imgs;
     }
-    return imgs;
 }
 
 var defaults = {

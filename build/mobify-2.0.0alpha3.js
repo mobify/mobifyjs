@@ -573,32 +573,42 @@ function extractHTMLStringFromElement(container) {
 // cached div used repeatedly to create new elements
 var cachedDiv = document.createElement('div');
 
+var defaults = {
+    prefix: 'x-',
+    createDocument: true
+}
+
 // ##
 // # Constructor
 // ##
-var Capture = function(doc, prefix) {
+var Capture = function(doc, options) {
+    options = Utils.extend(defaults, options || {});
+
+    this.prefix = options.prefix;
+    
     this.doc = doc;
-    this.prefix = prefix || "x-";
 
     var capturedStringFragments = this.createDocumentFragmentsStrings();
     Utils.extend(this, capturedStringFragments);
 
-    var capturedDOMFragments = this.createDocumentFragments();
-    Utils.extend(this, capturedDOMFragments);
+    if (options.createDocument) {
+        var capturedDOMFragments = this.createDocumentFragments();
+        Utils.extend(this, capturedDOMFragments);
+    }
 };
 
-var init = Capture.init = function(callback, doc, prefix) {
+var init = Capture.init = function(callback, doc, options) {
     var doc = doc || document;
 
-    var createCapture = function(callback, doc, prefix) {
-        var capture = new Capture(doc, prefix);
+    var createCapture = function(callback, doc, options) {
+        var capture = new Capture(doc, options);
         callback(capture);
     }
     // iOS 4.3, some Android 2.X.X have a non-typical "loaded" readyState,
     // which is an acceptable readyState to start capturing on, because
     // the data is fully loaded from the server at that state.
     if (/complete|interactive|loaded/.test(doc.readyState)) {
-        createCapture(callback, doc, prefix);
+        createCapture(callback, doc, options);
     }
     // We may be in "loading" state by the time we get here, meaning we are
     // not ready to capture. Next step after "loading" is "interactive",
@@ -609,7 +619,7 @@ var init = Capture.init = function(callback, doc, prefix) {
         doc.addEventListener("readystatechange", function() {
             if (!created) {
                 created = true;
-                createCapture(callback, doc, prefix);
+                createCapture(callback, doc, options);
             }
         }, false);
     }
@@ -714,7 +724,7 @@ Capture.prototype.getDoctype = function() {
  * Returns an object containing the state of the original page. Caches the object
  * in `extractedHTML` for later use.
  */
- Capture.prototype.createDocumentFragmentsStrings = function() {
+ Capture.prototype.createDocumentFragmentsStrings = function(escape) {
     var doc = this.doc;
     var headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head');
     var bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body');
@@ -1079,18 +1089,25 @@ ResizeImages.resize = function(imgs, options) {
     opts.maxWidth = Math.ceil(width);
     opts.maxHeight = Math.ceil(height);
 
-    var attr;
-    for(var i=0; i<imgs.length; i++) {
-        var img = imgs[i];
-        if (attr = img.getAttribute(opts.attribute)) {
-            absolutify.href = attr;
-            var url = absolutify.href;
-            if (httpRe.test(url)) {
-                img.setAttribute(opts.attribute, getImageURL(url, opts));
+    if (Object.prototype.toString.call(imgs) == '[object String]') {
+        var html = imgs.replace(/(<img [^>]*src=['"])(.*?[^\\])(['"][^>]*\/>)/ig, function(match, p1, p2, p3, offset, string) {
+            return p1 +  getImageURL(p2, opts) + p3;
+        });
+        return html;
+    } else {
+        var attr;
+        for(var i=0; i<imgs.length; i++) {
+            var img = imgs[i];
+            if (attr = img.getAttribute(opts.attribute)) {
+                absolutify.href = attr;
+                var url = absolutify.href;
+                if (httpRe.test(url)) {
+                    img.setAttribute(opts.attribute, getImageURL(url, opts));
+                }
             }
         }
+        return imgs;
     }
-    return imgs;
 }
 
 var defaults = {
