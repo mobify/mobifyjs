@@ -53,7 +53,7 @@
                 maxHeight: 480,
             });
 
-            var src = $('#resizeImages-no-projectName img').attr('x-src');
+            var src = $('#resizeImages-no-projectName img').attr('src');
 
             equal(src, "//ir0.mobify.com/project-oss-localhost/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
@@ -68,7 +68,7 @@
                 maxHeight: 480,
             });
 
-            var src = $('#resizeImages img').attr('x-src');
+            var src = $('#resizeImages img').attr('src');
 
             equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
         });
@@ -80,9 +80,11 @@
                 maxWidth: 320,
                 maxHeight: 480,
             });   
-            var src = $('#resizeImages-non-http img').attr('x-src');
+            var xSrc = $('#resizeImages-non-http img').attr('x-src');
+            var src = $('#resizeImages-non-http img').attr('src');
 
-            equal(src, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
+            equal(xSrc, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
+            equal(src, undefined, "non-http img should not resize");
         });
 
         test('resize images - high dpr', function() {
@@ -95,7 +97,7 @@
                 devicePixelRatio: 2,
             });
 
-            var src = $('#resizeImages-high-dpr img').attr('x-src');
+            var src = $('#resizeImages-high-dpr img').attr('src');
 
             equal(src, "//ir0.mobify.com/project-test1/640/960/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
@@ -111,7 +113,7 @@
                 attribute: "data-src"
             });
 
-            var src = $('#resizeImages-different-attribute img').attr('data-src');
+            var src = $('#resizeImages-different-attribute img').attr('src');
 
             equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
