@@ -1079,14 +1079,20 @@ ResizeImages.resize = function(imgs, options) {
     opts.maxWidth = Math.ceil(width);
     opts.maxHeight = Math.ceil(height);
 
-    var attr;
+    // If not Capturing, use "src" for attribute
+    var attr = 'src';
+    if (window.Mobify && window.Mobify.capturing) {
+        attr = opts.attribute;
+    }
+
+    var value;
     for(var i=0; i<imgs.length; i++) {
         var img = imgs[i];
-        if (attr = img.getAttribute(opts.attribute)) {
-            absolutify.href = attr;
+        if (value = img.getAttribute(opts.attribute)) {
+            absolutify.href = value;
             var url = absolutify.href;
             if (httpRe.test(url)) {
-                img.setAttribute(opts.attribute, getImageURL(url, opts));
+                img.setAttribute(attr, getImageURL(url, opts));
             }
         }
     }
