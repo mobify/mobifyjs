@@ -393,16 +393,17 @@
                     var scriptText = $("#combineScripts-cache-override-scripts").text()
                     var doc = document.implementation.createHTMLDocument("");
                     
-                    doc.write("<html><head></head><body>" + scriptText + "</body></html>");
+                    doc.write("<html><head><script src=\"/build/mobify.js\"><\/script></head><body>" + scriptText + "</body></html>");
 
                     var scripts = doc.querySelectorAll('script');
                     Jazzcat.combineScripts(scripts, doc, {cacheOverrideTime: 10});
 
                     // verify that things we wanted to load from cache did and other things did not
 
-                    var enabledDocumentString = Capture.enable(doc.documentElement.innerHTML);
+                    var enabledDocumentString = Capture.enable(Utils.outerHTML(doc.documentElement));
+
                     // we expect there to be a jazzcat request for bar.js and baz.js
-                    var expectedHTML = "<head><title></title></head><body>    <script>Jazzcat.httpCache.load({\"overrideTime\":10});<\/script><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Fwww.example.com%2Fbar.js%22%2C%22http%3A%2F%2Fwww.example.com%2Fbaz.js%22%5D\"><\/script><script>true,\"body\",Jazzcat.combo.exec('http://www.example.com/foo.js');<\/script>\n    <script>false,\"body\",Jazzcat.combo.exec('http://www.example.com/bar.js');<\/script>\n    <script>false,\"body\",Jazzcat.combo.exec('http://www.example.com/baz.js');<\/script>\n</body>";
+                    var expectedHTML = "<html><head><title></title></head><body><script src=\"/build/mobify.js\"><\/script>    <script>Jazzcat.httpCache.load({\"overrideTime\":10});<\/script><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.combo.load/%5B%22http%3A%2F%2Fwww.example.com%2Fbar.js%22%2C%22http%3A%2F%2Fwww.example.com%2Fbaz.js%22%5D\"><\/script><script>true,\"body\",Jazzcat.combo.exec('http://www.example.com/foo.js');<\/script>\n    <script>false,\"body\",Jazzcat.combo.exec('http://www.example.com/bar.js');<\/script>\n    <script>false,\"body\",Jazzcat.combo.exec('http://www.example.com/baz.js');<\/script>\n</body></html>";
 
                     // and finally, an assertion
                     equal(enabledDocumentString, expectedHTML, "html is what we expect");
