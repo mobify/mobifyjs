@@ -1,23 +1,26 @@
 define(["utils"], function(Utils) {
 
-var ResizeImages = {}
+var ResizeImages = {};
 
-var absolutify = document.createElement('a')
+var absolutify = document.createElement('a');
 
 // A regex for detecting http(s) URLs.
-var httpRe = /^https?/
+var httpRe = /^https?/;
+
+// A regex for detecting data URIs
+var dataUriRe = /^data\:*$/g;
 
 // A protocol relative URL for the host ir0.mobify.com
-var PROTOCOL_AND_HOST = '//ir0.mobify.com'
-     
+var PROTOCOL_AND_HOST = '//ir0.mobify.com';
+
 function getPhysicalScreenSize(devicePixelRatio) {
-    
+
     function multiplyByPixelRatio(sizes) {
         var dpr = devicePixelRatio || 1;
 
         sizes.width = Math.round(sizes.width * dpr);
         sizes.height = Math.round(sizes.height * dpr);
-        
+
         return sizes;
     }
 
@@ -49,11 +52,11 @@ function getPhysicalScreenSize(devicePixelRatio) {
     }
 
     return multiplyByPixelRatio(sizes);
-};
+}
 
 /**
  * Returns a URL suitable for use with the 'ir' service.
- */ 
+ */
 var getImageURL = ResizeImages.getImageURL = function(url, options) {
     var opts = Utils.clone(defaults);
     if (options) {
@@ -85,7 +88,7 @@ var getImageURL = ResizeImages.getImageURL = function(url, options) {
 
     bits.push(url);
     return bits.join('/');
-}
+};
 
 /**
  * Searches the collection for image elements and modifies them to use
@@ -108,7 +111,7 @@ ResizeImages.resize = function(imgs, options) {
     var height = opts.maxHeight || screenSize.height;
 
     // Otherwise, compute device pixels
-    if (dpr && opts.maxWidth) { 
+    if (dpr && opts.maxWidth) {
         width = width * dpr;
         if (opts.maxHeight) {
             height = height * dpr;
@@ -119,11 +122,15 @@ ResizeImages.resize = function(imgs, options) {
     opts.maxWidth = Math.ceil(width);
     opts.maxHeight = Math.ceil(height);
 
-    var attr;
+    var attrVal;
     for(var i=0; i<imgs.length; i++) {
         var img = imgs[i];
-        if (attr = img.getAttribute(opts.attribute)) {
-            absolutify.href = attr;
+        if (attrVal = img.getAttribute(opts.attribute)) {
+            // Don't modify dataURI valued attributes
+            if (dataUriRe.test(attrVal)) {
+                continue;
+            }
+            absolutify.href = attrVal;
             var url = absolutify.href;
             if (httpRe.test(url)) {
                 img.setAttribute(opts.attribute, getImageURL(url, opts));
@@ -131,11 +138,11 @@ ResizeImages.resize = function(imgs, options) {
         }
     }
     return imgs;
-}
+};
 
 var defaults = {
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
-      attribute: "x-src",
+      attribute: "x-src"
 };
 
 return ResizeImages;
