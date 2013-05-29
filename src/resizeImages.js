@@ -7,9 +7,6 @@ var absolutify = document.createElement('a');
 // A regex for detecting http(s) URLs.
 var httpRe = /^https?/;
 
-// A regex for detecting data URIs
-var dataUriRe = /^data\:*$/g;
-
 // A protocol relative URL for the host ir0.mobify.com
 var PROTOCOL_AND_HOST = '//ir0.mobify.com';
 
@@ -126,10 +123,6 @@ ResizeImages.resize = function(imgs, options) {
     for(var i=0; i<imgs.length; i++) {
         var img = imgs[i];
         if (attrVal = img.getAttribute(opts.attribute)) {
-            // Don't modify dataURI valued attributes
-            if (dataUriRe.test(attrVal)) {
-                continue;
-            }
             absolutify.href = attrVal;
             var url = absolutify.href;
             if (httpRe.test(url)) {
