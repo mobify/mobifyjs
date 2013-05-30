@@ -65,7 +65,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         var key;
         var staleOptions;
 
-        if (options && options.overrideTime) {
+        if (options && options.overrideTime !== undefined) {
             staleOptions = {overrideTime: options.overrideTime};
         }
 
@@ -180,27 +180,31 @@ define(["utils", "capture"], function(Utils, Capture) {
     };
 
     /**
-     * Returns `true` if `resource` is stale by HTTP/1.1 caching rules.
-     * Treats invalid headers as stale.
+     * Returns `false` if a response is "fresh" by HTTP/1.1 caching rules or 
+     * less than ten minutes old. Treats invalid headers as stale.
      */
     var isStale = function(resource, options) {
         var headers = resource.headers || {};
         var cacheControl = headers['cache-control'];
         var now = Date.now();
-        var date;
+        var date = Date.parse(headers.date);
         var overrideTime;
+
+        // Fresh if less than 10 minutes old
+        if (date && (now < date + 600 * 1000)) {
+            return false;
+        }
 
         // If a cache override parameter is present, see if the age of the 
         // response is less than the override, cacheOverrideTime is in minutes, 
         // turn it off by setting it to false
-        if (options && (overrideTime = options.overrideTime) &&
-          (date = Date.parse(headers.date))) {
+        if (options && (overrideTime = options.overrideTime)) {
             return (now > (date + (overrideTime * 60 * 1000)));
         }
 
         // If `max-age` and `date` are present, and no other cache
         // directives exist, then we are stale if we are older.
-        if (cacheControl && (date = Date.parse(headers.date))) {
+        if (cacheControl && date) {
             cacheControl = ccParse(cacheControl);
 
             if ((cacheControl['max-age']) &&
@@ -286,6 +290,14 @@ define(["utils", "capture"], function(Utils, Capture) {
      *
      * Note that this only the first part of the Jazzcat transformation. The
      * bootloader script is inserted by the overriden `Capture.enabled` function.
+     * 
+     * Takes an option argument, `options`, an object whose properties define 
+     * optiosn that alter jazzcat's javascript loading, caching and execution 
+     * behaviour. Right now the options are:
+     *
+     * - `cacheOverrideTime` :  An integer value greater than 10 that will 
+     *                          override the freshness implied by the HTTP 
+     *                          caching headers set on the reource.
      */
 
     Jazzcat.combineScripts = function(scripts, doc, options) {
@@ -315,9 +327,9 @@ define(["utils", "capture"], function(Utils, Capture) {
 
             // Rewriting script to grab contents from localstorage
             // ex. <script>true,"body",Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
-                                
+                               
                                 // true or false depending if the script is cached
-            script.innerHTML = !!httpCache.get(url) + 
+            script.innerHTML = !!httpCache.get(url) +
                                 ",\"" +
                                 // head or body
                                 (script.parentNode === doc.head ? "head" : "body") +
@@ -423,7 +435,6 @@ define(["utils", "capture"], function(Utils, Capture) {
           "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
           "Jazzcat.httpCache.load();" );
 
-        //loadFromCacheScript.innerHTML = "Jazzcat.httpCache.load();"
         return loadFromCacheScript;
     };
 
@@ -465,7 +476,7 @@ define(["utils", "capture"], function(Utils, Capture) {
     Jazzcat.JSONURIencode = function(obj) {
         return encodeURIComponent(JSON.stringify(obj));
     };
-    
+
     /**
      * Regex generator used to match Jazzcat calls in an HTML string.
      * Generates regexp based on parent, which should either be head or body.
@@ -483,7 +494,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      */
     Jazzcat.insertLoadersIntoHTMLString = function(html) {
         var addedCacheLoader = false;
-        
+
         var insert = function(html, parent) {
             var match;
             var bootstrap;
@@ -496,14 +507,14 @@ define(["utils", "capture"], function(Utils, Capture) {
             while (match = execRe.exec(html)) {
                 if (firstIndex == -1) firstIndex = match.index;
                 if (match[1] === "false") uncached.push(match[2]);
-            };
+            }
 
             if (firstIndex == -1) {
                 return html;
             }
 
             bootstrap = Jazzcat.getLoaderScripts(uncached, defaults.loadCallback, addedCacheLoader);
-        
+
             // If we had not added the cache loader, and any scripts come back 
             // from the getLaoderScripts method, we can expect that we have now 
             // added it
@@ -542,5 +553,4 @@ define(["utils", "capture"], function(Utils, Capture) {
     };
 
     return Jazzcat;
-
 });
