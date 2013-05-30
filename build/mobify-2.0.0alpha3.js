@@ -1133,6 +1133,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
     var localStorageKey = 'Mobify-Combo-Cache-v1.0';
 
+    var httpCacheOptions = {};
+
     /**
      * Reset the cache, optionally to `val`. Useful for testing.
      */
@@ -1162,9 +1164,14 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     /**
      * Load the cache into memory, skipping stale resources.
      */
-    var load = function() {
+    var load = function(options) {
         var data = localStorage.getItem(localStorageKey)
         var key;
+        var staleOptions;
+
+        if (options && options.overrideTime !== undefined) {
+            staleOptions = {overrideTime: options.overrideTime};
+        }
 
         if (!data) {
             return;
@@ -1177,7 +1184,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         }
 
         for (key in data) {
-            if (data.hasOwnProperty(key) && !isStale(data[key])) {
+            if (data.hasOwnProperty(key) && !isStale(data[key], staleOptions)) {
                 set(key, data[key]);
             }
         }
@@ -1277,18 +1284,31 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     };
 
     /**
-     * Returns `true` if `resource` is stale by HTTP/1.1 caching rules.
-     * Treats invalid headers as stale.
+     * Returns `false` if a response is "fresh" by HTTP/1.1 caching rules or 
+     * less than ten minutes old. Treats invalid headers as stale.
      */
-    var isStale = function(resource) {
+    var isStale = function(resource, options) {
         var headers = resource.headers || {};
         var cacheControl = headers['cache-control'];
         var now = Date.now();
-        var date;
+        var date = Date.parse(headers['date']);
+        var overrideTime;
 
-        // If `max-age` and `date` are present, and no other no other cache
+        // Fresh if less than 10 minutes old
+        if (date && (now < date + 600 * 1000)) {
+            return false;
+        }
+
+        // If a cache override parameter is present, see if the age of the 
+        // response is less than the override, cacheOverrideTime is in minutes, 
+        // turn it off by setting it to false
+        if (options && (overrideTime = options.overrideTime) && date) {
+            return (now > (date + (overrideTime * 60 * 1000)));
+        }
+
+        // If `max-age` and `date` are present, and no other cache
         // directives exist, then we are stale if we are older.
-        if (cacheControl && (date = Date.parse(headers.date))) {
+        if (cacheControl && date) {
             cacheControl = ccParse(cacheControl);
 
             if ((cacheControl['max-age']) &&
@@ -1316,7 +1336,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         save: save,
         reset: reset,
         cache: cache,
-        utils: {isStale: isStale}
+        utils: {isStale: isStale},
+        options: httpCacheOptions
     };
 
     var absolutify = document.createElement('a');
@@ -1368,13 +1389,26 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      *
      *   After:
      *
-     *   <script>true,Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
+     *   <script>true,"body",Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
      *   <script>$(function() { alert("helo joe"); })</script>
      *
      * Note that this only the first part of the Jazzcat transformation. The
      * bootloader script is inserted by the overriden `Capture.enabled` function.
+     * 
+     * Takes an option argument, `options`, an object whose properties define 
+     * optiosn that alter jazzcat's javascript loading, caching and execution 
+     * behaviour. Right now the options are:
+     *
+     * - `cacheOverrideTime` :  An integer value greater than 10 that will 
+     *                          override the freshness implied by the HTTP 
+     *                          caching headers set on the reource.
      */
-    Jazzcat.combineScripts = function(scripts, options) {
+
+    Jazzcat.combineScripts = function(scripts, doc, options) {
+        if (options && options.cacheOverrideTime !== undefined) {
+            Utils.extend(httpCache.options,
+              {overrideTime: options.cacheOverrideTime});
+        }
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || Jazzcat.isIncompatibleBrowser()) {
             return scripts;
@@ -1382,19 +1416,31 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
         var script;
         var url;
-        var i = 0
+        var i = 0;
 
-        options = Utils.extend(defaults, options || {});
+        options = Utils.extend({}, defaults, options || {});
 
-        httpCache.load();
+        httpCache.load(httpCache.options);
 
         while (script = scripts[i++]) {
-            url = script.getAttribute(options.attribute)
+            url = script.getAttribute(options.attribute);
             if (!url) continue;
             script.removeAttribute(options.attribute);
             absolutify.href = url;
             url = absolutify.href;
-            script.innerHTML = !!httpCache.get(url) + ',' + options.execCallback + "('" + url + "');";
+
+            // Rewriting script to grab contents from localstorage
+            // ex. <script>true,"body",Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
+                               
+                                // true or false depending if the script is cached
+            script.innerHTML = !!httpCache.get(url) +
+                                ",\"" +
+                                // head or body
+                                (script.parentNode === doc.head ? "head" : "body") +
+                                "\"," +
+                                // Jazzcat callback to be executed when new document is written
+                                options.execCallback +
+                                "('" + url + "');";
         }
 
         return scripts;
@@ -1465,8 +1511,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             var i = 0;
             var save = false;
 
-            httpCache.load();
-
             // All the resources are already in the cache.
             if (!resources) {
                 return;
@@ -1486,17 +1530,40 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     };
 
     /**
-     * Returns a script suitable for loading `urls` from Jazzcat, calling the
-     * function `jsonpCallback` on complete.
+     * Private helper that returns a script node that when run, loads the 
+     * httpCache from localStorage.
      */
-    Jazzcat.getLoaderScript = function(urls, jsonpCallback) {
-        var bootstrap = document.createElement('script');
-        if (urls.length) {
-            bootstrap.src = Jazzcat.getURL(urls, jsonpCallback);
-        } else {
-            bootstrap.innerHTML = jsonpCallback + '();';
+    var _getLoadFromCacheScript = function() {
+        var loadFromCacheScript = document.createElement('script');
+        loadFromCacheScript.innerHTML = (httpCache.options.overrideTime ?
+          "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
+          "Jazzcat.httpCache.load();" );
+
+        return loadFromCacheScript;
+    };
+
+    /**
+     * Returns an array of scripts suitable for loading Jazzcat's localStorage 
+     * cache and loading any uncached scripts through the jazzcat service. Takes
+     * a list of URLs to load via the service (possibly empty), the name of the 
+     * jsonp callback used in loading the service's response and a boolean of 
+     * whether we expect the cache to have been loaded from localStorage by this 
+     * point.
+     */
+    Jazzcat.getLoaderScripts = function(urls, jsonpCallback, cacheLoaded) {
+        var loadFromCacheScript;
+        var loadFromServiceScript;
+        var result = [];
+        if (!cacheLoaded) {
+            loadFromCacheScript = _getLoadFromCacheScript();
+            result.push(loadFromCacheScript);
         }
-        return bootstrap;
+        if (urls && urls.length) {
+            loadFromServiceScript = document.createElement('script');
+            loadFromServiceScript.src = Jazzcat.getURL(urls, jsonpCallback);
+            result.push(loadFromServiceScript);
+        }
+        return result;
     };
 
     /**
@@ -1514,35 +1581,69 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         return encodeURIComponent(JSON.stringify(obj));
     };
 
-    // Used to find Jazzcat calls in an HTML string.
-    var execRe = new RegExp("<script[^>]*?>(true|false)," +
-      defaults.execCallback.replace(/\./g, '\\.') +
-      "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
+    /**
+     * Regex generator used to match Jazzcat calls in an HTML string.
+     * Generates regexp based on parent, which should either be head or body.
+     */
+    var execReGenerator = function(parent) {
+        return new RegExp("<script[^>]*?>(true|false),['\"]" +
+            parent + "['\"]," +
+            defaults.execCallback.replace(/\./g, '\\.') +
+            "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
+    };
 
     /**
-     * Insert the loader before the first Jazzcat call in the HTML string
-     * `html`.
+     * Inserts one Jazzcat loader script into the document, either for
+     * scripts in the body, or scripts in the head (specified by parent arg)
      */
-    Jazzcat.insertLoaderIntoHTMLString = function(html) {
-        var match;
-        var bootstrap;
-        var firstIndex = -1;
-        var uncached = [];
+    Jazzcat.insertLoadersIntoHTMLString = function(html) {
+        var addedCacheLoader = false;
 
-        // Find the first Jazzcat call and gather all the uncached scripts.
-        while (match = execRe.exec(html)) {
-            if (firstIndex == -1) firstIndex = match.index;
-            if (match[1] === "false") uncached.push(match[2]);
+        var insert = function(html, parent) {
+            var match;
+            var bootstrap;
+            var firstIndex = -1;
+            var uncached = [];
+
+            // Find the first Jazzcat call and gather all the uncached scripts.
+            var execRe = execReGenerator(parent);
+
+            while (match = execRe.exec(html)) {
+                if (firstIndex == -1) firstIndex = match.index;
+                if (match[1] === "false") uncached.push(match[2]);
+            }
+
+            if (firstIndex == -1) {
+                return html;
+            }
+
+            bootstrap = Jazzcat.getLoaderScripts(uncached, defaults.loadCallback, addedCacheLoader);
+
+            // If we had not added the cache loader, and any scripts come back 
+            // from the getLaoderScripts method, we can expect that we have now 
+            // added it
+            if (!addedCacheLoader && bootstrap.length > 0) {
+                addedCacheLoader = true;
+            }
+
+            // Transform all bootstrap scripts into a string
+            var bootstrapString = bootstrap.map(function(script, index) {
+                return Utils.outerHTML(script);
+            }).join('');
+
+            return html.substr(0, firstIndex) + bootstrapString + html.substr(firstIndex);
         };
-
-        if (firstIndex == -1) {
-            return html;
-        }
-
-        bootstrap = Jazzcat.getLoaderScript(uncached, defaults.loadCallback);
-
-        return html.substr(0, firstIndex) + Utils.outerHTML(bootstrap) + html.substr(firstIndex);
+        // Since bootloader jazzcat scripts must be placed before the first external script,
+        // two seperate bootloader scripts are inserted - one for scripts in the head,
+        // and one for scripts in the body. If there was only one jazzcat request for
+        // all the concatinated scripts in the document, it could cause every script to
+        // load in the head, which would block rendering. Therefore, we concatinate scripts
+        // in the head and body seperately.
+        html = insert(html, "head");
+        html = insert(html, "body");
+        return html;
     };
+
 
     /**
      * Overrides `Capture.enable` to insert a Jazzcat bootloader to fetch all
@@ -1550,12 +1651,12 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      */
     var oldEnable = Capture.enable;
     Capture.enable = function() {
-        var htmlStr = oldEnable.apply(Capture, arguments);
-        return Jazzcat.insertLoaderIntoHTMLString(htmlStr);
+        var html = oldEnable.apply(Capture, arguments);
+        html = Jazzcat.insertLoadersIntoHTMLString(html);
+        return html;
     };
 
     return Jazzcat;
-
 });
 
 define('unblockify',["utils", "capture"], function(Utils, Capture) {
