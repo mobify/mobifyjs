@@ -960,24 +960,24 @@ return Capture;
 
 define('resizeImages',["utils"], function(Utils) {
 
-var ResizeImages = {}
+var ResizeImages = {};
 
-var absolutify = document.createElement('a')
+var absolutify = document.createElement('a');
 
 // A regex for detecting http(s) URLs.
-var httpRe = /^https?/
+var httpRe = /^https?/;
 
 // A protocol relative URL for the host ir0.mobify.com
-var PROTOCOL_AND_HOST = '//ir0.mobify.com'
-     
+var PROTOCOL_AND_HOST = '//6.wesleycrush.appspot.com';
+
 function getPhysicalScreenSize(devicePixelRatio) {
-    
+
     function multiplyByPixelRatio(sizes) {
         var dpr = devicePixelRatio || 1;
 
         sizes.width = Math.round(sizes.width * dpr);
         sizes.height = Math.round(sizes.height * dpr);
-        
+
         return sizes;
     }
 
@@ -1009,11 +1009,11 @@ function getPhysicalScreenSize(devicePixelRatio) {
     }
 
     return multiplyByPixelRatio(sizes);
-};
+}
 
 /**
  * Returns a URL suitable for use with the 'ir' service.
- */ 
+ */
 var getImageURL = ResizeImages.getImageURL = function(url, options) {
     var opts = Utils.clone(defaults);
     if (options) {
@@ -1045,7 +1045,7 @@ var getImageURL = ResizeImages.getImageURL = function(url, options) {
 
     bits.push(url);
     return bits.join('/');
-}
+};
 
 /**
  * Searches the collection for image elements and modifies them to use
@@ -1068,7 +1068,7 @@ ResizeImages.resize = function(imgs, options) {
     var height = opts.maxHeight || screenSize.height;
 
     // Otherwise, compute device pixels
-    if (dpr && opts.maxWidth) { 
+    if (dpr && opts.maxWidth) {
         width = width * dpr;
         if (opts.maxHeight) {
             height = height * dpr;
@@ -1079,11 +1079,15 @@ ResizeImages.resize = function(imgs, options) {
     opts.maxWidth = Math.ceil(width);
     opts.maxHeight = Math.ceil(height);
 
-    var attr;
+    if (!opts.format && opts.webp) {
+        opts.format = "webp";
+    }
+
+    var attrVal;
     for(var i=0; i<imgs.length; i++) {
         var img = imgs[i];
-        if (attr = img.getAttribute(opts.attribute)) {
-            absolutify.href = attr;
+        if (attrVal = img.getAttribute(opts.attribute)) {
+            absolutify.href = attrVal;
             var url = absolutify.href;
             if (httpRe.test(url)) {
                 img.setAttribute(opts.attribute, getImageURL(url, opts));
@@ -1091,12 +1095,24 @@ ResizeImages.resize = function(imgs, options) {
         }
     }
     return imgs;
-}
+};
 
 var defaults = {
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
       attribute: "x-src",
+      webp: false
 };
+
+// webp feature detect
+// https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
+(function(){
+    var image = new Image();
+    image.onload = function() {
+        defaults.webp = (image.width == 4);
+    };
+    image.src = 'data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAAAQAgCdASoEAAQAAAcIhYWIhYSIgIIADA1gAAUAAAEAAAEAAP7%2F2fIAAAAA';
+
+})();
 
 return ResizeImages;
 
