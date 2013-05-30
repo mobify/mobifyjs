@@ -1,24 +1,33 @@
-require(["capture", "resizeImages"], function(Capture, ResizeImages) {
+require(["utils", "capture", "resizeImages", "jazzcat", "unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
     var Mobify = window.Mobify = window.Mobify || {};
-    
+
     // DECLARE LIBRARIES ATTACHED TO MOBIFY OBJECT HERE
+    Mobify.Utils = Utils;
+    Mobify.Capture = Capture;
+    Mobify.ResizeImages = ResizeImages;
+    Mobify.Jazzcat = Jazzcat;
+    Mobify.Unblockify = Unblockify;
+    Mobify.api = "2.0"; // v6 tag backwards compatibility change
+    
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
 
     // OPTIONAL: Also add main executable logic to compile library + main
     //           instead of having seperate main.js file
-    /*
-    var capturing = window.capturing || false;
+    
+    var capturing = window.Mobify && window.Mobify.capturing || false;
     if (capturing) {
         // Grab reference to a newly created document
-        var capture = new Capture();
-        var capturedDoc = capture.capturedDoc;
+        var capture = Capture.init(function(capture){
+            var capturedDoc = capture.capturedDoc;
 
-        // Resize images using Mobify Image Resizer
-        ResizeImages.resize(capturedDoc, 320);
-        // Render source DOM to document
-        capture.renderCapturedDoc();
-    }*/
+            var scripts = capturedDoc.querySelectorAll('script');
+            Mobify.Jazzcat.combineScripts(scripts, capturedDoc, {cacheOverrideTime: 1});
+
+            // Render source DOM to document
+            capture.renderCapturedDoc();
+        });
+    }
 
 }, undefined, true);
 // relPath, forceSync

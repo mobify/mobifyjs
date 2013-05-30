@@ -111,7 +111,7 @@ module.exports = function(grunt) {
             },
             custom: {
                 files: {
-                    'build/mobify-custom.min.js': ['build/mobify-custom.min.js']
+                    'build/custom/mobify.min.js': ['build/custom/mobify.js']
                 }
             },
         },
