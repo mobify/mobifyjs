@@ -35,6 +35,10 @@
         <img data-src="http://www.mobify.com/i/phone-tablet.png"/>
     </div>
 
+    <div id="resizeImages-dataURI">
+        <img x-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCB1jYAAAAAIAAc/INeUAAAAASUVORK5CYII=" />
+    </div>
+
 </div>
 
 <script>
@@ -115,6 +119,19 @@
 
             equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
+        });
+
+        test('resizeImages - does not modify data URI', function() {
+            var images = document.querySelectorAll("#resizeImages-dataURI img");
+            imageXSrc = images[0].getAttribute('x-src');
+
+            var resized = ResizeImages.resize(images, {
+                projectName: 'test',
+                maxWidth: 320
+            });
+            strictEqual(resized.length, 1, "still just the one image");
+            strictEqual(resized[0].getAttribute('x-src'), imageXSrc,
+              "x-src is unmodified");
         });
 
 
