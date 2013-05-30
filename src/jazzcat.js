@@ -187,7 +187,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         var headers = resource.headers || {};
         var cacheControl = headers['cache-control'];
         var now = Date.now();
-        var date = Date.parse(headers.date);
+        var date = Date.parse(headers['date']);
         var overrideTime;
 
         // Fresh if less than 10 minutes old
@@ -198,7 +198,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         // If a cache override parameter is present, see if the age of the 
         // response is less than the override, cacheOverrideTime is in minutes, 
         // turn it off by setting it to false
-        if (options && (overrideTime = options.overrideTime)) {
+        if (options && (overrideTime = options.overrideTime) && date) {
             return (now > (date + (overrideTime * 60 * 1000)));
         }
 

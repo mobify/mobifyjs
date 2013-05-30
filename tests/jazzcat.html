@@ -198,7 +198,7 @@
 
         } else {
 
-            test('httpCache.utils.isStale', 8, function() {
+            test('httpCache.utils.isStale', 9, function() {
                 var isStale = httpCache.utils.isStale;
 
                 ok(isStale(resourceFixtures['stale-expires']));
@@ -209,11 +209,13 @@
                 ok(isStale(resourceFixtures['undefined-headers']), 'undefined cache headers is stale');
                 ok(isStale(resourceFixtures['invalid-date']), 'Invalid date is stale');
                 ok(isStale(resourceFixtures['invalid-expires']), 'Invalid expires is stale');
+                // Test our ten minute minimum
+                ok(!isStale(resourceFixtures['new-no-cache-headers']), 'No cache headers but less than 10 minutes old');
             });
 
             test('httpCache.isStale with cacheOverride', function() {
                 var isStale = httpCache.utils.isStale;
-                var staleOptions = {overrideTime: 10};
+                var staleOptions = {overrideTime: 15};
 
                 // should be fresh
                 ok(!isStale(resourceFixtures['new-no-cache-headers'], staleOptions),
