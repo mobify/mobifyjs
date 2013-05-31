@@ -8,7 +8,7 @@ var absolutify = document.createElement('a');
 var httpRe = /^https?/;
 
 // A protocol relative URL for the host ir0.mobify.com
-var PROTOCOL_AND_HOST = '//6.wesleycrush.appspot.com';
+var PROTOCOL_AND_HOST = '//ir0.mobify.com';
 
 function persistWebpSupport(supported) {
     document.cookie = "webpSupport=" + supported + "; path=/"
