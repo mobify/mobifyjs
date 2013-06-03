@@ -1045,8 +1045,8 @@ ResizeImages.detectWEBP = function(options, callback) {
         var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
         var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3)\\.)|(Chrome\\/[0-8]\\.)' +
                                     '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
-                                    '|(Android\\sChrome\\/20\\.)|(Opera\\/9\\.80*Version\\/10\\.)' + 
-                                    '|(Opera.*10\\.)|(Opera.*11\\.)|(Chrome\\/(1.|20|21|22)\\.)', 'i');
+                                    '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' + 
+                                    '|(Opera.*(10|11)\\.)', 'i');
 
         // Return false if browser is not supported
         if (!supportedRe.test(userAgent)) {

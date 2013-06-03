@@ -200,6 +200,11 @@
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
+            // Opera 10
+            ok(!ResizeImages.detectWEBP({ userAgent: "Opera/9.80 (X11; Linux i686; U; pl) Presto/2.6.30 Version/10.61",
+                                         runAsyncTest: false,
+                                         disablePersist: true}));
+
             // IE10
             ok(!ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)",
                                          runAsyncTest: false,
