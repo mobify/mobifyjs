@@ -136,73 +136,73 @@ module.exports = function(grunt) {
                     tunneled: true,
                     detailedError: true,
                     browsers: [
-                        { // Only working version of IE compatable
-                            browserName: 'internet explorer',
-                            platform: 'Windows 2012',
-                            version: '10'
-                        },
-                        { // Lowest known working version of FF
-                            browserName: 'opera',
-                            platform: 'Windows 2003',
-                            version: '11'
-                        },
-                        { // Highest known working version of Opera
-                            browserName: 'opera',
-                            platform: 'Windows 2008',
-                            version: '12'
-                        },
-                        { // Latest Chrome on Windows XP
-                            browserName: 'chrome',
-                            platform: 'Windows 2003'
-                        },
-                        { // Latest Chrome on Windows 7
-                            browserName: 'chrome',
-                            platform: 'Windows 2008'
-                        },
-                        { // Latest Chrome on Linux (unknown distro)
-                            browserName: 'chrome',
-                            platform: 'Linux'
-                        },
-                        { // Lowest known working version of FF
-                            browserName: 'firefox',
-                            version: '4.0'
-                        },
-                        { // Highest known working version of FF on Windows
-                            browserName: 'firefox',
-                            version: '18.0'
-                        },
-                        { // Highest FF on OSX
-                            browserName: 'firefox',
-                            platform: 'Mac 10.6',
-                            version: '14.0'
-                        },
+                        // { // Only working version of IE compatable
+                        //     browserName: 'internet explorer',
+                        //     platform: 'Windows 2012',
+                        //     version: '10'
+                        // },
+                        // { // Lowest known working version of FF
+                        //     browserName: 'opera',
+                        //     platform: 'Windows 2003',
+                        //     version: '11'
+                        // },
+                        // { // Highest known working version of Opera
+                        //     browserName: 'opera',
+                        //     platform: 'Windows 2008',
+                        //     version: '12'
+                        // },
+                        // { // Latest Chrome on Windows XP
+                        //     browserName: 'chrome',
+                        //     platform: 'Windows 2003'
+                        // },
+                        // { // Latest Chrome on Windows 7
+                        //     browserName: 'chrome',
+                        //     platform: 'Windows 2008'
+                        // },
+                        // { // Latest Chrome on Linux (unknown distro)
+                        //     browserName: 'chrome',
+                        //     platform: 'Linux'
+                        // },
+                        // { // Lowest known working version of FF
+                        //     browserName: 'firefox',
+                        //     version: '4.0'
+                        // },
+                        // { // Highest known working version of FF on Windows
+                        //     browserName: 'firefox',
+                        //     version: '18.0'
+                        // },
+                        // { // Highest FF on OSX
+                        //     browserName: 'firefox',
+                        //     platform: 'Mac 10.6',
+                        //     version: '14.0'
+                        // },
                         { // Lowest iPad on OSX (simulator)
                             browserName: 'ipad',
                             platform: 'Mac 10.6',
                             version: '4.3'
                         },
-                        { // Highest iPad on OSX (simulator)
-                          // NOTE: iOS 6 is available, but it hangs on SauceLabs...
-                            browserName: 'ipad',
-                            platform: 'Mac 10.6',
-                            version: '5'
-                        },
-                        { // Lowest iPhone on OSX (simulator)
-                            browserName: 'iphone',
-                            platform: 'Mac 10.6',
-                            version: '4.3'
-                        },
-                        { // Highest iPhone on OSX (simulator)
-                          // NOTE: iOS 6 is available, but it hangs on SauceLabs...
-                            browserName: 'iphone',
-                            platform: 'Mac 10.6',
-                            version: '5'
-                        },
-                        { // Android 4.0 (simulator)
-                            browserName: 'android',
-                            platform: 'Linux',
-                            version: '4'
-                        }
+                        // { // Highest iPad on OSX (simulator)
+                        //   // NOTE: iOS 6 is available, but it hangs on SauceLabs...
+                        //     browserName: 'ipad',
+                        //     platform: 'Mac 10.6',
+                        //     version: '5'
+                        // },
+                        // { // Lowest iPhone on OSX (simulator)
+                        //     browserName: 'iphone',
+                        //     platform: 'Mac 10.6',
+                        //     version: '4.3'
+                        // },
+                        // { // Highest iPhone on OSX (simulator)
+                        //   // NOTE: iOS 6 is available, but it hangs on SauceLabs...
+                        //     browserName: 'iphone',
+                        //     platform: 'Mac 10.6',
+                        //     version: '5'
+                        // },
+                        // { // Android 4.0 (simulator)
+                        //     browserName: 'android',
+                        //     platform: 'Linux',
+                        //     version: '4'
+                        // }
                     ], // https://saucelabs.com/docs/browsers
                     onTestComplete: function(){
                         // Called after a qunit unit is done, per page, per browser
