@@ -63,9 +63,10 @@ function persistWebpSupport(supported) {
     }
 }
 
-// Synchronous WEBP detection using regex
-// Avoiding async way of detecting due to performance reasons
-// (onload of detector image won't fire until document is complete)
+// Detect WEBP support sync and async. Detects sync using regexs,
+// and will detect async for future proofing
+// (note: async test will not complete before first run of `resize`,
+// since onload of detector image won't fire until document is complete)
 ResizeImages.detectWebp = function(options, callback) {
     var opts = {
         userAgent: navigator.userAgent,
