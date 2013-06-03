@@ -3,6 +3,7 @@ require.config({
     "baseUrl": ".",
     "keepBuildDir": true,
     "paths": {   
+        "mobifyjs": ".",
         "Zepto": "vendor/zepto"
     },
     "shim": {
