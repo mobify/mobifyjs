@@ -43,10 +43,8 @@
 
 <script>
     QUnit.config.autostart = false;
-    require.config({
-        "baseUrl": "../src/",  
-    })
-    require(["../src/resizeImages.js"], function(ResizeImages) {
+    require.config({"baseUrl": "../src/"});
+    require(["utils", "resizeImages"], function(Utils, ResizeImages) {
         QUnit.start();
 
         test('resize images - no projectName', function() {
@@ -162,22 +160,22 @@
              */
 
             // First version of Chrome to support WEBP
-            ok(ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.17 Safari/537.11",
+            ok(ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.17 Safari/537.11",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // Android 4 Native Browser
-            ok(ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+            ok(ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // Android 4 Chrome Browser
-            ok(ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (Linux; Android 4.1.2; GT-I9100 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.90 Mobile Safari/537.36",
+            ok(ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (Linux; Android 4.1.2; GT-I9100 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.90 Mobile Safari/537.36",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // Opera 12
-            ok(ResizeImages.detectWEBP({ userAgent: "Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00",
+            ok(ResizeImages.detectWebp({ userAgent: "Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
@@ -186,50 +184,70 @@
              */
 
             // Last version of Chrome to not support WEBP
-            ok(!ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4",
+            ok(!ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // 1* Chrome
-            ok(!ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1",
+            ok(!ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // Android 2.3
-            ok(!ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
+            ok(!ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // Opera 11
-            ok(!ResizeImages.detectWEBP({ userAgent: "Opera/9.80 (Windows NT 6.1; U; zh-tw) Presto/2.7.62 Version/11.01",
+            ok(!ResizeImages.detectWebp({ userAgent: "Opera/9.80 (Windows NT 6.1; U; zh-tw) Presto/2.7.62 Version/11.01",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // Opera 10
-            ok(!ResizeImages.detectWEBP({ userAgent: "Opera/9.80 (X11; Linux i686; U; pl) Presto/2.6.30 Version/10.61",
+            ok(!ResizeImages.detectWebp({ userAgent: "Opera/9.80 (X11; Linux i686; U; pl) Presto/2.6.30 Version/10.61",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // IE10
-            ok(!ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)",
+            ok(!ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // Firefox 24
-            ok(!ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0",
+            ok(!ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // Android Chrome 18
-            ok(!ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19",
+            ok(!ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19",
                                          runAsyncTest: false,
                                          disablePersist: true}));
 
             // iOS Chrome 25
-            ok(!ResizeImages.detectWEBP({ userAgent: "Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 Safari/531.21.10",
+            ok(!ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 Safari/531.21.10",
                                          runAsyncTest: false,
                                          disablePersist: true}));
-        })
+
+        });
+
+        test('detect WEBP test persistance', function() {
+            
+            var supported = ResizeImages.detectWebp({ userAgent: "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.17 Safari/537.11",
+                                         runAsyncTest: false });
+
+            if (Utils.supportsLocalStorage()) {
+                var persistedSupport;
+                persistedSupport = JSON.parse(localStorage.getItem('webp-support')).supported;
+                ok(supported === persistedSupport, 'Support persisted properly')
+            } else {
+                // Supported should be `true`, thus if there is no
+                // localStorage support, ensure our detector is still
+                // working properly.
+                ok(supported);
+            }
+
+
+        });
 
     });
 

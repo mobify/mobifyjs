@@ -480,6 +480,20 @@ Utils.removeElements = function(elements, doc) {
     return elements;
 };
 
+// localStorage detection as seen in such great libraries as Modernizr
+// https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
+// Exposing on Jazzcat for use in qunit tests
+Utils.supportsLocalStorage = function() {
+    var mod = 'modernizr';
+    try {
+        localStorage.setItem(mod, mod);
+        localStorage.removeItem(mod);
+        return true;
+    } catch(e) {
+        return false;
+    }
+};
+
 return Utils;
 
 });
@@ -1011,31 +1025,39 @@ function getPhysicalScreenSize(devicePixelRatio) {
     return multiplyByPixelRatio(sizes);
 }
 
+var localStorageWebpKey = 'webp-support'
+
 function persistWebpSupport(supported) {
-    document.cookie = "webpSupport=" + supported + "; path=/"
+    if (Utils.supportsLocalStorage()) {
+        var webpSupport = {
+            supported: supported,
+            date: Date.now()
+        };
+        localStorage.setItem(localStorageWebpKey, JSON.stringify(webpSupport));
+    }
 }
 
 // Synchronous WEBP detection using regex
 // Avoiding async way of detecting due to performance reasons
 // (onload of detector image won't fire until document is complete)
-ResizeImages.detectWEBP = function(options, callback) {
+ResizeImages.detectWebp = function(options, callback) {
     var opts = {
         userAgent: navigator.userAgent,
         disablePersist: false,
         runAsyncTest: true
     };
-
     if (options) {
         Utils.extend(opts, options);
     }
 
-    if (!opts.disablePersist) {
+    // Return early if we have persisted WEBP support
+    if (!opts.disablePersist && Utils.supportsLocalStorage()) {
         // Check if WEBP support has already been detected
-        var match = /webpSupport=([^&;]*)/.exec(document.cookie);
-        if (match && match[1] == "0") {
-            return 0;
-        } else if (match && match[1] == "1") {
-            return 1;
+        var webpSupport = JSON.parse(localStorage.getItem(localStorageWebpKey));
+        // If webpSupport is in localStorage, and its less then 1 week old,
+        // return previously detected value
+        if (webpSupport && (Date.now() - webpSupport.date < 604800000)) {
+            return webpSupport.supported;
         }
     }
 
@@ -1050,14 +1072,14 @@ ResizeImages.detectWEBP = function(options, callback) {
 
         // Return false if browser is not supported
         if (!supportedRe.test(userAgent)) {
-            return 0;
+            return false;
         }
 
         // Return false if a specific browser version is not supported
         if (unsupportedVersionsRe.test(userAgent)) {
-            return 0;  
+            return false;  
         }
-        return 1;
+        return true;
     }
 
     function dataUriDetect() {
@@ -1065,7 +1087,7 @@ ResizeImages.detectWEBP = function(options, callback) {
         // https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
         var image = new Image();
         image.onload = function() {
-            var support = (image.width == 4) ? 1 : 0;
+            var support = (image.width == 4) ? true : false;
             if (!opts.disablePersist) persistWebpSupport(support);
             if (callback) callback(support);
             };
@@ -1080,7 +1102,8 @@ ResizeImages.detectWEBP = function(options, callback) {
 
     // Run regex based synchronous WEBP detection
     var support = regexDetect(opts.userAgent);
-    persistWebpSupport(support);
+
+    if (!opts.disablePersist) persistWebpSupport(support);
 
     return support;
 
@@ -1175,7 +1198,7 @@ ResizeImages.resize = function(imgs, options) {
 var defaults = {
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
       attribute: "x-src",
-      webp: ResizeImages.detectWEBP()
+      webp: ResizeImages.detectWebp()
 };
 
 return ResizeImages;
@@ -1422,20 +1445,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
     var absolutify = document.createElement('a');
 
-    // localStorage detection as seen in such great libraries as Modernizr
-    // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
-    // Exposing on Jazzcat for use in qunit tests
-    var supportsLocalStorage = function() {
-        var mod = 'modernizr';
-        try {
-            localStorage.setItem(mod, mod);
-            localStorage.removeItem(mod);
-            return true;
-        } catch(e) {
-            return false;
-        }
-    };
-
     var Jazzcat = window.Jazzcat = {
         httpCache: httpCache,
         // Cache a reference to `document.write` in case it is reassigned.
@@ -1450,7 +1459,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         // match[1] == Firefox <= 11, // match[3] == Opera 11|12
         // These browsers have problems with document.write after a document.write
         if ((match && match[1] && +match[2] < 12) || (match && match[3])
-            || (!supportsLocalStorage())
+            || (!Utils.supportsLocalStorage())
             || (!window.JSON)) {
             return true;
         }
