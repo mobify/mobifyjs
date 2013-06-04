@@ -73,7 +73,7 @@ ResizeImages.supportsWebpRegex = function(userAgent){
     var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3)\\.)|(Chrome\\/[0-8]\\.)' +
                                 '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
                                 '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' + 
-                                '|(Opera.*(10|11)\\.)', 'i');
+                                '|(Opera.*(Version/|Opera\\s)(10|11)\\.)', 'i');
 
     // Return false if browser is not supported
     if (!supportedRe.test(userAgent)) {
