@@ -394,9 +394,7 @@
                     httpCache.reset({}); //initialize the cache empty to simulate a fresh load
                     var scriptText = $("#combineScripts-cache-override-scripts").text()
                     var doc = document.implementation.createHTMLDocument("");
-
-                    // IE10 throws an unspecified error when doc.writing
-                    // into a document created by `createHTMLDocument`
+                    
                     doc.body.innerHTML = scriptText;
 
                     var scripts = doc.querySelectorAll('script');
