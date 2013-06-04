@@ -76,7 +76,7 @@ Utils.removeElements = function(elements, doc) {
 // Exposing on Jazzcat for use in qunit tests
 var cachedLocalStorageSupport;
 Utils.supportsLocalStorage = function() {
-    if (cachedLocalStorageSupport) {
+    if (cachedLocalStorageSupport !== undefined) {
         return cachedLocalStorageSupport;
     }
     var mod = 'modernizr';
