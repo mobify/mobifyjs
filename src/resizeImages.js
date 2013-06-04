@@ -127,6 +127,7 @@ ResizeImages.resize = function(imgs, options) {
             var url = absolutify.href;
             if (httpRe.test(url)) {
                 img.setAttribute(opts.attribute, getImageURL(url, opts));
+                img.setAttribute('data-orig-src', attrVal);
             }
         }
     }
@@ -136,6 +137,29 @@ ResizeImages.resize = function(imgs, options) {
 var defaults = {
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
       attribute: "x-src"
+};
+
+var restoreOriginalSrc = function(event) {
+    var origSrc;
+    if (origSrc = event.target.getAttr('data-orig-src')) {
+        event.target.setAttr('src', origSrc);
+    }
+};
+
+var removeListeners = function(event) {
+    if(event && event.target) {
+        event.target.removeEventListener("error", restoreOriginalSrc);
+        event.target.removeEventListener("load", removeListeners);
+    }
+};
+
+var installImageErrorHandler = function(document) {
+    var images = document.querySelectorAll("img[data-orig-src]");
+    for(var i=0, len = images.length; i < len; i++) {
+        var image = images[i];
+        image.addEventLsitener("error", restoreOriginalSrc);
+        image.addEventLsitener("load", removeHandlers);
+    }
 };
 
 return ResizeImages;
