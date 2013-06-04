@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Compression Comparison</title>
     <meta name="viewport" content="width=device-width">
-    <!--<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css"> -->
+    <link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
     <style>
     .img-container {
         display: inline-block;
@@ -39,10 +39,12 @@ var options;
 var resizedUrls = [];
 
 for (var i = 0, len = imageUrls.length; i < len; i++) {
-    resizedUrls.push(imageUrls[i]);
-    for(var j = 1, jlen = 10; j < jlen; j++) {
+    for(var j = 1, jlen = 10; j <= jlen; j++) {
         options = { format: 'webp', quality: j*10, maxWidth: 512 };
-        resizedUrls.push(Mobify.ResizeImages.getImageURL(imageUrls[i], options));
+        resizedUrls.push({url: Mobify.ResizeImages.getImageURL(imageUrls[i], options), options: options});
+        
+        options = {format: 'jpg', quality: j*10, maxWidth: 512 };
+        resizedUrls.push({url: Mobify.ResizeImages.getImageURL(imageUrls[i], options), options: options})
     }
 }
 
@@ -50,10 +52,10 @@ for(i = 0, len = resizedUrls.length; i<len; i++) {
     var containerEl = document.createElement("div");
     containerEl.className = "img-container"
     var imgEl = document.createElement("img");
-    var textEl = document.createElement("p");
+    var textEl = document.createElement("pre");
 
-    textEl.innerText = resizedUrls[i];
-    imgEl.src = resizedUrls[i];
+    textEl.innerText = JSON.stringify(resizedUrls[i]["options"]);
+    imgEl.src = resizedUrls[i]["url"];
     containerEl.appendChild(imgEl);
     containerEl.appendChild(textEl);
     document.getElementById("wrap").appendChild(containerEl);
