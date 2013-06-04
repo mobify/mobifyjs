@@ -483,15 +483,20 @@ Utils.removeElements = function(elements, doc) {
 // localStorage detection as seen in such great libraries as Modernizr
 // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
 // Exposing on Jazzcat for use in qunit tests
+var cachedLocalStorageSupport;
 Utils.supportsLocalStorage = function() {
+    if (cachedLocalStorageSupport) {
+        return cachedLocalStorageSupport;
+    }
     var mod = 'modernizr';
     try {
         localStorage.setItem(mod, mod);
         localStorage.removeItem(mod);
-        return true;
+        cachedLocalStorageSupport = true;
     } catch(e) {
-        return false;
+        cachedLocalStorageSupport = false
     }
+    return cachedLocalStorageSupport;
 };
 
 return Utils;
@@ -1025,7 +1030,7 @@ function getPhysicalScreenSize(devicePixelRatio) {
     return multiplyByPixelRatio(sizes);
 }
 
-var localStorageWebpKey = 'webp-support'
+var localStorageWebpKey = 'Mobify-Webp-Support';
 
 function persistWebpSupport(supported) {
     if (Utils.supportsLocalStorage()) {
@@ -1037,73 +1042,74 @@ function persistWebpSupport(supported) {
     }
 }
 
-// Synchronous WEBP detection using regex
-// Avoiding async way of detecting due to performance reasons
-// (onload of detector image won't fire until document is complete)
-ResizeImages.detectWebp = function(options, callback) {
-    var opts = {
-        userAgent: navigator.userAgent,
-        disablePersist: false,
-        runAsyncTest: true
-    };
-    if (options) {
-        Utils.extend(opts, options);
+/**
+ * Synchronous WEBP detection using regular expressions
+ * Credit to Ilya Grigorik for WEBP regex matching
+ * https://github.com/igrigorik/webp-detect/blob/master/pagespeed.cc
+ */
+ResizeImages.supportsWebpRegex = function(userAgent){
+    var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
+    var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3)\\.)|(Chrome\\/[0-8]\\.)' +
+                                '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
+                                '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' + 
+                                '|(Opera.*(10|11)\\.)', 'i');
+
+    // Return false if browser is not supported
+    if (!supportedRe.test(userAgent)) {
+        return false;
     }
 
+    // Return false if a specific browser version is not supported
+    if (unsupportedVersionsRe.test(userAgent)) {
+        return false;  
+    }
+    return true;
+}
+
+/**
+ * Asychronous WEB detection using a data uri.
+ * Credit to Modernizer:
+ * https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
+ */
+ResizeImages.supportsWebpDataUri = function(callback) {
+    var image = new Image();
+    image.onload = function() {
+        var support = (image.width == 4) ? true : false;
+        persistWebpSupport(support);
+        if (callback) callback(support);
+        };
+    image.src = 'data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAAAQAgCdASoEAAQAAAcIhYWIhYSIgIIADA1gAAUAAAEAAAEAAP7%2F2fIAAAAA';
+}
+
+/**
+ * Detect WEBP support sync and async. Do our best to determine support
+ * with regex, and use data-uri method for future proofing.
+ * (note: async test will not complete before first run of `resize`,
+ * since onload of detector image won't fire until document is complete)
+ * Also caches results for WEBP support in localStorage.
+ */
+ResizeImages.supportsWebp = function(callback) {
+
     // Return early if we have persisted WEBP support
-    if (!opts.disablePersist && Utils.supportsLocalStorage()) {
+    if (Utils.supportsLocalStorage()) {
+        
         // Check if WEBP support has already been detected
         var webpSupport = JSON.parse(localStorage.getItem(localStorageWebpKey));
-        // If webpSupport is in localStorage, and its less then 1 week old,
-        // return previously detected value
+        
+        // Grab previously cached support value in localStorage.
         if (webpSupport && (Date.now() - webpSupport.date < 604800000)) {
             return webpSupport.supported;
         }
     }
 
-    function regexDetect(userAgent){
-        // Credit to Ilya Grigorik for WEBP regex matching
-        // https://github.com/igrigorik/webp-detect/blob/master/pagespeed.cc
-        var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
-        var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3)\\.)|(Chrome\\/[0-8]\\.)' +
-                                    '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
-                                    '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' + 
-                                    '|(Opera.*(10|11)\\.)', 'i');
-
-        // Return false if browser is not supported
-        if (!supportedRe.test(userAgent)) {
-            return false;
-        }
-
-        // Return false if a specific browser version is not supported
-        if (unsupportedVersionsRe.test(userAgent)) {
-            return false;  
-        }
-        return true;
-    }
-
-    function dataUriDetect() {
-        // Credit to Modernizer for data uri detection method
-        // https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
-        var image = new Image();
-        image.onload = function() {
-            var support = (image.width == 4) ? true : false;
-            if (!opts.disablePersist) persistWebpSupport(support);
-            if (callback) callback(support);
-            };
-        image.src = 'data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAAAQAgCdASoEAAQAAAcIhYWIhYSIgIIADA1gAAUAAAEAAAEAAP7%2F2fIAAAAA';
-    }
-
     // Run async WEBP detection for future proofing
     // This test may not finish running before the first call of `resize`
-    if (opts.runAsyncTest) {
-        dataUriDetect();
-    }
+    ResizeImages.supportsWebpDataUri(callback);
 
     // Run regex based synchronous WEBP detection
-    var support = regexDetect(opts.userAgent);
+    var support = ResizeImages.supportsWebpRegex(navigator.userAgent);
 
-    if (!opts.disablePersist) persistWebpSupport(support);
+    persistWebpSupport(support);
 
     return support;
 
@@ -1198,7 +1204,7 @@ ResizeImages.resize = function(imgs, options) {
 var defaults = {
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
       attribute: "x-src",
-      webp: ResizeImages.detectWebp()
+      webp: ResizeImages.supportsWebp()
 };
 
 return ResizeImages;
