@@ -238,20 +238,6 @@ define(["utils", "capture"], function(Utils, Capture) {
 
     var absolutify = document.createElement('a');
 
-    // localStorage detection as seen in such great libraries as Modernizr
-    // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
-    // Exposing on Jazzcat for use in qunit tests
-    var supportsLocalStorage = function() {
-        var mod = 'modernizr';
-        try {
-            localStorage.setItem(mod, mod);
-            localStorage.removeItem(mod);
-            return true;
-        } catch(e) {
-            return false;
-        }
-    };
-
     var Jazzcat = window.Jazzcat = {
         httpCache: httpCache,
         // Cache a reference to `document.write` in case it is reassigned.
@@ -266,7 +252,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         // match[1] == Firefox <= 11, // match[3] == Opera 11|12
         // These browsers have problems with document.write after a document.write
         if ((match && match[1] && +match[2] < 12) || (match && match[3])
-            || (!supportsLocalStorage())
+            || (!Utils.supportsLocalStorage())
             || (!window.JSON)) {
             return true;
         }

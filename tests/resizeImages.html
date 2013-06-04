@@ -43,10 +43,8 @@
 
 <script>
     QUnit.config.autostart = false;
-    require.config({
-        "baseUrl": "../src/",  
-    })
-    require(["../src/resizeImages.js"], function(ResizeImages) {
+    require.config({"baseUrl": "../src/"});
+    require(["utils", "resizeImages"], function(Utils, ResizeImages) {
         QUnit.start();
 
         test('resize images - no projectName', function() {
@@ -55,6 +53,7 @@
             ResizeImages.resize(images, {
                 maxWidth: 320,
                 maxHeight: 480,
+                webp: false
             });
 
             var src = $('#resizeImages-no-projectName img').attr('x-src');
@@ -70,6 +69,7 @@
                 projectName: 'test1',
                 maxWidth: 320,
                 maxHeight: 480,
+                webp: false
             });
 
             var src = $('#resizeImages img').attr('x-src');
@@ -96,6 +96,7 @@
                 projectName: 'test1',
                 maxWidth: 320,
                 maxHeight: 480,
+                webp: false,
                 devicePixelRatio: 2,
             });
 
@@ -112,7 +113,8 @@
                 projectName: 'test1',
                 maxWidth: 320,
                 maxHeight: 480,
-                attribute: "data-src"
+                attribute: "data-src",
+                webp: false
             });
 
             var src = $('#resizeImages-different-attribute img').attr('data-src');
@@ -150,6 +152,83 @@
             expectedUrl = '//ir0.mobify.com/project-test1/c8/png95/320/480/http://test/image.jpg';
 
             equal(url, expectedUrl);
+        });
+
+        test('userAgentWebpDetect', function() {
+            /*
+             * Supported WEBP devices
+             */
+
+            // First version of Chrome to support WEBP
+            ok(ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.17 Safari/537.11"));
+
+            // Android 4 Native Browser
+            ok(ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"));
+
+            // Android 4 Chrome Browser
+            ok(ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; Android 4.1.2; GT-I9100 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.90 Mobile Safari/537.36"));
+
+            // Opera 12
+            ok(ResizeImages.userAgentWebpDetect("Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00"));
+            ok(ResizeImages.userAgentWebpDetect("Opera/9.80 (Macintosh; Intel Mac OS X 10.8.3) Presto/2.12.388 Version/12.15"));
+
+            /*
+             * Unsupported WEBP devices
+             */
+
+            // Last version of Chrome to not support WEBP
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4"));
+
+            // 1* Chrome
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1"));
+
+            // Android 2.3
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"));
+
+            // Opera 11
+            ok(!ResizeImages.userAgentWebpDetect("Opera/9.80 (Windows NT 6.1; U; zh-tw) Presto/2.7.62 Version/11.01"));
+            ok(!ResizeImages.userAgentWebpDetect("Opera/9.80 (Windows NT 5.2; U; en) Presto/2.10.229 Version/11.64"));
+
+            // Opera 10
+            ok(!ResizeImages.userAgentWebpDetect("Opera/9.80 (X11; Linux i686; U; pl) Presto/2.6.30 Version/10.61"));
+
+            // IE10
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)"));
+
+            // Firefox 24
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0"));
+
+            // Android Chrome 18
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19"));
+
+            // iOS Chrome 25
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 Safari/531.21.10"));
+
+        });
+
+        asyncTest('supportsWebp', 1, function() {
+            // Check whether or not WEBP is supported
+            var supported;
+            supported = ResizeImages.supportsWebp(function(_supported){
+                supported = _supported;
+            });
+
+            // Check if localStorage contains the correct value
+            // (setTimeout is used because for some browsers (PhantomJS),
+            // the image onload event does not fire, thus we can't rely
+            // on the callback above)
+            setTimeout(function(){
+                if (Utils.supportsLocalStorage()) {
+                    var persistedSupport;
+                    persistedSupport = JSON.parse(localStorage.getItem('Mobify-Webp-Support')).supported;
+                    ok(supported === persistedSupport, 'Support persisted properly')
+                } else {
+                    ok(true, 'No support for localStorage. Support not persisted');
+                }
+                start();
+            }, 1000); // 1 second given for dataURI WEBP detection
+
+
         });
 
     });
