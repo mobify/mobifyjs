@@ -211,6 +211,7 @@ ResizeImages.resize = function(imgs, options) {
     var attrVal;
     for(var i=0; i<imgs.length; i++) {
         var img = imgs[i];
+        debugger;
         if (attrVal = img.getAttribute(opts.attribute)) {
             absolutify.href = attrVal;
             var url = absolutify.href;

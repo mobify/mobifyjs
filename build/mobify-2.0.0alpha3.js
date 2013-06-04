@@ -524,6 +524,7 @@ var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 // Map of all attributes we should disable (to prevent resources from downloading)
 var disablingMap = {
     img:    ['src'],
+    source: ['src'],
     iframe: ['src'],
     script: ['src', 'type'],
     link:   ['href'],
@@ -1037,9 +1038,10 @@ function persistWebpSupport(supported) {
     }
 }
 
-// Synchronous WEBP detection using regex
-// Avoiding async way of detecting due to performance reasons
-// (onload of detector image won't fire until document is complete)
+// Detect WEBP support sync and async. Detects sync using regexs,
+// and will detect async for future proofing
+// (note: async test will not complete before first run of `resize`,
+// since onload of detector image won't fire until document is complete)
 ResizeImages.detectWebp = function(options, callback) {
     var opts = {
         userAgent: navigator.userAgent,
@@ -1184,6 +1186,7 @@ ResizeImages.resize = function(imgs, options) {
     var attrVal;
     for(var i=0; i<imgs.length; i++) {
         var img = imgs[i];
+        debugger;
         if (attrVal = img.getAttribute(opts.attribute)) {
             absolutify.href = attrVal;
             var url = absolutify.href;

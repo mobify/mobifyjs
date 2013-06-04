@@ -240,9 +240,8 @@
                 persistedSupport = JSON.parse(localStorage.getItem('webp-support')).supported;
                 ok(supported === persistedSupport, 'Support persisted properly')
             } else {
-                // Supported should be `true`, thus if there is no
-                // localStorage support, ensure our detector is still
-                // working properly.
+                // Supported should be `true`, thus if there is no localStorage
+                // support, ensure our detector is still working properly.
                 ok(supported);
             }
 

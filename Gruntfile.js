@@ -272,5 +272,6 @@ module.exports = function(grunt) {
     grunt.registerTask('default', 'build');
     grunt.registerTask('deploy', ['build', 's3']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
-    grunt.registerTask('preview', ['connect', 'watch']);
+    grunt.registerTask('serve', ['connect', 'watch']);
+    grunt.registerTask('preview', 'serve'); // alias to serve
 };
