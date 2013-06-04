@@ -28,7 +28,10 @@ var images = [
     'kodim08.png',
     'kodim09.png',
     'spidersharkcmyk.jpg',
-    'Telefunken_FuBK_test_pattern.svg.png'
+    'Telefunken_FuBK_test_pattern.svg.png',
+    'mobify-logo-with-transparency.png',
+    'ajax_loader_blue_512.gif',
+    'thriller.gif'
 ]
 
 var imageUrls = images.map(function(imageName){
@@ -39,6 +42,7 @@ var options;
 var resizedUrls = [];
 
 for (var i = 0, len = imageUrls.length; i < len; i++) {
+    resizedUrls.push({url: imageUrls[i], options:{format: "original"}})
     for(var j = 1, jlen = 10; j <= jlen; j++) {
         options = { format: 'webp', quality: j*10, maxWidth: 512 };
         resizedUrls.push({url: Mobify.ResizeImages.getImageURL(imageUrls[i], options), options: options});
