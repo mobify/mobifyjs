@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Compression Comparison</title>
+    <meta name="viewport" content="width=device-width">
+    <!--<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css"> -->
+    <style>
+    .img-container {
+        display: inline-block;
+        max-width: 512px;
+        margin: 10px;
+    }
+    .img-container img {
+        max-width: 512px;
+    }
+    </style>
+</head>
+<body>
+    <h1>Compression Battle Royale</h1>
+    <div id="wrap"></div>
+    <script src="/mobifyjs/build/mobify.js"></script>
+    <script>
+var urlBase = 'http://assets.mobify.com/teams/platform/testing/reference_images/'
+var images = [
+    '4.2.03.png',
+    'JK060BRN.jpg',
+    'kodim08.png',
+    'kodim09.png',
+    'spidersharkcmyk.jpg',
+    'Telefunken_FuBK_test_pattern.svg.png'
+]
+
+var imageUrls = images.map(function(imageName){
+    return urlBase + imageName;
+});
+
+var options;
+var resizedUrls = [];
+
+for (var i = 0, len = imageUrls.length; i < len; i++) {
+    resizedUrls.push(imageUrls[i]);
+    for(var j = 1, jlen = 10; j < jlen; j++) {
+        options = { format: 'webp', quality: j*10, maxWidth: 512 };
+        resizedUrls.push(Mobify.ResizeImages.getImageURL(imageUrls[i], options));
+    }
+}
+
+for(i = 0, len = resizedUrls.length; i<len; i++) {
+    var containerEl = document.createElement("div");
+    containerEl.className = "img-container"
+    var imgEl = document.createElement("img");
+    var textEl = document.createElement("p");
+
+    textEl.innerText = resizedUrls[i];
+    imgEl.src = resizedUrls[i];
+    containerEl.appendChild(imgEl);
+    containerEl.appendChild(textEl);
+    document.getElementById("wrap").appendChild(containerEl);
+}
+    </script>
+</body>
+</html>
