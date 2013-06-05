@@ -209,20 +209,19 @@ ResizeImages.resize = function(imgs, options) {
     }
 
     function modifySrcAttribute(img, srcVal, width){
-        var srcVal = img.getAttribute(opts.attribute) || srcVal;
+        var localOpts = Utils.clone(opts);
+        var srcVal = img.getAttribute(localOpts.attribute) || srcVal;
         if (srcVal) {
             absolutify.href = srcVal;
             var url = absolutify.href;
             if (httpRe.test(url)) {
                 if (width) {
-                    opts = Utils.clone(opts);
-                    opts.maxWidth = width;
+                    localOpts.maxWidth = width;
                 }
-                delete opts;
-                img.setAttribute(opts.setAttr, ResizeImages.getImageURL(url, opts));
+                img.setAttribute(localOpts.setAttr, ResizeImages.getImageURL(url, localOpts));
             }
         }
-    }
+    };
 
     // Modifies img and picture/source elements
     // (rootSrc used for use with recursion)
@@ -252,7 +251,7 @@ ResizeImages.resize = function(imgs, options) {
                 modifySrcAttribute(img, rootSrc, width);
             }
         }
-    }
+    };
 
     modifyImages(imgs);
 
