@@ -483,51 +483,15 @@ Utils.removeElements = function(elements, doc) {
 // localStorage detection as seen in such great libraries as Modernizr
 // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
 // Exposing on Jazzcat for use in qunit tests
-var cachedLocalStorageSupport;
 Utils.supportsLocalStorage = function() {
-    if (cachedLocalStorageSupport !== undefined) {
-        return cachedLocalStorageSupport;
-    }
     var mod = 'modernizr';
     try {
         localStorage.setItem(mod, mod);
         localStorage.removeItem(mod);
-        cachedLocalStorageSupport = true;
+        return true;
     } catch(e) {
-        cachedLocalStorageSupport = false
+        return false;
     }
-    return cachedLocalStorageSupport;
-};
-
-// matchMedia polyfill generator
-// (allows you to specify which document to run polyfill on)
-Utils.matchMedia = function(doc) {
-    
-
-    var bool,
-        docElem = doc.documentElement,
-        refNode = docElem.firstElementChild || docElem.firstChild,
-        // fakeBody required for <FF4 when executed in <head>
-        fakeBody = doc.createElement("body"),
-        div = doc.createElement("div");
-
-    div.id = "mq-test-1";
-    div.style.cssText = "position:absolute;top:-100em";
-    fakeBody.style.background = "none";
-    fakeBody.appendChild(div);
-
-    return function(q){
-        div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
-
-        docElem.insertBefore(fakeBody, refNode);
-        bool = div.offsetWidth === 42;
-        docElem.removeChild(fakeBody);
-
-        return {
-           matches: bool,
-           media: q
-        };
-    };
 };
 
 return Utils;
@@ -560,7 +524,6 @@ var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 // Map of all attributes we should disable (to prevent resources from downloading)
 var disablingMap = {
     img:    ['src'],
-    source: ['src'],
     iframe: ['src'],
     script: ['src', 'type'],
     link:   ['href'],
@@ -1062,7 +1025,7 @@ function getPhysicalScreenSize(devicePixelRatio) {
     return multiplyByPixelRatio(sizes);
 }
 
-var localStorageWebpKey = 'Mobify-Webp-Support';
+var localStorageWebpKey = 'webp-support'
 
 function persistWebpSupport(supported) {
     if (Utils.supportsLocalStorage()) {
@@ -1074,74 +1037,73 @@ function persistWebpSupport(supported) {
     }
 }
 
-/**
- * Synchronous WEBP detection using regular expressions
- * Credit to Ilya Grigorik for WEBP regex matching
- * https://github.com/igrigorik/webp-detect/blob/master/pagespeed.cc
- */
-ResizeImages.userAgentWebpDetect = function(userAgent){
-    var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
-    var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3)\\.)|(Chrome\\/[0-8]\\.)' +
-                                '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
-                                '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' + 
-                                '|(Opera.*(Version/|Opera\\s)(10|11)\\.)', 'i');
-
-    // Return false if browser is not supported
-    if (!supportedRe.test(userAgent)) {
-        return false;
+// Synchronous WEBP detection using regex
+// Avoiding async way of detecting due to performance reasons
+// (onload of detector image won't fire until document is complete)
+ResizeImages.detectWebp = function(options, callback) {
+    var opts = {
+        userAgent: navigator.userAgent,
+        disablePersist: false,
+        runAsyncTest: true
+    };
+    if (options) {
+        Utils.extend(opts, options);
     }
-
-    // Return false if a specific browser version is not supported
-    if (unsupportedVersionsRe.test(userAgent)) {
-        return false;  
-    }
-    return true;
-}
-
-/**
- * Asychronous WEB detection using a data uri.
- * Credit to Modernizer:
- * https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
- */
-ResizeImages.dataUriWebpDetect = function(callback) {
-    var image = new Image();
-    image.onload = function() {
-        var support = (image.width == 4) ? true : false;
-        persistWebpSupport(support);
-        if (callback) callback(support);
-        };
-    image.src = 'data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAAAQAgCdASoEAAQAAAcIhYWIhYSIgIIADA1gAAUAAAEAAAEAAP7%2F2fIAAAAA';
-}
-
-/**
- * Detect WEBP support sync and async. Do our best to determine support
- * with regex, and use data-uri method for future proofing.
- * (note: async test will not complete before first run of `resize`,
- * since onload of detector image won't fire until document is complete)
- * Also caches results for WEBP support in localStorage.
- */
-ResizeImages.supportsWebp = function(callback) {
 
     // Return early if we have persisted WEBP support
-    if (Utils.supportsLocalStorage()) {
-        
+    if (!opts.disablePersist && Utils.supportsLocalStorage()) {
         // Check if WEBP support has already been detected
         var webpSupport = JSON.parse(localStorage.getItem(localStorageWebpKey));
-        
-        // Grab previously cached support value in localStorage.
+        // If webpSupport is in localStorage, and its less then 1 week old,
+        // return previously detected value
         if (webpSupport && (Date.now() - webpSupport.date < 604800000)) {
             return webpSupport.supported;
         }
     }
 
+    function regexDetect(userAgent){
+        // Credit to Ilya Grigorik for WEBP regex matching
+        // https://github.com/igrigorik/webp-detect/blob/master/pagespeed.cc
+        var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
+        var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3)\\.)|(Chrome\\/[0-8]\\.)' +
+                                    '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
+                                    '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' + 
+                                    '|(Opera.*(10|11)\\.)', 'i');
+
+        // Return false if browser is not supported
+        if (!supportedRe.test(userAgent)) {
+            return false;
+        }
+
+        // Return false if a specific browser version is not supported
+        if (unsupportedVersionsRe.test(userAgent)) {
+            return false;  
+        }
+        return true;
+    }
+
+    function dataUriDetect() {
+        // Credit to Modernizer for data uri detection method
+        // https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
+        var image = new Image();
+        image.onload = function() {
+            var support = (image.width == 4) ? true : false;
+            if (!opts.disablePersist) persistWebpSupport(support);
+            if (callback) callback(support);
+            };
+        image.src = 'data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAAAQAgCdASoEAAQAAAcIhYWIhYSIgIIADA1gAAUAAAEAAAEAAP7%2F2fIAAAAA';
+    }
+
     // Run async WEBP detection for future proofing
     // This test may not finish running before the first call of `resize`
-    ResizeImages.dataUriWebpDetect(callback);
+    if (opts.runAsyncTest) {
+        dataUriDetect();
+    }
 
     // Run regex based synchronous WEBP detection
-    var support = ResizeImages.userAgentWebpDetect(navigator.userAgent);
+    var support = regexDetect(opts.userAgent);
 
-    persistWebpSupport(support);
+    if (!opts.disablePersist) persistWebpSupport(support);
 
     return support;
 
@@ -1219,66 +1181,25 @@ ResizeImages.resize = function(imgs, options) {
         opts.format = "webp";
     }
 
-    function modifySrcAttribute(img, srcVal, width){
-        var srcVal = img.getAttribute(opts.attribute) || srcVal;
-        if (srcVal) {
-            absolutify.href = srcVal;
+    var attrVal;
+    for(var i=0; i<imgs.length; i++) {
+        var img = imgs[i];
+        if (attrVal = img.getAttribute(opts.attribute)) {
+            absolutify.href = attrVal;
             var url = absolutify.href;
             if (httpRe.test(url)) {
-                if (width) {
-                    opts = Utils.clone(opts);
-                    opts.maxWidth = width;
-                }
-                delete opts;
-                img.setAttribute(opts.setAttr, ResizeImages.getImageURL(url, opts));
+                img.setAttribute(opts.attribute, ResizeImages.getImageURL(url, opts));
             }
         }
     }
-
-    // Modifies img and picture/source elements
-    // (rootSrc used for use with recursion)
-    function modifyImages(imgs, rootSrc) {
-        for(var i=0; i<imgs.length; i++) {
-            var img = imgs[i];
-            if (img.nodeName === 'IMG') {
-                modifySrcAttribute(img);
-            }
-            else if (img.nodeName === 'PICTURE') {
-                // Change attribute of any img element inside a picture element
-                // so it does not load post-flood
-                var disableImg = img.getElementsByTagName('img');
-                if (disableImg.length > 0) {
-                    disableImg[0].setAttribute('data-orig-src', disableImg[0].getAttribute(opts.attribute));
-                    disableImg[0].removeAttribute(opts.attribute);
-                }
-                // Recurse on the source elements
-                var sources = img.getElementsByTagName('source');
-                var rootSrc = img.getAttribute('data-src');
-                modifyImages(sources, rootSrc);
-
-            }
-            else if (img.nodeName === 'SOURCE') {
-                // Grab all source elements and modify the src
-                var width = img.getAttribute('data-width');
-                modifySrcAttribute(img, rootSrc, width);
-            }
-        }
-    }
-
-    modifyImages(imgs);
-
     return imgs;
 };
 
-var capturing = window.Mobify && window.Mobify.capturing || false;
-
 var defaults = {
-      projectName: 'oss-' + location.hostname.replace(/[^\w]/g, '-'),
-      attribute: 'x-src',
-      webp: ResizeImages.supportsWebp()
+      projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
+      attribute: "x-src",
+      webp: ResizeImages.detectWebp()
 };
-
-defaults.setAttr = (capturing ? defaults.attribute : 'src');
 
 return ResizeImages;
 
@@ -1860,134 +1781,7 @@ Unblockify.unblock = function(scripts) {
 return Unblockify;
 
 });
-define('external/picturefill',["utils"], function(Utils) {
-
-var capturing = window.Mobify && window.Mobify.capturing || false;
-
-// Return early if in Capturing mode.
-if (capturing) {
-    return;
-}
-
-window.matchMedia = Utils.matchMedia(document);
-
-/*! Picturefill - Author: Scott Jehl, 2012 | License: MIT/GPLv2 */
-/*
-    Picturefill: A polyfill for proposed behavior of the picture element, which does not yet exist, but should. :)
-    * Notes: 
-        * For active discussion of the picture element, see http://www.w3.org/community/respimg/
-        * While this code does work, it is intended to be used only for example purposes until either:
-            A) A W3C Candidate Recommendation for <picture> is released
-            B) A major browser implements <picture>
-*/ 
-(function( w ){
-    // Enable strict mode
-    
-
-    // User preference for HD content when available
-    var prefHD = false || w.localStorage && w.localStorage[ "picturefill-prefHD" ] === "true",
-        hasHD;
-
-    // Test if `<picture>` is supported natively, if so, exit - no polyfill needed.
-    if ( !!( w.document.createElement( "picture" ) && w.document.createElement( "source" ) && w.HTMLPictureElement ) ){
-        return;
-    }
-
-    w.picturefill = function() {
-        var ps = w.document.getElementsByTagName( "picture" );
-
-        // Loop the pictures
-        for( var i = 0, il = ps.length; i < il; i++ ){
-            var sources = ps[ i ].getElementsByTagName( "source" ),
-                picImg = null,
-                matches = [];
-
-            // If no sources are found, they're likely erased from the DOM. Try finding them inside comments.
-            if( !sources.length ){
-                var picText =  ps[ i ].innerHTML,
-                    frag = w.document.createElement( "div" ),
-                    // For IE9, convert the source elements to divs
-                    srcs = picText.replace( /(<)source([^>]+>)/gmi, "$1div$2" ).match( /<div[^>]+>/gmi );
-
-                frag.innerHTML = srcs.join( "" );
-                sources = frag.getElementsByTagName( "div" );
-            }
-
-            // See which sources match
-            for( var j = 0, jl = sources.length; j < jl; j++ ){
-                var media = sources[ j ].getAttribute( "media" );
-                // if there's no media specified, OR w.matchMedia is supported 
-                if( !media || ( w.matchMedia && w.matchMedia( media ).matches ) ){
-                    matches.push( sources[ j ] );
-                }
-            }
-
-            // Find any existing img element in the picture element
-            picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
-
-            if( matches.length ){
-                // Grab the most appropriate (last) match.
-                var match = matches.pop(),
-                    srcset = match.getAttribute( "srcset" );
-
-                if( !picImg ){
-                    picImg = w.document.createElement( "img" );
-                    picImg.alt = ps[ i ].getAttribute( "alt" );
-                    ps[ i ].appendChild( picImg );
-                }
-
-                if( srcset ) {
-                        var screenRes = ( prefHD && w.devicePixelRatio ) || 1, // Is it worth looping through reasonable matchMedia values here?
-                            sources = srcset.split(","); // Split comma-separated `srcset` sources into an array.
-
-                        hasHD = w.devicePixelRatio > 1;
-
-                        for( var res = sources.length, r = res - 1; r >= 0; r-- ) { // Loop through each source/resolution in `srcset`.
-                            var source = sources[ r ].replace(/^\s*/, '').replace(/\s*$/, '').split(" "), // Remove any leading whitespace, then split on spaces.
-                                resMatch = parseFloat( source[1], 10 ); // Parse out the resolution for each source in `srcset`.
-
-                            if( screenRes >= resMatch ) {
-                                if( picImg.getAttribute( "src" ) !== source[0] ) {
-                                    var newImg = document.createElement("img");
-
-                                    newImg.src = source[0];
-                                    // When the image is loaded, set a width equal to that of the original’s intrinsic width divided by the screen resolution:
-                                    newImg.onload = function() {
-                                        // Clone the original image into memory so the width is unaffected by page styles:
-                                        this.width = ( this.cloneNode( true ).width / resMatch );
-                                    }
-                                    picImg.parentNode.replaceChild( newImg, picImg );
-                                }
-                                break; // We’ve matched, so bail out of the loop here.
-                            }
-                        }
-                } else {
-                    // No `srcset` in play, so just use the `src` value:
-                    picImg.src = match.getAttribute( "src" );
-                }
-            }
-        }
-    };
-
-    // Run on resize and domready (w.load as a fallback)
-    if( w.addEventListener ){
-        w.addEventListener( "resize", w.picturefill, false );
-        w.addEventListener( "DOMContentLoaded", function(){
-            w.picturefill();
-            // Run once only
-            w.removeEventListener( "load", w.picturefill, false );
-        }, false );
-        w.addEventListener( "load", w.picturefill, false );
-    }
-    else if( w.attachEvent ){
-        w.attachEvent( "onload", w.picturefill );
-    }
-})( this );
-
-return;
-
-});
-require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
+require(["utils", "capture", "resizeImages", "jazzcat", "unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
