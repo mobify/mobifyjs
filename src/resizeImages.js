@@ -221,9 +221,9 @@ ResizeImages.resize = function(imgs, options) {
         }
     };
 
-    // Modifies img and picture/source elements
-    // (rootSrc used for use with recursion)
-    function modifyImages(imgs, rootSrc) {
+    // Inner function used to resize `img` and `picture` elements.
+    // Called recursively for picture element.
+    function resizeInner(imgs, rootSrc) {
         for(var i=0; i<imgs.length; i++) {
             var img = imgs[i];
 
@@ -234,7 +234,7 @@ ResizeImages.resize = function(imgs, options) {
             // For a `source`, modify the src attribute, and also
             // potentially override the width and src value.
             else if (img.nodeName === 'SOURCE') {
-                // Grab all source elements and modify the src
+                // Grab optional width override
                 var width = img.getAttribute('data-width');
                 var localOpts = opts;
                 if (width) {
@@ -254,16 +254,20 @@ ResizeImages.resize = function(imgs, options) {
                     disableImg[0].setAttribute('data-orig-src', disableImg[0].getAttribute(opts.attribute));
                     disableImg[0].removeAttribute(opts.attribute);
                 }
+                // Grab optional src attribute on `picture`.
+                // Used for preventing writing the same src multiple times for
+                // different `source` elements.
+                var rootSrc = img.getAttribute('data-src');
+
                 // Recurse on the source elements
                 var sources = img.getElementsByTagName('source');
-                var rootSrc = img.getAttribute('data-src');
-                modifyImages(sources, rootSrc);
+                resizeInner(sources, rootSrc);
 
             }
         }
     };
 
-    modifyImages(imgs);
+    resizeInner(imgs);
 
     return imgs;
 };
