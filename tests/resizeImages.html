@@ -38,9 +38,9 @@
 
     <div id="resizeImages-picture-element">
         <picture data-src="http://www.mobify.com/i/phone-tablet.png">
-            <source x-src="http://www.mobify.com/mobifyjs/static/img/illustration-content.min.png" data-media="(min-width: 800px)" data-width="320">
-            <source media="(min-width: 800px)" data-width="400">
-            <source media="(min-width: 1000px)">
+            <source x-src="http://www.mobify.com/i/phone-tablet-small.png" data-media="(min-width: 800px)" data-width="300" id="width-and-src">
+            <source media="(min-width: 800px)" data-width="400" id="width-and-no-src">
+            <source media="(min-width: 1000px)" id="no-width-and-no-src">
             <img x-src="/mobifyjs/examples/assets/images/small.jpg">
         </picture>
     </div>
@@ -158,12 +158,22 @@
                 webp: false
             });
 
+            equal(images[0].querySelectorAll("#width-and-src")[0].src,
+                  "http://ir0.mobify.com/project-test1/300/480/http://www.mobify.com/i/phone-tablet-small.png",
+                  "source in picture has width overridden, and uses own src");
 
-            var expectedHTML = "<picture data-src=\"http://www.mobify.com/i/phone-tablet.png\">            <source x-src=\"http://www.mobify.com/mobifyjs/static/img/illustration-content.min.png\" data-media=\"(min-width: 800px)\" data-width=\"320\" src=\"//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/mobifyjs/static/img/illustration-content.min.png\">            <source media=\"(min-width: 800px)\" data-width=\"400\" src=\"//ir0.mobify.com/project-test1/400/480/http://www.mobify.com/i/phone-tablet.png\">            <source media=\"(min-width: 1000px)\" src=\"//ir0.mobify.com/project-test1/1280/480/http://www.mobify.com/i/phone-tablet.png\">            <img data-orig-src=\"/mobifyjs/examples/assets/images/small.jpg\">        </picture>";
+            equal(images[0].querySelectorAll("#width-and-no-src")[0].src,
+                  "http://ir0.mobify.com/project-test1/400/480/http://www.mobify.com/i/phone-tablet.png",
+                  "source in picture has width overridden, and uses data-src in picture");
 
-            var html = Utils.outerHTML(images[0]).replace(/(\r\n|\n|\r)/gm,'');
+            equal(images[0].querySelectorAll("#no-width-and-no-src")[0].src,
+                  "http://ir0.mobify.com/project-test1/1280/480/http://www.mobify.com/i/phone-tablet.png",
+                  "source in picture has no width overide, and uses data-src in picture");
 
-            equal(html, expectedHTML, "picture element should be rewritten");
+            ok(!images[0].getElementsByTagName("img")[0].hasAttribute("src"),
+                "src for img element inside of a picture element is not set");
+
+
         });
 
         test('get image url', function() {
