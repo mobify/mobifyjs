@@ -247,6 +247,14 @@ ResizeImages.resize = function(imgs, options) {
             // For a `picture`, (potentially) nuke src on `img`, and
             // pass all `source` elements into modifyImages recursively
             else if (img.nodeName === 'PICTURE') {
+                var sources = img.getElementsByTagName('source');
+
+                // If source elements are erased from the dom, leave the
+                // picture element alone.
+                if (sources.length === 0) {
+                    continue;
+                }
+
                 // Change attribute of any img element inside a picture element
                 // so it does not load post-flood
                 var disableImg = img.getElementsByTagName('img');
@@ -260,7 +268,6 @@ ResizeImages.resize = function(imgs, options) {
                 var rootSrc = img.getAttribute('data-src');
 
                 // Recurse on the source elements
-                var sources = img.getElementsByTagName('source');
                 resizeInner(sources, rootSrc);
 
             }

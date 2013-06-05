@@ -38,10 +38,10 @@
 
     <div id="resizeImages-picture-element">
         <picture data-src="http://www.mobify.com/i/phone-tablet.png">
-            <source x-src="http://www.mobify.com/i/phone-tablet-small.png" data-media="(min-width: 800px)" data-width="300" id="width-and-src">
+            <source src="http://www.mobify.com/i/phone-tablet-small.png" data-media="(min-width: 800px)" data-width="300" id="width-and-src">
             <source media="(min-width: 800px)" data-width="400" id="width-and-no-src">
             <source media="(min-width: 1000px)" id="no-width-and-no-src">
-            <img x-src="/mobifyjs/examples/assets/images/small.jpg">
+            <img src="http://www.mobify.com/i/phone-tablet-small.png">
         </picture>
     </div>
 
@@ -155,24 +155,32 @@
                 projectName: 'test1',
                 maxWidth: 1280,
                 maxHeight: 480,
-                webp: false
+                webp: false,
+                attribute: 'src'
             });
 
-            equal(images[0].querySelectorAll("#width-and-src")[0].src,
-                  "http://ir0.mobify.com/project-test1/300/480/http://www.mobify.com/i/phone-tablet-small.png",
+            var sources = images[0].getElementsByTagName('source');
+            if (sources.length === 0) {
+                ok(images[0].getElementsByTagName("img")[0].getAttribute("src"), 
+                    "http://www.mobify.com/i/phone-tablet-small.png",
+                    "if source not properly parsed (iOS 4.3), src for img element inside of a picture element should remain");
+                return;
+            }
+
+            equal(images[0].querySelectorAll("#width-and-src")[0].getAttribute("src"),
+                  "//ir0.mobify.com/project-test1/300/480/http://www.mobify.com/i/phone-tablet-small.png",
                   "source in picture has width overridden, and uses own src");
 
-            equal(images[0].querySelectorAll("#width-and-no-src")[0].src,
-                  "http://ir0.mobify.com/project-test1/400/480/http://www.mobify.com/i/phone-tablet.png",
+            equal(images[0].querySelectorAll("#width-and-no-src")[0].getAttribute("src"),
+                  "//ir0.mobify.com/project-test1/400/480/http://www.mobify.com/i/phone-tablet.png",
                   "source in picture has width overridden, and uses data-src in picture");
 
-            equal(images[0].querySelectorAll("#no-width-and-no-src")[0].src,
-                  "http://ir0.mobify.com/project-test1/1280/480/http://www.mobify.com/i/phone-tablet.png",
+            equal(images[0].querySelectorAll("#no-width-and-no-src")[0].getAttribute("src"),
+                  "//ir0.mobify.com/project-test1/1280/480/http://www.mobify.com/i/phone-tablet.png",
                   "source in picture has no width overide, and uses data-src in picture");
 
             ok(!images[0].getElementsByTagName("img")[0].hasAttribute("src"),
                 "src for img element inside of a picture element is not set");
-
 
         });
 
