@@ -128,6 +128,7 @@ ResizeImages.resize = function(imgs, options) {
             if (httpRe.test(url)) {
                 img.setAttribute(opts.attribute, getImageURL(url, opts));
                 img.setAttribute('data-orig-src', attrVal);
+                img.setAttribute('onerror', 'Mobify.ResizeImages.restoreOriginalSrc(event);')
             }
         }
     }
@@ -139,26 +140,11 @@ var defaults = {
       attribute: "x-src"
 };
 
-var restoreOriginalSrc = function(event) {
+var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
     var origSrc;
-    if (origSrc = event.target.getAttr('data-orig-src')) {
-        event.target.setAttr('src', origSrc);
-    }
-};
-
-var removeListeners = function(event) {
-    if(event && event.target) {
-        event.target.removeEventListener("error", restoreOriginalSrc);
-        event.target.removeEventListener("load", removeListeners);
-    }
-};
-
-var installImageErrorHandler = function(document) {
-    var images = document.querySelectorAll("img[data-orig-src]");
-    for(var i=0, len = images.length; i < len; i++) {
-        var image = images[i];
-        image.addEventLsitener("error", restoreOriginalSrc);
-        image.addEventLsitener("load", removeHandlers);
+    if (origSrc = event.target.getAttribute('data-orig-src')) {
+        console.log("Restoring " + event.target.src + " to " + origSrc);
+        event.target.setAttribute('src', origSrc);
     }
 };
 
