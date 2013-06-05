@@ -208,17 +208,15 @@ ResizeImages.resize = function(imgs, options) {
         opts.format = "webp";
     }
 
-    function modifySrcAttribute(img, srcVal, width){
-        var localOpts = Utils.clone(opts);
-        var srcVal = img.getAttribute(localOpts.attribute) || srcVal;
+    // Runs `getImageUrl` on src attr of an img/source element.
+    // Allows overriding of img.getAttribute(x-src) with srcVal
+    function modifySrcAttribute(img, opts, srcVal){
+        var srcVal = img.getAttribute(opts.attribute) || srcVal;
         if (srcVal) {
             absolutify.href = srcVal;
             var url = absolutify.href;
             if (httpRe.test(url)) {
-                if (width) {
-                    localOpts.maxWidth = width;
-                }
-                img.setAttribute(localOpts.setAttr, ResizeImages.getImageURL(url, localOpts));
+                img.setAttribute(opts.setAttr, ResizeImages.getImageURL(url, opts));
             }
         }
     };
@@ -228,9 +226,26 @@ ResizeImages.resize = function(imgs, options) {
     function modifyImages(imgs, rootSrc) {
         for(var i=0; i<imgs.length; i++) {
             var img = imgs[i];
+
+            // For an `img`, simply modify the src attribute
             if (img.nodeName === 'IMG') {
-                modifySrcAttribute(img);
+                modifySrcAttribute(img, opts);
             }
+            // For a `source`, modify the src attribute, and also
+            // potentially override the width and src value.
+            else if (img.nodeName === 'SOURCE') {
+                // Grab all source elements and modify the src
+                var width = img.getAttribute('data-width');
+                var localOpts = opts;
+                if (width) {
+                    localOpts = Utils.clone(opts);
+                    localOpts.maxWidth = width;
+                }
+                // pass along rootSrc if defined on `picture` element
+                modifySrcAttribute(img, localOpts, rootSrc);
+            }
+            // For a `picture`, (potentially) nuke src on `img`, and
+            // pass all `source` elements into modifyImages recursively
             else if (img.nodeName === 'PICTURE') {
                 // Change attribute of any img element inside a picture element
                 // so it does not load post-flood
@@ -244,11 +259,6 @@ ResizeImages.resize = function(imgs, options) {
                 var rootSrc = img.getAttribute('data-src');
                 modifyImages(sources, rootSrc);
 
-            }
-            else if (img.nodeName === 'SOURCE') {
-                // Grab all source elements and modify the src
-                var width = img.getAttribute('data-width');
-                modifySrcAttribute(img, rootSrc, width);
             }
         }
     };
