@@ -219,7 +219,7 @@ ResizeImages.resize = function(imgs, options) {
                     opts.maxWidth = width;
                 }
                 delete opts;
-                img.setAttribute(opts.attribute, ResizeImages.getImageURL(url, opts));
+                img.setAttribute(opts.setAttr, ResizeImages.getImageURL(url, opts));
             }
         }
     }
@@ -259,11 +259,15 @@ ResizeImages.resize = function(imgs, options) {
     return imgs;
 };
 
+var capturing = window.Mobify && window.Mobify.capturing || false;
+
 var defaults = {
-      projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
-      attribute: "x-src",
-      webp: ResizeImages.detectWebp()
+      projectName: 'oss-' + location.hostname.replace(/[^\w]/g, '-'),
+      attribute: 'x-src',
+      webp: ResizeImages.detectWebp(),
 };
+
+defaults.setAttr = (capturing ? defaults.attribute : 'src');
 
 return ResizeImages;
 
