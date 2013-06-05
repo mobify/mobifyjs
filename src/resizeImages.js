@@ -208,18 +208,54 @@ ResizeImages.resize = function(imgs, options) {
         opts.format = "webp";
     }
 
-    var attrVal;
-    for(var i=0; i<imgs.length; i++) {
-        var img = imgs[i];
-        debugger;
-        if (attrVal = img.getAttribute(opts.attribute)) {
-            absolutify.href = attrVal;
+    function modifySrcAttribute(img, srcVal, width){
+        var srcVal = img.getAttribute(opts.attribute) || srcVal;
+        if (srcVal) {
+            absolutify.href = srcVal;
             var url = absolutify.href;
             if (httpRe.test(url)) {
+                if (width) {
+                    opts = Utils.clone(opts);
+                    opts.maxWidth = width;
+                }
+                delete opts;
                 img.setAttribute(opts.attribute, ResizeImages.getImageURL(url, opts));
             }
         }
     }
+
+    // Modifies img and picture/source elements
+    // (rootSrc used for use with recursion)
+    function modifyImages(imgs, rootSrc) {
+        for(var i=0; i<imgs.length; i++) {
+            var img = imgs[i];
+            if (img.nodeName === 'IMG') {
+                modifySrcAttribute(img);
+            }
+            else if (img.nodeName === 'PICTURE') {
+                // Change attribute of any img element inside a picture element
+                // so it does not load post-flood
+                var disableImg = img.getElementsByTagName('img');
+                if (disableImg.length > 0) {
+                    disableImg[0].setAttribute('data-orig-src', disableImg[0].getAttribute(opts.attribute));
+                    disableImg[0].removeAttribute(opts.attribute);
+                }
+                // Recurse on the source elements
+                var sources = img.getElementsByTagName('source');
+                var rootSrc = img.getAttribute('data-src');
+                modifyImages(sources, rootSrc);
+
+            }
+            else if (img.nodeName === 'SOURCE') {
+                // Grab all source elements and modify the src
+                var width = img.getAttribute('data-width');
+                modifySrcAttribute(img, rootSrc, width);
+            }
+        }
+    }
+
+    modifyImages(imgs);
+
     return imgs;
 };
 
