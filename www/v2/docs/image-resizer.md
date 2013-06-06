@@ -143,8 +143,9 @@ versions in the markup. Scaling image widths can be automated. (although the
 
 To solve this problem, Mobify.js allows for alternate `picture` markup that
 allows you to specify widths as attributes on `source` elements, instead of
-specifying a different image for each breakpoint. For example, you could
-write your element like this:
+specifying a different image for each breakpoint. 
+
+For example, you could write your element like this:
 
     <picture data-src="horse.png">
         <source media="(min-width: 1000px)">
@@ -159,14 +160,14 @@ that you don't have to specify the same image with different widths at different
 breakpoints. Let's break down how this will actually work in the browser:
 
 - if the browser width is 1000px or greater:
-    - Use "horse.png" since `src` is not specified. Auto determine width since `data-width` isn't specified.
+    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Auto determine width since `data-width` isn't specified.
 - if the browser width is between 800px and 999px:
-    - Use "horse.png" since `src` is not specified. Resize to 400px wide.
+    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Resize to 400px wide.
 - if the browser width is between 480px and 799px:
-    - Use "horse.png" since `src` is not specified. Resize to 200px wide.
+    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Resize to 200px wide.
 - if the browser width is between 0 and 480px (smartphone):
     - Use "alt-horse.png" for art direction purposes.
-- if javascript isn't supported, fallback to regular old `img` tag. 
+- if Javascript isn't supported, fallback to regular old `img` tag. 
 (which has no <noscript> hacks).
 
 The `resize` method will cause the above markup to transform into this (on an iPhone):
