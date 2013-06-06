@@ -7,9 +7,6 @@ var absolutify = document.createElement('a');
 // A regex for detecting http(s) URLs.
 var httpRe = /^https?/;
 
-// A protocol relative URL for the host ir0.mobify.com
-var PROTOCOL_AND_HOST = '//ir0.mobify.com';
-
 function getPhysicalScreenSize(devicePixelRatio) {
 
     function multiplyByPixelRatio(sizes) {
@@ -60,7 +57,7 @@ var getImageURL = ResizeImages.getImageURL = function(url, options) {
         Utils.extend(opts, options);
     }
 
-    var bits = [PROTOCOL_AND_HOST];
+    var bits = [opts.proto + opts.host];
 
     if (opts.projectName) {
         var projectId = "project-" + opts.projectName;
@@ -128,7 +125,9 @@ ResizeImages.resize = function(imgs, options) {
             if (httpRe.test(url)) {
                 img.setAttribute(opts.attribute, getImageURL(url, opts));
                 img.setAttribute('data-orig-src', attrVal);
-                img.setAttribute('onerror', 'Mobify.ResizeImages.restoreOriginalSrc(event);')
+                if(opts.onerror) {
+                    img.setAttribute('onerror', opts.onerror);
+                }
             }
         }
     }
@@ -136,12 +135,16 @@ ResizeImages.resize = function(imgs, options) {
 };
 
 var defaults = {
+      proto: '//',
+      host: 'ir0.mobify.com',
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
-      attribute: "x-src"
+      attribute: "x-src",
+      onerror: 'Mobify.ResizeImages.restoreOriginalSrc(event);'
 };
 
 var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
     var origSrc;
+    event.target.removeAttribute('onerror'); // remove ourselves
     if (origSrc = event.target.getAttribute('data-orig-src')) {
         console.log("Restoring " + event.target.src + " to " + origSrc);
         event.target.setAttribute('src', origSrc);

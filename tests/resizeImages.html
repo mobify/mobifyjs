@@ -39,6 +39,16 @@
         <img x-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCB1jYAAAAAIAAc/INeUAAAAASUVORK5CYII=" />
     </div>
 
+    <div id="resizeImages-adds-data-orig-src">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
+        <div id="resizeImages-adds-onerror">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
+
+
 </div>
 
 <script>
@@ -119,6 +129,25 @@
 
             equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
+        });
+
+        test('resize images - adds an original src data attribute', function() {
+            var images = document.querySelectorAll("#resizeImages-adds-data-orig-src img");
+            var originalSrcs = [].map.call(images, function(img) {
+                return img.getAttribute("x-src");
+            });
+            var resized = ResizeImages.resize(images);
+            for(var i = 0, len = resized.length; i < len; i++) {
+                equal(resized[i].getAttribute('data-orig-src'), originalSrcs[i]);
+            }
+        });
+
+        test('resize images - adds an onerror handler', function() {
+            var images = document.querySelectorAll("#resizeImages-adds-onerror img");
+            var resized = ResizeImages.resize(images);
+            for(var i = 0, len = resized.length; i < len; i++) {
+                ok(resized[i].getAttribute('onerror'));
+            }
         });
 
         test('resizeImages - does not modify data URI', function() {
