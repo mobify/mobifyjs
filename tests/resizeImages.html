@@ -43,11 +43,9 @@
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
-        <div id="resizeImages-adds-onerror">
+    <div id="resizeImages-adds-onerror">
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
-
-
 
 </div>
 
@@ -150,6 +148,16 @@
             }
         });
 
+        test('resize images - onerror handler restores src', function () {
+            var img = new Image()
+            img.setAttribute("src", "foo");
+            img.setAttribute("data-orig-src", "bar");
+
+            ResizeImages.restoreOriginalSrc({target: img});
+
+            equal(img.getAttribute("src"), "bar");
+        });
+
         test('resizeImages - does not modify data URI', function() {
             var images = document.querySelectorAll("#resizeImages-dataURI img");
             imageXSrc = images[0].getAttribute('x-src');
@@ -162,7 +170,6 @@
             strictEqual(resized[0].getAttribute('x-src'), imageXSrc,
               "x-src is unmodified");
         });
-
 
         test('get image url', function() {
 
