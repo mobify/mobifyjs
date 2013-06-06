@@ -79,12 +79,12 @@ Automatic image resizing:
         capture.renderCapturedDoc();
     });
 
-Specify custom width:
+Specify custom width for a group of images:
 
     Mobify.Capture.init(function(capture){
         var capturedDoc = capture.capturedDoc;
         // Resize images using Mobify Image Resizer
-        var images = capturedDoc.querySelectorAll('img, picture');
+        var images = capturedDoc.querySelectorAll('#footer img');
 
         var maxWidth;
         if (window.matchMedia( "(min-width: 768px) and (max-width : 1024px)" ).matches) {
