@@ -71,6 +71,25 @@ Utils.removeElements = function(elements, doc) {
     return elements;
 };
 
+// localStorage detection as seen in such great libraries as Modernizr
+// https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
+// Exposing on Jazzcat for use in qunit tests
+var cachedLocalStorageSupport;
+Utils.supportsLocalStorage = function() {
+    if (cachedLocalStorageSupport !== undefined) {
+        return cachedLocalStorageSupport;
+    }
+    var mod = 'modernizr';
+    try {
+        localStorage.setItem(mod, mod);
+        localStorage.removeItem(mod);
+        cachedLocalStorageSupport = true;
+    } catch(e) {
+        cachedLocalStorageSupport = false
+    }
+    return cachedLocalStorageSupport;
+};
+
 return Utils;
 
 });
