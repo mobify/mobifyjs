@@ -22,7 +22,7 @@ more.
     <pre id="mobify-tag"><code class="javascript">&lt;script>(function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=c,a.id=d,a.setAttribute("class",e),f.parentNode.insertBefore(a,f)}var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[1]){if(!+f[1])return}else if(this.Mobify||!c())return;a.Mobify={points:[+new Date]},b.write('&lt;plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h=function(){var c=new Date;c.setTime(c.getTime()+18e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e){var a=b.createElement("script");a.onerror=h,g(a,e,"mobify-js-main","mobify")}},f.onerror=h,g(f,d,"mobify-js","mobify")})})(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&4>+match[2]?!1:match[3]&&11>+match[4]?!1:!0:!1},
 
     // path to mobify library
-    "//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha3.min.js",
+    "//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha4.min.js",
     // path to main executable
     "/PATH/TO/main.js");
     &lt;/script></code></pre>

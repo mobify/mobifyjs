@@ -22,7 +22,7 @@ Please refer to the  [quickstart guide](/mobifyjs/v2/docs/) to get setup.
 If you have access to change `src` to `x-src` (or `data-src` - any prefix is fine) on your backend,
 you can use a regular external script tag to include this API:
 
-    <script src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha3.min.js">
+    <script src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha4.min.js">
 
 * TOC
 {:toc}
