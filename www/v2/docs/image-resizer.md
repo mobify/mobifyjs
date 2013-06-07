@@ -67,6 +67,8 @@ oss-www-yourhostname-com.
 
 **Example**
 
+Many examples using Image Resizer on the [examples](/mobifyjs/v2/examples) page.
+
 Automatic image resizing:
 
     Mobify.Capture.init(function(capture){
@@ -168,7 +170,7 @@ breakpoints. Let's break down how this will actually work in the browser:
 - if the browser width is between 0 and 480px (smartphone):
     - Use "alt-horse.png" for art direction purposes.
 - if Javascript isn't supported, fallback to regular old `img` tag. 
-(which has no <noscript> hacks).
+(which has no &lt;noscript> hacks).
 
 The `resize` method will cause the above markup to transform into this (on an iPhone):
 

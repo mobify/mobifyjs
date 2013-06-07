@@ -65,7 +65,7 @@ The following markup (URLs shortened for example):
 
 is modified into this on the fly:
 
-    <picture data-src="/mobifyjs/examples/assets/images/extralarge.jpg">
+    <picture data-src="extralarge.jpg">
         <source src="//ir0.mobify.com/project-oss-localhost/webp/320/1418/http://localhost:3000/mobifyjs/examples/assets/images/alternate_art.png" media="(min-width: 320px)" data-width="320">
         <source media="(min-width: 800px)" data-width="400" src="//ir0.mobify.com/project-oss-localhost/webp/400/1418/http://localhost:3000/mobifyjs/examples/assets/images/extralarge.jpg">
         <source media="(min-width: 1000px)" data-width="500" src="//ir0.mobify.com/project-oss-localhost/webp/500/1418/http://localhost:3000/mobifyjs/examples/assets/images/extralarge.jpg">
