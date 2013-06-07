@@ -10,9 +10,7 @@ if (capturing) {
 
         // Resize images using Mobify Image Resizer
         var images = capturedDoc.querySelectorAll('img');
-        Mobify.ResizeImages.resize( images, {
-            maxWidth: 320   
-        });
+        Mobify.ResizeImages.resize(images);
 
         // Render source DOM to document
         capture.renderCapturedDoc();

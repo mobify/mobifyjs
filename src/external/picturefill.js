@@ -1,9 +1,23 @@
-define(["utils"], function(Utils) {
+define(["utils", "capture"], function(Utils, Capture) {
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
-// Return early if in Capturing mode.
 if (capturing) {
+    // Override renderCapturedDoc to disable img elements in picture elements
+    var oldRenderCapturedDoc = Capture.prototype.renderCapturedDoc;
+    Capture.prototype.renderCapturedDoc = function(options) {
+        // Change attribute of any img element inside a picture element
+        // so it does not load post-flood
+        var imgsInPicture = this.capturedDoc.querySelectorAll('picture img');
+        for (var i = 0, len = imgsInPicture.length; i < len; i++) {
+            var disableImg = imgsInPicture[i];
+            var srcAttr = window.Mobify && window.Mobify.prefix + 'src';
+            disableImg.setAttribute('data-orig-src', disableImg.getAttribute(srcAttr));
+            disableImg.removeAttribute(srcAttr);
+        }
+        oldRenderCapturedDoc.apply(this, arguments);
+    }
+
     return;
 }
 

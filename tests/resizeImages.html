@@ -179,9 +179,6 @@
                   "//ir0.mobify.com/project-test1/1280/480/http://www.mobify.com/i/phone-tablet.png",
                   "source in picture has no width overide, and uses data-src in picture");
 
-            ok(!images[0].getElementsByTagName("img")[0].hasAttribute("src"),
-                "src for img element inside of a picture element is not set");
-
         });
 
         test('get image url', function() {

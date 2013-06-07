@@ -95,6 +95,7 @@ var cachedDiv = document.createElement('div');
 var Capture = function(doc, prefix) {
     this.doc = doc;
     this.prefix = prefix || "x-";
+    if (window.Mobify) window.Mobify.prefix = this.prefix;
 
     var capturedStringFragments = this.createDocumentFragmentsStrings();
     Utils.extend(this, capturedStringFragments);
@@ -465,7 +466,6 @@ Capture.prototype.renderCapturedDoc = function(options) {
         date.innerHTML = window.Mobify.points[0];
         body.insertBefore(date, body.firstChild);
     }
-
 
     this.render();
 };

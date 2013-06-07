@@ -255,13 +255,6 @@ ResizeImages.resize = function(imgs, options) {
                     continue;
                 }
 
-                // Change attribute of any img element inside a picture element
-                // so it does not load post-flood
-                var disableImg = img.getElementsByTagName('img');
-                if (disableImg.length > 0) {
-                    disableImg[0].setAttribute('data-orig-src', disableImg[0].getAttribute(opts.attribute));
-                    disableImg[0].removeAttribute(opts.attribute);
-                }
                 // Grab optional src attribute on `picture`.
                 // Used for preventing writing the same src multiple times for
                 // different `source` elements.
