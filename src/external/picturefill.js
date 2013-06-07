@@ -23,7 +23,8 @@ if (capturing) {
 
 window.matchMedia = Utils.matchMedia(document);
 
-/*! Picturefill - Author: Scott Jehl, 2012 | License: MIT/GPLv2 */
+/* https://github.com/Wilto/picturefill-proposal */
+/*! Picturefill - Author: Scott Jehl, 2012 | License: MIT/GPLv2 */ 
 /*
     Picturefill: A polyfill for proposed behavior of the picture element, which does not yet exist, but should. :)
     * Notes: 
