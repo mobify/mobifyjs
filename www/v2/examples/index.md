@@ -39,7 +39,7 @@ You can find the source code here:
 ){: target='_blank' }
 * [main.js](https://github.com/mobify/mobifyjs/tree/v2.0/examples/resizeImages-img-element/main.js){: target='_blank' }
 
-## Capturing - Picture Polyfill
+## Picture Polyfill
 
 The Picture element is the official W3C HTML extension for 
 dealing with adaptive images. There are [polyfills that exist in 
@@ -74,7 +74,7 @@ is only available in the example, not the library itself - yet):
 ){: target='_blank' }
 * [main.js](https://github.com/mobify/mobifyjs/tree/v2.0/examples/capturing-picturepolyfill/main.js){: target='_blank' }
 
-Original polyfill example:
+Original polyfill example from Scott Jehl:
 
 * [Original Picture Polyfill example (not using Capturing)](http://scottjehl.github.com/picturefill/){: target='_blank' }
 
