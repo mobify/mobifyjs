@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
+<title>Using Image Resize with PICTURE elements</title>
 <script>
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
@@ -85,7 +86,7 @@ setTimeout(function() {
     },
 
     // path to mobify.js
-    '/mobifyjs/build/mobify.js',
+    '/mobifyjs/build/mobify.min.js',
 
     // path to main executable 
     '/mobifyjs/examples/resizeImages-picture-element/main.js'
@@ -93,13 +94,11 @@ setTimeout(function() {
 </script>
 <!-- END MOBIFY TAG -->
 <link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
-
-<title>Mobify.js Picturefill example</title>
 </head>
 <body class="foo">
-    <p>Credit to scottjehl for his <a href="http://scottjehl.github.com/picturefill/">picturefill example</a></p>
-    <p>This example has been forked and replicated using capturing to avoid the need for a &lt;noscript&gt; tag (view source to see for yourself).</p>
-    <p>Open up the network tab of your web inspector to see that the img element does not have it's asset downloaded.</p>
+
+    <p>Picture element is used here in a much simpler way. Equivilent images at different breakpoints do not need to be automatically generated, they only need to set width attributes for each `source` element.</p>
+    <p>View the source to have a look, and view the inspector to see what the `resize` method does to the picture element's markup.</p>
     <picture data-src="/mobifyjs/examples/assets/images/extralarge.jpg">
         <source src="/mobifyjs/examples/assets/images/alternate_art.png" media="(min-width: 320px)" data-width="320">
         <source media="(min-width: 800px)" data-width="400">

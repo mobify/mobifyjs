@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>Mobify.js Image Resizer</title>
+<title>Image Resizer with IMG elements</title>
 <script>
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
@@ -85,7 +85,7 @@ setTimeout(function() {
         return true;
     },
 
-    '/mobifyjs/build/mobify.js',
+    '/mobifyjs/build/mobify.min.js',
     '/mobifyjs/examples/resizeImages/main.js'
     //'/build/custom/mobify.js'
 );
@@ -103,24 +103,9 @@ setTimeout(function() {
 </style>
 </head>
 <body class="foo">
-<div class="images">
-    <img src="/mobifyjs/examples/assets/images/forest.jpg">
-    <img src="/mobifyjs/examples/assets/images/mountains.jpg">
-</div>
-
-<script>
-// Grab the total time since starting capturing and send it
-// to the parent for testing in performance.html
-var end = +new Date;
-var begin;
-if (window.Mobify.points) {
-    begin = window.Mobify.points[0];
-} else {
-    var pointEl = document.getElementById("mobify-point");
-    begin = pointEl.innerText || pointEl.textContent;
-}
-var diff = end - begin;
-parent.postMessage(diff, "*");
-</script>
+    <div class="images">
+        <img src="/mobifyjs/examples/assets/images/forest.jpg">
+        <img src="/mobifyjs/examples/assets/images/mountains.jpg">
+    </div>
 </body>
 </html>
