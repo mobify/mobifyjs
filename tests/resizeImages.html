@@ -54,7 +54,6 @@
     require.config({"baseUrl": "../src/"});
     require(["utils", "resizeImages"], function(Utils, ResizeImages) {
         QUnit.start();
-
         test('resize images - no projectName', function() {
             var images = document.querySelectorAll('#resizeImages-no-projectName img');
 
@@ -154,10 +153,17 @@
             var img = new Image()
             img.setAttribute("src", "foo");
             img.setAttribute("data-orig-src", "bar");
-
             ResizeImages.restoreOriginalSrc({target: img});
 
             equal(img.getAttribute("src"), "bar");
+        });
+
+        asyncTest('resize images - onerror handler gets triggered', function () {
+            var img = new Image()
+            img.setAttribute("x-src", "http://www.mobify.com/fake/path.png");
+
+            ResizeImages.resize([img], {onerror: "ok(true); start();"});
+            img.setAttribute("src", img.getAttribute("x-src"));
         });
 
         test('resizeImages - does not modify data URI', function() {
