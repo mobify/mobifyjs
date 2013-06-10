@@ -1,14 +1,11 @@
 define(["utils"], function(Utils) {
 
-var ResizeImages = {};
+var ResizeImages = window.ResizeImages = {};
 
 var absolutify = document.createElement('a');
 
 // A regex for detecting http(s) URLs.
 var httpRe = /^https?/;
-
-// A protocol relative URL for the host ir0.mobify.com
-var PROTOCOL_AND_HOST = '//ir0.mobify.com';
 
 function getPhysicalScreenSize(devicePixelRatio) {
 
@@ -145,7 +142,7 @@ ResizeImages.getImageURL = function(url, options) {
         Utils.extend(opts, options);
     }
 
-    var bits = [PROTOCOL_AND_HOST];
+    var bits = [opts.proto + opts.host];
 
     if (opts.projectName) {
         var projectId = "project-" + opts.projectName;
@@ -217,6 +214,10 @@ ResizeImages.resize = function(imgs, options) {
             var url = absolutify.href;
             if (httpRe.test(url)) {
                 img.setAttribute(opts.setAttr, ResizeImages.getImageURL(url, opts));
+                img.setAttribute('data-orig-src', srcVal);
+                if(opts.onerror) {
+                    img.setAttribute('onerror', opts.onerror);
+                }
             }
         }
     };
@@ -275,9 +276,21 @@ ResizeImages.resize = function(imgs, options) {
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
 var defaults = {
-      projectName: 'oss-' + location.hostname.replace(/[^\w]/g, '-'),
-      attribute: 'x-src',
-      webp: ResizeImages.supportsWebp()
+      proto: '//',
+      host: 'ir0.mobify.com',
+      projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
+      attribute: "x-src",
+      webp: ResizeImages.supportsWebp(),
+      onerror: 'ResizeImages.restoreOriginalSrc(event);'
+};
+
+var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
+    var origSrc;
+    event.target.removeAttribute('onerror'); // remove ourselves
+    if (origSrc = event.target.getAttribute('data-orig-src')) {
+        console.log("Restoring " + event.target.src + " to " + origSrc);
+        event.target.setAttribute('src', origSrc);
+    }
 };
 
 defaults.setAttr = (capturing ? defaults.attribute : 'src');

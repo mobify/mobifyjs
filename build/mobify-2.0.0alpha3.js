@@ -986,9 +986,6 @@ var absolutify = document.createElement('a');
 // A regex for detecting http(s) URLs.
 var httpRe = /^https?/;
 
-// A protocol relative URL for the host ir0.mobify.com
-var PROTOCOL_AND_HOST = '//ir0.mobify.com';
-
 function getPhysicalScreenSize(devicePixelRatio) {
 
     function multiplyByPixelRatio(sizes) {
@@ -1047,7 +1044,7 @@ function persistWebpSupport(supported) {
  * Credit to Ilya Grigorik for WEBP regex matching
  * https://github.com/igrigorik/webp-detect/blob/master/pagespeed.cc
  */
-ResizeImages.userAgentSupportsWebp = function(userAgent){
+ResizeImages.userAgentWebpDetect = function(userAgent){
     var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
     var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3)\\.)|(Chrome\\/[0-8]\\.)' +
                                 '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
@@ -1071,7 +1068,7 @@ ResizeImages.userAgentSupportsWebp = function(userAgent){
  * Credit to Modernizer:
  * https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
  */
-ResizeImages.dataUriSupportsWebp = function(callback) {
+ResizeImages.dataUriWebpDetect = function(callback) {
     var image = new Image();
     image.onload = function() {
         var support = (image.width == 4) ? true : false;
@@ -1104,10 +1101,10 @@ ResizeImages.supportsWebp = function(callback) {
 
     // Run async WEBP detection for future proofing
     // This test may not finish running before the first call of `resize`
-    ResizeImages.dataUriSupportsWebp(callback);
+    ResizeImages.dataUriWebpDetect(callback);
 
     // Run regex based synchronous WEBP detection
-    var support = ResizeImages.userAgentSupportsWebp(navigator.userAgent);
+    var support = ResizeImages.userAgentWebpDetect(navigator.userAgent);
 
     persistWebpSupport(support);
 
@@ -1124,7 +1121,7 @@ ResizeImages.getImageURL = function(url, options) {
         Utils.extend(opts, options);
     }
 
-    var bits = [PROTOCOL_AND_HOST];
+    var bits = [opts.proto + opts.host];
 
     if (opts.projectName) {
         var projectId = "project-" + opts.projectName;
@@ -1195,6 +1192,10 @@ ResizeImages.resize = function(imgs, options) {
             var url = absolutify.href;
             if (httpRe.test(url)) {
                 img.setAttribute(opts.attribute, ResizeImages.getImageURL(url, opts));
+                img.setAttribute('data-orig-src', attrVal);
+                if(opts.onerror) {
+                    img.setAttribute('onerror', opts.onerror);
+                }
             }
         }
     }
@@ -1202,9 +1203,21 @@ ResizeImages.resize = function(imgs, options) {
 };
 
 var defaults = {
+      proto: '//',
+      host: 'ir0.mobify.com',
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
       attribute: "x-src",
-      webp: ResizeImages.supportsWebp()
+      webp: ResizeImages.supportsWebp(),
+      onerror: 'Mobify.ResizeImages.restoreOriginalSrc(event);'
+};
+
+var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
+    var origSrc;
+    event.target.removeAttribute('onerror'); // remove ourselves
+    if (origSrc = event.target.getAttribute('data-orig-src')) {
+        console.log("Restoring " + event.target.src + " to " + origSrc);
+        event.target.setAttribute('src', origSrc);
+    }
 };
 
 return ResizeImages;
