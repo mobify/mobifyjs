@@ -39,6 +39,14 @@
         <img x-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCB1jYAAAAAIAAc/INeUAAAAASUVORK5CYII=" />
     </div>
 
+    <div id="resizeImages-adds-data-orig-src">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
+    <div id="resizeImages-adds-onerror">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
 </div>
 
 <script>
@@ -46,7 +54,6 @@
     require.config({"baseUrl": "../src/"});
     require(["utils", "resizeImages"], function(Utils, ResizeImages) {
         QUnit.start();
-
         test('resize images - no projectName', function() {
             var images = document.querySelectorAll('#resizeImages-no-projectName img');
 
@@ -123,6 +130,47 @@
 
         });
 
+        test('resize images - adds an original src data attribute', function() {
+            var images = document.querySelectorAll("#resizeImages-adds-data-orig-src img");
+            var originalSrcs = [].map.call(images, function(img) {
+                return img.getAttribute("x-src");
+            });
+            var resized = ResizeImages.resize(images);
+            for(var i = 0, len = resized.length; i < len; i++) {
+                equal(resized[i].getAttribute('data-orig-src'), originalSrcs[i]);
+            }
+        });
+
+        test('resize images - adds an onerror handler', function() {
+            var images = document.querySelectorAll("#resizeImages-adds-onerror img");
+            var resized = ResizeImages.resize(images);
+            for(var i = 0, len = resized.length; i < len; i++) {
+                ok(resized[i].getAttribute('onerror'));
+            }
+        });
+
+        test('resize images - onerror handler restores src', function () {
+            var img = new Image()
+            img.setAttribute("src", "foo");
+            img.setAttribute("data-orig-src", "bar");
+            ResizeImages.restoreOriginalSrc({target: img});
+
+            equal(img.getAttribute("src"), "bar");
+        });
+
+        asyncTest('resize images - onerror handler gets triggered', function () {
+            var img = new Image()
+            img.setAttribute("x-src", "http://www.mobify.com/fake/path.png");
+
+            window.onerr = function() {
+                ok(true);
+                start();
+            }
+
+            ResizeImages.resize([img], {onerror: "onerr()" });
+            img.setAttribute("src", img.getAttribute("x-src"));
+        });
+
         test('resizeImages - does not modify data URI', function() {
             var images = document.querySelectorAll("#resizeImages-dataURI img");
             imageXSrc = images[0].getAttribute('x-src');
@@ -135,7 +183,6 @@
             strictEqual(resized[0].getAttribute('x-src'), imageXSrc,
               "x-src is unmodified");
         });
-
 
         test('get image url', function() {
 
