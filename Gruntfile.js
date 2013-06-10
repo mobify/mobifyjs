@@ -20,6 +20,7 @@ module.exports = function(grunt) {
         qunit: {
             all: {
               options: {
+                timeout: 10000,
                 urls: [
                   'http://localhost:3000/tests/mobify-library.html',
                   'http://localhost:3000/tests/capture.html',
