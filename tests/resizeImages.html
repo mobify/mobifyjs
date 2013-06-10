@@ -162,7 +162,12 @@
             var img = new Image()
             img.setAttribute("x-src", "http://www.mobify.com/fake/path.png");
 
-            ResizeImages.resize([img], {onerror: "ok(true); start();"});
+            window.onerr = function() {
+                ok(true);
+                start();
+            }
+
+            ResizeImages.resize([img], {onerror: "onerr()" });
             img.setAttribute("src", img.getAttribute("x-src"));
         });
 
