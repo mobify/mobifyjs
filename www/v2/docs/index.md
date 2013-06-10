@@ -7,7 +7,9 @@ title: Mobify.js Documentation
 
 ## What is Mobify.js?
 
-Mobify.js is an open source library for improving the performance of responsive sites, and/or for creating new responsive experiences using Adaptive Templating. Core to Mobify.js is the ability to capture and manipulate the DOM
+Mobify.js is an open source library for improving the performance of responsive 
+sites, as well as for creating new sites using Adaptive Templating. 
+Core to Mobify.js is the ability to capture and manipulate the DOM
 before any resources have downloaded, which unlocks the ability to do resource
 control, conditional loading, image resizing, javascript  concatination and
 more.
