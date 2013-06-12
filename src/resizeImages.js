@@ -170,11 +170,71 @@ ResizeImages.getImageURL = function(url, options) {
 };
 
 /**
+ * Replaces src attr of passed element with value of running `getImageUrl` on it
+ * Allows overriding of img.getAttribute(x-src) with srcVal
+ */
+
+ResizeImages._rewriteSrcAttribute = function(element, opts, srcVal){
+    srcVal = element.getAttribute(opts.attribute) || srcVal;
+    if (srcVal) {
+        absolutify.href = srcVal;
+        var url = absolutify.href;
+        if (httpRe.test(url)) {
+            element.setAttribute(opts.setAttr, ResizeImages.getImageURL(url, opts));
+            element.setAttribute('data-orig-src', srcVal);
+            if(opts.onerror) {
+                element.setAttribute('onerror', opts.onerror);
+            }
+        }
+    }
+};
+
+/**
+ * Modifies src of `<source />` children of a `<picture>` element to use image 
+ * resizer
+ */
+ResizeImages._resizeSourceElement = function(element, opts, rootSrc) {
+    // Grab optional width override
+    var width = element.getAttribute('data-width');
+    var localOpts = opts;
+    if (width) {
+        localOpts = Utils.clone(opts);
+        localOpts.maxWidth = width;
+    }
+    // pass along rootSrc if defined on `picture` element
+    ResizeImages._rewriteSrcAttribute(element, localOpts, rootSrc);
+};
+
+/**
+ * Takes a picture element and calls _resizeSourceElement on its `<source />` 
+ * children
+ */
+ResizeImages._crawlPictureElement = function(el, opts) {
+    var sources = el.getElementsByTagName('source');
+    // If source elements are erased from the dom, leave the
+    // picture element alone.
+    if (sources.length === 0) {
+        return;
+    }
+
+    // Grab optional `data-src` attribute on `picture`.
+    // Used for preventing writing the same src multiple times for
+    // different `source` elements.
+    var rootSrc = el.getAttribute('data-src');
+
+    // resize the sources
+    for(var i =  0, len = sources.length; i < len; i++) {
+        ResizeImages._resizeSourceElement(sources[i], opts, rootSrc);
+    }
+};
+
+/**
  * Searches the collection for image elements and modifies them to use
  * the Image Resize service. Pass `options` to modify how the images are 
  * resized.
  */
-ResizeImages.resize = function(imgs, options) {
+
+ResizeImages.resize = function(elements, options) {
     var opts = Utils.clone(defaults);
     if (options) {
         Utils.extend(opts, options);
@@ -205,72 +265,21 @@ ResizeImages.resize = function(imgs, options) {
         opts.format = "webp";
     }
 
-    // Runs `getImageUrl` on src attr of an img/source element.
-    // Allows overriding of img.getAttribute(x-src) with srcVal
-    function modifySrcAttribute(img, opts, srcVal){
-        var srcVal = img.getAttribute(opts.attribute) || srcVal;
-        if (srcVal) {
-            absolutify.href = srcVal;
-            var url = absolutify.href;
-            if (httpRe.test(url)) {
-                img.setAttribute(opts.setAttr, ResizeImages.getImageURL(url, opts));
-                img.setAttribute('data-orig-src', srcVal);
-                if(opts.onerror) {
-                    img.setAttribute('onerror', opts.onerror);
-                }
-            }
+    for(var i=0; i < elements.length; i++) {
+        var element = elements[i];
+
+        // For an `img`, simply modify the src attribute
+        if (element.nodeName === 'IMG') {
+            ResizeImages._rewriteSrcAttribute(element, opts);
         }
-    };
-
-    // Inner function used to resize `img` and `picture` elements.
-    // Called recursively for picture element.
-    function resizeInner(imgs, rootSrc) {
-        for(var i=0; i<imgs.length; i++) {
-            var img = imgs[i];
-
-            // For an `img`, simply modify the src attribute
-            if (img.nodeName === 'IMG') {
-                modifySrcAttribute(img, opts);
-            }
-            // For a `source`, modify the src attribute, and also
-            // potentially override the width and src value.
-            else if (img.nodeName === 'SOURCE') {
-                // Grab optional width override
-                var width = img.getAttribute('data-width');
-                var localOpts = opts;
-                if (width) {
-                    localOpts = Utils.clone(opts);
-                    localOpts.maxWidth = width;
-                }
-                // pass along rootSrc if defined on `picture` element
-                modifySrcAttribute(img, localOpts, rootSrc);
-            }
-            // For a `picture`, (potentially) nuke src on `img`, and
-            // pass all `source` elements into modifyImages recursively
-            else if (img.nodeName === 'PICTURE') {
-                var sources = img.getElementsByTagName('source');
-
-                // If source elements are erased from the dom, leave the
-                // picture element alone.
-                if (sources.length === 0) {
-                    continue;
-                }
-
-                // Grab optional src attribute on `picture`.
-                // Used for preventing writing the same src multiple times for
-                // different `source` elements.
-                var rootSrc = img.getAttribute('data-src');
-
-                // Recurse on the source elements
-                resizeInner(sources, rootSrc);
-
-            }
+        // For a `picture`, (potentially) nuke src on `img`, and
+        // pass all `source` elements into modifyImages recursively
+        else if (element.nodeName === 'PICTURE') {
+            ResizeImages._crawlPictureElement(element, opts);
         }
-    };
+    }
 
-    resizeInner(imgs);
-
-    return imgs;
+    return elements;
 };
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
