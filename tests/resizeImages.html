@@ -209,9 +209,6 @@
             // First version of Chrome to support WEBP
             ok(ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.17 Safari/537.11"));
 
-            // Android 4 Native Browser
-            ok(ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"));
-
             // Android 4 Chrome Browser
             ok(ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; Android 4.1.2; GT-I9100 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.90 Mobile Safari/537.36"));
 
@@ -231,6 +228,9 @@
 
             // Chrome 18 on Android 4.1.2 on Galaxy S3
             ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; Android 4.1.2; GT-I9300 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"))
+
+            // Android 4 Native Browser on HTC Sensation
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"));
 
             // Android 4.1.2 Native Browser on Galaxy S3
             ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; U; Android 4.1.2; en-us; GT-I9300 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"));

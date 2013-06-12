@@ -64,12 +64,13 @@ function persistWebpSupport(supported) {
  * Synchronous WEBP detection using regular expressions
  * Credit to Ilya Grigorik for WEBP regex matching
  * https://github.com/igrigorik/webp-detect/blob/master/pagespeed.cc
+ * Modified to exclude Android native browser on Android 4
  */
 ResizeImages.userAgentWebpDetect = function(userAgent){
     var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
-    var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3)\\.)|(Chrome\\/[0-8]\\.)' +
+    var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3|(4(?!.*Chrome)))\\.)|(Chrome\\/[0-8]\\.)' +
                                 '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
-                                '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' + 
+                                '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' +
                                 '|(Opera.*(Version/|Opera\\s)(10|11)\\.)', 'i');
 
     // Return false if browser is not supported
@@ -79,10 +80,10 @@ ResizeImages.userAgentWebpDetect = function(userAgent){
 
     // Return false if a specific browser version is not supported
     if (unsupportedVersionsRe.test(userAgent)) {
-        return false;  
+        return false;
     }
     return true;
-}
+};
 
 /**
  * Asychronous WEB detection using a data uri.
