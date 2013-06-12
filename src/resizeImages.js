@@ -97,6 +97,10 @@ ResizeImages.dataUriWebpDetect = function(callback) {
         persistWebpSupport(support);
         if (callback) callback(support);
         };
+    // this webp generated with Mobify image resizer from 
+    // http://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png passed 
+    // through the Mobify Image resizer: 
+    // http://ir0.mobify.com/webp/http://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png
     image.src = 'data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQABgBwlpAADcAD+/gbQAA==';
 }
 
