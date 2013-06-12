@@ -1027,7 +1027,7 @@ function getPhysicalScreenSize(devicePixelRatio) {
     return multiplyByPixelRatio(sizes);
 }
 
-var localStorageWebpKey = 'Mobify-Webp-Support';
+var localStorageWebpKey = 'Mobify-Webp-Support-v2';
 
 function persistWebpSupport(supported) {
     if (Utils.supportsLocalStorage()) {
@@ -1043,12 +1043,13 @@ function persistWebpSupport(supported) {
  * Synchronous WEBP detection using regular expressions
  * Credit to Ilya Grigorik for WEBP regex matching
  * https://github.com/igrigorik/webp-detect/blob/master/pagespeed.cc
+ * Modified to exclude Android native browser on Android 4
  */
 ResizeImages.userAgentWebpDetect = function(userAgent){
     var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
-    var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3)\\.)|(Chrome\\/[0-8]\\.)' +
+    var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3|(4(?!.*Chrome)))\\.)|(Chrome\\/[0-8]\\.)' +
                                 '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
-                                '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' + 
+                                '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' +
                                 '|(Opera.*(Version/|Opera\\s)(10|11)\\.)', 'i');
 
     // Return false if browser is not supported
@@ -1058,10 +1059,10 @@ ResizeImages.userAgentWebpDetect = function(userAgent){
 
     // Return false if a specific browser version is not supported
     if (unsupportedVersionsRe.test(userAgent)) {
-        return false;  
+        return false;
     }
     return true;
-}
+};
 
 /**
  * Asychronous WEB detection using a data uri.
@@ -1071,11 +1072,15 @@ ResizeImages.userAgentWebpDetect = function(userAgent){
 ResizeImages.dataUriWebpDetect = function(callback) {
     var image = new Image();
     image.onload = function() {
-        var support = (image.width == 4) ? true : false;
+        var support = (image.width === 1) ? true : false;
         persistWebpSupport(support);
         if (callback) callback(support);
         };
-    image.src = 'data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAAAQAgCdASoEAAQAAAcIhYWIhYSIgIIADA1gAAUAAAEAAAEAAP7%2F2fIAAAAA';
+    // this webp generated with Mobify image resizer from 
+    // http://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png passed 
+    // through the Mobify Image resizer: 
+    // http://ir0.mobify.com/webp/http://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png
+    image.src = 'data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQABgBwlpAADcAD+/gbQAA==';
 }
 
 /**
