@@ -48,7 +48,7 @@ function getPhysicalScreenSize(devicePixelRatio) {
     return multiplyByPixelRatio(sizes);
 }
 
-var localStorageWebpKey = 'Mobify-Webp-Support';
+var localStorageWebpKey = 'Mobify-Webp-Support-v2';
 
 function persistWebpSupport(supported) {
     if (Utils.supportsLocalStorage()) {
@@ -92,11 +92,11 @@ ResizeImages.userAgentWebpDetect = function(userAgent){
 ResizeImages.dataUriWebpDetect = function(callback) {
     var image = new Image();
     image.onload = function() {
-        var support = (image.width == 4) ? true : false;
+        var support = (image.width === 1) ? true : false;
         persistWebpSupport(support);
         if (callback) callback(support);
         };
-    image.src = 'data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAAAQAgCdASoEAAQAAAcIhYWIhYSIgIIADA1gAAUAAAEAAAEAAP7%2F2fIAAAAA';
+    image.src = 'data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQABgBwlpAADcAD+/gbQAA==';
 }
 
 /**
