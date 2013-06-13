@@ -26,19 +26,21 @@ And then download the latest code from git and install the dependancies:
     cd mobifyjs
     npm install
 
-Now, to build the library, simply run grunt:
+Now, to build the library, simply run the following command:
 
-    grunt
+    grunt build
 
-Open the ./build folder to see the generated Mobify.js libraries.
+Open the `build` folder to see the generated Mobify.js libraries.
 
-Mobify.js uses Require.js mainly for dependency management, and doesn't use it for dynamic library loading when developing.
+Mobify.js is built with AMD modules using almond.js.
 
-In order to build Mobify.js during development without having to run `grunt` everytime you change a file, run the following command:
+In order to build Mobify.js during development without having to run
+`grunt build` everytime you change a file, run the following command:
     
     grunt serve
 
-This will run a development server on http://localhost:3000 using connect.
+This will run a development server on http://localhost:3000 using connect,
+and build the library every time the files in `src` change.
 
 To see how the project is setup to build, open up `Gruntfile.js` and have a look!
 
@@ -58,8 +60,8 @@ To create a custom build, run the following:
 
     `cp mobify-custom.js.example mobify-custom.js`
 
-Then, run `grunt server` as normal. The output of the custom build will be
-located in `./build/custom`.
+Then, run `grunt serve` as normal. The output of the custom build will be
+located in `build/custom`.
 
 **Note: We use a `mobifyjs` symlink to resolve paths so they can be the same
 locally as they are on the CDN. This can be problematic for Windows.**
