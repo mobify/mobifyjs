@@ -44,7 +44,7 @@ Otherwise it defaults to the original image format.
 
 **Note: The image resizer backend must have access to the images in order to resize
 them. If your development server is not publicly accessible, 
-ir.mobify.com will serve a 302 redirect back to the original image location.**
+ir0.mobify.com will serve a 302 redirect back to the original image location.**
 
 <div class="alert alert-block">
     <p>Our image resizing service backend service is free to use up to a certain number
@@ -192,7 +192,12 @@ format, and quality of any image. All requests through this service are cached o
 The image resizer API in Mobify.js uses this service by default for image
 manipulation.
 
-Visit [http://ir0.mobify.com](http://ir0.mobify.com) to see full REST API.
+Requests are in the form of:
+
+    http://ir0.mobify.com/<format><quality>/<maximum width>/<maximum height>/<url>
+
+Visit [http://ir0.mobify.com](http://ir0.mobify.com) to understand the REST API
+in more detail.
 
 ## Browser Support
 
