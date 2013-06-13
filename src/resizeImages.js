@@ -117,7 +117,12 @@ ResizeImages.supportsWebp = function(callback) {
     if (Utils.supportsLocalStorage()) {
         
         // Check if WEBP support has already been detected
-        var webpSupport = JSON.parse(localStorage.getItem(localStorageWebpKey));
+        var webpSupport;
+        var storedSupport = localStorage.getItem(localStorageWebpKey);
+
+        // Only JSON.parse if storedSupport is not null, or else things
+        // will break on Android 2.3
+        storedSupport && (webpSupport = JSON.parse(storedSupport));
         
         // Grab previously cached support value in localStorage.
         if (webpSupport && (Date.now() - webpSupport.date < 604800000)) {
