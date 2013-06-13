@@ -2,10 +2,12 @@
 
 Mobify.js is an open source library for improving the performance of responsive 
 sites, as well as for creating new sites using Adaptive Templating. 
-Core to Mobify.js is the ability to capture and manipulate the DOM
+
+Mobify.js contains an API called "Capturing", which enables you to manipulate the DOM
 before any resources have downloaded, which unlocks the ability to do resource
 control, conditional loading, image resizing, javascript  concatination and
-more, all without changing any existing backend markup.
+more, all without changing any existing backend markup. Many of these APIs
+can also work without Capturing with some modifications to your backend.
 
 For instructions on how to use the library, follow the instructions on [mobifyjs.com](https://www.mobifyjs.com/)
 or build the docs site manually in the instructions below.
@@ -30,11 +32,11 @@ Now, to build the library, simply run grunt:
 
 Open the ./build folder to see the generated Mobify.js libraries.
 
-Mobify.js uses Require.js mainly for dependency management, we don't use it for dynamic library loading when developing.
+Mobify.js uses Require.js mainly for dependency management, and doesn't use it for dynamic library loading when developing.
 
 In order to build Mobify.js during development without having to run `grunt` everytime you change a file, run the following command:
     
-    grunt preview
+    grunt serve
 
 This will run a development server on http://localhost:3000 using connect.
 
@@ -45,14 +47,10 @@ To see how the project is setup to build, open up `Gruntfile.js` and have a look
 Require.js is used to build Mobify.js. 
 
  - src/config.js # The require.js base config for all build mobify.js builds
-
-There are a number of files that define which modules to load in to build our various libraries.
-
- - src/mobify-full.js # Defines how to build the full mobify.js library
- - src/mobify-capture.js # Defines how to build the capture library only
+ - src/mobify-library.js # Defines how to build the full mobify.js library
 
 There is also an example custom build file to make it simple to build a custom
-mobify.js library (or to compile the library with executable code)
+mobify.js library (or to compile the library with executable code):
 
  - mobify-custom.js.example
 
@@ -60,15 +58,16 @@ To create a custom build, run the following:
 
     `cp mobify-custom.js.example mobify-custom.js`
 
-Then, run `grunt preview` as normal. The output of the custom build will be
+Then, run `grunt server` as normal. The output of the custom build will be
 located in `./build/custom`.
 
-**Note: We use a `mobifyjs` symlink to resolve paths so they can be the same locally as they are on the CDN. This can be problematic for Windows.**
+**Note: We use a `mobifyjs` symlink to resolve paths so they can be the same
+locally as they are on the CDN. This can be problematic for Windows.**
 
 ### Tests
 
 Tests for Mobify.js are written in QUnit. To run them individually, run
-`grunt preview` and then go to `http://localhost:3000/tests/capture.html`
+`grunt serve` and then go to `http://localhost:3000/tests/capture.html`
 or any other of the QUnit tests in the /tests/ folder.
 
 To run all of the tests in an automated fashion using Phantomjs
@@ -87,10 +86,18 @@ Saucelabs Connect username and key).
 
 ## Browser support
 
+Using Capturing:
+
  - All Webkit browsers (Safari, Chrome, Netfront, etc)
  - Firefox - version 4 and up
  - Opera - 11 and up (previous versions untested)
- - IE10 - TODO: Explain why not IE9 and previous
+ - IE - 10 and up
+
+Not Using Capturing:
+
+Support for using the API without Capturing has not been tested, but it will
+at minimum support the browsers listed above (as well, it should cover many 
+older browsers)
 
 ##  Docs
 
