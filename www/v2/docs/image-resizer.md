@@ -5,63 +5,94 @@ title: Mobify.js Documentation
 
 # Image Resizer
 
-To use the Image Resizer API, you must first install the Mobify.js tag on your site.
-If you have not already, please refer to the  [quickstart guide](/mobifyjs/v2/docs/) to get setup.
+- Automatically resize `<img>` and `<picture>` elements to the maximum width
+of the screen.
+- Automatically determine support for `WEBP`, and convert images on the fly.
+- Manual resize of `<picture>` elements by specifying different widths
+on each `<source>` element breakpoint.
+- Cache all images on Mobify's CDN.
+- Image resizing powered by the [Mobify Performance Suite](https://cloud.mobify.com){: target='_blank' }.
+- Can be overridden to use another resizing service.
+
+To automatically add resizing to your site without modifying any markup on your backend,
+you must have the ability to [Capture](/mobifyjs/v2/docs/capturing/) the DOM, 
+which requires the Mobify.js tag on your site.
+Please refer to the  [quickstart guide](/mobifyjs/v2/docs/) to get setup.
+
+If you have access to change `src` to `x-src` (or `data-src` - any prefix is fine) on your backend,
+you can use a regular external script tag to include this API:
+
+    <script src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha4.min.js">
 
 * TOC
 {:toc}
 
-## `ResizeImages.resize(imgElements, [options])`
+## `ResizeImages.resize(images, [options])`
 
-__imgElements__ must be an array of image elements to resize.
+__images__ must be an array of `<img>` and/or `<picture>` elements.
 
 __options__ are optional.
 
-Rewrites the `src` of every image in the array `imgElements` on the page based 
-on the options passed. By default, images are requested through mobfy's image 
-resizing web service, `ir0.mobify.com`, maximum dimensions are based on the 
-size of the device, taking into account is pixel density, output format of 
-images are maintained (except for gifs), and the requested image is cached 
-indefinitely.
+Rewrites the `src` of every `<img>/<picture>` in the `images` array on the page based 
+on the options passed. 
 
-The image resizer backend must have access to the images in order to resize them. If your development server is not accessible on the publicly, 
-`ir.mobify.com` will serve a 302 redirect back to the original image location.
+- By default, images are requested through `ir0.mobify.com` (part of the [Mobify Performance Suite](https://cloud.mobify.com){: target='_blank' }).
+- Maximum dimensions are based on the size of the device, taking into 
+account pixel density. This can be overridden in the `options`.
+- Determines support for WEBP and uses that on images whenever possible.
+Otherwise it defaults to the original image format.
 
-Our image resizing service backend service is free to use up to a certain number
-of views per month. If you plan on using this service on a website with high 
-amounts of traffic, feel free to visit our 
-[pricing page](http://www.mobify.com/pricing/) for more detail.
+**Note: The image resizer backend must have access to the images in order to 
+resize them. If your development server is not publicly accessible, 
+ir0.mobify.com will serve a 302 redirect back to the original image location.**
+
+<div class="alert alert-block">
+    <p>Our image resizing service backend service is free to use up to a certain
+    number of views per month. If you plan on using this service on a website with high amounts of traffic, feel free to visit our 
+    <a href="http://www.mobify.com/pricing/">pricing page</a> for more detail.
+    </p>
+</div>
 
 **Options**
 
-- `attribute`: `img` element attribute to manipulate. Defaults to "x-src". "x-" is the default escape prefix used in [Capturing](/mobifyjs/v2/docs/capturing/)
-- `projectName`: The project slug of the project on Mobify Cloud. Defaults to ""
-- `cacheHours`: Sets the length of time for the image(s) to be cached on the CDN. Defaults to forever.
-- `format`: Output format of the image(s) being resized. Defaults to original format, except gifs, which are converted to pngs.
-- `maxWidth`: Maximum width of the image(s) being resized (in CSS pixes). Defaults to automatically determine width of device.
-- `maxHeight`: Maximum height of the image(s) being resized (in CSS pixels). Only usable when maxWidth is specified.
-- `devicePixelRatio`: Override the default devicePixelRatio. Defaults to window.devicePixelRatio.
+- `attribute`: Attribute to manipulate for img/picture elements. Defaults to 
+  "x-src". "x-" is the default escape prefix used in [Capturing](/mobifyjs/v2/docs/capturing/)
+- `cacheHours`: Sets the length of time for the image(s) to be cached on the CDN. 
+  The default is 2 months.
+- `format`: Output format of the image(s) being resized. Defaults to original
+  format, except non-animated gifs, which are converted to png.
+- `quality`: An integer from 1-100 used as a quality parameter when encoding 
+  jpg and webp images, can only be set along with the `format` parameter.
+- `maxWidth`: Maximum width of the image(s) being resized (in CSS pixes). 
+  Defaults to automatically determine width of device.
+- `maxHeight`: Maximum height of the image(s) being resized (in CSS pixels). 
+  Only usable when maxWidth is specified.
+- `devicePixelRatio`: Override the default devicePixelRatio. Defaults to 
+  `window.devicePixelRatio.`
 
 **Example**
+
+There are many examples using Image Resizer on the 
+[examples](/mobifyjs/v2/examples) page.
 
 Automatic image resizing:
 
     Mobify.Capture.init(function(capture){
         var capturedDoc = capture.capturedDoc;
         // Resize images using Mobify Image Resizer
-        var images = capturedDoc.querySelectorAll('img');
+        var images = capturedDoc.querySelectorAll('img, picture');
         Mobify.ResizeImages.resize( images, {
             cacheHours: "2",
         } );
         capture.renderCapturedDoc();
     });
 
-Specify custom width:
+Specify a custom width for a group of images:
 
     Mobify.Capture.init(function(capture){
         var capturedDoc = capture.capturedDoc;
         // Resize images using Mobify Image Resizer
-        var images = capturedDoc.querySelectorAll('img');
+        var images = capturedDoc.querySelectorAll('#footer img');
 
         var maxWidth;
         if (window.matchMedia( "(min-width: 768px) and (max-width : 1024px)" ).matches) {
@@ -81,9 +112,10 @@ __url__ is the image URL being modifed.
 
 __options__ are optional.
 
-This method takes a URL and modifies it based on the options passed. It is executed
-by `ResizeImages.resize` for each element. It can be overridden to use this API
-for a different image resizing service (such as src.sencha.io).
+This method takes a URL and modifies it based on the options passed. It is 
+executed by `ResizeImages.resize` for each element. It can be overridden to use
+this API for a different image resizing service (such as 
+[src.sencha.io](http://www.sencha.com/learn/how-to-use-src-sencha-io/)).
 
 **Options**
 
@@ -96,18 +128,95 @@ The same as `ResizeImages.resize` options.
         return "http://src.sencha.io/" + options.maxWidth + "/" + url  
     };
 
+## WebP
+
+[WebP](https://developers.google.com/speed/webp/) is a new image file format from Google, it offers significantly smaller file sizes than JPEG 
+compression with similar image quality.
+
+Using the Image Resizer API with Mobify.js, image files referenced by your img 
+and picture elements will automatically be converted to WebP for browsers that
+support it. This can have a significant impact on the total weight of your pages
+for supported browsers.
+
+Have a look at [http://caniuse.com/webp](http://caniuse.com/webp) to see the
+current state of browser support for this format.
+
+## Simplified Picture Element
+
+Mobify.js comes with a `<picture>` polyfill. In combination with the Image Resize
+API, you can have much simplier `<picture>` elements. You also no longer need
+a &lt;noscript> fallback when using the Resize API (with Capturing).
+
+The problem with the `<picture>` element is that using it to specify the same
+image at different widths can be extremely tedious. Nobody wants to generate 4
+versions of every image at all of the possible resolutions, and constantly 
+update those versions in the markup. Scaling image widths can be automated
+(although the `<picture>` element is the best solution for art direction).
+
+To solve this problem, Mobify.js allows for alternate `<picture>` markup that
+allows you to specify widths as attributes on `<source>` elements, instead of
+specifying a different `src` attribute for each breakpoint. 
+
+For example, you could write your element like this:
+
+    <picture data-src="horse.png">
+        <source src="alt-horse.png" data-media="(max-width: 480px)">
+        <source media="(min-width: 480px)" data-width="200">
+        <source media="(min-width: 800px)" data-width="400">
+        <source media="(min-width: 1000px)">
+        <img src="horse-small.png">
+    </picture>
+
+Notice the use of the `data-src` attribute inside of the `<picture>` element. 
+This gives us a basis that we can resize to produce an asset for other 
+breakpoints. 
+
+Let's break down how this will actually work in the browser:
+
+- If the browser width is between 0 and 480px (smartphone):
+    - Use "alt-horse.png" for art direction purposes.
+- If the browser width is between 480px and 799px:
+    - Use "horse.png" since `src` is not specified in the `<source>` element corresponding to that media query. Resize to 200px wide.
+- If the browser width is between 800px and 999px:
+    - Use "horse.png" since `src` is not specified in the `<source>` element corresponding to that media query. Resize to 400px wide.
+- If the browser width is 1000px or greater:
+    - Use "horse.png" since `src` is not specified in the `<source>` element 
+    corresponding to that media query. Automatically determine width since 
+    `data-width` isn't specified.
+- If Javascript isn't supported, fallback to regular old `<img>` tag. 
+(which needs no &lt;noscript> wrapping as with other solutions).
+
+The `resize` method will cause the above markup to transform into this (on an iPhone):
+
+    <picture data-src="horse.png">
+        <source src="ir0.mobify.com/320/http://site.com/alt-horse.png" data-media="(max-width: 480px)">
+        <source src="ir0.mobify.com/200/http://site.com/horse.png" media="(min-width: 480px)" data-width="200">
+        <source src="ir0.mobify.com/400/http://site.com/horse.png" media="(min-width: 800px)" data-width="400">
+        <source src="ir0.mobify.com/320/http://site.com/horse.png" media="(min-width: 1000px)">
+        <img src="horse-small.png">
+    </picture>
+
+After `resize` changes the markup, the Picture polyfill will run and select the appropriate image based on running the media queries.
+
 ## ir0.mobify.com
 
 Mobify's image resizing backend that can manipulate the width, height, file
-format, and quality of any image. All requests through this service are cached on Mobify's CDN.
+format, and quality of any image. All requests through this service are cached 
+on Mobify's CDN.
 
 The image resizer API in Mobify.js uses this service by default for image
 manipulation.
 
-Visit [http://ir0.mobify.com](http://ir0.mobify.com) to see full REST API.
+Requests are in the form of:
+
+    http://ir0.mobify.com/<format><quality>/<maximum width>/<maximum height>/<url>
+
+Visit [http://ir0.mobify.com](http://ir0.mobify.com) to understand the API in 
+more detail.
 
 ## Browser Support
 
+### With Capturing (fully tested)
 
 | Browser                      | Version |
 |------------------------------|---------|
@@ -115,3 +224,9 @@ Visit [http://ir0.mobify.com](http://ir0.mobify.com) to see full REST API.
 | Firefox                      | 4.0+    |
 | Opera                        | 11.0+   |
 | Internet Explorer            | 10+     |
+
+### Without Capturing
+
+Support for using the API without Capturing is untested. At minimum, it will
+support everything in the table above, but will cover many more older browsers
+due to Capturing not being required.

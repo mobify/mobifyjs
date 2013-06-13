@@ -1,6 +1,6 @@
 define(["utils"], function(Utils) {
 
-var ResizeImages = {};
+var ResizeImages = window.ResizeImages = {};
 
 var absolutify = document.createElement('a');
 
@@ -180,11 +180,71 @@ ResizeImages.getImageURL = function(url, options) {
 };
 
 /**
+ * Replaces src attr of passed element with value of running `getImageUrl` on it
+ * Allows overriding of img.getAttribute(x-src) with srcVal
+ */
+
+ResizeImages._rewriteSrcAttribute = function(element, opts, srcVal){
+    srcVal = element.getAttribute(opts.attribute) || srcVal;
+    if (srcVal) {
+        absolutify.href = srcVal;
+        var url = absolutify.href;
+        if (httpRe.test(url)) {
+            element.setAttribute(opts.setAttr, ResizeImages.getImageURL(url, opts));
+            element.setAttribute('data-orig-src', srcVal);
+            if(opts.onerror) {
+                element.setAttribute('onerror', opts.onerror);
+            }
+        }
+    }
+};
+
+/**
+ * Modifies src of `<source />` children of a `<picture>` element to use image 
+ * resizer
+ */
+ResizeImages._resizeSourceElement = function(element, opts, rootSrc) {
+    // Grab optional width override
+    var width = element.getAttribute('data-width');
+    var localOpts = opts;
+    if (width) {
+        localOpts = Utils.clone(opts);
+        localOpts.maxWidth = width;
+    }
+    // pass along rootSrc if defined on `picture` element
+    ResizeImages._rewriteSrcAttribute(element, localOpts, rootSrc);
+};
+
+/**
+ * Takes a picture element and calls _resizeSourceElement on its `<source />` 
+ * children
+ */
+ResizeImages._crawlPictureElement = function(el, opts) {
+    var sources = el.getElementsByTagName('source');
+    // If source elements are erased from the dom, leave the
+    // picture element alone.
+    if (sources.length === 0) {
+        return;
+    }
+
+    // Grab optional `data-src` attribute on `picture`.
+    // Used for preventing writing the same src multiple times for
+    // different `source` elements.
+    var rootSrc = el.getAttribute('data-src');
+
+    // resize the sources
+    for(var i =  0, len = sources.length; i < len; i++) {
+        ResizeImages._resizeSourceElement(sources[i], opts, rootSrc);
+    }
+};
+
+/**
  * Searches the collection for image elements and modifies them to use
  * the Image Resize service. Pass `options` to modify how the images are 
  * resized.
  */
-ResizeImages.resize = function(imgs, options) {
+
+ResizeImages.resize = function(elements, options) {
     var opts = Utils.clone(defaults);
     if (options) {
         Utils.extend(opts, options);
@@ -215,23 +275,24 @@ ResizeImages.resize = function(imgs, options) {
         opts.format = "webp";
     }
 
-    var attrVal;
-    for(var i=0; i<imgs.length; i++) {
-        var img = imgs[i];
-        if (attrVal = img.getAttribute(opts.attribute)) {
-            absolutify.href = attrVal;
-            var url = absolutify.href;
-            if (httpRe.test(url)) {
-                img.setAttribute(opts.attribute, ResizeImages.getImageURL(url, opts));
-                img.setAttribute('data-orig-src', attrVal);
-                if(opts.onerror) {
-                    img.setAttribute('onerror', opts.onerror);
-                }
-            }
+    for(var i=0; i < elements.length; i++) {
+        var element = elements[i];
+
+        // For an `img`, simply modify the src attribute
+        if (element.nodeName === 'IMG') {
+            ResizeImages._rewriteSrcAttribute(element, opts);
+        }
+        // For a `picture`, (potentially) nuke src on `img`, and
+        // pass all `source` elements into modifyImages recursively
+        else if (element.nodeName === 'PICTURE') {
+            ResizeImages._crawlPictureElement(element, opts);
         }
     }
-    return imgs;
+
+    return elements;
 };
+
+var capturing = window.Mobify && window.Mobify.capturing || false;
 
 var defaults = {
       proto: '//',
@@ -239,7 +300,7 @@ var defaults = {
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
       attribute: "x-src",
       webp: ResizeImages.supportsWebp(),
-      onerror: 'Mobify.ResizeImages.restoreOriginalSrc(event);'
+      onerror: 'ResizeImages.restoreOriginalSrc(event);'
 };
 
 var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
@@ -249,6 +310,8 @@ var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
         event.target.setAttribute('src', origSrc);
     }
 };
+
+defaults.setAttr = (capturing ? defaults.attribute : 'src');
 
 return ResizeImages;
 
