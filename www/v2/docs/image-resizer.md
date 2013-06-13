@@ -160,36 +160,39 @@ specifying a different `src` attribute for each breakpoint.
 For example, you could write your element like this:
 
     <picture data-src="horse.png">
-        <source media="(min-width: 1000px)">
-        <source media="(min-width: 800px)" data-width="400">
-        <source media="(min-width: 480px)" data-width="200">
         <source src="alt-horse.png" data-media="(max-width: 480px)">
+        <source media="(min-width: 480px)" data-width="200">
+        <source media="(min-width: 800px)" data-width="400">
+        <source media="(min-width: 1000px)">
         <img src="horse-small.png">
     </picture>
 
 Notice the use of the `data-src` attribute inside of the `<picture>` element. 
-This is used so that you don't have to specify the same image with different
-widths at different breakpoints. Let's break down how this will actually work in
-the browser:
+This gives us a basis that we can resize to produce an asset for other 
+breakpoints. 
 
-- if the browser width is 1000px or greater:
-    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Auto determine width since `data-width` isn't specified.
-- if the browser width is between 800px and 999px:
-    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Resize to 400px wide.
-- if the browser width is between 480px and 799px:
-    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Resize to 200px wide.
-- if the browser width is between 0 and 480px (smartphone):
+Let's break down how this will actually work in the browser:
+
+- If the browser width is between 0 and 480px (smartphone):
     - Use "alt-horse.png" for art direction purposes.
-- if Javascript isn't supported, fallback to regular old `img` tag. 
+- If the browser width is between 480px and 799px:
+    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Resize to 200px wide.
+- If the browser width is between 800px and 999px:
+    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Resize to 400px wide.
+- If the browser width is 1000px or greater:
+    - Use "horse.png" since `src` is not specified in the `source` element 
+    corresponding to that media query. Automatically determine width since 
+    `data-width` isn't specified.
+- If Javascript isn't supported, fallback to regular old `img` tag. 
 (which has no &lt;noscript> hacks).
 
 The `resize` method will cause the above markup to transform into this (on an iPhone):
 
     <picture data-src="horse.png">
-        <source src="ir0.mobify.com/320/http://site.com/horse.png" media="(min-width: 1000px)">
-        <source src="ir0.mobify.com/400/http://site.com/horse.png" media="(min-width: 800px)" data-width="400">
-        <source src="ir0.mobify.com/200/http://site.com/horse.png" media="(min-width: 480px)" data-width="200">
         <source src="ir0.mobify.com/320/http://site.com/alt-horse.png" data-media="(max-width: 480px)">
+        <source src="ir0.mobify.com/200/http://site.com/horse.png" media="(min-width: 480px)" data-width="200">
+        <source src="ir0.mobify.com/400/http://site.com/horse.png" media="(min-width: 800px)" data-width="400">
+        <source src="ir0.mobify.com/320/http://site.com/horse.png" media="(min-width: 1000px)">
         <img src="horse-small.png">
     </picture>
 
