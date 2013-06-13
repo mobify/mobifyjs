@@ -307,7 +307,6 @@ var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
     var origSrc;
     event.target.removeAttribute('onerror'); // remove ourselves
     if (origSrc = event.target.getAttribute('data-orig-src')) {
-        console.log("Restoring " + event.target.src + " to " + origSrc);
         event.target.setAttribute('src', origSrc);
     }
 };
