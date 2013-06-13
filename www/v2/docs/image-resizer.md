@@ -42,28 +42,31 @@ account pixel density. This can be overridden in the `options`.
 - Determines support for WEBP and uses that on images whenever possible.
 Otherwise it defaults to the original image format.
 
-**Note: The image resizer backend must have access to the images in order to resize
-them. If your development server is not publicly accessible, 
+**Note: The image resizer backend must have access to the images in order to 
+resize them. If your development server is not publicly accessible, 
 ir0.mobify.com will serve a 302 redirect back to the original image location.**
 
 <div class="alert alert-block">
-    <p>Our image resizing service backend service is free to use up to a certain number
-    of views per month. If you plan on using this service on a website with high 
-    amounts of traffic, feel free to visit our 
+    <p>Our image resizing service backend service is free to use up to a certain
+    number of views per month. If you plan on using this service on a website with high amounts of traffic, feel free to visit our 
     <a href="http://www.mobify.com/pricing/">pricing page</a> for more detail.
     </p>
 </div>
 
 **Options**
 
-- `attribute`: Attribute to manipulate for img/picture elements. Defaults to "x-src". "x-" is the default escape prefix used in [Capturing](/mobifyjs/v2/docs/capturing/)
-- `cacheHours`: Sets the length of time for the image(s) to be cached on the CDN. Defaults to forever.
-- `format`: Output format of the image(s) being resized. Defaults to original format, except gifs, which are converted to pngs.
-- `maxWidth`: Maximum width of the image(s) being resized (in CSS pixes). Defaults to automatically determine width of device.
-- `maxHeight`: Maximum height of the image(s) being resized (in CSS pixels). Only usable when maxWidth is specified.
-- `devicePixelRatio`: Override the default devicePixelRatio. Defaults to window.devicePixelRatio.
-- `projectName`: The project slug of the project on [Mobify Performance Suite](https://cloud.mobify.com){: target='_blank' }. Defaults to 
-oss-www-yourhostname-com.
+- `attribute`: Attribute to manipulate for img/picture elements. Defaults to 
+  "x-src". "x-" is the default escape prefix used in [Capturing](/mobifyjs/v2/docs/capturing/)
+- `cacheHours`: Sets the length of time for the image(s) to be cached on the CDN. 
+  The default is 2 months.
+- `format`: Output format of the image(s) being resized. Defaults to original
+  format, except non-animated gifs, which are converted to png.
+- `maxWidth`: Maximum width of the image(s) being resized (in CSS pixes). 
+  Defaults to automatically determine width of device.
+- `maxHeight`: Maximum height of the image(s) being resized (in CSS pixels). 
+  Only usable when maxWidth is specified.
+- `devicePixelRatio`: Override the default devicePixelRatio. Defaults to 
+  `window.devicePixelRatio.`
 
 **Example**
 
@@ -106,9 +109,9 @@ __url__ is the image URL being modifed.
 
 __options__ are optional.
 
-This method takes a URL and modifies it based on the options passed. It is executed
-by `ResizeImages.resize` for each element. It can be overridden to use this API
-for a different image resizing service (such as src.sencha.io).
+This method takes a URL and modifies it based on the options passed. It is 
+executed by `ResizeImages.resize` for each element. It can be overridden to use
+this API for a different image resizing service (such as src.sencha.io).
 
 **Options**
 
