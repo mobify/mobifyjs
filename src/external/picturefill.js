@@ -21,7 +21,7 @@ if (capturing) {
     return;
 }
 
-window.matchMedia = Utils.matchMedia(document);
+window.matchMedia = window.matchMedia || Utils.matchMedia(document);
 
 /* https://github.com/Wilto/picturefill-proposal */
 /*! Picturefill - Author: Scott Jehl, 2012 | License: MIT/GPLv2 */ 
