@@ -184,7 +184,7 @@ Let's break down how this will actually work in the browser:
     corresponding to that media query. Automatically determine width since 
     `data-width` isn't specified.
 - If Javascript isn't supported, fallback to regular old `img` tag. 
-(which has no &lt;noscript> hacks).
+(which needs no &lt;noscript> wrapping as with other solutions).
 
 The `resize` method will cause the above markup to transform into this (on an iPhone):
 
@@ -201,7 +201,8 @@ After `resize` changes the markup, the Picture polyfill will run and select the 
 ## ir0.mobify.com
 
 Mobify's image resizing backend that can manipulate the width, height, file
-format, and quality of any image. All requests through this service are cached on Mobify's CDN.
+format, and quality of any image. All requests through this service are cached 
+on Mobify's CDN.
 
 The image resizer API in Mobify.js uses this service by default for image
 manipulation.
@@ -210,8 +211,8 @@ Requests are in the form of:
 
     http://ir0.mobify.com/<format><quality>/<maximum width>/<maximum height>/<url>
 
-Visit [http://ir0.mobify.com](http://ir0.mobify.com) to understand the REST API
-in more detail.
+Visit [http://ir0.mobify.com](http://ir0.mobify.com) to understand the API in 
+more detail.
 
 ## Browser Support
 
@@ -228,4 +229,4 @@ in more detail.
 
 Support for using the API without Capturing is untested. At minimum, it will
 support everything in the table above, but will cover many more older browsers
-due to Capturing not being present.
+due to Capturing not being required.
