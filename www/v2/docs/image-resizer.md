@@ -121,10 +121,10 @@ The same as `ResizeImages.resize` options.
         return "http://src.sencha.io/" + options.maxWidth + "/" + url  
     };
 
-## WEBP
+## WebP
 
-Using the Image Resizer API with Mobify.js, you can automatically have WEBP
-support without changing anything on your backend. This
+Using the Image Resizer API with Mobify.js, your img/picture elements by default
+will automatically be converted to WebP on browsers that support it. This
 can have a huge impact on the total page weight of your website for supported
 browsers.
 
