@@ -123,10 +123,10 @@ The same as `ResizeImages.resize` options.
 
 ## WebP
 
-Using the Image Resizer API with Mobify.js, your img/picture elements by default
-will automatically be converted to WebP on browsers that support it. This
-can have a huge impact on the total page weight of your website for supported
-browsers.
+Using the Image Resizer API with Mobify.js, your `img` and `picture` elements by
+default will automatically be converted to WebP on browsers that support it.
+This can have a huge impact on the total page weight of your website for
+supported browsers.
 
 Have a look at [http://caniuse.com/webp](http://caniuse.com/webp) to see the
 current state of browser support for this format.
