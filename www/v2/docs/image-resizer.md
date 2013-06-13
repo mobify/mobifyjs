@@ -12,7 +12,7 @@ of the screen.
 on each `source` element breakpoint.
 - Cache all images on Mobify's CDN.
 - Image resizing powered by the [Mobify Performance Suite](https://cloud.mobify.com){: target='_blank' }.
-Can be overridden to use any resizing server.
+- Can be overridden to use another resizing service.
 
 To automatically add resizing to your site without modifying any markup on your backend,
 you must have the ability to [Capture](/mobifyjs/v2/docs/capturing/) the DOM, 
@@ -72,7 +72,8 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
 
 **Example**
 
-Many examples using Image Resizer on the [examples](/mobifyjs/v2/examples) page.
+There are many examples using Image Resizer on the 
+[examples](/mobifyjs/v2/examples) page.
 
 Automatic image resizing:
 
@@ -86,7 +87,7 @@ Automatic image resizing:
         capture.renderCapturedDoc();
     });
 
-Specify custom width for a group of images:
+Specify a custom width for a group of images:
 
     Mobify.Capture.init(function(capture){
         var capturedDoc = capture.capturedDoc;
@@ -113,7 +114,8 @@ __options__ are optional.
 
 This method takes a URL and modifies it based on the options passed. It is 
 executed by `ResizeImages.resize` for each element. It can be overridden to use
-this API for a different image resizing service (such as src.sencha.io).
+this API for a different image resizing service (such as 
+[src.sencha.io](http://www.sencha.com/learn/how-to-use-src-sencha-io/)).
 
 **Options**
 
@@ -141,18 +143,19 @@ current state of browser support for this format.
 
 ## Simplified Picture Element
 
-Mobify.js comes with a `picture` polyfill. In combination with the Image Resize
-API, you can have much simplier `picture` elements. You also no longer need
+Mobify.js comes with a `<picture>` polyfill. In combination with the Image Resize
+API, you can have much simplier `<picture>` elements. You also no longer need
 a &lt;noscript> fallback when using the Resize API (with Capturing).
 
-The problem with the `picture` element is that using it to specify the same image at different widths can be extremely tedious. Nobody wants to generate 4 versions of
-every image at all of the possible resolutions, and constantly update those 
-versions in the markup. Scaling image widths can be automated. (although the
-`picture` element is the best solution for art direction).
+The problem with the `<picture>` element is that using it to specify the same
+image at different widths can be extremely tedious. Nobody wants to generate 4
+versions of every image at all of the possible resolutions, and constantly 
+update those versions in the markup. Scaling image widths can be automated
+(although the `<picture>` element is the best solution for art direction).
 
-To solve this problem, Mobify.js allows for alternate `picture` markup that
-allows you to specify widths as attributes on `source` elements, instead of
-specifying a different image for each breakpoint. 
+To solve this problem, Mobify.js allows for alternate `<picture>` markup that
+allows you to specify widths as attributes on `<source>` elements, instead of
+specifying a different `src` attribute for each breakpoint. 
 
 For example, you could write your element like this:
 
@@ -164,9 +167,10 @@ For example, you could write your element like this:
         <img src="horse-small.png">
     </picture>
 
-Notice the use of `data-src` inside of the `picture` element. This is used so
-that you don't have to specify the same image with different widths at different
-breakpoints. Let's break down how this will actually work in the browser:
+Notice the use of the `data-src` attribute inside of the `<picture>` element. 
+This is used so that you don't have to specify the same image with different
+widths at different breakpoints. Let's break down how this will actually work in
+the browser:
 
 - if the browser width is 1000px or greater:
     - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Auto determine width since `data-width` isn't specified.
