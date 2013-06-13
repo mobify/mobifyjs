@@ -5,11 +5,11 @@ title: Mobify.js Documentation
 
 # Image Resizer
 
-- Automatically resize `img` and `picture` elements to the maximum width
+- Automatically resize `<img>` and `<picture>` elements to the maximum width
 of the screen.
 - Automatically determine support for `WEBP`, and convert images on the fly.
-- Manual resize of `picture` elements by specifying different widths
-on each `source` element breakpoint.
+- Manual resize of `<picture>` elements by specifying different widths
+on each `<source>` element breakpoint.
 - Cache all images on Mobify's CDN.
 - Image resizing powered by the [Mobify Performance Suite](https://cloud.mobify.com){: target='_blank' }.
 - Can be overridden to use another resizing service.
@@ -29,11 +29,11 @@ you can use a regular external script tag to include this API:
 
 ## `ResizeImages.resize(images, [options])`
 
-__images__ must be an array of `img` and/or `picture` elements.
+__images__ must be an array of `<img>` and/or `<picture>` elements.
 
 __options__ are optional.
 
-Rewrites the `src` of every `img/picture` in the `images` array on the page based 
+Rewrites the `src` of every `<img>/<picture>` in the `images` array on the page based 
 on the options passed. 
 
 - By default, images are requested through `ir0.mobify.com` (part of the [Mobify Performance Suite](https://cloud.mobify.com){: target='_blank' }).
@@ -176,14 +176,14 @@ Let's break down how this will actually work in the browser:
 - If the browser width is between 0 and 480px (smartphone):
     - Use "alt-horse.png" for art direction purposes.
 - If the browser width is between 480px and 799px:
-    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Resize to 200px wide.
+    - Use "horse.png" since `src` is not specified in the `<source>` element corresponding to that media query. Resize to 200px wide.
 - If the browser width is between 800px and 999px:
-    - Use "horse.png" since `src` is not specified in the `source` element corresponding to that media query. Resize to 400px wide.
+    - Use "horse.png" since `src` is not specified in the `<source>` element corresponding to that media query. Resize to 400px wide.
 - If the browser width is 1000px or greater:
-    - Use "horse.png" since `src` is not specified in the `source` element 
+    - Use "horse.png" since `src` is not specified in the `<source>` element 
     corresponding to that media query. Automatically determine width since 
     `data-width` isn't specified.
-- If Javascript isn't supported, fallback to regular old `img` tag. 
+- If Javascript isn't supported, fallback to regular old `<img>` tag. 
 (which needs no &lt;noscript> wrapping as with other solutions).
 
 The `resize` method will cause the above markup to transform into this (on an iPhone):
