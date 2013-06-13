@@ -61,6 +61,8 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
   The default is 2 months.
 - `format`: Output format of the image(s) being resized. Defaults to original
   format, except non-animated gifs, which are converted to png.
+- `quality`: An integer from 1-100 used as a quality parameter when encoding 
+  jpg and webp images, can only be set along with the `format` parameter.
 - `maxWidth`: Maximum width of the image(s) being resized (in CSS pixes). 
   Defaults to automatically determine width of device.
 - `maxHeight`: Maximum height of the image(s) being resized (in CSS pixels). 
@@ -126,14 +128,16 @@ The same as `ResizeImages.resize` options.
 
 ## WebP
 
-Using the Image Resizer API with Mobify.js, your `img` and `picture` elements by
-default will automatically be converted to WebP on browsers that support it.
-This can have a huge impact on the total page weight of your website for
-supported browsers.
+[WebP](https://developers.google.com/speed/webp/) is a new image file format from Google, it offers significantly smaller file sizes than JPEG 
+compression with similar image quality.
+
+Using the Image Resizer API with Mobify.js, image files referenced by your img 
+and picture elements will automatically be converted to WebP for browsers that
+support it. This can have a significant impact on the total weight of your pages
+for supported browsers.
 
 Have a look at [http://caniuse.com/webp](http://caniuse.com/webp) to see the
 current state of browser support for this format.
-
 
 ## Simplified Picture Element
 
