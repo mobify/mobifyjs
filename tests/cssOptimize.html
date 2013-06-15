@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="foo">
+<html>
 <head>
   <meta charset="utf-8">
   <title>cssOptimize.js Tests</title>
@@ -21,6 +21,7 @@
 <script>
     QUnit.config.autostart = false;
     require.config({"baseUrl": "../src/"});
+    
     require(["utils", "cssOptimize"], function(Utils, CssOptimize) {
         QUnit.start();
         

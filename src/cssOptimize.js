@@ -17,9 +17,6 @@ CssOptimize.getCssURL = function(url, options) {
     var opts = Utils.extend({}, defaults, options);
     var bits = [opts.proto + opts.host];
 
-    console.log(JSON.stringify(opts));
-    console.log("Hi!!!")
-
     if (opts.projectName) {
         bits.push('project-' + opts.projectName);
     }
