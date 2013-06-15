@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html class="foo">
+<head>
+  <meta charset="utf-8">
+  <title>cssOptimize.js Tests</title>
+  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/require.js" id="requirejs"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
+</head>
+<body>
+
+<div id="qunit"></div>
+
+<div id="qunit-fixture">
+    <div id="disabled-stylesheet-link">
+        <link rel="stylesheet" x-href="/foo.css">
+    </div>
+</div>
+
+<script>
+    QUnit.config.autostart = false;
+    require.config({"baseUrl": "../src/"});
+    require(["utils", "cssOptimize"], function(Utils, CssOptimize) {
+        QUnit.start();
+        
+        test("cssOptimize - rewrites a <link> element's href", function() {
+            links = document.querySelectorAll("#disabled-stylesheet-link link");
+
+            CssOptimize.optimize(links);
+            strictEqual(links[0].getAttribute("x-href"), "//jazzcat.mobify.com/project-oss-localhost/cssoptimizer/http://localhost:3000/foo.css");
+        });
+    });
+</script>
+
+</body>
+</html>
