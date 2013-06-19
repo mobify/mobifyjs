@@ -1,10 +1,11 @@
-require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
+require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "prefetch", "external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, Prefetch) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
     Mobify.Jazzcat = Jazzcat;
     Mobify.Unblockify = Unblockify;
+    Mobify.Prefetch = Prefetch;
     Mobify.api = "2.0"; // v6 tag backwards compatibility change
     return Mobify;
 

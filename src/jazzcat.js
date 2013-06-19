@@ -399,12 +399,12 @@ define(["utils", "capture"], function(Utils, Capture) {
             }
 
             while (resource = resources[i++]) {
+                debugger;
                 if (resource.status == 'ready') {
                     save = true;
                     httpCache.set(encodeURI(resource.url), resource);
                 }
             }
-
             if (save) {
                 httpCache.save();
             }
