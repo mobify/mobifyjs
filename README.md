@@ -111,11 +111,3 @@ The static site is build with [Jekyll](http://jekyllrb.com/). Run the following 
     grunt jekyll
 
 Then navigate to http://localhost:4000/mobifyjs/docs/.
-
-## Deploy mobifyjs.com
-
-When creating a build of mobifyjs.com for release, execute this command:
-
-    make buildstatic
-
-And then copy the generated "\_site" folder to where the site will be hosted.
