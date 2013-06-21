@@ -227,6 +227,7 @@ module.exports = function(grunt) {
                 bucket: '<%= localConfig.aws.bucket %>',
                 access: "public-read",
                 headers: { "Cache-Control": "max-age=1200" },
+                gzip: true
             },
             build: {
                 upload: [
@@ -234,7 +235,6 @@ module.exports = function(grunt) {
                         src: "build/**/*",
                         dest: "mobifyjs/build/",
                         rel: "build",
-                        gzip: true
                     }
                 ]
             },
@@ -244,10 +244,39 @@ module.exports = function(grunt) {
                         src: "examples/**/*",
                         dest: "mobifyjs/examples/",
                         rel: "examples",
-                        gzip: true
                     }
                 ]
+            },
+            wwwstaging: {
+                options: {
+                    bucket: '<%= localConfig.aws.staging_bucket %>'
+                },
+                upload: [
+                    { 
+                        src: "www/_site/**/*",
+                        dest: "mobifyjs",
+                        rel: "www/_site",
+                    },
+                ]
+            },
+            www: {
+                upload: [
+                    { 
+                        src: "www/_site/**/*",
+                        dest: "mobifyjs",
+                        rel: "www/_site",
+                    },
+                ]
             }
+        },
+        jekyll: {
+            server: {
+                src: './www',
+                dest: './www/_site',
+                server: true,
+                server_port: 4000,
+                watch: true
+            },
         }
     });
 
@@ -258,6 +287,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-saucelabs');
     grunt.loadNpmTasks('grunt-s3');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-jekyll');
 
     grunt.registerTask('test', ['connect', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present

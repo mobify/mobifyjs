@@ -7,9 +7,6 @@ install:
 test: install
 	grunt test
 
-jenkins:
-	./tests/runner.sh
-
 all:
 	install
 
@@ -19,14 +16,5 @@ modules:
 	zip -r ../downloads/carousel.zip carousel; \
 	zip -r ../downloads/accordion.zip accordion; \
 	zip -r ../downloads/zoomable.zip zoomable
-
-buildstatic: modules ; \
-	cd www ; \
-	jekyll ; \
-	rm static/downloads/*
-
-serve:
-	cd www ; \
-	jekyll --server --auto
 
 .PHONY: modules
