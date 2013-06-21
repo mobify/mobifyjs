@@ -277,6 +277,10 @@ module.exports = function(grunt) {
                 server_port: 4000,
                 watch: true
             },
+            build: {
+                src: './www',
+                dest: './www/_site',
+            },
         }
     });
 
@@ -301,7 +305,9 @@ module.exports = function(grunt) {
         }
     });
     grunt.registerTask('default', 'build');
-    grunt.registerTask('deploy', ['build', 's3']);
+    grunt.registerTask('deploy', ['build', 's3:build', 's3:examples']);
+    grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging']);
+    grunt.registerTask('wwwdeploy', ['jekyll:build', 's3:www']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('serve', ['connect', 'watch']);
     grunt.registerTask('preview', 'serve'); // alias to serve
