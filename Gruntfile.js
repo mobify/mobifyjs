@@ -224,12 +224,14 @@ module.exports = function(grunt) {
             options: {
                 key: '<%= localConfig.aws.key %>',
                 secret: '<%= localConfig.aws.secret %>',
-                bucket: '<%= localConfig.aws.bucket %>',
                 access: "public-read",
                 headers: { "Cache-Control": "max-age=1200" },
                 gzip: true
             },
             build: {
+                options: {
+                    bucket: '<%= localConfig.aws.buckets.cdn %>'
+                },
                 upload: [
                     { // build
                         src: "build/**/*",
@@ -239,6 +241,9 @@ module.exports = function(grunt) {
                 ]
             },
             examples: {
+                options: {
+                    bucket: '<%= localConfig.aws.buckets.cdn %>'
+                },
                 upload: [
                     { // examples
                         src: "examples/**/*",
@@ -249,7 +254,7 @@ module.exports = function(grunt) {
             },
             wwwstaging: {
                 options: {
-                    bucket: '<%= localConfig.aws.staging_bucket %>'
+                    bucket: '<%= localConfig.aws.buckets.wwwstaging %>',
                 },
                 upload: [
                     { 
@@ -260,6 +265,9 @@ module.exports = function(grunt) {
                 ]
             },
             www: {
+                options: {
+                    bucket: '<%= localConfig.aws.buckets.wwwprod %>',
+                },
                 upload: [
                     { 
                         src: "www/_site/**/*",

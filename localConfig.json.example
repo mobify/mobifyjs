@@ -6,6 +6,10 @@
     "aws": {
         "key": "{AWS_KEY}",
         "secret": "{AWS_SECRET}",
-        "bucket": "{AWS_BUCKET}"
+        "buckets": {
+            "cdn": "{AWS_CDN_BUCKET}",
+            "wwwstaging": "{AWS_WWWSTAGING_BUCKET}",
+            "wwwprod": "{AWS_WWWPROD_BUCKET}"
+        }
     }
 }
