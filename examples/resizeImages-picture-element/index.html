@@ -99,11 +99,14 @@ setTimeout(function() {
 
     <p>Picture element is used here in a much simpler way. Equivilent images at different breakpoints do not need to be automatically generated, they only need to set width attributes for each `source` element.</p>
     <p>View the source to have a look, and view the inspector to see what the `resize` method does to the picture element's markup.</p>
-    <picture data-src="/mobifyjs/examples/assets/images/extralarge.jpg">
-        <source src="/mobifyjs/examples/assets/images/alternate_art.png" media="(min-width: 320px)" data-width="320">
-        <source media="(min-width: 800px)" data-width="400">
-        <source media="(min-width: 1000px)" data-width="500">
-        <img src="/mobifyjs/examples/assets/images/small.jpg">
+    <!-- http://upload.wikimedia.org/wikipedia/commons/6/68/President_Barack_Obama_Tours_Storm_Damage_in_New_Jersey_2.jpg -->
+    <picture data-src="/mobifyjs/examples/assets/images/responsive-obama.jpg">
+        <source src="/mobifyjs/examples/assets/images/responsive-obama-mobile.png">
+        <source media="(min-width: 512px)">
+        <source media="(min-width: 1024px)" data-width="512">
+        <source media="(min-width: 2048px)" data-width="1024">
+        <img src="/mobifyjs/examples/assets/images/responsive-obama.jpg">
     </picture>
+
 </body>
 </html>
