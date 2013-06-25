@@ -224,30 +224,71 @@ module.exports = function(grunt) {
             options: {
                 key: '<%= localConfig.aws.key %>',
                 secret: '<%= localConfig.aws.secret %>',
-                bucket: '<%= localConfig.aws.bucket %>',
                 access: "public-read",
                 headers: { "Cache-Control": "max-age=1200" },
+                gzip: true
             },
             build: {
+                options: {
+                    bucket: '<%= localConfig.aws.buckets.cdn %>'
+                },
                 upload: [
                     { // build
                         src: "build/**/*",
                         dest: "mobifyjs/build/",
                         rel: "build",
-                        gzip: true
                     }
                 ]
             },
             examples: {
+                options: {
+                    bucket: '<%= localConfig.aws.buckets.cdn %>'
+                },
                 upload: [
                     { // examples
                         src: "examples/**/*",
                         dest: "mobifyjs/examples/",
                         rel: "examples",
-                        gzip: true
                     }
                 ]
+            },
+            wwwstaging: {
+                options: {
+                    bucket: '<%= localConfig.aws.buckets.wwwstaging %>',
+                },
+                upload: [
+                    { 
+                        src: "www/_site/**/*",
+                        dest: "mobifyjs",
+                        rel: "www/_site",
+                    },
+                ]
+            },
+            www: {
+                options: {
+                    bucket: '<%= localConfig.aws.buckets.wwwprod %>',
+                },
+                upload: [
+                    { 
+                        src: "www/_site/**/*",
+                        dest: "mobifyjs",
+                        rel: "www/_site",
+                    },
+                ]
             }
+        },
+        jekyll: {
+            server: {
+                src: './www',
+                dest: './www/_site',
+                server: true,
+                server_port: 4000,
+                watch: true
+            },
+            build: {
+                src: './www',
+                dest: './www/_site',
+            },
         }
     });
 
@@ -258,6 +299,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-saucelabs');
     grunt.loadNpmTasks('grunt-s3');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-jekyll');
 
     grunt.registerTask('test', ['connect', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present
@@ -271,7 +313,9 @@ module.exports = function(grunt) {
         }
     });
     grunt.registerTask('default', 'build');
-    grunt.registerTask('deploy', ['build', 's3']);
+    grunt.registerTask('deploy', ['build', 's3:build', 's3:examples']);
+    grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging']);
+    grunt.registerTask('wwwdeploy', ['jekyll:build', 's3:www']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('serve', ['connect', 'watch']);
     grunt.registerTask('preview', 'serve'); // alias to serve
