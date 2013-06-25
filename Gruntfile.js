@@ -1,7 +1,7 @@
 // http://stackoverflow.com/questions/13567312/working-project-structure-that-uses-grunt-js-to-combine-javascript-files-using-r
 var fs = require("fs");
 
-var LONG_CACHE_CONTROL = "public,max-age=31536000"; // one year
+var LONG_CACHE_CONTROL = "public,max-age=31536000, s-maxage=900"; // one year
 var SHORT_CACHE_CONTROL = "public,max-age=300;" // five minutes
 
 /*global module:false*/
@@ -259,40 +259,54 @@ module.exports = function(grunt) {
             },
             wwwstaging: {
                 options: {
-                    bucket: 'www-staging.mobify.com'
+                    bucket: 'www-staging.mobify.com',
+                },
+                upload: [
+                    {
+                       src: "www/_site/**/*",
+                       dest: "mobifyjs",
+                       rel: "www/_site"
+                    },
+                ]
+            },
+            wwwstagingstatic: {
+                options: {
+                    bucket: 'www-staging.mobify.com',
+                    headers: { "Cache-Control": LONG_CACHE_CONTROL }
                 },
                 upload: [
                     {
                         src: "www/_site/static/**/*",
-                        dest: "mobifyjs/static",
-                        rel: "www/_site",
-                        headers: { "Cache-Control": LONG_CACHE_CONTROL }
-                    },
-                    {
-                        src: "www/_site/**/*",
                         dest: "mobifyjs",
-                        rel: "www/_site"
+                        rel: "www/_site",
                     }
                 ]
             },
-            www: {
+            wwwprod: {
                 options: {
-                    bucket: 'www.mobify.com'
+                    bucket: 'www.mobify.com',
+                },
+                upload: [
+                    {
+                       src: "www/_site/**/*",
+                       dest: "mobifyjs",
+                       rel: "www/_site"
+                    },
+                ]
+            },
+            wwwprodstatic: {
+                options: {
+                    bucket: 'www.mobify.com',
+                    headers: { "Cache-Control": LONG_CACHE_CONTROL }
                 },
                 upload: [
                     {
                         src: "www/_site/static/**/*",
-                        dest: "mobifyjs/static",
+                        dest: "mobifyjs",
                         rel: "www/_site",
-                        headers: { "Cache-Control": LONG_CACHE_CONTROL }
-                    }, 
-                    // {
-                    //     src: "www/_site/**/*",
-                    //     dest: "mobifyjs",
-                    //     rel: "www/_site"
-                    // }
+                    }
                 ]
-            }
+            },
         },
         jekyll: {
             server: {
@@ -331,8 +345,8 @@ module.exports = function(grunt) {
     });
     grunt.registerTask('default', 'build');
     grunt.registerTask('deploy', ['build', 's3:build', 's3:examples']);
-    grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging']);
-    grunt.registerTask('wwwdeploy', ['jekyll:build', 's3:www']);
+    grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging', 's3:wwwstagingstatic']);
+    grunt.registerTask('wwwproddeploy', ['jekyll:build', 's3:wwwprod', 's3:wwwprodstatic']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
     grunt.registerTask('serve', ['connect', 'watch']);
     grunt.registerTask('preview', 'serve'); // alias to serve
