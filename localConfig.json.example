@@ -5,11 +5,6 @@
     },
     "aws": {
         "key": "{AWS_KEY}",
-        "secret": "{AWS_SECRET}",
-        "buckets": {
-            "cdn": "{AWS_CDN_BUCKET}",
-            "wwwstaging": "{AWS_WWWSTAGING_BUCKET}",
-            "wwwprod": "{AWS_WWWPROD_BUCKET}"
-        }
+        "secret": "{AWS_SECRET}"
     }
 }

@@ -2,7 +2,7 @@
 var fs = require("fs");
 
 var LONG_CACHE_CONTROL = "public,max-age=31536000, s-maxage=900"; // one year
-var SHORT_CACHE_CONTROL = "public,max-age=300;" // five minutes
+var SHORT_CACHE_CONTROL = "public,max-age=300"; // five minutes
 
 /*global module:false*/
 module.exports = function(grunt) {
@@ -233,7 +233,7 @@ module.exports = function(grunt) {
             },
             build: {
                 options: {
-                    bucket: '<%= localConfig.aws.buckets.cdn %>',
+                    bucket: 'mobify',
                     gzip: true
                 },
                 upload: [
