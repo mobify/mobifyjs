@@ -105,19 +105,9 @@ older browsers)
 
 The compiled documentation for Mobify.js can be found online at [mobifyjs.com](https://www.mobifyjs.com/).
 
-To compile the documentation yourself, install [Jekyll](http://jekyllrb.com/)
-and run it from `www` folder:
+The static site is built with [Jekyll](http://jekyllrb.com/). Run the following commands to get the docs running locally:
 
     gem install jekyll
-    cd www
-    jekyll --server --auto
+    grunt jekyll
 
 Then navigate to http://localhost:4000/mobifyjs/docs/.
-
-## Build mobifyjs.com
-
-When creating a build of mobifyjs.com for release, execute this command:
-
-    make buildstatic
-
-And then copy the generated "\_site" folder to where the site will be hosted.
