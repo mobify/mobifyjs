@@ -123,7 +123,8 @@ var init = Capture.init = function(callback, doc, prefix) {
     // For some IE (IE10 on Lumia 920 for example), interactive is not 
     // indicative of the DOM being ready, therefore "complete" is the only acceptable
     // readyState for IE10
-    // https://github.com/jquery/jquery/commit/0f553ed0ca0c50c5f66377e9f2c6314f822e8f25
+    // Credit to https://github.com/jquery/jquery/commit/0f553ed0ca0c50c5f66377e9f2c6314f822e8f25
+    // for the IE10 fix
     if (document.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading") {
         createCapture(callback, doc, prefix);
     }
