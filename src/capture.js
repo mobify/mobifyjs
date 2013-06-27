@@ -111,16 +111,27 @@ var init = Capture.init = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
         callback(capture);
     }
-    // iOS 4.3, some Android 2.X.X have a non-typical "loaded" readyState,
+    // readyState: loading --> interactive --> complete
+    //                      |               |
+    //                      |               |
+    //                      v               v
+    // Event:        DOMContentLoaded    onload
+    //
+    // iOS 4.3 and some Android 2.X.X have a non-typical "loaded" readyState,
     // which is an acceptable readyState to start capturing on, because
     // the data is fully loaded from the server at that state.
-    if (/complete|interactive|loaded/.test(doc.readyState)) {
+    // For some IE (IE10 on Lumia 920 for example), interactive is not 
+    // indicative of the DOM being ready, therefore "complete" is the only acceptable
+    // readyState for IE10
+    if (document.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading") {
         createCapture(callback, doc, prefix);
     }
     // We may be in "loading" state by the time we get here, meaning we are
     // not ready to capture. Next step after "loading" is "interactive",
-    // which is a valid state to start capturing on, and thus when ready
+    // which is a valid state to start capturing on (except IE), and thus when ready
     // state changes once, we know we are good to start capturing.
+    // Cannot rely on using DOMContentLoaded because this event prematurely fires
+    // for some IE10s.
     else {
         var created = false;
         doc.addEventListener("readystatechange", function() {
