@@ -55,8 +55,10 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
 
 **Options**
 
-- `attribute`: Attribute to manipulate for img/picture elements. Defaults to 
+- `sourceAttribute`: The attribute to get the source value from. Defaults to 
   "x-src". "x-" is the default escape prefix used in [Capturing](/mobifyjs/v2/docs/capturing/)
+- `targetAttribute`: The attribute to set witht he resized url. Defaults to 
+  "x-src" when capturing, and "src" without capturing.
 - `cacheHours`: Sets the length of time for the image(s) to be cached on the CDN. 
   The default is 2 months.
 - `format`: Output format of the image(s) being resized. Defaults to original

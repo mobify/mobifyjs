@@ -1196,12 +1196,12 @@ ResizeImages.getImageURL = function(url, options) {
  */
 
 ResizeImages._rewriteSrcAttribute = function(element, opts, srcVal){
-    srcVal = element.getAttribute(opts.attribute) || srcVal;
+    srcVal = element.getAttribute(opts.sourceAttribute) || srcVal;
     if (srcVal) {
         absolutify.href = srcVal;
         var url = absolutify.href;
         if (httpRe.test(url)) {
-            element.setAttribute(opts.setAttr, ResizeImages.getImageURL(url, opts));
+            element.setAttribute(opts.targetAttribute, ResizeImages.getImageURL(url, opts));
             element.setAttribute('data-orig-src', srcVal);
             if(opts.onerror) {
                 element.setAttribute('onerror', opts.onerror);
@@ -1309,7 +1309,8 @@ var defaults = {
       proto: '//',
       host: 'ir0.mobify.com',
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
-      attribute: "x-src",
+      sourceAttribute: "x-src",
+      targetAttribute: (capturing ? "x-src" : "src"),
       webp: ResizeImages.supportsWebp(),
       onerror: 'ResizeImages.restoreOriginalSrc(event);'
 };
@@ -1321,8 +1322,6 @@ var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
         event.target.setAttribute('src', origSrc);
     }
 };
-
-defaults.setAttr = (capturing ? defaults.attribute : 'src');
 
 return ResizeImages;
 
