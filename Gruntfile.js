@@ -1,5 +1,6 @@
 // http://stackoverflow.com/questions/13567312/working-project-structure-that-uses-grunt-js-to-combine-javascript-files-using-r
 var fs = require("fs");
+var path = require('path');
 
 var LONG_CACHE_CONTROL = "public,max-age=31536000, s-maxage=900"; // one year
 var SHORT_CACHE_CONTROL = "public,max-age=300"; // five minutes
@@ -34,36 +35,13 @@ module.exports = function(grunt) {
               }
             }
         },
-        connect: {
-            server: {
+        express: {
+            custom: {
                 options: {
                     hostname: '0.0.0.0',
                     port: 3000,
                     base: '.',
-                    middleware: function(connect, options) {
-                        /**
-                         * A "slow" response which is served in two chunks.
-                         */
-                        var splitPath = '/tests/fixtures/split.html';
-                        var split = fs.readFileSync(__dirname + splitPath, 'utf8').split('<!-- SPLIT -->')
-
-                        var splitHandler = function(req, res, next) {
-                            if (req.url != splitPath) return next();
-
-                            res.writeHead(200, {'Content-Type': 'text/html'});
-                            res.write(split[0]);
-
-                            setTimeout(function() {
-                                res.write(split[1]);
-                                res.end();
-                            }, 5000);
-                        };
-
-                        return [
-                            splitHandler,
-                            connect.static(__dirname)
-                        ];
-                    }
+                    server: path.resolve("./server")
                 }
             },
         },
@@ -326,13 +304,13 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-qunit');
-    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-saucelabs');
     grunt.loadNpmTasks('grunt-s3');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-jekyll');
+    grunt.loadNpmTasks('grunt-express');
 
-    grunt.registerTask('test', ['connect', 'qunit']);
+    grunt.registerTask('test', ['express', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present
     grunt.registerTask('build', function() {
         // Then build mobify.js library
@@ -348,6 +326,6 @@ module.exports = function(grunt) {
     grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging', 's3:wwwstagingstatic']);
     grunt.registerTask('wwwproddeploy', ['jekyll:build', 's3:wwwprod', 's3:wwwprodstatic']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
-    grunt.registerTask('serve', ['connect', 'watch']);
+    grunt.registerTask('serve', ['express', 'watch']);
     grunt.registerTask('preview', 'serve'); // alias to serve
 };
