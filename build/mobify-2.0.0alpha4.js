@@ -1629,7 +1629,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         var url;
         var i = 0;
 
-        options = Utils.extend({}, defaults, options || {});
+        options = Utils.extend({}, Jazzcat.combineScripts.defaults, options || {});
 
         httpCache.load(httpCache.options);
 
@@ -1657,7 +1657,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         return scripts;
     };
 
-    var defaults = Jazzcat.combineScripts.defaults = {
+    Jazzcat.combineScripts.defaults = {
         selector: 'script',
         attribute: 'x-src',
         base: '//jazzcat.mobify.com',
@@ -1783,6 +1783,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * consistent URLs.
      */
     Jazzcat.getURL = function(urls, jsonpCallback) {
+        var defaults = Jazzcat.combineScripts.defaults;
         return defaults.base + (defaults.projectName ? '/project-' + defaults.projectName : '') +
                '/' + defaults.endpoint + '/' + jsonpCallback + '/' +
                Jazzcat.JSONURIencode(urls.slice().sort());
@@ -1797,6 +1798,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * Generates regexp based on parent, which should either be head or body.
      */
     var execReGenerator = function(parent) {
+        var defaults = Jazzcat.combineScripts.defaults;
         return new RegExp("<script[^>]*?>(true|false),['\"]" +
             parent + "['\"]," +
             defaults.execCallback.replace(/\./g, '\\.') +
@@ -1809,6 +1811,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      */
     Jazzcat.insertLoadersIntoHTMLString = function(html) {
         var addedCacheLoader = false;
+        var defaults = Jazzcat.combineScripts.defaults;
 
         var insert = function(html, parent) {
             var match;
