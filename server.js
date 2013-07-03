@@ -1,5 +1,6 @@
 var express = require('express');
 var fs = require('fs');
+var url = require('url');
 var hbs = require('hbs');
 
 
@@ -35,18 +36,28 @@ server.get('/performance/jazzcat/', function(req, res, next) {
     res.render('jazzcat', {});
 });
 
-var jquery = '/mobifyjs/performance/resources/jquery.js';
-var jqueryData = JSON.stringify(fs.readFileSync(__dirname + jquery, 'utf8'));
-var underscore = '/mobifyjs/performance/resources/underscore.js';
-var underscoreData = JSON.stringify(fs.readFileSync(__dirname + underscore, 'utf8'))
+var resourcesUrl = '/mobifyjs/performance/resources/samplescripts/';
+
+var files = fs.readdirSync(__dirname + resourcesUrl);
+
+var scriptsObj = {};
+var scriptsArray = [];
+
+for (file in files) {
+    if (files.hasOwnProperty(file)) {
+        var fileName = files[file];
+        var fileData = fs.readFileSync(__dirname + resourcesUrl + files[file]);
+        scriptsArray.push({'fileName': fileName, 'fileData': fileData});
+        scriptsObj[resourcesUrl + fileName] = fileData;
+    }
+}
 
 server.get('/performance/jazzcat/runner/:numScripts', function(req, res, next) {
     var numScripts = parseInt(req.params.numScripts);
     var scripts = [];
     for (var i=0; i<numScripts; i++) {
-        // alternate between jquery and underscore
-        var script = i%2 ? underscore : jquery;
-        scripts.push(script + "?" + i)
+        var index = i%files.length;
+        scripts.push(resourcesUrl + scriptsArray[index].fileName + "?" + i)
     }
     res.render('fixtures/jazzcatRunner', {
         mobifypath: '/mobifyjs/performance/resources/mobify-main-jazzcat.min.js',
@@ -54,20 +65,15 @@ server.get('/performance/jazzcat/runner/:numScripts', function(req, res, next) {
     });
 });
 
+
+// Mock Jazzcat jsonp call
 server.get('/jsonp/Jazzcat.combo.load/:scripts', function(req, res, next) {
     var scripts = JSON.parse(req.params.scripts);
     var scriptData = scripts.map(function(script){
-        if (script.indexOf(jquery)) {
-            return {
-                url: script,
-                data: jqueryData
-            };
-        }
-        else {
-            return {
-                url: script,
-                data: underscoreData
-            };
+        var pathname = url.parse(script).pathname;
+        return {
+            url: script,
+            data: JSON.stringify(scriptsObj[pathname].toString())
         }
     });
     //console.log(scriptData);
@@ -75,7 +81,22 @@ server.get('/jsonp/Jazzcat.combo.load/:scripts', function(req, res, next) {
     res.render('fixtures/jazzcatJSONResponse', {
         scripts: scriptData
     })
-})
+});
+
+// Mock Jazzcat js call
+server.get('/js/Jazzcat.combo.load/:scripts', function(req, res, next) {
+    var scripts = JSON.parse(req.params.scripts);
+    var scriptData = scripts.map(function(script){
+        var pathname = url.parse(script).pathname;
+        return scriptsObj[pathname].toString()
+    });
+    //console.log(scriptData);
+    res.header('Content-Type', 'application/javascript')
+    res.render('fixtures/jazzcatJSResponse', {
+        scripts: scriptData
+    })
+});
+
 
 //server.listen(3000);
 

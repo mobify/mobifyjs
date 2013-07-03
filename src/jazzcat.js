@@ -28,6 +28,7 @@ define(["utils", "capture"], function(Utils, Capture) {
     var cache = {};
 
     var localStorageKey = 'Mobify-Combo-Cache-v1.0';
+    var localStorageCacheKey = 'Mobify-Combo-Script-Caching-v1.0';
 
     var httpCacheOptions = {};
 
@@ -278,7 +279,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      * bootloader script is inserted by the overriden `Capture.enabled` function.
      * 
      * Takes an option argument, `options`, an object whose properties define 
-     * optiosn that alter jazzcat's javascript loading, caching and execution 
+     * options that alter jazzcat's javascript loading, caching and execution 
      * behaviour. Right now the options are:
      *
      * - `cacheOverrideTime` :  An integer value greater than 10 that will 
@@ -300,7 +301,11 @@ define(["utils", "capture"], function(Utils, Capture) {
         var url;
         var i = 0;
 
-        options = Utils.extend({}, Jazzcat.combineScripts.defaults, options || {});
+        options = Utils.extend(Jazzcat.combineScripts.defaults, options || {});
+
+        if (Utils.supportsLocalStorage()) {
+            localStorage.setItem(localStorageCacheKey, options.localStorageCache);
+        }
 
         httpCache.load(httpCache.options);
 
@@ -332,10 +337,10 @@ define(["utils", "capture"], function(Utils, Capture) {
         selector: 'script',
         attribute: 'x-src',
         base: '//jazzcat.mobify.com',
-        endpoint: 'jsonp',
         execCallback: 'Jazzcat.combo.exec',
         loadCallback: 'Jazzcat.combo.load',
-        projectName: ''
+        projectName: '',
+        localStorageCache: true
     };
 
     Jazzcat.combo = {
@@ -344,6 +349,13 @@ define(["utils", "capture"], function(Utils, Capture) {
          * can't be retrieved from the cache, load it using an external script.
          */
         exec: function(url) {
+            if (localStorage.getItem(localStorageCacheKey) === "false") {
+                // In the future, we would add an onerror handler to the js
+                // script, and if there is an error, write out the original scripts
+                // But for now, do nothing.
+                return;
+            }
+
             var resource = httpCache.get(url, true);
             var out;
 
@@ -375,7 +387,6 @@ define(["utils", "capture"], function(Utils, Capture) {
                 // Talk to Roman if you want to know more about this.
                 out += '>' + resource.body.replace(/(<\/scr)(ipt\s*>)/ig, '$1\\$2');
             }
-
             // `document.write` is used to ensure scripts are executed in order,
             // as opposed to "as fast as possible"
             // http://hsivonen.iki.fi/script-execution/
@@ -456,7 +467,8 @@ define(["utils", "capture"], function(Utils, Capture) {
     Jazzcat.getURL = function(urls, jsonpCallback) {
         var defaults = Jazzcat.combineScripts.defaults;
         return defaults.base + (defaults.projectName ? '/project-' + defaults.projectName : '') +
-               '/' + defaults.endpoint + '/' + jsonpCallback + '/' +
+               '/' + (defaults.localStorageCache ? 'jsonp' : 'js') + 
+               '/' + jsonpCallback + '/' +
                Jazzcat.JSONURIencode(urls.slice().sort());
     };
 
