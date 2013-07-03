@@ -26,10 +26,38 @@
         QUnit.start();
         
         test("cssOptimize - rewrites a <link> element's href", function() {
-            links = document.querySelectorAll("#disabled-stylesheet-link link");
+            var links = document.querySelectorAll("#disabled-stylesheet-link link");
 
             CssOptimize.optimize(links);
             strictEqual(links[0].getAttribute("x-href"), "//jazzcat.mobify.com/project-oss-localhost/cssoptimizer/http://localhost:3000/foo.css");
+        });
+
+        test("cssOptimize - getCssURL", function() {
+            var styleSheetUrl = 'http://www.example.com/static/style.css'
+            var options = {
+                'bare': {},
+                'project': {
+                    projectName: 'amazing'
+                }
+            }
+            var expected = {
+                'bare': '//jazzcat.mobify.com/project-oss-localhost/cssoptimizer/' + styleSheetUrl,
+                'project': '//jazzcat.mobify.com/project-amazing/cssoptimizer/' + styleSheetUrl
+            }
+            for (var key in options) {
+                strictEqual(CssOptimize.getCssURL(styleSheetUrl, options[key]), expected[key], key);
+            }
+        });
+
+        test('restoreOriginalHref', function() {
+            var l = document.createElement('link'),
+                origHref = 'bar';
+            l.setAttribute('data-orig-href', origHref);
+            l.setAttribute('href', 'foo');
+
+            cssOptimize.restoreOriginalHref({target: l});
+
+            strictEqual(l.getAttribute('href'), origHref);
         });
     });
 </script>

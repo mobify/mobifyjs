@@ -71,7 +71,7 @@ CssOptimize.optimize = function(elements, options) {
 var restoreOriginalHref = CssOptimize.restoreOriginalHref = function(event) {
     var origHref;
     event.target.removeAttribute('onerror'); //remove error handler
-    if(origSrc = event.target.getAttribute('data-orig-href')) {
+    if(origHref = event.target.getAttribute('data-orig-href')) {
         event.target.setAttribute('href', origHref);
     }
 };
