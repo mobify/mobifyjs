@@ -38,7 +38,10 @@ server.get('/performance/jazzcat/', function(req, res, next) {
 
 var resourcesUrl = '/mobifyjs/performance/resources/samplescripts/';
 
-var files = fs.readdirSync(__dirname + resourcesUrl);
+var files = fs.readdirSync(__dirname + resourcesUrl).filter(function(folder){
+    // filter out hidden folders and files (like .DS_Store)
+    return folder[0] !== '.';
+});
 
 var scriptsObj = {};
 var scriptsArray = [];
@@ -46,7 +49,7 @@ var scriptsArray = [];
 for (file in files) {
     if (files.hasOwnProperty(file)) {
         var fileName = files[file];
-        var fileData = fs.readFileSync(__dirname + resourcesUrl + files[file]);
+        var fileData = fs.readFileSync(__dirname + resourcesUrl + files[file], 'utf8');
         scriptsArray.push({'fileName': fileName, 'fileData': fileData});
         scriptsObj[resourcesUrl + fileName] = fileData;
     }
@@ -73,7 +76,7 @@ server.get('/jsonp/Jazzcat.combo.load/:scripts', function(req, res, next) {
         var pathname = url.parse(script).pathname;
         return {
             url: script,
-            data: JSON.stringify(scriptsObj[pathname].toString())
+            data: JSON.stringify(scriptsObj[pathname])
         }
     });
     //console.log(scriptData);
