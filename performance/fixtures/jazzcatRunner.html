@@ -17,7 +17,9 @@ window.onload = function() {
         }
     }
     var diff = end - begin;
-    console.log((Mobify.Capture ? "Mobify " : "Native ") + "onload time: " + diff);
+    console.log((Mobify.Capture ? "Mobify " : "Native ") + 
+                "onload time: " + diff +
+                " for {{scripts.length}} scripts.");
     // Cleanup cache
     localStorage.removeItem("Mobify-Combo-Cache-v1.0");
     // Send data to parent;

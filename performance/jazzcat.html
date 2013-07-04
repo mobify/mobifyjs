@@ -1,6 +1,11 @@
 <html>
 <head>
 <title>Performance tests for Jazzcat</title>
+<style>
+.hide {
+    display: none;
+}
+</style>
 </head>
 <body>
 
@@ -11,6 +16,8 @@
     <p>Runs per script: <input type="text" name="runs" value="5"></p>
     <input type="submit" value="Run Test">
 </form>
+
+<img src="/mobifyjs/performance/resources/images/ajax-loader.gif" class="hide">
 
 <script src="/mobifyjs/performance/resources/jquery.js"></script>
 <script>
@@ -84,33 +91,9 @@ var avg = function(arr) {
     return sum/arr.length;
 }
 
-// var runsPerTest = 5;
-// var scriptRange = new Array(5);
-// scriptRange[0] = 1;
-// var stepSize = 5;
-// for (var i=1; i<scriptRange.length; i++) {
-//     scriptRange[i] = i * stepSize;
-// }
-
-// var mobifyResults = create2dArray(scriptRange.length, runsPerTest);
-// var nativeResults = create2dArray(scriptRange.length, runsPerTest);
-
-// var i = 0;
-
-// run(function(){
-//     var averagedMobifyResults = mobifyResults.map(function(testSet){
-//         return avg(testSet).toFixed(1);
-//     });
-//     var averagedNativeResults = nativeResults.map(function(testSet){
-//         return avg(testSet).toFixed(1);
-//     });
-//     console.log("Scripts Used: " + scriptRange);
-//     console.log("Mobify results: " + averagedMobifyResults);
-//     console.log("Native results: " + averagedNativeResults); 
-// });
-
 $("form").submit(function(e){
     e.preventDefault();
+    $("img").removeClass("hide");
     var form = this;
 
     // TODO: being lazy, do this without globals
@@ -124,7 +107,7 @@ $("form").submit(function(e){
         scriptRange[i] = i * stepSize;
     }
 
-    var scriptsMsg = "Scripts Used: " + scriptRange;
+    var scriptsMsg = "Scripts Used: " + scriptRange.join(", ");
     console.log(scriptsMsg);
     $("body").append($("<p>" + scriptsMsg + "</p>"));
 
@@ -139,12 +122,13 @@ $("form").submit(function(e){
         var averagedNativeResults = nativeResults.map(function(testSet){
             return avg(testSet).toFixed(1);
         });
-        var mobifyResultsMsg = "Mobify results: " + averagedMobifyResults;
-        var nativeResultsMsg = "Native results: " + averagedNativeResults;
+        var mobifyResultsMsg = "Mobify results: " + averagedMobifyResults.join(", ");
+        var nativeResultsMsg = "Native results: " + averagedNativeResults.join(", ");
         console.log(mobifyResultsMsg);
         console.log(nativeResultsMsg);
         $("body").append($("<p>" + mobifyResultsMsg + "</p>"));
         $("body").append($("<p>" + nativeResultsMsg + "</p>"));
+        $("img").addClass("hide");
     });
 })
 
