@@ -110,7 +110,8 @@ app.get('/js/Jazzcat.combo.load/:scripts', function(req, res, next) {
 if (!global.runningGrunt) {
     // Grunt does this automatically.
     app.use("/", express.static(__dirname));
-    app.listen(3000);
+    var port = process.env.PORT || 3000;
+    app.listen(port);
 }
 
 module.exports = app;
