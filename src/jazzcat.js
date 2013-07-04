@@ -393,6 +393,7 @@ define(["utils", "capture"], function(Utils, Capture) {
             // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
             // This call seems to do nothing in Opera 11/12
             Jazzcat.write.call(document, '<script ' + out + '<\/script>');
+            // Alternative: eval(resource.body)
         },
 
         /**

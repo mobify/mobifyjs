@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+{{> bootstrap}}
+<script>
+window.onload = function() {
+    // Grab the total time since starting capturing and send it
+    // to the parent for testing in performance.html
+    var end = +new Date;
+    var begin;
+    if (window.Mobify && window.Mobify.points) {
+        begin = window.Mobify.points[0];
+    } else {
+        var pointEl = document.getElementById("mobify-point");
+        if (pointEl) {
+            begin = pointEl.innerText || pointEl.textContent;
+        }
+    }
+    var diff = end - begin;
+    console.log((Mobify.Capture ? "Mobify " : "Native ") + "onload time: " + diff);
+    // Cleanup cache
+    localStorage.removeItem("Mobify-Combo-Cache-v1.0");
+    // Send data to parent;
+    parent.postMessage(diff, "*");
+}
+</script>
+<!-- END MOBIFY TAG -->
+<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
+<title>Performance Runner for Jazzcat</title>
+</head>
+<body class="foo">
+    
+{{#each scripts}}
+    <script src="{{this}}"></script>
+{{/each}}
+
+</body>
+</html>

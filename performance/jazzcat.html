@@ -1,0 +1,111 @@
+<html>
+<head>
+<title>Performance tests for Jazzcat</title>
+</head>
+<body>
+<script>
+var runsPerTest = 3;
+var scriptRange = new Array(10);
+scriptRange[0] = 1;
+var stepSize = 5;
+for (var i=1; i<scriptRange.length; i++) {
+    scriptRange[i] = i * stepSize;
+}
+
+var createIframe = function(url, callback) {
+    var cb = function(event){
+        var diff = event.data;
+        window.removeEventListener("message", cb);
+        callback && callback(diff);
+    };
+
+    window.addEventListener("message", cb);
+
+    // must re-create the iframe (can't use iframe.contentWindow.location.reload() because
+    // firefox reload won't work after doc.write)
+    var removeIframe = document.getElementsByTagName("iframe");
+    if (removeIframe.length > 0) {
+        removeIframe[0].parentNode.removeChild(removeIframe[0]);
+    }
+    var iframe = document.createElement("iframe");
+    iframe.src = url;
+    iframe.setAttribute("style", "display: none;");
+    document.getElementsByTagName("body")[0].appendChild(iframe);
+
+};
+
+var create2dArray = function(length, runs) {
+    var array = new Array(length);
+    for (var i=0; i<length; i++) {
+        array[i] = new Array(runs);
+    }
+    return array;
+}
+
+var mobifyResults = create2dArray(scriptRange.length, runsPerTest);
+var nativeResults = create2dArray(scriptRange.length, runsPerTest);
+// var mobifyResults = [];
+// var nativeResults = [];
+var i = 0;
+
+console.log(mobifyResults);
+
+var run = function(finishedCallback){
+
+    if (i===scriptRange.length) {
+        finishedCallback();
+        return;
+    }
+
+    var mobifyUrl = "/performance/jazzcat/runner/" + scriptRange[i] + "#mobify=1";
+    var nativeUrl = "/performance/jazzcat/runner/" + scriptRange[i] + "#mobify=0";
+
+    var j = 0;
+
+    var runTestLoop = function(callback) {
+
+        if (j===runsPerTest) {
+            callback();
+            return;
+        }
+        createIframe(mobifyUrl, function(diff){
+            mobifyResults[i][j] = diff;
+            createIframe(nativeUrl, function(diff){
+                nativeResults[i][j] = diff;
+                j++;
+                runTestLoop(callback);
+            })
+        });
+    };
+
+    runTestLoop(function() {
+        i++;
+        run(finishedCallback);
+    })
+};
+
+var avg = function(arr) {
+    var sum = arr.reduce(function(prev, curr){
+        return prev + curr;
+    });
+    return sum/arr.length;
+}
+
+run(function(){
+    var averagedMobifyResults = mobifyResults.map(function(testSet){
+        return avg(testSet).toFixed(1);
+    });
+    var averagedNativeResults = nativeResults.map(function(testSet){
+        return avg(testSet).toFixed(1);
+    });
+    console.log("Scripts Used: " + scriptRange);
+    console.log("Mobify results: " + averagedMobifyResults);
+    console.log("Native results: " + averagedNativeResults); 
+});
+
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+/* JSONP response for: http://underscorejs.org/underscore-min.js */
+Jazzcat.combo.load([
+{{#each scripts}}
+    {"url":"{{{url}}}","status":"ready","statusCode":200,"headers":{"server":"GitHub.com","date":"Fri, 28 Jun 2013 20:21:47 GMT","content-type":"application/x-javascript","connection":"keep-alive","content-length":"13450","last-modified":"Wed, 10 Apr 2013 20:47:06 GMT","expires":"Fri, 28 Jun 2013 20:31:47 GMT","cache-control":"max-age=600","vary":"Accept-Encoding","accept-ranges":"bytes"},"body":"{{data}}","text":true},
+{{/each}}
+]);

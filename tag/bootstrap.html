@@ -80,13 +80,15 @@ setTimeout(function() {
         return true;
     },
 
-    // path to mobify.js
-    '/mobifyjs/build/mobify.js',
-
-    // path to main executable 
-    //'/PATH/TO/main.js'
-
-    // Or combine both scripts for better performance
-    '{{ mobifypath }}'
+{{#mobifyfull}}
+    // Combine both scripts for better performance
+    '{{this}}'
+{{/mobifyfull}}
+{{^mobifyfull}}
+    // path to mobify.js: /mobifyjs/build/mobify.js',
+    '{{library}}',
+    // path to main executable: '/PATH/TO/main.js'
+    '{{main}}'
+{{/mobifyfull}}
 );
 </script>
