@@ -102,7 +102,6 @@ server.get('/js/Jazzcat.combo.load/:scripts', function(req, res, next) {
     })
 });
 
-
-//server.listen(3000);
+if (!global.runningGrunt) server.listen(3000);
 
 module.exports = server;

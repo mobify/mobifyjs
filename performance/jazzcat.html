@@ -3,14 +3,17 @@
 <title>Performance tests for Jazzcat</title>
 </head>
 <body>
+
+<h1>Performance test for Jazzcat</h1>
+<form>
+    <p>Range: <input type="text" name="range" value="5"></p>
+    <p>Step Size: <input type="text" name="stepsize" value="5"></p>
+    <p>Runs per script: <input type="text" name="runs" value="5"></p>
+    <input type="submit" value="Run Test">
+</form>
+
+<script src="/mobifyjs/performance/resources/jquery.js"></script>
 <script>
-var runsPerTest = 3;
-var scriptRange = new Array(10);
-scriptRange[0] = 1;
-var stepSize = 5;
-for (var i=1; i<scriptRange.length; i++) {
-    scriptRange[i] = i * stepSize;
-}
 
 var createIframe = function(url, callback) {
     var cb = function(event){
@@ -42,16 +45,7 @@ var create2dArray = function(length, runs) {
     return array;
 }
 
-var mobifyResults = create2dArray(scriptRange.length, runsPerTest);
-var nativeResults = create2dArray(scriptRange.length, runsPerTest);
-// var mobifyResults = [];
-// var nativeResults = [];
-var i = 0;
-
-console.log(mobifyResults);
-
 var run = function(finishedCallback){
-
     if (i===scriptRange.length) {
         finishedCallback();
         return;
@@ -63,7 +57,6 @@ var run = function(finishedCallback){
     var j = 0;
 
     var runTestLoop = function(callback) {
-
         if (j===runsPerTest) {
             callback();
             return;
@@ -91,19 +84,66 @@ var avg = function(arr) {
     return sum/arr.length;
 }
 
-run(function(){
-    var averagedMobifyResults = mobifyResults.map(function(testSet){
-        return avg(testSet).toFixed(1);
-    });
-    var averagedNativeResults = nativeResults.map(function(testSet){
-        return avg(testSet).toFixed(1);
-    });
-    console.log("Scripts Used: " + scriptRange);
-    console.log("Mobify results: " + averagedMobifyResults);
-    console.log("Native results: " + averagedNativeResults); 
-});
+// var runsPerTest = 5;
+// var scriptRange = new Array(5);
+// scriptRange[0] = 1;
+// var stepSize = 5;
+// for (var i=1; i<scriptRange.length; i++) {
+//     scriptRange[i] = i * stepSize;
+// }
 
+// var mobifyResults = create2dArray(scriptRange.length, runsPerTest);
+// var nativeResults = create2dArray(scriptRange.length, runsPerTest);
 
+// var i = 0;
+
+// run(function(){
+//     var averagedMobifyResults = mobifyResults.map(function(testSet){
+//         return avg(testSet).toFixed(1);
+//     });
+//     var averagedNativeResults = nativeResults.map(function(testSet){
+//         return avg(testSet).toFixed(1);
+//     });
+//     console.log("Scripts Used: " + scriptRange);
+//     console.log("Mobify results: " + averagedMobifyResults);
+//     console.log("Native results: " + averagedNativeResults); 
+// });
+
+$("form").submit(function(e){
+    e.preventDefault();
+    var form = this;
+
+    // TODO: being lazy, do this without globals
+    window.runsPerTest = parseInt(form.runs.value);
+    window.scriptRange = new Array(parseInt(form.range.value));
+    window.stepSize = parseInt(form.stepsize.value);
+
+    // always start with 1 script for first test
+    scriptRange[0] = 1;
+    for (var i=1; i<scriptRange.length; i++) {
+        scriptRange[i] = i * stepSize;
+    }
+
+    var scriptsMsg = "Scripts Used: " + scriptRange;
+    $("body").append($("<p>" + scriptsMsg + "</p>"));
+
+    window.mobifyResults = create2dArray(scriptRange.length, runsPerTest);
+    window.nativeResults = create2dArray(scriptRange.length, runsPerTest);
+    window.i = 0;
+
+    run(function(){
+        var averagedMobifyResults = mobifyResults.map(function(testSet){
+            return avg(testSet).toFixed(1);
+        });
+        var averagedNativeResults = nativeResults.map(function(testSet){
+            return avg(testSet).toFixed(1);
+        });
+        var mobifyResultsMsg = "Mobify results: " + averagedMobifyResults;
+        var nativeResultsMsg = "Native results: " + averagedNativeResults;
+        $("body").append($("<p>" + mobifyResultsMsg + "</p>"));
+        $("body").append($("<p>" + nativeResultsMsg + "</p>"));
+    });
+})
 
 
 </script>

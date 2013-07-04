@@ -5,6 +5,8 @@ var path = require('path');
 var LONG_CACHE_CONTROL = "public,max-age=31536000, s-maxage=900"; // one year
 var SHORT_CACHE_CONTROL = "public,max-age=300"; // five minutes
 
+global.runningGrunt = true;
+
 /*global module:false*/
 module.exports = function(grunt) {
 
