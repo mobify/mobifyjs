@@ -125,6 +125,7 @@ $("form").submit(function(e){
     }
 
     var scriptsMsg = "Scripts Used: " + scriptRange;
+    console.log(scriptsMsg);
     $("body").append($("<p>" + scriptsMsg + "</p>"));
 
     window.mobifyResults = create2dArray(scriptRange.length, runsPerTest);
@@ -140,6 +141,8 @@ $("form").submit(function(e){
         });
         var mobifyResultsMsg = "Mobify results: " + averagedMobifyResults;
         var nativeResultsMsg = "Native results: " + averagedNativeResults;
+        console.log(mobifyResultsMsg);
+        console.log(nativeResultsMsg);
         $("body").append($("<p>" + mobifyResultsMsg + "</p>"));
         $("body").append($("<p>" + nativeResultsMsg + "</p>"));
     });

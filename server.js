@@ -4,23 +4,23 @@ var url = require('url');
 var hbs = require('hbs');
 
 
-var server = express();
+var app = express();
 
-server.set('views', __dirname + '/performance');
-server.set('view engine', 'html');
-server.engine('html', require('hbs').__express);
+app.set('views', __dirname + '/performance');
+app.set('view engine', 'html');
+app.engine('html', require('hbs').__express);
 
 hbs.registerPartial('bootstrap', fs.readFileSync(__dirname + '/tag/bootstrap.html', 'utf8'));
 
 // global controller
-server.get('/*',function(req,res,next){
+app.get('/*',function(req,res,next){
     res.header('Cache-Control' , 'max-age=0, no-cache, no-store');
     next(); // http://expressjs.com/guide.html#passing-route control
 });
 
 // Used for test "capture captures the complete document"
 // in tests/capture.html
-server.get('/tests/fixtures/split.html', function(req, res){
+app.get('/tests/fixtures/split.html', function(req, res){
     var split = fs.readFileSync(__dirname + req.path, 'utf8').split('<!-- SPLIT -->')
 
     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -32,10 +32,11 @@ server.get('/tests/fixtures/split.html', function(req, res){
     }, 5000);
 });
 
-server.get('/performance/jazzcat/', function(req, res, next) {
+app.get('/performance/jazzcat/', function(req, res, next) {
     res.render('jazzcat', {});
 });
 
+// Start loading scripts from disk to be used in mock requests
 var resourcesUrl = '/mobifyjs/performance/resources/samplescripts/';
 
 var files = fs.readdirSync(__dirname + resourcesUrl).filter(function(folder){
@@ -54,8 +55,11 @@ for (file in files) {
         scriptsObj[resourcesUrl + fileName] = fileData;
     }
 }
+// end script load
+ 
 
-server.get('/performance/jazzcat/runner/:numScripts', function(req, res, next) {
+// Jazzcat runner with varying # of scripts
+app.get('/performance/jazzcat/runner/:numScripts', function(req, res, next) {
     var numScripts = parseInt(req.params.numScripts);
     var scripts = [];
     for (var i=0; i<numScripts; i++) {
@@ -72,7 +76,7 @@ server.get('/performance/jazzcat/runner/:numScripts', function(req, res, next) {
 
 
 // Mock Jazzcat jsonp call
-server.get('/jsonp/Jazzcat.combo.load/:scripts', function(req, res, next) {
+app.get('/jsonp/Jazzcat.combo.load/:scripts', function(req, res, next) {
     var scripts = JSON.parse(req.params.scripts);
     var scriptData = scripts.map(function(script){
         var pathname = url.parse(script).pathname;
@@ -89,7 +93,7 @@ server.get('/jsonp/Jazzcat.combo.load/:scripts', function(req, res, next) {
 });
 
 // Mock Jazzcat js call
-server.get('/js/Jazzcat.combo.load/:scripts', function(req, res, next) {
+app.get('/js/Jazzcat.combo.load/:scripts', function(req, res, next) {
     var scripts = JSON.parse(req.params.scripts);
     var scriptData = scripts.map(function(script){
         var pathname = url.parse(script).pathname;
@@ -102,6 +106,11 @@ server.get('/js/Jazzcat.combo.load/:scripts', function(req, res, next) {
     })
 });
 
-if (!global.runningGrunt) server.listen(3000);
+// When running server.js stand-alone (for running on Heroku)
+if (!global.runningGrunt) {
+    // Grunt does this automatically.
+    app.use("/", express.static(__dirname));
+    app.listen(3000);
+}
 
-module.exports = server;
+module.exports = app;
