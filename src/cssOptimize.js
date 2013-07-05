@@ -13,7 +13,7 @@ var CssOptimize = window.cssOptimize = {};
 
 CssOptimize.getCssUrl = function(url, options) {
     var opts = Utils.extend({}, defaults, options);
-    var bits = [opts.proto + opts.host];
+    var bits = [opts.protoAndHost];
 
     if (opts.projectName) {
         bits.push('project-' + opts.projectName);
@@ -37,7 +37,7 @@ CssOptimize._rewriteHref = function(element, options) {
         if (Utils.httpUrl(url)) {
             element.setAttribute('data-orig-href', attributeVal);
             element.setAttribute(options.targetAttribute,
-                                 CssOptimize.getCssUrl(url));
+                                 CssOptimize.getCssUrl(url, options));
             if (options.onerror) {
                 element.setAttribute('onerror', options.onerror);
             }
@@ -77,12 +77,11 @@ var restoreOriginalHref = CssOptimize.restoreOriginalHref = function(event) {
 };
 
 var defaults = CssOptimize._defaults = {
-    proto: '//',
-    host: 'jazzcat.mobify.com',
+    protoAndHost: '//jazzcat.mobify.com',
     endpoint: 'cssoptimizer',
     projectName: 'oss-' + location.hostname.replace(/[^\w]/g, '-'),
     targetAttribute: 'x-href',
-    onerror: 'CssOptimize.restoreOriginalHref(event);'
+    onerror: 'Mobify.CssOptimize.restoreOriginalHref(event);'
 };
 
 return CssOptimize;
