@@ -1357,7 +1357,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     var cache = {};
 
     var localStorageKey = 'Mobify-Combo-Cache-v1.0';
-    var localStorageCacheKey = 'Mobify-Combo-Script-Caching-v1.0';
 
     var httpCacheOptions = {};
 
@@ -1608,7 +1607,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * bootloader script is inserted by the overriden `Capture.enabled` function.
      * 
      * Takes an option argument, `options`, an object whose properties define 
-     * options that alter jazzcat's javascript loading, caching and execution 
+     * optiosn that alter jazzcat's javascript loading, caching and execution 
      * behaviour. Right now the options are:
      *
      * - `cacheOverrideTime` :  An integer value greater than 10 that will 
@@ -1630,11 +1629,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         var url;
         var i = 0;
 
-        options = Utils.extend(Jazzcat.combineScripts.defaults, options || {});
-
-        if (Utils.supportsLocalStorage()) {
-            localStorage.setItem(localStorageCacheKey, options.localStorageCache);
-        }
+        options = Utils.extend({}, defaults, options || {});
 
         httpCache.load(httpCache.options);
 
@@ -1662,14 +1657,14 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         return scripts;
     };
 
-    Jazzcat.combineScripts.defaults = {
+    var defaults = Jazzcat.combineScripts.defaults = {
         selector: 'script',
         attribute: 'x-src',
         base: '//jazzcat.mobify.com',
+        endpoint: 'jsonp',
         execCallback: 'Jazzcat.combo.exec',
         loadCallback: 'Jazzcat.combo.load',
-        projectName: '',
-        localStorageCache: true
+        projectName: ''
     };
 
     Jazzcat.combo = {
@@ -1678,13 +1673,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
          * can't be retrieved from the cache, load it using an external script.
          */
         exec: function(url) {
-            if (localStorage.getItem(localStorageCacheKey) === "false") {
-                // In the future, we would add an onerror handler to the js
-                // script, and if there is an error, write out the original scripts
-                // But for now, do nothing.
-                return;
-            }
-
             var resource = httpCache.get(url, true);
             var out;
 
@@ -1716,13 +1704,13 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 // Talk to Roman if you want to know more about this.
                 out += '>' + resource.body.replace(/(<\/scr)(ipt\s*>)/ig, '$1\\$2');
             }
+
             // `document.write` is used to ensure scripts are executed in order,
             // as opposed to "as fast as possible"
             // http://hsivonen.iki.fi/script-execution/
             // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
             // This call seems to do nothing in Opera 11/12
             Jazzcat.write.call(document, '<script ' + out + '<\/script>');
-            // Alternative: eval(resource.body)
         },
 
         /**
@@ -1795,10 +1783,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * consistent URLs.
      */
     Jazzcat.getURL = function(urls, jsonpCallback) {
-        var defaults = Jazzcat.combineScripts.defaults;
         return defaults.base + (defaults.projectName ? '/project-' + defaults.projectName : '') +
-               '/' + (defaults.localStorageCache ? 'jsonp' : 'js') + 
-               '/' + jsonpCallback + '/' +
+               '/' + defaults.endpoint + '/' + jsonpCallback + '/' +
                Jazzcat.JSONURIencode(urls.slice().sort());
     };
 
@@ -1811,7 +1797,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * Generates regexp based on parent, which should either be head or body.
      */
     var execReGenerator = function(parent) {
-        var defaults = Jazzcat.combineScripts.defaults;
         return new RegExp("<script[^>]*?>(true|false),['\"]" +
             parent + "['\"]," +
             defaults.execCallback.replace(/\./g, '\\.') +
@@ -1824,7 +1809,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      */
     Jazzcat.insertLoadersIntoHTMLString = function(html) {
         var addedCacheLoader = false;
-        var defaults = Jazzcat.combineScripts.defaults;
 
         var insert = function(html, parent) {
             var match;

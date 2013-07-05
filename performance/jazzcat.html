@@ -19,6 +19,8 @@
 
 <img src="/mobifyjs/performance/resources/images/ajax-loader.gif" class="hide">
 
+<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+
 <script src="/mobifyjs/performance/resources/jquery.js"></script>
 <script>
 
@@ -129,10 +131,61 @@ $("form").submit(function(e){
         $("body").append($("<p>" + mobifyResultsMsg + "</p>"));
         $("body").append($("<p>" + nativeResultsMsg + "</p>"));
         $("img").addClass("hide");
+
+        renderChart(scriptRange, averagedMobifyResults, averagedNativeResults);
+
     });
 })
 
+var createPoints = function(x, y) {
+    var points = [];
+    for (var i=0; i<x.length; i++) {
+        points.push({x: x[i], y: y[i]/10});
+    }
+    console.log(points);
+    return points;
+}
 
+var renderChart = function (scripts, mobifyData, nativeData) {
+
+    var chart = new CanvasJS.Chart("chartContainer",
+            {
+                zoomEnabled: true,
+                panEnabled: true,
+                axisY:{
+                    includeZero: false
+                },               
+                theme: "theme2",
+                legend:{
+                    verticalAlign: "center",
+                    horizontalAlign: "right",
+                },
+                data: [
+                {        
+                    type: "line",
+                    showInLegend: true,
+                    name: "Jazzcat",
+                    markerType: "square",
+                    color: "LightCoral",
+                    dataPoints: createPoints(scripts, mobifyData)
+                },
+                {        
+                    type: "line",
+                    showInLegend: true,
+                    name: "Native",
+                    color: "LightSeaGreen",
+                    dataPoints: createPoints(scripts, nativeData)
+                },
+
+                
+                ]
+            });
+
+    chart.render();
+
+}
 </script>
+<script type="text/javascript" src="/mobifyjs/performance/resources/canvasjs.min.js"></script>
+
 </body>
 </html>
