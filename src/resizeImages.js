@@ -2,11 +2,6 @@ define(["utils"], function(Utils) {
 
 var ResizeImages = window.ResizeImages = {};
 
-var absolutify = document.createElement('a');
-
-// A regex for detecting http(s) URLs.
-var httpRe = /^https?/;
-
 function getPhysicalScreenSize(devicePixelRatio) {
 
     function multiplyByPixelRatio(sizes) {
@@ -187,9 +182,8 @@ ResizeImages.getImageURL = function(url, options) {
 ResizeImages._rewriteSrcAttribute = function(element, opts, srcVal){
     srcVal = element.getAttribute(opts.sourceAttribute) || srcVal;
     if (srcVal) {
-        absolutify.href = srcVal;
-        var url = absolutify.href;
-        if (httpRe.test(url)) {
+        var url = Utils.absolutify(srcVal);
+        if (Utils.httpUrl(url)) {
             element.setAttribute(opts.targetAttribute, ResizeImages.getImageURL(url, opts));
             element.setAttribute('data-orig-src', srcVal);
             if(opts.onerror) {

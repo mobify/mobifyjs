@@ -236,8 +236,6 @@ define(["utils", "capture"], function(Utils, Capture) {
         options: httpCacheOptions
     };
 
-    var absolutify = document.createElement('a');
-
     var Jazzcat = window.Jazzcat = {
         httpCache: httpCache,
         // Cache a reference to `document.write` in case it is reassigned.
@@ -306,10 +304,11 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         while (script = scripts[i++]) {
             url = script.getAttribute(options.attribute);
-            if (!url) continue;
+            url = Utils.absolutify(url);
+            if (!url || !Utils.httpUrl(url)) {
+                continue;
+            }
             script.removeAttribute(options.attribute);
-            absolutify.href = url;
-            url = absolutify.href;
 
             // Rewriting script to grab contents from localstorage
             // ex. <script>true,"body",Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
