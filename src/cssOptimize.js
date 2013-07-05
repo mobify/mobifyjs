@@ -35,7 +35,7 @@ CssOptimize._rewriteHref = function(element, options) {
     if (attributeVal) {
         url = Utils.absolutify(attributeVal);
         if (Utils.httpUrl(url)) {
-            element.setAttribute('data-orig-href', url);
+            element.setAttribute('data-orig-href', attributeVal);
             element.setAttribute(options.targetAttribute,
                                  CssOptimize.getCssUrl(url));
             if (options.onerror) {
@@ -76,7 +76,7 @@ var restoreOriginalHref = CssOptimize.restoreOriginalHref = function(event) {
     }
 };
 
-var defaults = {
+var defaults = CssOptimize._defaults = {
     proto: '//',
     host: 'jazzcat.mobify.com',
     endpoint: 'cssoptimizer',
