@@ -140,6 +140,8 @@ $("form").submit(function(e){
 var createPoints = function(x, y) {
     var points = [];
     for (var i=0; i<x.length; i++) {
+        // TODO: only dividing by 10 because canvasjs
+        // seems to blow up when #'s are too big. Figure out why!
         points.push({x: x[i], y: y[i]/10});
     }
     console.log(points);
