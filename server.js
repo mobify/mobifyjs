@@ -67,9 +67,9 @@ app.get('/performance/jazzcat/runner/:numScripts', function(req, res, next) {
         scripts.push(resourcesUrl + scriptsArray[index].fileName + "?" + i)
     }
     res.render('fixtures/jazzcatRunner', {
-        //mobifyfull: '/mobifyjs/performance/resources/mobify-main-jazzcat.min.js',
-        library: '/mobifyjs/build/mobify.min.js',
-        main: '/mobifyjs/performance/resources/main-jazzcat.js',
+        mobifyfull: '/mobifyjs/performance/resources/mobify-main-jazzcat.min.js',
+        //library: '/mobifyjs/build/mobify.min.js',
+        //main: '/mobifyjs/performance/resources/main-jazzcat.js',
         scripts: scripts
     });
 });

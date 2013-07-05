@@ -9,9 +9,7 @@ if (capturing) {
 
         // Grab all scripts to be concatenated into one request
         var scripts = capturedDoc.querySelectorAll('script');
-        Mobify.Jazzcat.combineScripts(scripts, capturedDoc, {
-            localStorageCache: false
-        });
+        Mobify.Jazzcat.combineScripts(scripts, capturedDoc);
 
         // Render source DOM to document
         capture.renderCapturedDoc();
