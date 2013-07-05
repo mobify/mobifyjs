@@ -32,7 +32,7 @@
             strictEqual(links[0].getAttribute("x-href"), "//jazzcat.mobify.com/project-oss-localhost/cssoptimizer/http://localhost:3000/foo.css");
         });
 
-        test("cssOptimize - getCssURL", function() {
+        test("cssOptimize - getCssUrl", function() {
             var styleSheetUrl = 'http://www.example.com/static/style.css'
             var options = {
                 'bare': {},
@@ -45,7 +45,7 @@
                 'project': '//jazzcat.mobify.com/project-amazing/cssoptimizer/' + styleSheetUrl
             }
             for (var key in options) {
-                strictEqual(CssOptimize.getCssURL(styleSheetUrl, options[key]), expected[key], key);
+                strictEqual(CssOptimize.getCssUrl(styleSheetUrl, options[key]), expected[key], key);
             }
         });
 

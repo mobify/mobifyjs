@@ -6,14 +6,12 @@ define(["utils"], function(Utils) {
 
 var CssOptimize = window.cssOptimize = {};
 
-var absolutify = document.createElement("a");
-
 /**
  * Takes an original, absolute url of a stylesheet, returns a url for that
  * stylesheet going through the css service.
  */
 
-CssOptimize.getCssURL = function(url, options) {
+CssOptimize.getCssUrl = function(url, options) {
     var opts = Utils.extend({}, defaults, options);
     var bits = [opts.proto + opts.host];
 
@@ -34,13 +32,15 @@ CssOptimize.getCssURL = function(url, options) {
 CssOptimize._rewriteHref = function(element, options) {
     var attributeVal = element.getAttribute(options.targetAttribute);
     var url;
-    if(attributeVal) {
-        element.setAttribute('data-orig-href', url);
-        element.setAttribute('onerror', options.onerror);
+    if (attributeVal) {
         url = Utils.absolutify(attributeVal);
         if (Utils.httpUrl(url)) {
+            element.setAttribute('data-orig-href', url);
             element.setAttribute(options.targetAttribute,
-                                 CssOptimize.getCssURL(url));
+                                 CssOptimize.getCssUrl(url));
+            if (options.onerror) {
+                element.setAttribute('onerror', options.onerror);
+            }
         }
     }
 };
