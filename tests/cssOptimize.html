@@ -25,10 +25,11 @@
     require(["utils", "cssOptimize"], function(Utils, CssOptimize) {
         QUnit.start();
         
-        test("cssOptimize - rewrites a <link> element's href", function() {
+        test("optimize - rewrites a <link> element's href", function() {
             var links = document.querySelectorAll("#disabled-stylesheet-link link");
 
             CssOptimize.optimize(links);
+            
             strictEqual(links[0].getAttribute("x-href"), "//jazzcat.mobify.com/project-oss-localhost/cssoptimizer/http://localhost:3000/foo.css");
         });
 
