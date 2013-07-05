@@ -4,7 +4,7 @@ require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "cssOptimi
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
     Mobify.Jazzcat = Jazzcat;
-    Mobify.CssOptimize = CssOptimize
+    Mobify.CssOptimize = CssOptimize;
     Mobify.Unblockify = Unblockify;
     Mobify.api = "2.0"; // v6 tag backwards compatibility change
     return Mobify;
