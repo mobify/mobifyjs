@@ -304,10 +304,10 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         while (script = scripts[i++]) {
             url = script.getAttribute(options.attribute);
+            if (!url) continue;
             url = Utils.absolutify(url);
-            if (!url || !Utils.httpUrl(url)) {
-                continue;
-            }
+            if (!Utils.httpUrl(url)) continue;
+
             script.removeAttribute(options.attribute);
 
             // Rewriting script to grab contents from localstorage
