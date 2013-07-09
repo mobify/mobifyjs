@@ -25,7 +25,7 @@
     require(["utils", "cssOptimize"], function(Utils, CssOptimize) {
         QUnit.start();
         
-        test("optimize - rewrites a <link> element's href", function() {
+        test("cssOptimize - optimize (rewrites a <link> element's href)", function() {
             var links = document.querySelectorAll("#disabled-stylesheet-link link");
 
             CssOptimize.optimize(links);
@@ -50,7 +50,7 @@
             }
         });
 
-        test('_rewriteHref', function() {
+        test('cssOptimize - _rewriteHref', function() {
             var l = document.createElement("link");
             var href =  "/style.css"
             
@@ -72,7 +72,7 @@
 
         });
 
-        test('restoreOriginalHref', function() {
+        test('cssOptimize - restoreOriginalHref', function() {
             var l = document.createElement('link'),
                 origHref = 'bar';
             l.setAttribute('data-orig-href', origHref);
