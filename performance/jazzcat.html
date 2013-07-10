@@ -17,7 +17,7 @@
     <input type="submit" value="Run Test">
 </form>
 
-<img src="/mobifyjs/performance/resources/images/ajax-loader.gif" class="hide">
+<p class="hide">loading...</p>
 
 <div id="chartContainer" style="height: 300px; width: 100%;"></div>
 
@@ -95,7 +95,7 @@ var avg = function(arr) {
 
 $("form").submit(function(e){
     e.preventDefault();
-    $("img").removeClass("hide");
+    $("p").removeClass("hide");
     var form = this;
 
     // TODO: being lazy, do this without globals
@@ -130,7 +130,7 @@ $("form").submit(function(e){
         console.log(nativeResultsMsg);
         $("body").append($("<p>" + mobifyResultsMsg + "</p>"));
         $("body").append($("<p>" + nativeResultsMsg + "</p>"));
-        $("img").addClass("hide");
+        $("p").addClass("hide");
 
         renderChart(scriptRange, averagedMobifyResults, averagedNativeResults);
 
