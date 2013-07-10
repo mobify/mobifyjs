@@ -22,7 +22,7 @@
     require.config({
         "baseUrl": "/src",  
     })
-    require(["../src/capture.js", "../src/unblockify.js"], function(Capture, Unblockify) {
+    require(["../src/utils.js", "../src/capture.js", "../src/unblockify.js"], function(Utils, Capture, Unblockify) {
         QUnit.start();
         window.Unblockify = Unblockify;
 
@@ -34,6 +34,9 @@
             var iframeLoaded = false;
             iframe.load(function(){
                 var doc = this.contentDocument;
+
+                // Remove the webdriver attribute set when running tests on selenium (done through SauceLabs on various browsers (FF14 on OSX))
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver");
 
                 var capture = Capture.init(function(capture){
                     var capturedDoc = capture.capturedDoc;
@@ -54,7 +57,7 @@
     <p>Unblock fixture page!</p>\n\
 \n\n\n\
 <script type=\"text/mobify-script\" x-src=\"/path/to/script2.js\"><\/script><script type=\"text/mobify-script\" x-src=\"/path/to/script3.js\"><\/script></body></html>";
-                        equal(capturedDoc.documentElement.outerHTML, expectedHtml, "Scripts moved to bottom, filtered-out script left in place");
+                        equal(Utils.outerHTML(capturedDoc.documentElement), expectedHtml, "Scripts moved to bottom, filtered-out script left in place");
                         start();
                     }
                 }, doc);
