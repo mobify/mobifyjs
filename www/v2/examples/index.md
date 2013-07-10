@@ -19,17 +19,13 @@ page to only download the resized images.
 
 The following markup:
 
-    <div class="images">
-        <img src="/mobifyjs/examples/assets/images/forest.jpg">
-        <img src="/mobifyjs/examples/assets/images/mountains.jpg">
-    </div>
+    <img src="/mobifyjs/examples/assets/images/forest.jpg">
+    <img src="/mobifyjs/examples/assets/images/mountains.jpg">
 
 is modified into this on the fly:
 
-    <div class="images">
-        <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/forest.jpg">
-        <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/mountains.jpg">
-    </div>
+    <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/forest.jpg">
+    <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/mountains.jpg">
 
 The original image assets do not download.
 
