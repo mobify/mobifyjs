@@ -1,26 +1,16 @@
+/**
+ * Server for testing Mobify.js!
+ */
 var express = require('express');
 var fs = require('fs');
-var url = require('url');
+var Url = require('url');
 var hbs = require('hbs');
 
 
-var app = express();
-
-app.set('views', __dirname + '/performance');
-app.set('view engine', 'html');
-app.engine('html', require('hbs').__express);
-
-hbs.registerPartial('bootstrap', fs.readFileSync(__dirname + '/tag/bootstrap.html', 'utf8'));
-
-// global controller
-app.get('/*',function(req,res,next){
-    res.header('Cache-Control' , 'max-age=0, no-cache, no-store');
-    next(); // http://expressjs.com/guide.html#passing-route control
-});
-
-// Used for test "capture captures the complete document"
-// in tests/capture.html
-app.get('/tests/fixtures/split.html', function(req, res){
+/**
+ * Used for test "capture captures the complete document" in `tests/capture.html`.
+ */
+var slowResponse = function() {
     var split = fs.readFileSync(__dirname + req.path, 'utf8').split('<!-- SPLIT -->')
 
     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -30,17 +20,67 @@ app.get('/tests/fixtures/split.html', function(req, res){
         res.write(split[1]);
         res.end();
     }, 5000);
-});
+}
 
-app.get('/performance/jazzcat/', function(req, res, next) {
+/**
+ * Browser entry point for Jazzcat Performance tests.
+ */
+var jazzcatPerformanceIndex = function(req, res) {
     res.render('jazzcat', {});
-});
+};
 
-// Start loading scripts from disk to be used in mock requests
+/**
+ * Page that runs the Jazzcat performance test.
+ */
+var jazzcatPerformanceRunner = function(req, res) {
+    var numScripts = parseInt(req.params.numScripts);
+    var scripts = [];
+
+    for (var i = 0; i < numScripts; i++) {
+        var index = i % files.length;
+        scripts.push(resourcesUrl + scriptsArray[index].fileName + "?" + i);
+    }
+
+    res.render('fixtures/jazzcatRunner', {
+        mobifyfull: '/mobifyjs/performance/resources/mobify-main-jazzcat.min.js',
+        scripts: scripts
+    });
+};
+
+/**
+ * Implements the Jazzcat JSONP API.
+ */
+var jazzcatJsonp = function(req, res) {
+    var scripts = JSON.parse(req.params.scripts);
+    var scriptData = scripts.map(function(script){
+        var pathname = Url.parse(script).pathname;
+        return {
+            url: script,
+            data: JSON.stringify(scriptsObj[pathname])
+        }
+    });
+
+    res.header('Content-Type', 'application/javascript')
+    res.render('fixtures/jazzcatJSONResponse', {scripts: scriptData});
+};
+
+/**
+ * Implements the Jazzcat JS API.
+ */
+var jazzcatJs = function(req, res) {
+    var scripts = JSON.parse(req.params.scripts);
+    var scriptData = scripts.map(function(script){
+        var pathname = Url.parse(script).pathname;
+        return scriptsObj[pathname].toString()
+    });
+
+    res.header('Content-Type', 'application/javascript')
+    res.render('fixtures/jazzcatJSResponse', {scripts: scriptData})
+};
+
+// Load scripts for the mock mock Jazzcat API.
 var resourcesUrl = '/mobifyjs/performance/resources/samplescripts/';
-
-var files = fs.readdirSync(__dirname + resourcesUrl).filter(function(folder){
-    // filter out hidden folders and files (like .DS_Store)
+var files = fs.readdirSync(__dirname + resourcesUrl).filter(function(folder) {
     return folder[0] !== '.';
 });
 
@@ -48,70 +88,38 @@ var scriptsObj = {};
 var scriptsArray = [];
 
 for (file in files) {
-    if (files.hasOwnProperty(file)) {
-        var fileName = files[file];
-        var fileData = fs.readFileSync(__dirname + resourcesUrl + files[file], 'utf8');
-        scriptsArray.push({'fileName': fileName, 'fileData': fileData});
-        scriptsObj[resourcesUrl + fileName] = fileData;
-    }
+    var fileName = files[file];
+    var fileData = fs.readFileSync(__dirname + resourcesUrl + files[file], 'utf8');
+    scriptsArray.push({fileName: fileName, fileData: fileData});
+    scriptsObj[resourcesUrl + fileName] = fileData;
 }
-// end script load
- 
 
-// Jazzcat runner with varying # of scripts
-app.get('/performance/jazzcat/runner/:numScripts', function(req, res, next) {
-    var numScripts = parseInt(req.params.numScripts);
-    var scripts = [];
-    for (var i=0; i<numScripts; i++) {
-        var index = i%files.length;
-        scripts.push(resourcesUrl + scriptsArray[index].fileName + "?" + i)
-    }
-    res.render('fixtures/jazzcatRunner', {
-        mobifyfull: '/mobifyjs/performance/resources/mobify-main-jazzcat.min.js',
-        //library: '/mobifyjs/build/mobify.min.js',
-        //main: '/mobifyjs/performance/resources/main-jazzcat.js',
-        scripts: scripts
-    });
+
+
+hbs.registerPartial('bootstrap', fs.readFileSync(__dirname + '/tag/bootstrap.html', 'utf8'));
+
+var app = express();
+
+app.set('views', __dirname + '/performance');
+app.set('view engine', 'html');
+app.engine('html', require('hbs').__express);
+
+app.use(function(req, res, next) {
+    res.header('Cache-Control' , 'max-age=0, no-cache, no-store');
+    next();
 });
 
+app.get('/tests/fixtures/split.html', slowResponse);
+app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
+app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);
 
-// Mock Jazzcat jsonp call
-app.get('/jsonp/Jazzcat.combo.load/:scripts', function(req, res, next) {
-    var scripts = JSON.parse(req.params.scripts);
-    var scriptData = scripts.map(function(script){
-        var pathname = url.parse(script).pathname;
-        return {
-            url: script,
-            data: JSON.stringify(scriptsObj[pathname])
-        }
-    });
-    //console.log(scriptData);
-    res.header('Content-Type', 'application/javascript')
-    res.render('fixtures/jazzcatJSONResponse', {
-        scripts: scriptData
-    })
-});
+app.get('/jsonp/Jazzcat.combo.load/:scripts', jazzcatJsonp);
+app.get('/js/Jazzcat.combo.load/:scripts', jazzcatJs);
 
-// Mock Jazzcat js call
-app.get('/js/Jazzcat.combo.load/:scripts', function(req, res, next) {
-    var scripts = JSON.parse(req.params.scripts);
-    var scriptData = scripts.map(function(script){
-        var pathname = url.parse(script).pathname;
-        return scriptsObj[pathname].toString()
-    });
-    //console.log(scriptData);
-    res.header('Content-Type', 'application/javascript')
-    res.render('fixtures/jazzcatJSResponse', {
-        scripts: scriptData
-    })
-});
 
-// When running server.js stand-alone (for running on Heroku)
-if (!global.runningGrunt) {
-    // Grunt does this automatically.
-    app.use("/", express.static(__dirname));
-    var port = process.env.PORT || 3000;
-    app.listen(port);
+if (require.main === module) {
+    app.use(express.static(__dirname));
+    app.listen(process.env.PORT || 3000);
 }
 
 module.exports = app;
