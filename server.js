@@ -10,7 +10,7 @@ var hbs = require('hbs');
 /**
  * Used for test "capture captures the complete document" in `tests/capture.html`.
  */
-var slowResponse = function() {
+var slowResponse = function(req, res) {
     var split = fs.readFileSync(__dirname + req.path, 'utf8').split('<!-- SPLIT -->')
 
     res.writeHead(200, {'Content-Type': 'text/html'});
