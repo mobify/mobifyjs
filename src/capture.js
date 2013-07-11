@@ -419,7 +419,6 @@ Capture.prototype.getCapturedDoc = function(options) {
  */
 Capture.prototype.insertMobifyScripts = function() {
     var doc = this.capturedDoc;
-
     // After document.open(), all objects will be removed.
     // To provide our library functionality afterwards, we
     // must re-inject the script.
@@ -439,10 +438,13 @@ Capture.prototype.insertMobifyScripts = function() {
     var head = this.headEl;
     head.insertBefore(mobifyjsClone, head.firstChild);
 
-    // If main exists, re-inject it as well.
-    var mainScript = document.getElementById("mobify-js-main");
+    // If main script exists, re-inject it as well.
+    var mainScript = document.getElementById("main-executable");
     if (mainScript) {
         var mainClone = doc.importNode(mainScript, false);
+        if (!mainScript.src) {
+            mainClone.innerHTML = mainScript.innerHTML;
+        }
         this.bodyEl.appendChild(mainClone);
     }
 };

@@ -2,7 +2,7 @@
 
   - [Quick start]({{ site.baseurl }}/v2/docs/)
   - [Tutorial]({{ site.baseurl }}/v2/docs/tutorial)
-  - [Capturing]({{ site.baseurl }}/v2/docs/capturing)
+  - [Capturing API]({{ site.baseurl }}/v2/docs/capturing)
     - [`Capture.init()`]({{ site.baseurl }}/v2/docs/capturing/#captureinitcallback-document-prefixx-)
     - [`getCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#getcaptureddoc)
     - [`capturing` variable]({{ site.baseurl }}/v2/docs/capturing/#capturing-variable)
@@ -11,7 +11,7 @@
     - [`renderCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#rendercaptureddoc)
     - [`restore()`]({{ site.baseurl }}/v2/docs/capturing/#restore)
     - [Browser Support]({{ site.baseurl }}/v2/docs/capturing/#browser-support)
-  - [Image Resizer]({{ site.baseurl }}/v2/docs/image-resizer)
+  - [Image API]({{ site.baseurl }}/v2/docs/image-resizer)
     - [`resize`]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesresizeimgelements-options)
     - [`getImageURL`]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesgetimageurlurl-options)
     - [WebP]({{ site.baseurl }}/v2/docs/image-resizer/#webp)

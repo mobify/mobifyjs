@@ -17,6 +17,7 @@
     <p class="hide">Running...</p>
 
     <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+    <p class="loader hide">loading...</p>
 
     <script src="/mobifyjs/performance/resources/jquery.js"></script>
     <script>
@@ -109,7 +110,7 @@ $("form").submit(function(e) {
         scriptRange[i] = i * stepSize;
     }
 
-    $("p").removeClass("hide");
+    $("p.loader").removeClass("hide");
     var scriptsMsg = "Scripts Used: " + scriptRange.join(", ");
     $("body").append($("<p>" + scriptsMsg + "</p>"));
 
@@ -130,7 +131,7 @@ $("form").submit(function(e) {
         // console.log(nativeResultsMsg);
         $("body").append($("<p>" + mobifyResultsMsg + "</p>"));
         $("body").append($("<p>" + nativeResultsMsg + "</p>"));
-        $("p").addClass("hide");
+        $("p.loader").addClass("hide");
 
         renderChart(scriptRange, averagedMobifyResults, averagedNativeResults);
     });
