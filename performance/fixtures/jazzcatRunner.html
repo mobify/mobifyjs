@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+{{> bootstrap}}
+<script>
+/**
+ * Calculate the running time and send it to the parent.
+ */
+window.onload = function() {
+    var end = +new Date;
+
+    var begin;
+    if (window.Mobify) {
+        begin = window.Mobify.points[0];
+    } else {
+        var pointEl = document.getElementById("mobify-point");
+        begin = pointEl.innerText || pointEl.textContent;
+    }
+    var diff = end - begin;
+
+    console.log((Mobify.Capture ? "Mobify " : "Native ") + "onload time: " + diff + " for {{scripts.length}} scripts.");
+
+    // Cleanup cache!
+    localStorage.removeItem("Mobify-Combo-Cache-v1.0");
+
+    parent.postMessage(diff, "*");
+};
+</script>
+<title>Performance Runner for Jazzcat</title>
+</head>
+<body>
+    {{#each scripts}}
+        <script src="{{this}}"></script>
+    {{/each}}
+</body>
+</html>
