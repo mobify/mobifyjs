@@ -11,6 +11,7 @@
         <p>Number of steps: <input type="text" name="range" value="5"></p>
         <p>Step size: <input type="text" name="stepsize" value="5"></p>
         <p>Runs runs per step: <input type="text" name="runs" value="5"></p>
+        <p>Capture on native: <input type="checkbox" name="captureNative"></p>
         <input type="submit" value="Run Test">
     </form>
 
@@ -63,7 +64,13 @@ var run = function(complete) {
 
     var baseUrl = "/performance/jazzcat/runner/" + scriptRange[i] + "#mobify=";
     var mobifyUrl = baseUrl + '1';
-    var nativeUrl = baseUrl + '0';
+    var nativeUrl;
+    if (window.captureNative) {
+        nativeUrl = baseUrl + '1&disableJazzcat=1';
+    }
+    else {
+        nativeUrl = baseUrl + '0';
+    }
 
     var j = 0;
 
@@ -101,6 +108,7 @@ $("form").submit(function(e) {
     window.runsPerTest = parseInt(form.runs.value);
     window.mobifyResults = create2dArray(scriptRange.length, runsPerTest);
     window.nativeResults = create2dArray(scriptRange.length, runsPerTest);
+    window.captureNative = form.captureNative.checked;
     window.i = 0;
 
     // Always start with 1 script for first test

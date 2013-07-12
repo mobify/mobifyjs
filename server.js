@@ -56,7 +56,7 @@ var jazzcatPerformanceRunner = function(req, res) {
     // on a test does not load again.
     mobifyFull += "?" + new Date().getTime();;
 
-    console.log(mobifyFull);
+    res.header('Connection', 'close');
 
     res.render('fixtures/jazzcatRunner', {
         mobifyfull: mobifyFull,
@@ -126,7 +126,6 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get('/build/mobify(.min)?.js', cachedResponse);
 app.get('/performance/resources/mobify-main-jazzcat.min.js', cachedResponse);
 app.get('/tests/fixtures/split.html', slowResponse);
 app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
