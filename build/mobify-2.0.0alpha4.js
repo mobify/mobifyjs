@@ -452,6 +452,26 @@ Utils.clone = function(obj) {
     return target;
 };
 
+// Some url helpers
+/**
+ * Takes a url, relative or absolute, and absolutizes it relative to the current 
+ * document's location/base, with the assistance of an a element.
+ */
+var _absolutifyAnchor = document.createElement("a");
+Utils.absolutify = function(url) {
+    _absolutifyAnchor.href = url;
+    return _absolutifyAnchor.href;
+};
+
+/**
+ * Takes an absolute url, returns true if it is an http/s url, false otherwise 
+ * (e.g. mailto:, gopher://, data:, etc.)
+ */
+var _httpUrlRE = /^https?/;
+Utils.httpUrl = function(url) {
+    return _httpUrlRE.test(url);
+};
+
 /**
  * outerHTML polyfill - https://gist.github.com/889005
  */
@@ -1013,11 +1033,6 @@ define('resizeImages',["utils"], function(Utils) {
 
 var ResizeImages = window.ResizeImages = {};
 
-var absolutify = document.createElement('a');
-
-// A regex for detecting http(s) URLs.
-var httpRe = /^https?/;
-
 function getPhysicalScreenSize(devicePixelRatio) {
 
     function multiplyByPixelRatio(sizes) {
@@ -1198,9 +1213,8 @@ ResizeImages.getImageURL = function(url, options) {
 ResizeImages._rewriteSrcAttribute = function(element, opts, srcVal){
     srcVal = element.getAttribute(opts.sourceAttribute) || srcVal;
     if (srcVal) {
-        absolutify.href = srcVal;
-        var url = absolutify.href;
-        if (httpRe.test(url)) {
+        var url = Utils.absolutify(srcVal);
+        if (Utils.httpUrl(url)) {
             element.setAttribute(opts.targetAttribute, ResizeImages.getImageURL(url, opts));
             element.setAttribute('data-orig-src', srcVal);
             if(opts.onerror) {
@@ -1565,8 +1579,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         options: httpCacheOptions
     };
 
-    var absolutify = document.createElement('a');
-
     var Jazzcat = window.Jazzcat = {
         httpCache: httpCache,
         // Cache a reference to `document.write` in case it is reassigned.
@@ -1636,9 +1648,10 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         while (script = scripts[i++]) {
             url = script.getAttribute(options.attribute);
             if (!url) continue;
+            url = Utils.absolutify(url);
+            if (!Utils.httpUrl(url)) continue;
+
             script.removeAttribute(options.attribute);
-            absolutify.href = url;
-            url = absolutify.href;
 
             // Rewriting script to grab contents from localstorage
             // ex. <script>true,"body",Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
@@ -1903,6 +1916,94 @@ Unblockify.unblock = function(scripts) {
 return Unblockify;
 
 });
+/**
+ * cssOptimize - Client code to a css optimization service
+ */
+
+define('cssOptimize',["utils"], function(Utils) {
+
+var CssOptimize = window.cssOptimize = {};
+
+/**
+ * Takes an original, absolute url of a stylesheet, returns a url for that
+ * stylesheet going through the css service.
+ */
+
+CssOptimize.getCssUrl = function(url, options) {
+    var opts = Utils.extend({}, defaults, options);
+    var bits = [opts.protoAndHost];
+
+    if (opts.projectName) {
+        bits.push('project-' + opts.projectName);
+    }
+
+    bits.push(opts.endpoint);
+    bits.push(url);
+
+    return bits.join('/');
+};
+
+/**
+ * Rewrite the href of a stylesheet referencing `<link>` element to go through 
+ * our service.
+ */
+CssOptimize._rewriteHref = function(element, options) {
+    var attributeVal = element.getAttribute(options.targetAttribute);
+    var url;
+    if (attributeVal) {
+        url = Utils.absolutify(attributeVal);
+        if (Utils.httpUrl(url)) {
+            element.setAttribute('data-orig-href', attributeVal);
+            element.setAttribute(options.targetAttribute,
+                                 CssOptimize.getCssUrl(url, options));
+            if (options.onerror) {
+                element.setAttribute('onerror', options.onerror);
+            }
+        }
+    }
+};
+
+/**
+ * Takes an array-like object of `<link>` elements
+ */
+CssOptimize.optimize = function(elements, options) {
+    var opts = Utils.extend({}, defaults, options);
+    var element;
+
+    for(var i = 0, len = elements.length; i < len; i++) {
+        element = elements[i];
+        if (element.nodeName === 'LINK' &&
+            element.getAttribute('rel') === 'stylesheet' &&
+            element.getAttribute(opts.targetAttribute)) {
+
+            CssOptimize._rewriteHref(element, opts);
+        }
+    }
+};
+
+/**
+ * An 'error' event handler designed to be set using an "onerror" attribute that
+ * will set the target elements "href" attribute to the value of its 
+ * "data-orig-href" attribute, if one exists.
+ */
+var restoreOriginalHref = CssOptimize.restoreOriginalHref = function(event) {
+    var origHref;
+    event.target.removeAttribute('onerror'); //remove error handler
+    if(origHref = event.target.getAttribute('data-orig-href')) {
+        event.target.setAttribute('href', origHref);
+    }
+};
+
+var defaults = CssOptimize._defaults = {
+    protoAndHost: '//jazzcat.mobify.com',
+    endpoint: 'cssoptimizer',
+    projectName: 'oss-' + location.hostname.replace(/[^\w]/g, '-'),
+    targetAttribute: 'x-href',
+    onerror: 'Mobify.CssOptimize.restoreOriginalHref(event);'
+};
+
+return CssOptimize;
+});
 define('external/picturefill',["utils", "capture"], function(Utils, Capture) {
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
@@ -2045,12 +2146,13 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
 return;
 
 });
-require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
+require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "cssOptimize", "external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
     Mobify.ResizeImages = ResizeImages;
     Mobify.Jazzcat = Jazzcat;
+    Mobify.CssOptimize = CssOptimize;
     Mobify.Unblockify = Unblockify;
     Mobify.api = "2.0"; // v6 tag backwards compatibility change
     return Mobify;

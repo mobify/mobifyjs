@@ -43,6 +43,26 @@ Utils.clone = function(obj) {
     return target;
 };
 
+// Some url helpers
+/**
+ * Takes a url, relative or absolute, and absolutizes it relative to the current 
+ * document's location/base, with the assistance of an a element.
+ */
+var _absolutifyAnchor = document.createElement("a");
+Utils.absolutify = function(url) {
+    _absolutifyAnchor.href = url;
+    return _absolutifyAnchor.href;
+};
+
+/**
+ * Takes an absolute url, returns true if it is an http/s url, false otherwise 
+ * (e.g. mailto:, gopher://, data:, etc.)
+ */
+var _httpUrlRE = /^https?/;
+Utils.httpUrl = function(url) {
+    return _httpUrlRE.test(url);
+};
+
 /**
  * outerHTML polyfill - https://gist.github.com/889005
  */

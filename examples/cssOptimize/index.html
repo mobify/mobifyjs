@@ -1,7 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<title>Image Resizer with IMG elements</title>
+    <meta charset="utf-8">
+    <title>CSS Optimizer Example</title>
 <script>
 (function(window, document, detector, mobifyjsUrl, mainUrl) {
 
@@ -84,23 +85,17 @@ setTimeout(function() {
 
         return true;
     },
-
-    '/mobifyjs/build/mobify.min.js',
-    '/mobifyjs/examples/resizeImages-img-element/main.js'
-    //'/build/custom/mobify.js'
+    '/build/mobify.js', '/mobifyjs/examples/CssOptimize/main.js'
 );
 </script>
 <!-- END MOBIFY TAG -->
-
-<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
-<style>
-img {
-    width: 100%;
-}
-</style>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
 </head>
-<body class="foo">
-    <img src="/mobifyjs/examples/assets/images/forest.jpg">
-    <img src="/mobifyjs/examples/assets/images/mountains.jpg">
+<body>
+<h1>Styled!</h1>
+
+<p>What an amazing example page. Watch out, my stylesheet will be loaded from elsewhere!</p>
+
 </body>
 </html>

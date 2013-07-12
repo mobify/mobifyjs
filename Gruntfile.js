@@ -31,6 +31,7 @@ module.exports = function(grunt) {
                   'http://localhost:3000/tests/jazzcat.html',
                   'http://localhost:3000/tests/resizeImages.html',
                   'http://localhost:3000/tests/unblockify.html',
+                  'http://localhost:3000/tests/cssOptimize.html'
                 ]
               }
             }
@@ -113,6 +114,8 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/capture.html',
                         'http://localhost:3000/tests/resizeImages.html',
                         'http://localhost:3000/tests/jazzcat.html',
+                        'http://localhost:3000/tests/unblockify.html',
+                        'http://localhost:3000/tests/cssOptimize.html'
                     ],
                     concurrency: 4,
                     tunneled: true,
