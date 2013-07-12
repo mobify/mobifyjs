@@ -10,7 +10,7 @@ var hbs = require('hbs');
 /**
  * Used for test "capture captures the complete document" in `tests/capture.html`.
  */
-var slowResponse = function() {
+var slowResponse = function(req, res) {
     var split = fs.readFileSync(__dirname + req.path, 'utf8').split('<!-- SPLIT -->')
 
     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -20,6 +20,15 @@ var slowResponse = function() {
         res.write(split[1]);
         res.end();
     }, 5000);
+}
+
+/**
+ * Used for test "capture captures the complete document" in `tests/capture.html`.
+ */
+var cachedResponse = function(req, res, next) {
+    res.header('Content-Type', 'application/javascript');
+    res.header('Cache-Control', 'max-age=10000');
+    next();
 }
 
 /**
@@ -41,8 +50,16 @@ var jazzcatPerformanceRunner = function(req, res) {
         scripts.push(resourcesUrl + scriptsArray[index].fileName + "?" + i);
     }
 
+    var mobifyFull = '/performance/resources/mobify-main-jazzcat.min.js';
+    // Append timestamp in order to ensure the mobify.js does not always
+    // get loaded cached, and also ensures the second load of mobify.js
+    // on a test does not load again.
+    mobifyFull += "?" + new Date().getTime();;
+
+    res.header('Connection', 'close');
+
     res.render('fixtures/jazzcatRunner', {
-        mobifyfull: '/mobifyjs/performance/resources/mobify-main-jazzcat.min.js',
+        mobifyfull: mobifyFull,
         scripts: scripts
     });
 };
@@ -109,6 +126,7 @@ app.use(function(req, res, next) {
     next();
 });
 
+app.get('/performance/resources/mobify-main-jazzcat.min.js', cachedResponse);
 app.get('/tests/fixtures/split.html', slowResponse);
 app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
 app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);
