@@ -44,7 +44,6 @@ var jazzcatPerformanceIndex = function(req, res) {
  */
 var jazzcatMainExec = function(){
     var capturing = window.Mobify && window.Mobify.capturing || false;
-    Mobify.Jazzcat.combineScripts.defaults.base = ""
     if (capturing) {
         // Initiate capture
         Mobify.Capture.init(function(capture){
@@ -55,7 +54,10 @@ var jazzcatMainExec = function(){
             // Grab all scripts to be concatenated into one request
             if (!/disableJazzcat=1/.test(location.href)) {
                 var scripts = capturedDoc.querySelectorAll('script');
-                Mobify.Jazzcat.combineScripts(scripts, capturedDoc);
+                Mobify.Jazzcat.optimizeScripts(scripts, {
+                    responseType: 'js',
+                    base: ''
+                });
             }
 
             // Render source DOM to document
@@ -159,7 +161,7 @@ app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
 app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);
 
 app.get('/jsonp/Jazzcat.combo.load/:scripts', jazzcatJsonp);
-app.get('/js/Jazzcat.combo.load/:scripts', jazzcatJs);
+app.get('/js/:scripts', jazzcatJs);
 
 
 if (require.main === module) {
