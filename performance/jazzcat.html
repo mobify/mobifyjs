@@ -125,11 +125,11 @@ $("form").submit(function(e) {
 
     run(function() {
         var averagedMobifyResults = mobifyResults.map(function(testSet){
-            return average(testSet).toFixed(1);
+            return parseFloat(average(testSet).toFixed(1));
         });
 
         var averagedNativeResults = nativeResults.map(function(testSet){
-            return average(testSet).toFixed(1);
+            return parseFloat(average(testSet).toFixed(1));
         });
 
         var mobifyResultsMsg = "Mobify results: " + averagedMobifyResults.join(", ");
@@ -159,9 +159,7 @@ var average = function(array) {
 var createPoints = function(x, y) {
     var points = [];
     for (var i = 0; i < x.length; i++) {
-        // TODO: only dividing by 10 because canvasjs
-        // seems to blow up when #'s are too big. Figure out why!
-        points.push({x: x[i], y: y[i]/10});
+        points.push({x: x[i], y: y[i]});
     }
     // console.log(points);
     return points;
@@ -174,7 +172,11 @@ var renderChart = function(scripts, mobifyData, nativeData) {
     var chart = new CanvasJS.Chart("chartContainer", {
         zoomEnabled: true,
         panEnabled: true,
+        axisX: {
+            title: "# of Scripts"
+        },
         axisY: {
+            title: "Time (seconds)",
             includeZero: false
         },
         theme: "theme2",
