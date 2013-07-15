@@ -51,7 +51,7 @@ var jazzcatMainExec = function(){
             var capturedDoc = capture.capturedDoc;
 
             var match = location.href.match(/responseType=([^&;]*)/);
-            var responseType = (match && match[1]) || 'json';
+            var responseType = (match && match[1]) || 'jsonp';
 
             // Grab all scripts to be concatenated into one request
             if (!/disableJazzcat=1/.test(location.href)) {
@@ -116,6 +116,7 @@ var jazzcatJsonp = function(req, res) {
  * Implements the Jazzcat JS API.
  */
 var jazzcatJs = function(req, res) {
+
     var scripts = JSON.parse(req.params.scripts);
     var scriptData = scripts.map(function(script){
         var pathname = Url.parse(script).pathname;

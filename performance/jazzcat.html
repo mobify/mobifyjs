@@ -69,9 +69,12 @@ var run = function(complete) {
 
     var baseUrl = "/performance/jazzcat/runner/" + scriptRange[i];
     var mobifyUrl = baseUrl + '#mobify=1&responseType=' + window.responseType;
-    var nativeUrl = baseUrl + '#mobify=0';
+    var nativeUrl;
     if (window.captureNative) {
-        nativeUrl += '&disableJazzcat=1';
+        nativeUrl = baseUrl + '#mobify=1&disableJazzcat=1';
+    }
+    else {
+        nativeUrl = baseUrl + '#mobify=0';
     }
 
 
