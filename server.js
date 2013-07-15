@@ -83,7 +83,7 @@ var jazzcatPerformanceRunner = function(req, res) {
     // Append timestamp in order to ensure the mobify.js does not always
     // get loaded cached, and also ensures the second load of mobify.js
     // on a test does not load again.
-    var library = '/build/mobify.min.js';
+    var library = '/build/mobify.js';
     library += "?" + new Date().getTime();
 
     res.header('Connection', 'close');
