@@ -1361,7 +1361,7 @@ return ResizeImages;
  * To work around this, the client implements a cache over localStorage for caching
  * the results of requests to Jazzcat.
  *
- * Scripts that should use the client must be passed to `Jazzcat.combineScripts`
+ * Scripts that should use the client must be passed to `Jazzcat.optimizeScripts`
  * during the capturing phase. During execution, uncached scripts are loaded
  * into the cache using a bootloader request to Jazzcat. Scripts are then
  * executed directly from the cache.
@@ -1629,7 +1629,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      *                          caching headers set on the reource.
      */
 
-    Jazzcat.combineScripts = function(scripts, doc, options) {
+    Jazzcat.optimizeScripts = function(scripts, options) {
         if (options && options.cacheOverrideTime !== undefined) {
             Utils.extend(httpCache.options,
               {overrideTime: options.cacheOverrideTime});
@@ -1639,47 +1639,110 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             return scripts;
         }
 
-        var script;
-        var url;
-        var i = 0;
-
         options = Utils.extend({}, defaults, options || {});
+        var jsonp = (options.responseType === 'jsonp');
 
+        // load data from localStorage
         httpCache.load(httpCache.options);
 
-        while (script = scripts[i++]) {
+        var url;
+        var uncachedScripts = {
+            'head': [],
+            'body': []
+        };
+        for (var i=0, len=scripts.length; i<len; i++) {
+            var script = scripts[i];
             url = script.getAttribute(options.attribute);
             if (!url) continue;
             url = Utils.absolutify(url);
             if (!Utils.httpUrl(url)) continue;
-
-            script.removeAttribute(options.attribute);
+            var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
+            if (!httpCache.get(url)) {
+                uncachedScripts[parent].push({
+                    "script": script,
+                    "url": url
+                });
+            }
 
             // Rewriting script to grab contents from localstorage
-            // ex. <script>true,"body",Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>
-                               
-                                // true or false depending if the script is cached
-            script.innerHTML = !!httpCache.get(url) +
-                                ",\"" +
-                                // head or body
-                                (script.parentNode === doc.head ? "head" : "body") +
-                                "\"," +
-                                // Jazzcat callback to be executed when new document is written
-                                options.execCallback +
-                                "('" + url + "');";
+            // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
+            if (jsonp) {
+                script.innerHTML =  options.execCallback +
+                                    "('" + url + "');";
+            }
+            // Remove the src attribute
+            script.removeAttribute(options.attribute);
+
+            // Insert the httpCache loader before the first
+            // script being combined
+            if (i===0) {
+                var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
+                script.parentNode.insertBefore(httpLoaderScript, script);
+            }
         }
+
+        // helper method for inserting the loader script
+        // before the first uncached script in the "uncached" array
+        var insertLoader = function(uncached) {
+            if (uncached.length > 0) {
+                var scriptUrls = uncached.map(function(scriptObj) {
+                    return scriptObj.url;
+                })
+                var loader = Jazzcat.getLoaderScript(scriptUrls, jsonp, options);
+                uncached[0].script.parentNode.insertBefore(loader, uncached[0].script);
+            }
+        };
+        insertLoader(uncachedScripts['head']);
+        insertLoader(uncachedScripts['body']);
 
         return scripts;
     };
 
-    var defaults = Jazzcat.combineScripts.defaults = {
-        selector: 'script',
-        attribute: 'x-src',
-        base: '//jazzcat.mobify.com',
-        endpoint: 'jsonp',
-        execCallback: 'Jazzcat.combo.exec',
-        loadCallback: 'Jazzcat.combo.load',
-        projectName: ''
+    /**
+     * Private helper that returns a script node that when run, loads the 
+     * httpCache from localStorage.
+     */
+    Jazzcat.getHttpCacheLoaderScript = function() {
+        var loadFromCacheScript = document.createElement('script');
+        loadFromCacheScript.innerHTML = (httpCache.options.overrideTime ?
+          "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
+          "Jazzcat.httpCache.load();" );
+
+        return loadFromCacheScript;
+    };
+
+    /**
+     * Returns an array of scripts suitable for loading Jazzcat's localStorage 
+     * cache and loading any uncached scripts through the jazzcat service. Takes
+     * a list of URLs to load via the service (possibly empty), the name of the 
+     * jsonp callback used in loading the service's response and a boolean of 
+     * whether we expect the cache to have been loaded from localStorage by this 
+     * point.
+     */
+    Jazzcat.getLoaderScript = function(urls, jsonp, options) {
+        var loadScript;
+        if (urls && urls.length) {
+            loadScript = document.createElement('script');
+            loadScript.src = Jazzcat.getURL(urls, jsonp, options);
+        }
+        return loadScript;
+    };
+
+    /**
+     * Returns a URL suitable for loading `urls` from Jazzcat, calling the
+     * function `jsonpCallback` on complete. `urls` are sorted to generate
+     * consistent URLs.
+     */
+    Jazzcat.getURL = function(urls, jsonp, options) {
+        return options.base +
+               (options.projectName ? '/project-' + options.projectName : '') +
+               '/' + options.responseType +
+               (jsonp ? '/' + options.loadCallback : '') + 
+               '/' + Jazzcat.JSONURIencode(urls.slice());
+    };
+
+    Jazzcat.JSONURIencode = function(obj) {
+        return encodeURIComponent(JSON.stringify(obj));
     };
 
     Jazzcat.combo = {
@@ -1755,131 +1818,14 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         }
     };
 
-    /**
-     * Private helper that returns a script node that when run, loads the 
-     * httpCache from localStorage.
-     */
-    var _getLoadFromCacheScript = function() {
-        var loadFromCacheScript = document.createElement('script');
-        loadFromCacheScript.innerHTML = (httpCache.options.overrideTime ?
-          "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
-          "Jazzcat.httpCache.load();" );
-
-        return loadFromCacheScript;
-    };
-
-    /**
-     * Returns an array of scripts suitable for loading Jazzcat's localStorage 
-     * cache and loading any uncached scripts through the jazzcat service. Takes
-     * a list of URLs to load via the service (possibly empty), the name of the 
-     * jsonp callback used in loading the service's response and a boolean of 
-     * whether we expect the cache to have been loaded from localStorage by this 
-     * point.
-     */
-    Jazzcat.getLoaderScripts = function(urls, jsonpCallback, cacheLoaded) {
-        var loadFromCacheScript;
-        var loadFromServiceScript;
-        var result = [];
-        if (!cacheLoaded) {
-            loadFromCacheScript = _getLoadFromCacheScript();
-            result.push(loadFromCacheScript);
-        }
-        if (urls && urls.length) {
-            loadFromServiceScript = document.createElement('script');
-            loadFromServiceScript.src = Jazzcat.getURL(urls, jsonpCallback);
-            result.push(loadFromServiceScript);
-        }
-        return result;
-    };
-
-    /**
-     * Returns a URL suitable for loading `urls` from Jazzcat, calling the
-     * function `jsonpCallback` on complete. `urls` are sorted to generate
-     * consistent URLs.
-     */
-    Jazzcat.getURL = function(urls, jsonpCallback) {
-        return defaults.base + (defaults.projectName ? '/project-' + defaults.projectName : '') +
-               '/' + defaults.endpoint + '/' + jsonpCallback + '/' +
-               Jazzcat.JSONURIencode(urls.slice().sort());
-    };
-
-    Jazzcat.JSONURIencode = function(obj) {
-        return encodeURIComponent(JSON.stringify(obj));
-    };
-
-    /**
-     * Regex generator used to match Jazzcat calls in an HTML string.
-     * Generates regexp based on parent, which should either be head or body.
-     */
-    var execReGenerator = function(parent) {
-        return new RegExp("<script[^>]*?>(true|false),['\"]" +
-            parent + "['\"]," +
-            defaults.execCallback.replace(/\./g, '\\.') +
-            "\\('([\\s\\S]*?)'\\);<\\/script", "gi");
-    };
-
-    /**
-     * Inserts one Jazzcat loader script into the document, either for
-     * scripts in the body, or scripts in the head (specified by parent arg)
-     */
-    Jazzcat.insertLoadersIntoHTMLString = function(html) {
-        var addedCacheLoader = false;
-
-        var insert = function(html, parent) {
-            var match;
-            var bootstrap;
-            var firstIndex = -1;
-            var uncached = [];
-
-            // Find the first Jazzcat call and gather all the uncached scripts.
-            var execRe = execReGenerator(parent);
-
-            while (match = execRe.exec(html)) {
-                if (firstIndex == -1) firstIndex = match.index;
-                if (match[1] === "false") uncached.push(match[2]);
-            }
-
-            if (firstIndex == -1) {
-                return html;
-            }
-
-            bootstrap = Jazzcat.getLoaderScripts(uncached, defaults.loadCallback, addedCacheLoader);
-
-            // If we had not added the cache loader, and any scripts come back 
-            // from the getLaoderScripts method, we can expect that we have now 
-            // added it
-            if (!addedCacheLoader && bootstrap.length > 0) {
-                addedCacheLoader = true;
-            }
-
-            // Transform all bootstrap scripts into a string
-            var bootstrapString = bootstrap.map(function(script, index) {
-                return Utils.outerHTML(script);
-            }).join('');
-
-            return html.substr(0, firstIndex) + bootstrapString + html.substr(firstIndex);
-        };
-        // Since bootloader jazzcat scripts must be placed before the first external script,
-        // two seperate bootloader scripts are inserted - one for scripts in the head,
-        // and one for scripts in the body. If there was only one jazzcat request for
-        // all the concatinated scripts in the document, it could cause every script to
-        // load in the head, which would block rendering. Therefore, we concatinate scripts
-        // in the head and body seperately.
-        html = insert(html, "head");
-        html = insert(html, "body");
-        return html;
-    };
-
-
-    /**
-     * Overrides `Capture.enable` to insert a Jazzcat bootloader to fetch all
-     * uncached scripts from the Jazzcat service before executing any Jazzcat calls.
-     */
-    var oldEnable = Capture.enable;
-    Capture.enable = function() {
-        var html = oldEnable.apply(Capture, arguments);
-        html = Jazzcat.insertLoadersIntoHTMLString(html);
-        return html;
+    var defaults = Jazzcat.optimizeScripts.defaults = {
+        selector: 'script',
+        attribute: 'x-src',
+        base: '//jazzcat.mobify.com',
+        responseType: 'jsonp',
+        execCallback: 'Jazzcat.combo.exec',
+        loadCallback: 'Jazzcat.combo.load',
+        projectName: ''
     };
 
     return Jazzcat;

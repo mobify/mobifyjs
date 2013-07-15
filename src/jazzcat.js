@@ -295,7 +295,9 @@ define(["utils", "capture"], function(Utils, Capture) {
         }
 
         options = Utils.extend({}, defaults, options || {});
+        var jsonp = (options.responseType === 'jsonp');
 
+        // load data from localStorage
         httpCache.load(httpCache.options);
 
         var url;
@@ -305,7 +307,6 @@ define(["utils", "capture"], function(Utils, Capture) {
         };
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
-            console.log(script);
             url = script.getAttribute(options.attribute);
             if (!url) continue;
             url = Utils.absolutify(url);
@@ -320,7 +321,7 @@ define(["utils", "capture"], function(Utils, Capture) {
 
             // Rewriting script to grab contents from localstorage
             // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
-            if (options.responseType === 'jsonp') {
+            if (jsonp) {
                 script.innerHTML =  options.execCallback +
                                     "('" + url + "');";
             }
@@ -342,7 +343,6 @@ define(["utils", "capture"], function(Utils, Capture) {
                 var scriptUrls = uncached.map(function(scriptObj) {
                     return scriptObj.url;
                 })
-                var jsonp = (options.responseType === 'jsonp');
                 var loader = Jazzcat.getLoaderScript(scriptUrls, jsonp, options);
                 uncached[0].script.parentNode.insertBefore(loader, uncached[0].script);
             }
@@ -353,14 +353,51 @@ define(["utils", "capture"], function(Utils, Capture) {
         return scripts;
     };
 
-    var defaults = Jazzcat.optimizeScripts.defaults = {
-        selector: 'script',
-        attribute: 'x-src',
-        base: '//jazzcat.mobify.com',
-        responseType: 'jsonp',
-        execCallback: 'Jazzcat.combo.exec',
-        loadCallback: 'Jazzcat.combo.load',
-        projectName: ''
+    /**
+     * Private helper that returns a script node that when run, loads the 
+     * httpCache from localStorage.
+     */
+    Jazzcat.getHttpCacheLoaderScript = function() {
+        var loadFromCacheScript = document.createElement('script');
+        loadFromCacheScript.innerHTML = (httpCache.options.overrideTime ?
+          "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
+          "Jazzcat.httpCache.load();" );
+
+        return loadFromCacheScript;
+    };
+
+    /**
+     * Returns an array of scripts suitable for loading Jazzcat's localStorage 
+     * cache and loading any uncached scripts through the jazzcat service. Takes
+     * a list of URLs to load via the service (possibly empty), the name of the 
+     * jsonp callback used in loading the service's response and a boolean of 
+     * whether we expect the cache to have been loaded from localStorage by this 
+     * point.
+     */
+    Jazzcat.getLoaderScript = function(urls, jsonp, options) {
+        var loadScript;
+        if (urls && urls.length) {
+            loadScript = document.createElement('script');
+            loadScript.src = Jazzcat.getURL(urls, jsonp, options);
+        }
+        return loadScript;
+    };
+
+    /**
+     * Returns a URL suitable for loading `urls` from Jazzcat, calling the
+     * function `jsonpCallback` on complete. `urls` are sorted to generate
+     * consistent URLs.
+     */
+    Jazzcat.getURL = function(urls, jsonp, options) {
+        return options.base +
+               (options.projectName ? '/project-' + options.projectName : '') +
+               '/' + options.responseType +
+               (jsonp ? '/' + options.loadCallback : '') + 
+               '/' + Jazzcat.JSONURIencode(urls.slice());
+    };
+
+    Jazzcat.JSONURIencode = function(obj) {
+        return encodeURIComponent(JSON.stringify(obj));
     };
 
     Jazzcat.combo = {
@@ -436,51 +473,14 @@ define(["utils", "capture"], function(Utils, Capture) {
         }
     };
 
-    /**
-     * Private helper that returns a script node that when run, loads the 
-     * httpCache from localStorage.
-     */
-    Jazzcat.getHttpCacheLoaderScript = function() {
-        var loadFromCacheScript = document.createElement('script');
-        loadFromCacheScript.innerHTML = (httpCache.options.overrideTime ?
-          "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
-          "Jazzcat.httpCache.load();" );
-
-        return loadFromCacheScript;
-    };
-
-    /**
-     * Returns an array of scripts suitable for loading Jazzcat's localStorage 
-     * cache and loading any uncached scripts through the jazzcat service. Takes
-     * a list of URLs to load via the service (possibly empty), the name of the 
-     * jsonp callback used in loading the service's response and a boolean of 
-     * whether we expect the cache to have been loaded from localStorage by this 
-     * point.
-     */
-    Jazzcat.getLoaderScript = function(urls, jsonp, options) {
-        var loadScript;
-        if (urls && urls.length) {
-            loadScript = document.createElement('script');
-            loadScript.src = Jazzcat.getURL(urls, jsonp, options);
-        }
-        return loadScript;
-    };
-
-    /**
-     * Returns a URL suitable for loading `urls` from Jazzcat, calling the
-     * function `jsonpCallback` on complete. `urls` are sorted to generate
-     * consistent URLs.
-     */
-    Jazzcat.getURL = function(urls, jsonp, options) {
-        return options.base +
-               (options.projectName ? '/project-' + options.projectName : '') +
-               '/' + options.responseType +
-               (jsonp ? '/' + options.jsonpCallback : '') + 
-               '/' + Jazzcat.JSONURIencode(urls.slice().sort());
-    };
-
-    Jazzcat.JSONURIencode = function(obj) {
-        return encodeURIComponent(JSON.stringify(obj));
+    var defaults = Jazzcat.optimizeScripts.defaults = {
+        selector: 'script',
+        attribute: 'x-src',
+        base: '//jazzcat.mobify.com',
+        responseType: 'jsonp',
+        execCallback: 'Jazzcat.combo.exec',
+        loadCallback: 'Jazzcat.combo.load',
+        projectName: ''
     };
 
     return Jazzcat;

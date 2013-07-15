@@ -6,7 +6,6 @@ var fs = require('fs');
 var Url = require('url');
 var hbs = require('hbs');
 
-
 /**
  * Used for test "capture captures the complete document" in `tests/capture.html`.
  */
@@ -51,11 +50,14 @@ var jazzcatMainExec = function(){
             // Grab reference to a newly created document
             var capturedDoc = capture.capturedDoc;
 
+            var match = location.href.match(/responseType=([^&;]*)/);
+            var responseType = (match && match[1]) || 'json';
+
             // Grab all scripts to be concatenated into one request
             if (!/disableJazzcat=1/.test(location.href)) {
                 var scripts = capturedDoc.querySelectorAll('script');
                 Mobify.Jazzcat.optimizeScripts(scripts, {
-                    responseType: 'js',
+                    responseType: responseType,
                     base: ''
                 });
             }
