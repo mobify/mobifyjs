@@ -113,6 +113,9 @@
         // Too big for localStorage in Chrome, Webkit, and Firefox
         var LONG_STRING = Array(10000000).join('1');
 
+        // Large, but small enough to fit in cache
+        var MEDIUM_STRING = Array(2000000).join('1');
+
         var resourceFixtures = {
             'stale-expires': {'headers': {'expires': UTC_TWO_WEEKS_AGO}},
             'stale-cache-control': {
@@ -285,6 +288,30 @@
                         start();
                     });
                 }, 0);
+            });
+
+            // regression test to ensure Jazzcat does not evict everything
+            // when persisting
+            asyncTest('httpCache - Evict until small enough', 1, function() {
+                httpCache.reset();
+                httpCache.save(function(){
+                    for (var i=0; i < 5; i++) {
+                        httpCache.set('val' + i, {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: MEDIUM_STRING});
+                        if (i !== 0) {
+                            httpCache.get('val' + i, true);
+                        }
+                    }
+
+                    httpCache.save(function(err) {
+
+                        httpCache.reset();
+                        httpCache.load();
+
+                        ok(!!httpCache.get('val1'), '`val1` was cached');
+
+                        start();
+                    });
+                });
             });
 
             asyncTest('combineScripts - Warm cache', 1, function() {

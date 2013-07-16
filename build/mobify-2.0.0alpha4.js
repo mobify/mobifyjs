@@ -1438,10 +1438,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         var resource;
         var attempts = 10;
         var key;
-        var serialized;
-        // End of time.
-        var lruTime = 9007199254740991;
-        var lruKey;
 
         for (key in cache) {
             if (cache.hasOwnProperty(key)) {
@@ -1454,6 +1450,10 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         // responsive even if a number of resources are evicted.
         (function persist() {
             var store = function() {
+                var serialized;
+                // End of time.
+                var lruTime = 9007199254740991;
+                var lruKey;
                 try {
                     serialized = JSON.stringify(resources);
                 } catch(e) {
@@ -1468,7 +1468,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                     if (!--attempts) {
                         return callback && callback(e);
                     }
-
                     // Find the least recently used resource.
                     for (key in resources) {
                         if (!resources.hasOwnProperty(key)) continue;
@@ -1486,7 +1485,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                             break;
                         }
                     }
-
                     delete resources[lruKey];
 
                     return persist();
