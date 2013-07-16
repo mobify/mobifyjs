@@ -404,6 +404,8 @@ define(["utils", "capture"], function(Utils, Capture) {
         return encodeURIComponent(JSON.stringify(obj));
     };
 
+    var scriptSplitRe = /(<\/scr)(ipt\s*>)/ig
+
     Jazzcat.combo = {
         /**
          * Execute the script at `url` using `document.write`. If the scripts
@@ -439,7 +441,7 @@ define(["utils", "capture"], function(Utils, Capture) {
                 //   like 'i' when expression is matched.
                 //
                 // Talk to Roman if you want to know more about this.
-                out += '>' + resource.body.replace(/(<\/scr)(ipt\s*>)/ig, '$1\\$2');
+                out += '>' + resource.body.replace(scriptSplitRe, '$1\\$2');
             }
 
             // `document.write` is used to ensure scripts are executed in order,
