@@ -168,6 +168,9 @@
             // But I do seem to fit in FF.
           , LONG_STRING = Array(5000000).join('1')
 
+          // One or two will fit in local storage, but not several
+          , MEDIUM_STRING = Array(2000000).join('1')
+
           , getIframeDocument = function(selector) {
                 return $(selector)[0].contentDocument
             }
@@ -347,6 +350,7 @@
 
             httpCache.reset(cache);
 
+            var wrote;
             var origDocWrite = Mobify.combo._docWrite
             Mobify.combo._docWrite = function(s) {
                 wrote = s
@@ -386,7 +390,7 @@
             httpCache.set('unused', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
 
             httpCache.set('used', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'used'})
-            httpCache.get('used', true)
+            httpCache.get('used', true); // mark it used
 
             httpCache.save(function(err) {
                 if (err) return;
@@ -426,7 +430,35 @@
             }, 0);
         });
 
-        test('httpCache.utils.isStale', 8, function() {
+            // regression test to ensure Jazzcat evicts more than one itme 
+            // properly when there is too much to store
+            asyncTest('httpCache - Evict until small enough', 2, function() {
+                httpCache.reset();
+                httpCache.save(function(){
+                    for (var i=0; i < 5; i++) {
+                        httpCache.set('val' + i, {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: MEDIUM_STRING});
+                        if (i !== 0) {
+                            httpCache.get('val' + i, true);
+                        }
+                    }
+
+                    httpCache.save(function(err) {
+
+                        httpCache.reset();
+                        httpCache.load();
+
+                        ok(!httpCache.get('val0'), 'val0 was evicted')
+                        ok(!!httpCache.get('val1'), '`val1` was cached');
+
+                        httpCache.reset();
+                        httpCache.save();
+
+                        start();
+                    });
+                });
+            });
+
+        test('httpCache.utils.isStale', 9, function() {
             var isStale = httpCache.utils.isStale
               , resources = {
                     'stale-expires': {
@@ -473,7 +505,13 @@
                             'expires': 'invalid'
                         }
                     }
-                };
+                , 'new-no-cache-headers': {
+                    'headers': {
+                        'date': UTC_NOW
+                    }
+                }
+            };
+        
 
             ok(isStale(resources['stale-expires']));
             ok(isStale(resources['stale-cache-control']));
@@ -483,6 +521,8 @@
             ok(isStale(resources['undefined-headers']), 'undefined cache headers is stale');
             ok(isStale(resources['invalid-date']), 'Invalid date is stale');
             ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
+            // Test our ten minute minimum
+            ok(!isStale(resources['new-no-cache-headers']), 'No cache headers but less than 10 minutes old');
 
         });
 
