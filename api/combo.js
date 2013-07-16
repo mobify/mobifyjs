@@ -55,10 +55,7 @@ var get = function(key, increment) {
           , resource
           , attempts = 10
           , key
-          , serialized
-            // End of time.
-          , lruTime = 9007199254740991
-          , lruKey;
+          , serialized;
 
         for (key in cache) {
             if (cache.hasOwnProperty(key)) {
@@ -67,6 +64,9 @@ var get = function(key, increment) {
         }
 
         (function persist() {
+            // End of time.
+            var lruTime = 9007199254740991
+            , lruKey;
             setTimeout(function() {
                 try {
                     serialized = JSON.stringify(resources);
@@ -185,12 +185,17 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
             var headers = resource.headers || {}
               , cacheControl = headers['cache-control']
               , now = Date.now()
-              , date
+              , date = Date.parse(headers.date)
               , expires;
 
-            // If `max-age` and `date` are present, and no other no other cache
+              // Fresh if less than 10 minutes old
+              if (date && (now < date + 600 * 1000)) {
+                    return false;
+              }
+
+            // If `max-age` and `date` are present, and no other cache
             // directives exist, then we are stale if we are older.
-            if (cacheControl && (date = Date.parse(headers.date))) {
+            if (cacheControl && date) {
                 cacheControl = ccParse(cacheControl);
 
                 if ((cacheControl['max-age']) &&
@@ -203,8 +208,8 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
             }
 
             // If `expires` is present, we are stale if we are older.
-            if (expires = Date.parse(headers.expires)) {
-                return now > expires;
+            if (date = Date.parse(headers.expires)) {
+                return now > date;
             }
 
             // Otherwise, we are stale.
