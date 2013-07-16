@@ -47,27 +47,28 @@ var get = function(key, increment) {
     }
 
     /**
-     * Save the in-memory cache to disk. If the disk is full, use LRU to drop
-     * resources until it will fit on disk.
+     * Save the in-memory cache to localStorage. If the localStorage is full, 
+     * use LRU to drop resources until it will fit on disk, or give up after 10 
+     * attempts.
      */
   , save = function(callback) {
         var resources = {}
           , resource
           , attempts = 10
-          , key
-          , serialized;
+          , key;
 
         for (key in cache) {
             if (cache.hasOwnProperty(key)) {
-                resources[key] = cache[key]
+                resources[key] = cache[key];
             }
         }
 
         (function persist() {
-            // End of time.
-            var lruTime = 9007199254740991
-            , lruKey;
             setTimeout(function() {
+                var serialized;
+                // End of time.
+                var lruTime = 9007199254740991;
+                var lruKey;
                 try {
                     serialized = JSON.stringify(resources);
                 } catch(err) {
@@ -76,7 +77,7 @@ var get = function(key, increment) {
                 }
 
                 try {
-                    localStorage.setItem(localStorageKey, serialized)
+                    localStorage.setItem(localStorageKey, serialized);
                 } catch(err) {
                     if (!--attempts) {
                         if (callback) callback(err);
@@ -85,7 +86,7 @@ var get = function(key, increment) {
 
                     for (key in resources) {
                         if (!resources.hasOwnProperty(key)) continue;
-                        resource = resources[key]
+                        resource = resources[key];
 
                         // Nominate the LRU.
                         if (resource.lastUsed) {
@@ -127,7 +128,7 @@ var get = function(key, increment) {
       , load: load
       , save: save
       , reset: reset
-    }
+    };
 
 })(this, Mobify);
 
@@ -285,6 +286,7 @@ var $ = Mobify.$
       , endpoint: 'jsonp'
       , execCallback: 'Mobify.combo.exec'
       , loadCallback: 'Mobify.combo.load'
+      , projectName: (Mobify && Mobify.config && Mobify.config.projectName) || ''
     }
 
   , combo = Mobify.combo = {
@@ -340,7 +342,8 @@ var $ = Mobify.$
          * query.
          */
       , load: function(resources) {
-            var resource, i, save = false;
+            var resource, i, save = false, now;
+            now = Date.now();
 
             httpCache.load()
 
@@ -348,7 +351,8 @@ var $ = Mobify.$
 
             for (i = 0; i < resources.length; i++) {
                 resource = resources[i];
-                if (resource.status == 'ready') {
+               if (resource.status == 'ready') {
+                    resource.loadedTime = now;
                     save = true;
                     httpCache.set(encodeURI(resource.url), resource)
                 }
@@ -363,7 +367,7 @@ var $ = Mobify.$
      * consistent URLs.
      */
   , getURL = Mobify.combo.getURL = function(urls, callback) {
-        var projectName = Mobify.config.projectName || '';
+        var projectName = defaults.projectName || '';
         return defaults.proto + defaults.host + 
           (projectName ? '/project-' + projectName : '') + 
           '/' + defaults.endpoint + '/' + callback + '/' +
