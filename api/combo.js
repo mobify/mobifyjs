@@ -190,9 +190,9 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
               , expires;
 
               // Fresh if less than 10 minutes old
-              if (date && (now < date + 600 * 1000)) {
-                    return false;
-              }
+            if (date && (now < date + 600 * 1000)) {
+               return false;
+            }
 
             // If `max-age` and `date` are present, and no other cache
             // directives exist, then we are stale if we are older.
