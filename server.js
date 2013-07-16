@@ -83,7 +83,8 @@ var jazzcatPerformanceRunner = function(req, res) {
     // Append timestamp in order to ensure the mobify.js does not always
     // get loaded cached, and also ensures the second load of mobify.js
     // on a test does not load again.
-    var library = '/build/mobify.js';
+    var library = '/build/mobify.min.js';
+    //var library = '/build/mobify.js'; // uncomment for debugging
     library += "?" + new Date().getTime();
 
     res.header('Connection', 'close');
@@ -158,7 +159,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get('/build/mobify.min.js', cachedResponse);
+app.get('/build/mobify(.min)?.js', cachedResponse);
 app.get('/tests/fixtures/split.html', slowResponse);
 app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
 app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);

@@ -1440,10 +1440,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         var resource;
         var attempts = 10;
         var key;
-        var serialized;
-        // End of time.
-        var lruTime = 9007199254740991;
-        var lruKey;
 
         for (key in cache) {
             if (cache.hasOwnProperty(key)) {
@@ -1456,6 +1452,10 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         // responsive even if a number of resources are evicted.
         (function persist() {
             var store = function() {
+                var serialized;
+                // End of time.
+                var lruTime = 9007199254740991;
+                var lruKey;
                 try {
                     serialized = JSON.stringify(resources);
                 } catch(e) {
@@ -1464,7 +1464,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
                 try {
                     localStorage.setItem(localStorageKey, serialized);
-                // The serialized data won't fix. Remove the least recently used
+                // The serialized data won't fit. Remove the least recently used
                 // resource and try again.
                 } catch(e) {
                     if (!--attempts) {
@@ -1496,8 +1496,12 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
                 callback && callback();
             };
-
-            setTimeout(store, 0);
+            if (document.readyState === 'complete') {
+                store();
+            }
+            else {
+                setTimeout(persist, 15);
+            }
         })();
     };
 
@@ -1639,7 +1643,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             return scripts;
         }
 
-        options = Utils.extend({}, defaults, options || {});
+        options = Utils.extend({}, Jazzcat.defaults, options || {});
         var jsonp = (options.responseType === 'jsonp');
 
         // load data from localStorage
@@ -1811,14 +1815,13 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                     httpCache.set(encodeURI(resource.url), resource);
                 }
             }
-
             if (save) {
                 httpCache.save();
             }
         }
     };
 
-    var defaults = Jazzcat.optimizeScripts.defaults = {
+    Jazzcat.defaults = {
         selector: 'script',
         attribute: 'x-src',
         base: '//jazzcat.mobify.com',
