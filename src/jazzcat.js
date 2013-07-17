@@ -87,8 +87,9 @@ define(["utils", "capture"], function(Utils, Capture) {
     };
 
     /**
-     * Save the cache to `localStorage`. If it won't fit, evict the least
-     * recently used items.
+     * Save the in-memory cache to localStorage. If the localStorage is full,
+     * use LRU to drop resources until it will fit on disk, or give up after 10
+     * attempts.
      */
     var save = function(callback) {
         var resources = {};
@@ -125,7 +126,6 @@ define(["utils", "capture"], function(Utils, Capture) {
                     if (!--attempts) {
                         return callback && callback(e);
                     }
-
                     // Find the least recently used resource.
                     for (key in resources) {
                         if (!resources.hasOwnProperty(key)) continue;
@@ -143,7 +143,6 @@ define(["utils", "capture"], function(Utils, Capture) {
                             break;
                         }
                     }
-
                     delete resources[lruKey];
 
                     return persist();

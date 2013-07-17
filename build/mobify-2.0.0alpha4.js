@@ -666,16 +666,29 @@ var init = Capture.init = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
         callback(capture);
     }
-    // iOS 4.3, some Android 2.X.X have a non-typical "loaded" readyState,
+    // readyState: loading --> interactive --> complete
+    //                      |               |
+    //                      |               |
+    //                      v               v
+    // Event:        DOMContentLoaded    onload
+    //
+    // iOS 4.3 and some Android 2.X.X have a non-typical "loaded" readyState,
     // which is an acceptable readyState to start capturing on, because
     // the data is fully loaded from the server at that state.
-    if (/complete|interactive|loaded/.test(doc.readyState)) {
+    // For some IE (IE10 on Lumia 920 for example), interactive is not 
+    // indicative of the DOM being ready, therefore "complete" is the only acceptable
+    // readyState for IE10
+    // Credit to https://github.com/jquery/jquery/commit/0f553ed0ca0c50c5f66377e9f2c6314f822e8f25
+    // for the IE10 fix
+    if (document.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading") {
         createCapture(callback, doc, prefix);
     }
     // We may be in "loading" state by the time we get here, meaning we are
     // not ready to capture. Next step after "loading" is "interactive",
-    // which is a valid state to start capturing on, and thus when ready
+    // which is a valid state to start capturing on (except IE), and thus when ready
     // state changes once, we know we are good to start capturing.
+    // Cannot rely on using DOMContentLoaded because this event prematurely fires
+    // for some IE10s.
     else {
         var created = false;
         doc.addEventListener("readystatechange", function() {
@@ -1432,8 +1445,9 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     };
 
     /**
-     * Save the cache to `localStorage`. If it won't fit, evict the least
-     * recently used items.
+     * Save the in-memory cache to localStorage. If the localStorage is full,
+     * use LRU to drop resources until it will fit on disk, or give up after 10
+     * attempts.
      */
     var save = function(callback) {
         var resources = {};
@@ -1470,7 +1484,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                     if (!--attempts) {
                         return callback && callback(e);
                     }
-
                     // Find the least recently used resource.
                     for (key in resources) {
                         if (!resources.hasOwnProperty(key)) continue;
@@ -1488,7 +1501,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                             break;
                         }
                     }
-
                     delete resources[lruKey];
 
                     return persist();
