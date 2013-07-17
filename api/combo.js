@@ -47,27 +47,28 @@ var get = function(key, increment) {
     }
 
     /**
-     * Save the in-memory cache to disk. If the disk is full, use LRU to drop
-     * resources until it will fit on disk.
+     * Save the in-memory cache to localStorage. If the localStorage is full, 
+     * use LRU to drop resources until it will fit on disk, or give up after 10 
+     * attempts.
      */
   , save = function(callback) {
         var resources = {}
           , resource
           , attempts = 10
-          , key
-          , serialized
-            // End of time.
-          , lruTime = 9007199254740991
-          , lruKey;
+          , key;
 
         for (key in cache) {
             if (cache.hasOwnProperty(key)) {
-                resources[key] = cache[key]
+                resources[key] = cache[key];
             }
         }
 
         (function persist() {
             setTimeout(function() {
+                var serialized;
+                // End of time.
+                var lruTime = 9007199254740991;
+                var lruKey;
                 try {
                     serialized = JSON.stringify(resources);
                 } catch(err) {
@@ -76,7 +77,7 @@ var get = function(key, increment) {
                 }
 
                 try {
-                    localStorage.setItem(localStorageKey, serialized)
+                    localStorage.setItem(localStorageKey, serialized);
                 } catch(err) {
                     if (!--attempts) {
                         if (callback) callback(err);
@@ -85,7 +86,7 @@ var get = function(key, increment) {
 
                     for (key in resources) {
                         if (!resources.hasOwnProperty(key)) continue;
-                        resource = resources[key]
+                        resource = resources[key];
 
                         // Nominate the LRU.
                         if (resource.lastUsed) {
@@ -127,7 +128,7 @@ var get = function(key, increment) {
       , load: load
       , save: save
       , reset: reset
-    }
+    };
 
 })(this, Mobify);
 
@@ -185,12 +186,17 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
             var headers = resource.headers || {}
               , cacheControl = headers['cache-control']
               , now = Date.now()
-              , date
+              , date = Date.parse(headers.date)
               , expires;
 
-            // If `max-age` and `date` are present, and no other no other cache
+              // Fresh if less than 10 minutes old
+            if (date && (now < date + 600 * 1000)) {
+               return false;
+            }
+
+            // If `max-age` and `date` are present, and no other cache
             // directives exist, then we are stale if we are older.
-            if (cacheControl && (date = Date.parse(headers.date))) {
+            if (cacheControl && date) {
                 cacheControl = ccParse(cacheControl);
 
                 if ((cacheControl['max-age']) &&
@@ -203,8 +209,8 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
             }
 
             // If `expires` is present, we are stale if we are older.
-            if (expires = Date.parse(headers.expires)) {
-                return now > expires;
+            if (date = Date.parse(headers.expires)) {
+                return now > date;
             }
 
             // Otherwise, we are stale.
@@ -280,6 +286,7 @@ var $ = Mobify.$
       , endpoint: 'jsonp'
       , execCallback: 'Mobify.combo.exec'
       , loadCallback: 'Mobify.combo.load'
+      , projectName: (Mobify && Mobify.config && Mobify.config.projectName) || ''
     }
 
   , combo = Mobify.combo = {
@@ -335,7 +342,8 @@ var $ = Mobify.$
          * query.
          */
       , load: function(resources) {
-            var resource, i, save = false;
+            var resource, i, save = false, now;
+            now = Date.now();
 
             httpCache.load()
 
@@ -343,7 +351,8 @@ var $ = Mobify.$
 
             for (i = 0; i < resources.length; i++) {
                 resource = resources[i];
-                if (resource.status == 'ready') {
+               if (resource.status == 'ready') {
+                    resource.loadedTime = now;
                     save = true;
                     httpCache.set(encodeURI(resource.url), resource)
                 }
@@ -358,7 +367,7 @@ var $ = Mobify.$
      * consistent URLs.
      */
   , getURL = Mobify.combo.getURL = function(urls, callback) {
-        var projectName = Mobify.config.projectName || '';
+        var projectName = defaults.projectName || '';
         return defaults.proto + defaults.host + 
           (projectName ? '/project-' + projectName : '') + 
           '/' + defaults.endpoint + '/' + callback + '/' +
