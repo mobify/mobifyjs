@@ -292,11 +292,13 @@
 
             // regression test to ensure Jazzcat evicts more then one item
             // properly when there is too much to store.
-            asyncTest('httpCache - Evict until small enough', 1, function() {
+            asyncTest('httpCache - Evict until small enough', 2, function() {
                 httpCache.reset();
                 httpCache.save(function(){
                     for (var i=0; i < 5; i++) {
                         httpCache.set('val' + i, {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: MEDIUM_STRING});
+                        // touch every val except for 0 to ensure it is not
+                        // one of the vals that gets cached in localStorage
                         if (i !== 0) {
                             httpCache.get('val' + i, true);
                         }
@@ -306,8 +308,9 @@
 
                         httpCache.reset();
                         httpCache.load();
-
-                        ok(!!httpCache.get('val1'), '`val1` was cached');
+                        // Ensure one val (except for val0) was cached
+                        ok(httpCache.get('val1') || httpCache.get('val2') || httpCache.get('val3') || httpCache.get('val4'), '`val1` was cached');
+                        ok(!httpCache.get('val0'), '`val4` was not cached');
 
                         // cleanup httpCache and localStorage
                         httpCache.reset();
@@ -553,7 +556,7 @@
                 });
             });
 
-            asyncTest('test document.write override', function() {
+            asyncTest('test document.write override', 1, function() {
                 var html = $("#test-jazzcat-exec-document-write-override").val();
 
                 var $iframe = $('<iframe>').appendTo('#qunit-fixture');

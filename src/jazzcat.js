@@ -25,16 +25,6 @@ define(["utils", "capture"], function(Utils, Capture) {
     /**
      * An HTTP 1.1 compliant localStorage backed cache.
      */
-    // var httpCache = {
-    //     get: get,
-    //     set: set,
-    //     load: load,
-    //     save: save,
-    //     reset: reset,
-    //     cache: cache,
-    //     utils: {isStale: isStale},
-    //     options: httpCacheOptions
-    // };
     var httpCache = {
         cache: {},
         options: {},
