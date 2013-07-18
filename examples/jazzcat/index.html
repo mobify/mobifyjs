@@ -20,7 +20,8 @@ function() {
             // Grab all scripts to be concatenated into one request
             var scripts = capturedDoc.querySelectorAll('script');
             Mobify.Jazzcat.optimizeScripts(scripts, {
-                responseType: 'jsonp'
+                responseType: 'jsonp',
+                concat: false
             });
 
             // Render source DOM to document
