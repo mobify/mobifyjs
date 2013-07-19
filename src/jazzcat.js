@@ -349,12 +349,11 @@ define(["utils", "capture"], function(Utils, Capture) {
                 }
 
                 // if: the script is not in the cache (or not jsonp), add a loader
-                // else: queue for concatenation if 
+                // else: queue for concatenation
                 if (!httpCache.get(url)) {
                     if (!concat) {
                         insertLoader(script, [url]);
                     }
-                    // 
                     else {
                         if (toConcat[parent].firstScript === undefined) {
                             toConcat[parent].firstScript = script
