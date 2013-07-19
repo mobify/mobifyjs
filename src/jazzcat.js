@@ -310,72 +310,89 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         // helper method for inserting the loader script
         // before the first uncached script in the "uncached" array
-        var insertLoader = function(firstUncachedScript, urls) {
-            if (firstUncachedScript) {
+        var insertLoader = function(script, urls) {
+            if (script) {
                 var loader = Jazzcat.getLoaderScript(urls, options);
                 // insert the loader directly before the first uncached script
-                firstUncachedScript.parentNode.insertBefore(loader, firstUncachedScript);
+                script.parentNode.insertBefore(loader, script);
             }
         };
 
         var url;
-        var scriptsToConcat = {
-            'head': [],
-            'body': []
+        var toConcat = {
+            'head': {
+                firstScript: undefined,
+                urls: []
+            },
+            'body': {
+                firstScript: undefined,
+                urls: []
+            }
         };
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
 
             url = script.getAttribute(options.attribute);
-            
+
             // skip if the script is inline
             if (!url) continue;
             url = Utils.absolutify(url);
-
             if (!Utils.httpUrl(url)) continue;
 
-            // Insert the httpCache loader before the first Jazzcat script
-            if (jsonp && i===0) {
-                var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-                script.parentNode.insertBefore(httpLoaderScript, script);
-            }
+            var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
 
-            // if: the script is not in the cache (or not jsonp), add a loader
-            // else: queue for concatenation
-            var parent;
-            if (!jsonp || !httpCache.get(url)) {
-                if (!concat) {
-                    insertLoader(script, [url]);
-                }
-                else {
-                    parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
-                    scriptsToConcat[parent].push({script: script, url: url});
-                }
-            }
-
-            // Rewriting script to grab contents from localstorage
-            // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
             if (jsonp) {
+                // Insert the httpCache loader before the first script
+                if (i===0) {
+                    var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
+                    script.parentNode.insertBefore(httpLoaderScript, script);
+                }
+
+                // if: the script is not in the cache (or not jsonp), add a loader
+                // else: queue for concatenation if 
+                if (!httpCache.get(url)) {
+                    if (!concat) {
+                        insertLoader(script, [url]);
+                    }
+                    // 
+                    else {
+                        if (toConcat[parent].firstScript === undefined) {
+                            toConcat[parent].firstScript = script
+                        }
+                        toConcat[parent].urls.push(url);
+                    }
+                }
+
+                // Rewriting script to grab contents from localstorage
+                // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
                 script.innerHTML =  options.execCallback + "('" + url + "');";
                 // Remove the src attribute
                 script.removeAttribute(options.attribute);
             }
+            else {
+                if (!concat) {
+                    var jazzcatUrl = Jazzcat.getURL([url], options);
+                    script.setAttribute(options.attribute, jazzcatUrl);
+                }
+                else {
+                    if (toConcat[parent].firstScript === undefined) {
+                        toConcat[parent].firstScript = script
+                    }
+                    toConcat[parent].urls.push(url);
+                }
+            }
+
         }
         // insert the loaders for uncached head and body scripts if
         // using concatenation
         if (concat) {
-            var headObjs = scriptsToConcat['head'];
-            insertLoader(headObjs[0] && headObjs[0].script, headObjs.map(function(obj){
-                return obj.url;
-            }));
-            var bodyObjs = scriptsToConcat['body'];
-            insertLoader(bodyObjs[0] && bodyObjs[0].script, bodyObjs.map(function(obj){
-                return obj.url;
-            }));
+            insertLoader(toConcat['head'].firstScript, toConcat['head'].urls);
+            insertLoader(toConcat['body'].firstScript, toConcat['body'].urls);
         }
 
-        // if responseType is js, remove original scripts
-        if (!jsonp) {
+        // if responseType is js and we are concatenating,
+        // remove original scripts
+        if (!jsonp && concat) {
             for (var i=0, len=scripts.length; i<len; i++) {
                 var script = scripts[i];
                 script.parentNode.removeChild(script);
@@ -410,7 +427,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         var loadScript;
         if (urls && urls.length) {
             loadScript = document.createElement('script');
-            loadScript.src = Jazzcat.getURL(urls, options);
+            loadScript.setAttribute(options.attribute, Jazzcat.getURL(urls, options));
         }
         return loadScript;
     };
