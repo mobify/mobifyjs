@@ -713,14 +713,16 @@
 
                     equal(html, expected, "Combined, JS response type");
 
-                    // JS response type
                     var scripts = generateScripts();
                     var html = getHTMLWithLoader([scripts.uncachedHead, scripts.excluded],
                                                  [scripts.uncachedBody, scripts.cachedBody],
                                                  {concat: false, responseType: 'js'});
                     expected = "<html><head><title></title><script x-src=\"//jazzcat.mobify.com/js/%5B%22http%3A%2F%2Funcached%2F%22%5D\" class=\"combine\"><\/script><script x-src=\"http://excluded/\"><\/script></head><body><script x-src=\"//jazzcat.mobify.com/js/%5B%22http%3A%2F%2Funcached%2F%22%5D\" class=\"combine\"><\/script><script x-src=\"//jazzcat.mobify.com/js/%5B%22http%3A%2F%2Fcached%2F%22%5D\" class=\"combine\"><\/script></body></html>";
 
-                    equal(html, expected, "Separate, JS response type");
+                    // IE 10 prints attributes in a different order from other browsers
+                    expected_ie = "<html><head><title></title><script class=\"combine\" x-src=\"//jazzcat.mobify.com/js/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script x-src=\"http://excluded/\"><\/script></head><body><script class=\"combine\" x-src=\"//jazzcat.mobify.com/js/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script class=\"combine\" x-src=\"//jazzcat.mobify.com/js/%5B%22http%3A%2F%2Fcached%2F%22%5D\"><\/script></body></html>";
+
+                    ok((html === expected || html === expected_ie), "Separate, JS response type");
 
 
                     start();
