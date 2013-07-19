@@ -1421,7 +1421,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * Load the cache into memory, skipping stale resources.
      */
     httpCache.load = function(options) {
-        var data = localStorage.getItem(localStorageKey)
+        var data = localStorage.getItem(localStorageKey);
         var key;
         var staleOptions;
 
@@ -1683,23 +1683,25 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         };
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
-            // Insert the httpCache loader before the first Jazzcat script
-            if (i===0) {
-                var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-                script.parentNode.insertBefore(httpLoaderScript, script);
-            }
 
             url = script.getAttribute(options.attribute);
+            
             // skip if the script is inline
             if (!url) continue;
             url = Utils.absolutify(url);
 
             if (!Utils.httpUrl(url)) continue;
 
-            // if: the script is not in the cache, add a loader
+            // Insert the httpCache loader before the first Jazzcat script
+            if (jsonp && i===0) {
+                var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
+                script.parentNode.insertBefore(httpLoaderScript, script);
+            }
+
+            // if: the script is not in the cache (or not jsonp), add a loader
             // else: queue for concatenation
             var parent;
-            if (!httpCache.get(url)) {
+            if (!jsonp || !httpCache.get(url)) {
                 if (!concat) {
                     insertLoader(script, [url]);
                 }
