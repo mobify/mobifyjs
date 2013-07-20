@@ -25,6 +25,7 @@ var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 // Map of all attributes we should disable (to prevent resources from downloading)
 var disablingMap = {
     img:    ['src'],
+    source: ['src'],
     iframe: ['src'],
     script: ['src', 'type'],
     link:   ['href'],
@@ -94,6 +95,7 @@ var cachedDiv = document.createElement('div');
 var Capture = function(doc, prefix) {
     this.doc = doc;
     this.prefix = prefix || "x-";
+    if (window.Mobify) window.Mobify.prefix = this.prefix;
 
     var capturedStringFragments = this.createDocumentFragmentsStrings();
     Utils.extend(this, capturedStringFragments);
@@ -109,16 +111,29 @@ var init = Capture.init = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
         callback(capture);
     }
-    // iOS 4.3, some Android 2.X.X have a non-typical "loaded" readyState,
+    // readyState: loading --> interactive --> complete
+    //                      |               |
+    //                      |               |
+    //                      v               v
+    // Event:        DOMContentLoaded    onload
+    //
+    // iOS 4.3 and some Android 2.X.X have a non-typical "loaded" readyState,
     // which is an acceptable readyState to start capturing on, because
     // the data is fully loaded from the server at that state.
-    if (/complete|interactive|loaded/.test(doc.readyState)) {
+    // For some IE (IE10 on Lumia 920 for example), interactive is not 
+    // indicative of the DOM being ready, therefore "complete" is the only acceptable
+    // readyState for IE10
+    // Credit to https://github.com/jquery/jquery/commit/0f553ed0ca0c50c5f66377e9f2c6314f822e8f25
+    // for the IE10 fix
+    if (document.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading") {
         createCapture(callback, doc, prefix);
     }
     // We may be in "loading" state by the time we get here, meaning we are
     // not ready to capture. Next step after "loading" is "interactive",
-    // which is a valid state to start capturing on, and thus when ready
+    // which is a valid state to start capturing on (except IE), and thus when ready
     // state changes once, we know we are good to start capturing.
+    // Cannot rely on using DOMContentLoaded because this event prematurely fires
+    // for some IE10s.
     else {
         var created = false;
         doc.addEventListener("readystatechange", function() {
@@ -464,7 +479,6 @@ Capture.prototype.renderCapturedDoc = function(options) {
         date.innerHTML = window.Mobify.points[0];
         body.insertBefore(date, body.firstChild);
     }
-
 
     this.render();
 };

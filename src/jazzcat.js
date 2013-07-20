@@ -87,18 +87,15 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
     };
 
     /**
-     * Save the cache to `localStorage`. If it won't fit, evict the least
-     * recently used items.
+     * Save the in-memory cache to localStorage. If the localStorage is full,
+     * use LRU to drop resources until it will fit on disk, or give up after 10
+     * attempts.
      */
     var save = function(callback) {
         var resources = {};
         var resource;
         var attempts = 10;
         var key;
-        var serialized;
-        // End of time.
-        var lruTime = 9007199254740991;
-        var lruKey;
 
         for (key in cache) {
             if (cache.hasOwnProperty(key)) {
@@ -111,6 +108,10 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         // responsive even if a number of resources are evicted.
         (function persist() {
             var store = function() {
+                var serialized;
+                // End of time.
+                var lruTime = 9007199254740991;
+                var lruKey;
                 try {
                     serialized = JSON.stringify(resources);
                 } catch(e) {
@@ -125,7 +126,6 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
                     if (!--attempts) {
                         return callback && callback(e);
                     }
-
                     // Find the least recently used resource.
                     for (key in resources) {
                         if (!resources.hasOwnProperty(key)) continue;
@@ -143,7 +143,6 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
                             break;
                         }
                     }
-
                     delete resources[lruKey];
 
                     return persist();
@@ -236,22 +235,6 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         options: httpCacheOptions
     };
 
-    var absolutify = document.createElement('a');
-
-    // localStorage detection as seen in such great libraries as Modernizr
-    // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
-    // Exposing on Jazzcat for use in qunit tests
-    var supportsLocalStorage = function() {
-        var mod = 'modernizr';
-        try {
-            localStorage.setItem(mod, mod);
-            localStorage.removeItem(mod);
-            return true;
-        } catch(e) {
-            return false;
-        }
-    };
-
     var Jazzcat = window.Jazzcat = {
         httpCache: httpCache,
         // Cache a reference to `document.write` in case it is reassigned.
@@ -266,7 +249,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         // match[1] == Firefox <= 11, // match[3] == Opera 11|12
         // These browsers have problems with document.write after a document.write
         if ((match && match[1] && +match[2] < 12) || (match && match[3])
-            || (!supportsLocalStorage())
+            || (!Utils.supportsLocalStorage())
             || (!window.JSON)) {
             return true;
         }
@@ -321,9 +304,10 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         while (script = scripts[i++]) {
             url = script.getAttribute(options.attribute);
             if (!url) continue;
+            url = Utils.absolutify(url);
+            if (!Utils.httpUrl(url)) continue;
+
             script.removeAttribute(options.attribute);
-            absolutify.href = url;
-            url = absolutify.href;
 
             // Rewriting script to grab contents from localstorage
             // ex. <script>true,"body",Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>

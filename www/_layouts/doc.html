@@ -9,6 +9,6 @@ bodyclass: docs
 	    {{ content }}
     </div>
     <div class="span4 sidebar-nav docs-nav rounded shaded">
-		{% active_links %}{% markdown %}{% include nav-docs.md %}{% endmarkdown %}{% endactive_links %}
+		{% active_links %}{% capture nav %}{% include nav-docs.md %}{% endcapture %}{{ nav | markdownify }}{% endactive_links %}
 	</div>
 </div>

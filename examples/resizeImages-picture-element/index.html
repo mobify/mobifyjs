@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Using Image Resize with PICTURE elements</title>
+<script>
+(function(window, document, detector, mobifyjsUrl, mainUrl) {
+
+// if mobify=(1|0) override is set in hash or cookie, force mobify on/off.
+var override = /((; )|#|&|^)mobify=(\d)/.exec(location.hash + '; ' + document.cookie);
+if (override && override[1]) {
+    // if mobify=0, do not run mobify.
+    if (!+override[1]) return;
+}
+// else do not run mobify if Mobify object exists, or detector fails.
+else if (this.Mobify || !detector()) {
+    return;
+}
+
+// Start Mobify object with initial timestamp when loaded.
+// Uncomment when needed for performance testing.
+window.Mobify = {points: [+new Date]};
+
+function attachScriptBeforeMobifyTag(script, src, id, classNames) {
+    var mobifyTagScript = document.getElementsByTagName('script')[0];
+
+    script.src = src;
+    script.id = id;
+    script.setAttribute("class", classNames);
+    mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
+}
+
+document.write('<plaintext style="display:none">');
+
+// On next tick, load library and main executable
+setTimeout(function() {
+    var Mobify = window.Mobify = window.Mobify || {};
+    Mobify.capturing = true;
+    var mobifyjsScript = document.createElement('script');
+    var errorHandler = function() {
+        var now = new Date();
+        // Set now to 30 minutes ahead
+        now.setTime(now.getTime() + 1800000);
+        document.cookie = 'mobify=0' +
+                '; expires=' + now.toGMTString() +
+                '; path=/';
+        // Reload the page (location.reload has problems in FF)
+        window.location = window.location.href;
+    };
+    mobifyjsScript.onload = function(){
+        if (mainUrl) {
+            var mainScript = document.createElement('script');
+            mainScript.onerror = errorHandler;
+            attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
+        }
+    };
+    mobifyjsScript.onerror = errorHandler;
+    attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
+
+});
+
+})( window, document,
+    // detector function
+    function (){
+        // We're enabled for:
+        // - WebKit based browsers
+        // - IE 10
+        // - FireFox 4+
+        // - Opera 11+
+        // - 3DS
+        match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
+     
+        if (!match) {
+            return false;
+        }
+     
+        // match[1] == Firefox
+        if (match[1] && +match[2] < 4) {
+            return false;
+        }
+        // match[3] == Opera
+        if (match[3] && +match[4] < 11) {
+            return false;
+        }
+
+        return true;
+    },
+
+    // path to mobify.js
+    '/mobifyjs/build/mobify.min.js',
+
+    // path to main executable 
+    '/mobifyjs/examples/resizeImages-picture-element/main.js'
+);
+</script>
+<!-- END MOBIFY TAG -->
+<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
+<style>
+img {
+    max-width: 100%;
+}
+picture {
+    display: block;
+    padding: 1em;
+}
+.example-photo {
+    max-width: 100%;
+}
+@media (min-width: 512px) {
+    .example-photo {
+        float: left;
+        max-width: 50%;
+    }
+}
+</style>
+</head>
+<body class="foo">
+
+    <p>Picture element is used here in a much simpler way. Equivilent images at different breakpoints do not need to be automatically generated, they only need to set width attributes for each `source` element.</p>
+    <p>View the source to have a look, and view the inspector to see what the `resize` method does to the picture element's markup.</p>
+    <!-- http://upload.wikimedia.org/wikipedia/commons/6/68/President_Barack_Obama_Tours_Storm_Damage_in_New_Jersey_2.jpg -->
+    <picture class="example-photo" data-src="/mobifyjs/examples/assets/images/responsive-obama.jpg">
+        <source src="/mobifyjs/examples/assets/images/responsive-obama-mobile.png">
+        <source media="(min-width: 512px)">
+        <source media="(min-width: 1024px)" data-width="512">
+        <source media="(min-width: 2048px)" data-width="1024">
+        <img src="/mobifyjs/examples/assets/images/responsive-obama.jpg">
+    </picture>
+
+    <h1>Excitingus Headlineus</h1>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam viverra vestibulum mi, vitae euismod libero vehicula non. Morbi sollicitudin nulla in metus tincidunt lobortis. Cras volutpat eros sapien, vitae tempor arcu faucibus at. Sed a accumsan purus. Nulla eget sem lectus. Nullam pharetra lobortis eleifend. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed vel ligula velit. Integer eget sodales lacus, rutrum blandit dui.</p>
+
+    <p>Quisque pharetra augue id vehicula vulputate. Quisque volutpat dui nec vehicula hendrerit. Vivamus semper quam enim, vitae molestie enim luctus non. Fusce ornare nisi non arcu volutpat vestibulum. Aliquam quis neque quis metus pretium auctor. Cras vitae felis et odio auctor ornare sed a augue. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut accumsan tincidunt sapien. Donec volutpat erat at diam facilisis, eget tempus quam pharetra.</p>
+
+    <p>Mauris vulputate diam ac ante scelerisque, sed sodales turpis mattis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed purus justo, facilisis sed mauris et, tempus auctor mi. Sed ac interdum magna. Pellentesque id odio a lectus dapibus pharetra nec vitae urna. Suspendisse rutrum, odio a bibendum semper, velit augue fringilla augue, a rutrum ligula tellus non lorem. Donec quis felis nec nisi venenatis scelerisque.</p>
+
+    <p>Sed at aliquam mauris. Vestibulum aliquet, risus in bibendum mollis, nibh lectus gravida nunc, at condimentum metus arcu vel mi. Morbi id egestas erat. Sed vitae nisl molestie, dictum ante a, ultrices magna. Ut euismod accumsan sagittis. Vivamus porta nibh quis erat suscipit, vel consectetur tellus ultricies. Donec aliquam ornare congue. Cras lobortis purus nec nisl laoreet sodales. Proin sit amet mi vel urna vehicula ultrices non et mauris. Mauris ante dui, consectetur et tincidunt sed, bibendum in elit. Pellentesque volutpat hendrerit nisi a lacinia. Cras cursus in dui id porta.</p>
+
+    <p>Aliquam erat volutpat. Duis odio felis, consectetur sit amet libero et, rhoncus lacinia lacus. Vestibulum et magna sit amet tortor hendrerit lacinia posuere sit amet nunc. Proin hendrerit gravida molestie. Vivamus sit amet velit a ligula pellentesque pretium. Suspendisse viverra malesuada purus aliquam venenatis. Nunc tempor varius lectus, eget eleifend orci condimentum quis. Suspendisse pharetra, odio id rhoncus pharetra, mauris eros consequat enim, ac feugiat tellus augue a urna. Proin hendrerit dapibus felis iaculis tincidunt.</p>
+
+</body>
+</html>

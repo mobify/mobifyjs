@@ -107,19 +107,5 @@ setTimeout(function() {
         <source src="/mobifyjs/examples/assets/images/extralarge.jpg" media="(min-width: 1000px)">
         <img src="/mobifyjs/examples/assets/images/small.jpg">
     </picture>
-<script>
-// Grab the total time since starting capturing and send it
-// to the parent for testing in performance.html
-var end = +new Date;
-var begin;
-if (window.Mobify.points) {
-    begin = window.Mobify.points[0];
-} else {
-    var pointEl = document.getElementById("mobify-point");
-    begin = pointEl.innerText || pointEl.textContent;
-}
-var diff = end - begin;
-parent.postMessage(diff, "*");
-</script>
 </body>
 </html>

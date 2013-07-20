@@ -407,7 +407,7 @@ var requirejs, require, define;
 
 define("almond", function(){});
 
-define('mobifyjs/utils',[], function() {
+define('utils',[], function() {
 
 // ##
 // # Utility methods
@@ -483,7 +483,7 @@ Utils.removeElements = function(elements, doc) {
 return Utils;
 
 });
-define('mobifyjs/capture',["mobifyjs/utils"], function(Utils) {
+define('capture',["utils"], function(Utils) {
 
 // ##
 // # Static Variables/Functions
@@ -958,26 +958,26 @@ return Capture;
 
 });
 
-define('mobifyjs/resizeImages',["mobifyjs/utils"], function(Utils) {
+define('resizeImages',["utils"], function(Utils) {
 
-var ResizeImages = {};
+var ResizeImages = {}
 
-var absolutify = document.createElement('a');
+var absolutify = document.createElement('a')
 
 // A regex for detecting http(s) URLs.
-var httpRe = /^https?/;
+var httpRe = /^https?/
 
 // A protocol relative URL for the host ir0.mobify.com
-var PROTOCOL_AND_HOST = '//ir0.mobify.com';
-
+var PROTOCOL_AND_HOST = '//ir0.mobify.com'
+     
 function getPhysicalScreenSize(devicePixelRatio) {
-
+    
     function multiplyByPixelRatio(sizes) {
         var dpr = devicePixelRatio || 1;
 
         sizes.width = Math.round(sizes.width * dpr);
         sizes.height = Math.round(sizes.height * dpr);
-
+        
         return sizes;
     }
 
@@ -1009,11 +1009,11 @@ function getPhysicalScreenSize(devicePixelRatio) {
     }
 
     return multiplyByPixelRatio(sizes);
-}
+};
 
 /**
  * Returns a URL suitable for use with the 'ir' service.
- */
+ */ 
 var getImageURL = ResizeImages.getImageURL = function(url, options) {
     var opts = Utils.clone(defaults);
     if (options) {
@@ -1045,7 +1045,7 @@ var getImageURL = ResizeImages.getImageURL = function(url, options) {
 
     bits.push(url);
     return bits.join('/');
-};
+}
 
 /**
  * Searches the collection for image elements and modifies them to use
@@ -1068,7 +1068,7 @@ ResizeImages.resize = function(imgs, options) {
     var height = opts.maxHeight || screenSize.height;
 
     // Otherwise, compute device pixels
-    if (dpr && opts.maxWidth) {
+    if (dpr && opts.maxWidth) { 
         width = width * dpr;
         if (opts.maxHeight) {
             height = height * dpr;
@@ -1079,11 +1079,11 @@ ResizeImages.resize = function(imgs, options) {
     opts.maxWidth = Math.ceil(width);
     opts.maxHeight = Math.ceil(height);
 
-    var attrVal;
+    var attr;
     for(var i=0; i<imgs.length; i++) {
         var img = imgs[i];
-        if (attrVal = img.getAttribute(opts.attribute)) {
-            absolutify.href = attrVal;
+        if (attr = img.getAttribute(opts.attribute)) {
+            absolutify.href = attr;
             var url = absolutify.href;
             if (httpRe.test(url)) {
                 img.setAttribute(opts.attribute, getImageURL(url, opts));
@@ -1091,11 +1091,11 @@ ResizeImages.resize = function(imgs, options) {
         }
     }
     return imgs;
-};
+}
 
 var defaults = {
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
-      attribute: "x-src"
+      attribute: "x-src",
 };
 
 return ResizeImages;
@@ -1125,7 +1125,7 @@ return ResizeImages;
  * into the cache using a bootloader request to Jazzcat. Scripts are then
  * executed directly from the cache.
  */
-define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     /**
      * An HTTP 1.1 compliant localStorage backed cache.
      */
@@ -1659,7 +1659,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
     return Jazzcat;
 });
 
-define('mobifyjs/unblockify',["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+define('unblockify',["utils", "capture"], function(Utils, Capture) {
 
 var Unblockify = {}
 
@@ -1692,8 +1692,7 @@ Unblockify.unblock = function(scripts) {
 return Unblockify;
 
 });
-
-require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
+require(["utils", "capture", "resizeImages", "jazzcat", "unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
@@ -1704,7 +1703,6 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
     return Mobify;
 
 }, undefined, true);
-// relPath, forceSync
-;
+// relPath, forceSync;
 define("mobify-library", function(){});
 }());

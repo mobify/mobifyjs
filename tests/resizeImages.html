@@ -35,29 +35,45 @@
         <img data-src="http://www.mobify.com/i/phone-tablet.png"/>
     </div>
 
+
+    <div id="resizeImages-picture-element">
+        <picture data-src="http://www.mobify.com/i/phone-tablet.png">
+            <source src="http://www.mobify.com/i/phone-tablet-small.png" data-media="(min-width: 800px)" data-width="300" id="width-and-src">
+            <source media="(min-width: 800px)" data-width="400" id="width-and-no-src">
+            <source media="(min-width: 1000px)" id="no-width-and-no-src">
+            <img src="http://www.mobify.com/i/phone-tablet-small.png">
+        </picture>
+    </div>
+
     <div id="resizeImages-dataURI">
         <img x-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCB1jYAAAAAIAAc/INeUAAAAASUVORK5CYII=" />
+    </div>
+
+    <div id="resizeImages-adds-data-orig-src">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
+    <div id="resizeImages-adds-onerror">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
 </div>
 
 <script>
     QUnit.config.autostart = false;
-    require.config({
-        "baseUrl": "../src/",  
-    })
-    require(["../src/resizeImages.js"], function(ResizeImages) {
+    require.config({"baseUrl": "../src/"});
+    require(["utils", "resizeImages"], function(Utils, ResizeImages) {
         QUnit.start();
-
         test('resize images - no projectName', function() {
             var images = document.querySelectorAll('#resizeImages-no-projectName img');
 
             ResizeImages.resize(images, {
                 maxWidth: 320,
                 maxHeight: 480,
+                webp: false
             });
 
-            var src = $('#resizeImages-no-projectName img').attr('x-src');
+            var src = $('#resizeImages-no-projectName img').attr('src');
 
             equal(src, "//ir0.mobify.com/project-oss-localhost/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
@@ -70,9 +86,10 @@
                 projectName: 'test1',
                 maxWidth: 320,
                 maxHeight: 480,
+                webp: false
             });
 
-            var src = $('#resizeImages img').attr('x-src');
+            var src = $('#resizeImages img').attr('src');
 
             equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
         });
@@ -84,9 +101,11 @@
                 maxWidth: 320,
                 maxHeight: 480,
             });   
-            var src = $('#resizeImages-non-http img').attr('x-src');
+            var xSrc = $('#resizeImages-non-http img').attr('x-src');
+            var src = $('#resizeImages-non-http img').attr('src');
 
-            equal(src, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
+            equal(xSrc, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
+            equal(src, undefined, "non-http img should not resize");
         });
 
         test('resize images - high dpr', function() {
@@ -96,10 +115,11 @@
                 projectName: 'test1',
                 maxWidth: 320,
                 maxHeight: 480,
+                webp: false,
                 devicePixelRatio: 2,
             });
 
-            var src = $('#resizeImages-high-dpr img').attr('x-src');
+            var src = $('#resizeImages-high-dpr img').attr('src');
 
             equal(src, "//ir0.mobify.com/project-test1/640/960/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
@@ -112,13 +132,55 @@
                 projectName: 'test1',
                 maxWidth: 320,
                 maxHeight: 480,
-                attribute: "data-src"
+                sourceAttribute: "data-src",
+                webp: false
             });
 
-            var src = $('#resizeImages-different-attribute img').attr('data-src');
+            var src = $('#resizeImages-different-attribute img').attr('src');
 
             equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
+        });
+
+        test('resize images - adds an original src data attribute', function() {
+            var images = document.querySelectorAll("#resizeImages-adds-data-orig-src img");
+            var originalSrcs = [].map.call(images, function(img) {
+                return img.getAttribute("x-src");
+            });
+            var resized = ResizeImages.resize(images);
+            for(var i = 0, len = resized.length; i < len; i++) {
+                equal(resized[i].getAttribute('data-orig-src'), originalSrcs[i]);
+            }
+        });
+
+        test('resize images - adds an onerror handler', function() {
+            var images = document.querySelectorAll("#resizeImages-adds-onerror img");
+            var resized = ResizeImages.resize(images);
+            for(var i = 0, len = resized.length; i < len; i++) {
+                ok(resized[i].getAttribute('onerror'));
+            }
+        });
+
+        test('resize images - onerror handler restores src', function () {
+            var img = new Image()
+            img.setAttribute("src", "foo");
+            img.setAttribute("data-orig-src", "bar");
+            ResizeImages.restoreOriginalSrc({target: img});
+
+            equal(img.getAttribute("src"), "bar");
+        });
+
+        asyncTest('resize images - onerror handler gets triggered', function () {
+            var img = new Image()
+            img.setAttribute("x-src", "http://www.mobify.com/fake/path.png");
+
+            window.onerr = function() {
+                ok(true);
+                start();
+            }
+
+            ResizeImages.resize([img], {onerror: "onerr()" });
+            img.setAttribute("src", img.getAttribute("x-src"));
         });
 
         test('resizeImages - does not modify data URI', function() {
@@ -134,6 +196,38 @@
               "x-src is unmodified");
         });
 
+        test('resize images - picture element', function() {
+            var images = document.querySelectorAll('#resizeImages-picture-element picture');
+
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                maxWidth: 1280,
+                maxHeight: 480,
+                webp: false,
+                sourceAttribute: 'src'
+            });
+
+            var sources = images[0].getElementsByTagName('source');
+            if (sources.length === 0) {
+                ok(images[0].getElementsByTagName("img")[0].getAttribute("src"), 
+                    "http://www.mobify.com/i/phone-tablet-small.png",
+                    "if source not properly parsed (iOS 4.3), src for img element inside of a picture element should remain");
+                return;
+            }
+
+            equal(images[0].querySelectorAll("#width-and-src")[0].getAttribute("src"),
+                  "//ir0.mobify.com/project-test1/300/480/http://www.mobify.com/i/phone-tablet-small.png",
+                  "source in picture has width overridden, and uses own src");
+
+            equal(images[0].querySelectorAll("#width-and-no-src")[0].getAttribute("src"),
+                  "//ir0.mobify.com/project-test1/400/480/http://www.mobify.com/i/phone-tablet.png",
+                  "source in picture has width overridden, and uses data-src in picture");
+
+            equal(images[0].querySelectorAll("#no-width-and-no-src")[0].getAttribute("src"),
+                  "//ir0.mobify.com/project-test1/1280/480/http://www.mobify.com/i/phone-tablet.png",
+                  "source in picture has no width overide, and uses data-src in picture");
+
+        });
 
         test('get image url', function() {
 
@@ -152,6 +246,89 @@
             equal(url, expectedUrl);
         });
 
+        test('userAgentWebpDetect', function() {
+            /*
+             * Supported WEBP devices
+             */
+
+            // First version of Chrome to support WEBP
+            ok(ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.17 Safari/537.11"));
+
+            // Android 4 Chrome Browser
+            ok(ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; Android 4.1.2; GT-I9100 Build/JZO54K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.90 Mobile Safari/537.36"));
+
+            // Opera 12
+            ok(ResizeImages.userAgentWebpDetect("Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00"));
+            ok(ResizeImages.userAgentWebpDetect("Opera/9.80 (Macintosh; Intel Mac OS X 10.8.3) Presto/2.12.388 Version/12.15"));
+
+            /*
+             * Unsupported WEBP devices
+             */
+
+            // Last version of Chrome to not support WEBP
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4"));
+
+            // 1* Chrome
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1"));
+
+            // Chrome 18 on Android 4.1.2 on Galaxy S3
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; Android 4.1.2; GT-I9300 Build/JZO54K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19"))
+
+            // Android 4 Native Browser on HTC Sensation
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"));
+
+            // Android 4.1.2 Native Browser on Galaxy S3
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; U; Android 4.1.2; en-us; GT-I9300 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"));
+
+            // Android 2.3
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"));
+
+            // Opera 11
+            ok(!ResizeImages.userAgentWebpDetect("Opera/9.80 (Windows NT 6.1; U; zh-tw) Presto/2.7.62 Version/11.01"));
+            ok(!ResizeImages.userAgentWebpDetect("Opera/9.80 (Windows NT 5.2; U; en) Presto/2.10.229 Version/11.64"));
+
+            // Opera 10
+            ok(!ResizeImages.userAgentWebpDetect("Opera/9.80 (X11; Linux i686; U; pl) Presto/2.6.30 Version/10.61"));
+
+            // IE10
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)"));
+
+            // Firefox 24
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0"));
+
+            // Android Chrome 18
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19"));
+
+            // iOS Chrome 25
+            ok(!ResizeImages.userAgentWebpDetect("Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 Safari/531.21.10"));
+
+        });
+
+        asyncTest('supportsWebp', 2, function() {
+            // Check whether or not WEBP is supported
+            var supported;
+            supported = ResizeImages.supportsWebp(function(_supported){
+                supported = _supported;
+            });
+
+            // Check if localStorage contains the correct value
+            // (setTimeout is used because for some browsers (PhantomJS),
+            // the image onload event does not fire, thus we can't rely
+            // on the callback above)
+            setTimeout(function(){
+                if (Utils.supportsLocalStorage()) {
+                    var persistedSupport;
+                    persistedSupport = JSON.parse(localStorage.getItem('Mobify-Webp-Support-v2')).supported;
+                    equal(supported, persistedSupport, 'Support persisted properly')
+                    equal(supported, ResizeImages.userAgentWebpDetect(navigator.userAgent), 'userAgent Webp detection and async test agree');
+                } else {
+                    ok(true, 'No support for localStorage. Support not persisted');
+                    ok(true);
+                }
+                start();
+            }, 1000); // 1 second given for dataURI WEBP detection
+
+        });
     });
 
 

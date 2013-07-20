@@ -1,3 +1,0 @@
-[submodule "src/vendor/zepto"]
-	path = src/vendor/zepto
-	url = git@github.com:mobify/zepto.git
