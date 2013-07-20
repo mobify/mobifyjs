@@ -1,7 +1,6 @@
 # v2 Documentation Index
 
   - [Quick start]({{ site.baseurl }}/v2/docs/)
-  - [Tutorial]({{ site.baseurl }}/v2/docs/tutorial)
   - [Capturing API]({{ site.baseurl }}/v2/docs/capturing)
     - [`Capture.init()`]({{ site.baseurl }}/v2/docs/capturing/#captureinitcallback-document-prefixx-)
     - [`getCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#getcaptureddoc)
