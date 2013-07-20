@@ -149,15 +149,11 @@ Source code on Github:
 
 ## Capturing - Basic Templating
 
-The primary function of Mobify.js 1.1 was client-side templating 
-to completely rewrite the pages of your existing site when
-responsive doesn't offer enough flexibility, or when changing 
-the backend is simply too painful and tedious. It is 
-particularly helpful when you need a mobile presence fast. This 
-is no longer the primary function of Mobify.js, but it is still 
-possible. 
+In this example, we use Templating to completely rewrite the original HTML
+in this page, using Capturing to prevent any of the original resources from loading.
 
-Check out this basic example:
+Check out this basic example (notice the CSS in the original markup does not
+load):
 
 * [Templating Example](http://cdn.mobify.com/mobifyjs/examples/capturing-basictemplating/index.html){: target='_blank' }
 
