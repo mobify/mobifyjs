@@ -152,7 +152,7 @@ Source code on Github:
 In this example, we use Templating to completely rewrite the original HTML
 in this page, using Capturing to prevent any of the original resources from loading.
 
-Check out this basic example (notice the CSS in the original markup does not
+Check out the example (notice the CSS in the original markup does not
 load):
 
 * [Templating Example](http://cdn.mobify.com/mobifyjs/examples/capturing-basictemplating/index.html){: target='_blank' }
