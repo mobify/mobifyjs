@@ -50,15 +50,22 @@ var jazzcatMainExec = function(){
             // Grab reference to a newly created document
             var capturedDoc = capture.capturedDoc;
 
-            var match = location.href.match(/responseType=([^&;]*)/);
-            var responseType = (match && match[1]) || 'jsonp';
+            var matchType = location.href.match(/responseType=([^&;]*)/);
+            var responseType = (matchType && matchType[1]) || 'jsonp';
+
+            var matchConcat = location.href.match(/concat=([^&;]*)/);
+            var concat = (matchConcat && matchConcat[1] === 'true');
+            if (concat === null) {
+                concat = true;
+            }
 
             // Grab all scripts to be concatenated into one request
             if (!/disableJazzcat=1/.test(location.href)) {
                 var scripts = capturedDoc.querySelectorAll('script');
                 Mobify.Jazzcat.optimizeScripts(scripts, {
                     responseType: responseType,
-                    base: ''
+                    base: '',
+                    concat: concat
                 });
             }
 
@@ -164,7 +171,7 @@ app.get('/tests/fixtures/split.html', slowResponse);
 app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
 app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);
 
-app.get('/jsonp/Jazzcat.combo.load/:scripts', jazzcatJsonp);
+app.get('/jsonp/Jazzcat.load/:scripts', jazzcatJsonp);
 app.get('/js/:scripts', jazzcatJs);
 
 

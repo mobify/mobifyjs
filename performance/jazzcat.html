@@ -16,6 +16,7 @@
             <input type="radio" name="responseType" value="jsonp" checked>jsonp
             <input type="radio" name="responseType" value="js">js
         </p>
+        <p>Concatenate: <input type="checkbox" name="concat" checked></p>
         <input type="submit" value="Run Test">
     </form>
 
@@ -68,7 +69,9 @@ var run = function(complete) {
     if (i === scriptRange.length) return complete();
 
     var baseUrl = "/performance/jazzcat/runner/" + scriptRange[i];
-    var mobifyUrl = baseUrl + '#mobify=1&responseType=' + window.responseType;
+    var mobifyUrl = baseUrl + '#mobify=1' +
+                    '&responseType=' + window.responseType +
+                    '&concat=' + window.concat;
     var nativeUrl;
     if (window.captureNative) {
         nativeUrl = baseUrl + '#mobify=1&disableJazzcat=1';
@@ -113,6 +116,7 @@ $("form").submit(function(e) {
     window.stepSize = parseInt(form.stepsize.value);
     window.runsPerTest = parseInt(form.runs.value);
     window.captureNative = form.captureNative.checked;
+    window.concat = form.concat.checked;
     window.responseType = $('form input[name="responseType"]:checked').val();
     window.mobifyResults = create2dArray(scriptRange.length, runsPerTest);
     window.nativeResults = create2dArray(scriptRange.length, runsPerTest);
