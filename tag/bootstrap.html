@@ -1,5 +1,5 @@
 <script>
-(function(window, document, detector, mobifyjsUrl, mainUrl) {
+(function(window, document, detector, mobifyjsUrl, main) {
 
 // Start Mobify object with initial timestamp when loaded.
 window.Mobify = {points: [+new Date]};
@@ -15,10 +15,14 @@ else if (!detector()) {
     return;
 }
 
-function attachScriptBeforeMobifyTag(script, src, id, classNames) {
+function attachScriptBeforeMobifyTag(script, id, classNames, data) {
     var mobifyTagScript = document.getElementsByTagName('script')[0];
-
-    script.src = src;
+    if (data.src) {
+        script.src = data.src;
+    }
+    else {
+        script.innerHTML = data.innerHTML;
+    }
     script.id = id;
     script.setAttribute("class", classNames);
     mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
@@ -31,6 +35,7 @@ setTimeout(function() {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.capturing = true;
     var mobifyjsScript = document.createElement('script');
+    var scriptClasses = "mobify";
     var errorHandler = function() {
         var now = new Date();
         // Set now to 30 minutes ahead
@@ -42,14 +47,20 @@ setTimeout(function() {
         window.location = window.location.href;
     };
     mobifyjsScript.onload = function(){
-        if (mainUrl) {
+        if (main) {
             var mainScript = document.createElement('script');
             mainScript.onerror = errorHandler;
-            attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
+            var scriptId = "main-executable";
+            if (typeof main === 'string') {
+                attachScriptBeforeMobifyTag(mainScript, scriptId, scriptClasses, {src: mainUrl});
+            } else {
+                var mainInnerHTML = "var main = " + main.toString() + "; main();";
+                attachScriptBeforeMobifyTag(mainScript, scriptId, scriptClasses, {innerHTML: mainInnerHTML});
+            }
         }
     };
     mobifyjsScript.onerror = errorHandler;
-    attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
+    attachScriptBeforeMobifyTag(mobifyjsScript, "mobify-js", scriptClasses, {src: mobifyjsUrl});
 
 });
 
@@ -81,14 +92,14 @@ setTimeout(function() {
     },
 
 {{#mobifyfull}}
-    // Combine both scripts for better performance
+    // Combine both library and main into one
     '{{this}}'
 {{/mobifyfull}}
 {{^mobifyfull}}
     // path to mobify.js: /mobifyjs/build/mobify.js',
     '{{library}}',
-    // path to main executable: '/PATH/TO/main.js'
-    '{{main}}'
+    // main function
+    {{&main}}
 {{/mobifyfull}}
 );
 </script>

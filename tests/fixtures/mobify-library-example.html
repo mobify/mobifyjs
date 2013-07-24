@@ -1,85 +1,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<script>
-(function(window, document, detector, mobifyjsUrl, mainUrl) {
+<script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];e.src?a.src=e.src:e.innerHTML&&(a.innerHTML=e.innerHTML),a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h=function(){var c=new Date;c.setTime(c.getTime()+18e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e){var a=b.createElement("script");if(a.onerror=h,"string"==typeof e)g(a,"main-executable","mobify",{src:e});else{var c="var main = "+e.toString()+"; main();";g(a,"main-executable","mobify",{innerHTML:c})}}},f.onerror=h,g(f,"mobify-js","mobify",{src:d})})}(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&+match[2]<4?!1:match[3]&&+match[4]<11?!1:!0:!1},
 
-// If Mobify has been defined already, or if the detector fails,
-// exit
-if (this.Mobify || !detector()) {
-    return;
-}
+// path to mobify.js
+"/mobifyjs/build/mobify.min.js",
 
-// Start Mobify object with initial timestamp when loaded.
-// Uncomment when needed for performance testing.
-// window.Mobify = {points: [+new Date]};
-
-function attachScriptBeforeMobifyTag(src, id, classNames) {
-    var attachedScript = document.createElement('script');
-    var mobifyTagScript = document.getElementsByTagName('script')[0];
-
-    attachedScript.src = src;
-    attachedScript.id = id;
-    attachedScript.setAttribute("class", classNames);
-    mobifyTagScript.parentNode.insertBefore(attachedScript, mobifyTagScript);
-    return attachedScript;
-}
-
-// Prevent the browser from downloading website resources
-document.write('<plaintext style="display:none">');
-
-// On next tick, load library and main executable
-setTimeout(function() {
-    var Mobify = window.Mobify = window.Mobify || {};
-    Mobify.capturing = true;
-    var mobifyjsScript = attachScriptBeforeMobifyTag(mobifyjsUrl, "mobify-js", "mobify");
-    mobifyjsScript.onload = function(){
-        if (mainUrl) {
-            attachScriptBeforeMobifyTag(mainUrl, "mobify-js-main", "mobify");
-        }
-        // TODO: If main fails to load, load capture.restore
-    };
-
-});
-
-})( window, document,
-    // detector function
-    function (){
-        // We're enabled for:
-        // - WebKit based browsers
-        // - IE 10
-        // - FireFox 4+
-        // - Opera 11+
-        // - 3DS
-        match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
-     
-        if (!match) {
-            return false;
-        }
-     
-        // match[1] == Firefox
-        if (match[1] && +match[2] < 4) {
-            return false;
-        }
-        // match[3] == Opera
-        if (match[3] && +match[4] < 11) {
-            return false;
-        }
-     
-        return true;
-    },
-    // path to mobify.js
-    '/mobifyjs/build/mobify-2.0.0alpha3.min.js',
-
-    // path to main executable 
-    '/tests/fixtures/main.js'
-);
-</script>
+// calls to APIs go here (or path to a main.js)
+function() {
+    var capturing = window.Mobify && window.Mobify.capturing || false;
+    if (capturing) {
+        // Grab reference to a newly created document
+        Mobify.Capture.init(function(capture){
+            var capturedDoc = capture.capturedDoc;
+            // Render source DOM to document
+            capture.renderCapturedDoc();
+        });
+    } else {
+        parent.postMessage("finished", "*");
+    }
+});</script>
 <!-- END MOBIFY TAG -->
 </head>
 <body>
-<script>
-    parent.postMessage("finished", "*")
-</script>
 </body>
 </html>

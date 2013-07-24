@@ -1,13 +1,11 @@
 # Mobify.js
 
-Mobify.js is an open source library for improving the performance of responsive 
-sites, as well as for creating new sites using Adaptive Templating. 
-
-Mobify.js contains an API called "Capturing", which enables you to manipulate the DOM
-before any resources have downloaded, which unlocks the ability to do resource
-control, conditional loading, image resizing, javascript  concatination and
-more, all without changing any existing backend markup. Many of these APIs
-can also work without Capturing with some modifications to your backend.
+Mobify.js is an open source library for improving responsive sites
+by providing responsive images, JS/CSS optimization, Adaptive
+Templating and more. Mobify.js also provides a 
+"Capturing" API for manipulating the DOM before any resources have
+loaded, giving developers the ability to enable the listed features above
+without changing any backend markup.
 
 For instructions on how to use the library, follow the instructions on [mobifyjs.com](https://www.mobifyjs.com/)
 or build the docs site manually in the instructions below.

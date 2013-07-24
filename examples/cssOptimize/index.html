@@ -3,91 +3,31 @@
 <head>
     <meta charset="utf-8">
     <title>CSS Optimizer Example</title>
-<script>
-(function(window, document, detector, mobifyjsUrl, mainUrl) {
+<script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];e.src?a.src=e.src:e.innerHTML&&(a.innerHTML=e.innerHTML),a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h=function(){var c=new Date;c.setTime(c.getTime()+18e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e){var a=b.createElement("script");if(a.onerror=h,"string"==typeof e)g(a,"main-executable","mobify",{src:e});else{var c="var main = "+e.toString()+"; main();";g(a,"main-executable","mobify",{innerHTML:c})}}},f.onerror=h,g(f,"mobify-js","mobify",{src:d})})}(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&+match[2]<4?!1:match[3]&&+match[4]<11?!1:!0:!1},
 
-// if mobify=(1|0) override is set in hash or cookie, force mobify on/off.
-var override = /((; )|#|&|^)mobify=(\d)/.exec(location.hash + '; ' + document.cookie);
-if (override && override[1]) {
-    // if mobify=0, do not run mobify.
-    if (!+override[1]) return;
-}
-// else do not run mobify if Mobify object exists, or detector fails.
-else if (this.Mobify || !detector()) {
-    return;
-}
+// path to mobify.js
+"/mobifyjs/build/mobify.min.js",
 
-// Start Mobify object with initial timestamp when loaded.
-// Uncomment when needed for performance testing.
-window.Mobify = {points: [+new Date]};
+// calls to APIs go here (or path to a main.js)
+function() {
+    var capturing = window.Mobify && window.Mobify.capturing || false;
+    if (capturing) {
+        console.log("Executing main during capturing phase!");
 
-function attachScriptBeforeMobifyTag(script, src, id, classNames) {
-    var mobifyTagScript = document.getElementsByTagName('script')[0];
+        // Grab reference to a newly created document
+        Mobify.Capture.init(function(capture){
+            var capturedDoc = capture.capturedDoc;
 
-    script.src = src;
-    script.id = id;
-    script.setAttribute("class", classNames);
-    mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
-}
+            // Optimize stylesheets using CSS Optimizer
+            var styleSheets = capturedDoc.querySelectorAll('link[rel="stylesheet"]');
+            // Mobify.CssOptimize.optimize(styleSheets, {protoAndHost: '//jazzcat-next.herokuapp.com'});
+            Mobify.CssOptimize.optimize(styleSheets);
 
-document.write('<plaintext style="display:none">');
-
-// On next tick, load library and main executable
-setTimeout(function() {
-    var Mobify = window.Mobify = window.Mobify || {};
-    Mobify.capturing = true;
-    var mobifyjsScript = document.createElement('script');
-    var errorHandler = function() {
-        var now = new Date();
-        // Set now to 30 minutes ahead
-        now.setTime(now.getTime() + 1800000);
-        document.cookie = 'mobify=0' +
-                '; expires=' + now.toGMTString() +
-                '; path=/';
-        // Reload the page (location.reload has problems in FF)
-        window.location = window.location.href;
-    };
-    mobifyjsScript.onload = function(){
-        if (mainUrl) {
-            var mainScript = document.createElement('script');
-            mainScript.onerror = errorHandler;
-            attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
-        }
-    };
-    mobifyjsScript.onerror = errorHandler;
-    attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
-
-});
-
-})( window, document,
-    // detector function
-    function (){
-        // We're enabled for:
-        // - WebKit based browsers
-        // - IE 10
-        // - FireFox 4+
-        // - Opera 11+
-        // - 3DS
-        match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
-     
-        if (!match) {
-            return false;
-        }
-     
-        // match[1] == Firefox
-        if (match[1] && +match[2] < 4) {
-            return false;
-        }
-        // match[3] == Opera
-        if (match[3] && +match[4] < 11) {
-            return false;
-        }
-
-        return true;
-    },
-    '/build/mobify.js', '/mobifyjs/examples/CssOptimize/main.js'
-);
-</script>
+            // Render source DOM to document
+            capture.renderCapturedDoc();
+        });
+    }
+});</script>
 <!-- END MOBIFY TAG -->
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
