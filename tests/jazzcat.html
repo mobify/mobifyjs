@@ -100,7 +100,7 @@
             "mobifyjs": "../src/"
         }
     });
-    require(["capture", "jazzcat", "utils"], function(Capture, Jazzcat, Utils) {
+    require(["mobifyjs/capture", "mobifyjs/jazzcat", "mobifyjs/utils"], function(Capture, Jazzcat, Utils) {
         QUnit.start();
 
         var httpCache = Jazzcat.httpCache;
@@ -437,7 +437,6 @@
                     Jazzcat.combineScripts(scripts, doc, {cacheOverrideTime: 10});
 
                     // verify that things we wanted to load from cache did and other things did not
-
                     var enabledDocumentString = Capture.enable(Utils.outerHTML(doc.documentElement));
 
                     // we expect there to be a jazzcat request for bar.js and baz.js

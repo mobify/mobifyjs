@@ -25,11 +25,11 @@
             "mobifyjs": "../src/"
         }
     });
-    require(["../src/utils.js", "../src/capture.js", "../src/unblockify.js"], function(Utils, Capture, Unblockify) {
+    require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/unblockify"], function(Utils, Capture, Unblockify) {
         QUnit.start();
         window.Unblockify = Unblockify;
 
-        asyncTest("unblock", function(){
+        asyncTest("mobifyjs/unblock", function(){
             var iframe = $("<iframe>", {id: "unblock-test"});
             iframe.attr("src", "/tests/fixtures/unblock-example.html");
 

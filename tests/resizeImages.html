@@ -67,7 +67,7 @@
             "mobifyjs": "../src/"
         }
     });
-    require(["utils", "resizeImages"], function(Utils, ResizeImages) {
+    require(["mobifyjs/utils", "mobifyjs/resizeImages"], function(Utils, ResizeImages) {
         QUnit.start();
         test('resize images - no projectName', function() {
             var images = document.querySelectorAll('#resizeImages-no-projectName img');
