@@ -1,4 +1,4 @@
-define(["utils", "capture"], function(Utils, Capture) {
+define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
