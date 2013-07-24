@@ -34,7 +34,7 @@
 </textarea>
 
 <textarea id="combineScripts-loader">
-    <script src="/build/mobify.min.js"></script>
+    <script src="/build/mobify.js"></script>
     <script>
         Jazzcat.httpCache.load();
         var scripts = document.getElementsByTagName("textarea")[0].textContent;
@@ -48,7 +48,7 @@
 </textarea>
 
 <textarea id="combineScripts-coldcache-loader">
-    <script src="/build/mobify.min.js"></script>
+    <script src="/build/mobify.js"></script>
     <script>
         Jazzcat.httpCache.load();
         var scripts = document.getElementsByTagName("textarea")[0].textContent;
@@ -58,7 +58,7 @@
 </textarea>
 
 <textarea id="combineScripts-cache-override-loader">
-    <script src="/build/mobify.min.js"></script>
+    <script src="/build/mobify.js"></script>
 </textarea>
 
 <textarea id="combineScripts-cache-override-scripts">
@@ -74,7 +74,7 @@
 </textarea>
 
 <textarea id="test-jazzcat-combo-exec-document-write-override">
-    <script src="/build/mobify.min.js"></script>
+    <script src="/build/mobify.js"></script>
     <script>
         document.write = function() {
             parent.postMessage(false, "*");
@@ -306,11 +306,14 @@
                             httpCache.get('val' + i, true);
                         }
                     }
+                    debugger;
 
                     httpCache.save(function(err) {
 
                         httpCache.reset();
                         httpCache.load();
+
+                        debugger;
 
                         ok(!!httpCache.get('val1'), '`val1` was cached');
 
