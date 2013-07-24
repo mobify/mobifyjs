@@ -39,6 +39,32 @@ var jazzcatPerformanceIndex = function(req, res) {
 };
 
 /**
+ * Main code for jazzcat runners. Passed in as a context variable for the
+ * bootstrap tag using toString.
+ */
+var jazzcatMainExec = function(){
+    var capturing = window.Mobify && window.Mobify.capturing || false;
+    Mobify.Jazzcat.combineScripts.defaults.base = ""
+    if (capturing) {
+        // Initiate capture
+        Mobify.Capture.init(function(capture){
+
+            // Grab reference to a newly created document
+            var capturedDoc = capture.capturedDoc;
+
+            // Grab all scripts to be concatenated into one request
+            if (!/disableJazzcat=1/.test(location.href)) {
+                var scripts = capturedDoc.querySelectorAll('script');
+                Mobify.Jazzcat.combineScripts(scripts, capturedDoc);
+            }
+
+            // Render source DOM to document
+            capture.renderCapturedDoc();
+        });
+    }
+};
+
+/**
  * Page that runs the Jazzcat performance test.
  */
 var jazzcatPerformanceRunner = function(req, res) {
@@ -50,16 +76,17 @@ var jazzcatPerformanceRunner = function(req, res) {
         scripts.push(resourcesUrl + scriptsArray[index].fileName + "?" + i);
     }
 
-    var mobifyFull = '/performance/resources/mobify-main-jazzcat.min.js';
     // Append timestamp in order to ensure the mobify.js does not always
     // get loaded cached, and also ensures the second load of mobify.js
     // on a test does not load again.
-    mobifyFull += "?" + new Date().getTime();;
+    var library = '/build/mobify.min.js';
+    library += "?" + new Date().getTime();
 
     res.header('Connection', 'close');
 
     res.render('fixtures/jazzcatRunner', {
-        mobifyfull: mobifyFull,
+        library: library,
+        main: jazzcatMainExec.toString(),
         scripts: scripts
     });
 };
@@ -126,7 +153,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get('/performance/resources/mobify-main-jazzcat.min.js', cachedResponse);
+app.get('/build/mobify.min.js', cachedResponse);
 app.get('/tests/fixtures/split.html', slowResponse);
 app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
 app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);

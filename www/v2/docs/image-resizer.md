@@ -17,12 +17,11 @@ on each `<source>` element breakpoint.
 To automatically add resizing to your site without modifying any markup on your backend,
 you must have the ability to [Capture](/mobifyjs/v2/docs/capturing/) the DOM, 
 which requires the Mobify.js tag on your site.
+You can also use this API if you have access to change all `src` to `x-src` in your backend
+markup.
+
 Please refer to the  [quickstart guide](/mobifyjs/v2/docs/) to get setup.
 
-If you have access to change `src` to `x-src` (or `data-src` - any prefix is fine) on your backend,
-you can use a regular external script tag to include this API:
-
-    <script src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha4.min.js">
 
 * TOC
 {:toc}
@@ -77,7 +76,7 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
 There are many examples using Image Resizer on the 
 [examples](/mobifyjs/v2/examples) page.
 
-Automatic image resizing:
+Automatic image resizing (using Capturing):
 
     Mobify.Capture.init(function(capture){
         var capturedDoc = capture.capturedDoc;
