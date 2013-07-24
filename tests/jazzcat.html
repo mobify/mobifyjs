@@ -94,7 +94,12 @@
 <!-- Tests -->
 <script>
     QUnit.config.autostart = false;
-    require.config({"baseUrl": "../src/"});
+    require.config({
+        "baseUrl": "../src/",
+        "paths": {
+            "mobifyjs": "../src/"
+        }
+    });
     require(["capture", "jazzcat", "utils"], function(Capture, Jazzcat, Utils) {
         QUnit.start();
 

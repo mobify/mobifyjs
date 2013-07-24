@@ -61,7 +61,12 @@
 
 <script>
     QUnit.config.autostart = false;
-    require.config({"baseUrl": "../src/"});
+    require.config({
+        "baseUrl": "../src/",
+        "paths": {
+            "mobifyjs": "../src/"
+        }
+    });
     require(["utils", "resizeImages"], function(Utils, ResizeImages) {
         QUnit.start();
         test('resize images - no projectName', function() {

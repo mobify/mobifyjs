@@ -49,7 +49,10 @@
 
     require.config({
         "baseUrl": "../src/",
-    })
+        "paths": {
+            "mobifyjs": "../src/"
+        }
+    });
     require(["../src/capture.js"], function(Capture) {
         QUnit.start();
 

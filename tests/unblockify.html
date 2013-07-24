@@ -20,8 +20,11 @@
 <script>
     QUnit.config.autostart = false;
     require.config({
-        "baseUrl": "/src",  
-    })
+        "baseUrl": "../src/",
+        "paths": {
+            "mobifyjs": "../src/"
+        }
+    });
     require(["../src/utils.js", "../src/capture.js", "../src/unblockify.js"], function(Utils, Capture, Unblockify) {
         QUnit.start();
         window.Unblockify = Unblockify;
