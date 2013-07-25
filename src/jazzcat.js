@@ -41,7 +41,8 @@ define(["utils", "capture"], function(Utils, Capture) {
     };
 
     /**
-     * Returns value of `key` if it is in the cache.
+     * Returns value of `key` if it is in the cache and marks it as used now if 
+     * `touch` is true.
      */
     httpCache.get = function(key, touch) {
         // Ignore anchors.
@@ -93,7 +94,10 @@ define(["utils", "capture"], function(Utils, Capture) {
      * use LRU to drop resources until it will fit on disk, or give up after 10
      * attempts.
      */
-    var canSave = true; // save mutex to prevent multiple saves before onload
+
+    // save mutex to prevent multiple concurrent saves and saving before `load` 
+    // event for document
+    var canSave = true;
     httpCache.save = function(callback) {
         var attempts = 10;
         var resources;
