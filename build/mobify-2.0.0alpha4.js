@@ -1400,7 +1400,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     };
 
     /**
-     * Returns value of `key` if it is in the cache.
+     * Returns value of `key` if it is in the cache and marks it as used now if 
+     * `touch` is true.
      */
     httpCache.get = function(key, touch) {
         // Ignore anchors.
@@ -1452,7 +1453,10 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * use LRU to drop resources until it will fit on disk, or give up after 10
      * attempts.
      */
-    var canSave = true; // save mutex to prevent multiple saves before onload
+
+    // save mutex to prevent multiple concurrent saves and saving before `load` 
+    // event for document
+    var canSave = true;
     httpCache.save = function(callback) {
         var attempts = 10;
         var resources;
@@ -1469,7 +1473,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         // responsive even if a number of resources are evicted.
         (function persist() {
             var store = function() {
-                debugger;
                 var resource;
                 var serialized;
                 // End of time.
@@ -1534,7 +1537,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     /**
      * Returns a parsed HTTP 1.1 Cache-Control directive from a string `directives`.
      */
-    httpCache.ccParse = function(directives) {
+    httpCache.utils.ccParse = function(directives) {
         var obj = {};
         var match;
 
@@ -1575,7 +1578,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         // If `max-age` and `date` are present, and no other cache
         // directives exist, then we are stale if we are older.
         if (cacheControl && date) {
-            cacheControl = httpCache.ccParse(cacheControl);
+            cacheControl = httpCache.utils.ccParse(cacheControl);
 
             if ((cacheControl['max-age']) &&
                 (!cacheControl['private']) &&
@@ -1631,11 +1634,12 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      *   <script>Jazzcat.exec("http://code.jquery.com/jquery.js")</script>
      *   <script>$(function() { alert("helo joe"); })</script>
      *
-     * Note that this only the first part of the Jazzcat transformation. The
-     * bootloader script is inserted by the overriden `Capture.enabled` function.
+     * Note that this is only the first part of the Jazzcat transformation. The
+     * bootloader script is inserted by the overriden `Capture.enabled` 
+     * function.
      * 
      * Takes an option argument, `options`, an object whose properties define 
-     * optiosn that alter jazzcat's javascript loading, caching and execution 
+     * options that alter jazzcat's javascript loading, caching and execution 
      * behaviour. Right now the options are:
      *
      * - `cacheOverrideTime` :  An integer value greater than 10 that will 
@@ -1681,6 +1685,12 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 urls: []
             }
         };
+        // Insert the httpCache loader before the first script
+        if (jsonp) {
+            var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
+            scripts[0].parentNode.insertBefore(httpLoaderScript, scripts[0]);
+        }
+
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
 
@@ -1694,12 +1704,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
 
             if (jsonp) {
-                // Insert the httpCache loader before the first script
-                if (i===0) {
-                    var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-                    script.parentNode.insertBefore(httpLoaderScript, script);
-                }
-
                 // if: the script is not in the cache (or not jsonp), add a loader
                 // else: queue for concatenation
                 if (!httpCache.get(url)) {
@@ -1714,7 +1718,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                     }
                 }
 
-                // Rewriting script to grab contents from localstorage
+                // Rewriting script to grab contents from our in-memory cache
                 // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
                 script.innerHTML =  options.execCallback + "('" + url + "');";
                 // Remove the src attribute

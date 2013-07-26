@@ -114,7 +114,6 @@ define(["utils", "capture"], function(Utils, Capture) {
         // responsive even if a number of resources are evicted.
         (function persist() {
             var store = function() {
-                debugger;
                 var resource;
                 var serialized;
                 // End of time.
@@ -179,7 +178,7 @@ define(["utils", "capture"], function(Utils, Capture) {
     /**
      * Returns a parsed HTTP 1.1 Cache-Control directive from a string `directives`.
      */
-    httpCache.ccParse = function(directives) {
+    httpCache.utils.ccParse = function(directives) {
         var obj = {};
         var match;
 
@@ -220,7 +219,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         // If `max-age` and `date` are present, and no other cache
         // directives exist, then we are stale if we are older.
         if (cacheControl && date) {
-            cacheControl = httpCache.ccParse(cacheControl);
+            cacheControl = httpCache.utils.ccParse(cacheControl);
 
             if ((cacheControl['max-age']) &&
                 (!cacheControl['private']) &&
@@ -327,6 +326,12 @@ define(["utils", "capture"], function(Utils, Capture) {
                 urls: []
             }
         };
+        // Insert the httpCache loader before the first script
+        if (jsonp) {
+            var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
+            scripts[0].parentNode.insertBefore(httpLoaderScript, scripts[0]);
+        }
+
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
 
@@ -340,12 +345,6 @@ define(["utils", "capture"], function(Utils, Capture) {
             var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
 
             if (jsonp) {
-                // Insert the httpCache loader before the first script
-                if (i===0) {
-                    var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-                    script.parentNode.insertBefore(httpLoaderScript, script);
-                }
-
                 // if: the script is not in the cache (or not jsonp), add a loader
                 // else: queue for concatenation
                 if (!httpCache.get(url)) {
