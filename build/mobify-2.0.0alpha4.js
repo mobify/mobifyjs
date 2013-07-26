@@ -999,22 +999,23 @@ Capture.prototype.insertMobifyScripts = function() {
         mobifyjsScript.setAttribute("class", "mobify");
     }
 
-    // Since you can't move nodes from one document to another,
-    // we must clone it first using importNode:
-    // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
-    var mobifyjsClone = doc.importNode(mobifyjsScript, false);
     var head = this.headEl;
-    head.insertBefore(mobifyjsClone, head.firstChild);
 
-    // If main script exists, re-inject it as well.
+    // If main script exists, re-inject it.
     var mainScript = document.getElementById("main-executable");
     if (mainScript) {
+        // Since you can't move nodes from one document to another,
+        // we must clone it first using importNode:
+        // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
         var mainClone = doc.importNode(mainScript, false);
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
-        this.bodyEl.appendChild(mainClone);
+        head.insertBefore(mainClone, head.firstChild)
     }
+    // reinject mobify.js file
+    var mobifyjsClone = doc.importNode(mobifyjsScript, false);
+    head.insertBefore(mobifyjsClone, head.firstChild);
 };
 
 /**
@@ -1459,7 +1460,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
 
         // prevent multiple saves before onload
         if (!canSave) {
-            return;
+            return callback && callback("Save currently in progress");
         }
         canSave = false;
 
@@ -1468,20 +1469,13 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         // responsive even if a number of resources are evicted.
         (function persist() {
             var store = function() {
+                debugger;
                 var resource;
                 var serialized;
                 // End of time.
                 var lruTime = 9007199254740991;
                 var lruKey;
-                resources = resources || (function(){
-                    var r = {};
-                    for (key in httpCache.cache) {
-                        if (httpCache.cache.hasOwnProperty(key)) {
-                            r[key] = httpCache.cache[key];
-                        }
-                    }
-                    return r;
-                })();
+                resources = resources || Utils.clone(httpCache.cache);
                 try {
                     serialized = JSON.stringify(resources);
                 } catch(e) {
@@ -1523,7 +1517,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 canSave = true;
                 callback && callback();
             };
-            if (document.readyState === 'complete') {
+            if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
                 store();
             }
             else {
@@ -1870,7 +1864,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 httpCache.set(encodeURI(resource.url), resource);
             }
         }
-        if (save) {
+        if (Jazzcat.defaults.persist && save) {
             httpCache.save();
         }
     };
@@ -1883,7 +1877,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         execCallback: 'Jazzcat.exec',
         loadCallback: 'Jazzcat.load',
         concat: true,
-        projectName: ''
+        projectName: '',
+        persist: true // useful for debugging
     };
 
     return Jazzcat;

@@ -105,7 +105,7 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         // prevent multiple saves before onload
         if (!canSave) {
-            return;
+            return callback && callback("Save currently in progress");
         }
         canSave = false;
 
@@ -114,20 +114,13 @@ define(["utils", "capture"], function(Utils, Capture) {
         // responsive even if a number of resources are evicted.
         (function persist() {
             var store = function() {
+                debugger;
                 var resource;
                 var serialized;
                 // End of time.
                 var lruTime = 9007199254740991;
                 var lruKey;
-                resources = resources || (function(){
-                    var r = {};
-                    for (key in httpCache.cache) {
-                        if (httpCache.cache.hasOwnProperty(key)) {
-                            r[key] = httpCache.cache[key];
-                        }
-                    }
-                    return r;
-                })();
+                resources = resources || Utils.clone(httpCache.cache);
                 try {
                     serialized = JSON.stringify(resources);
                 } catch(e) {
@@ -169,7 +162,7 @@ define(["utils", "capture"], function(Utils, Capture) {
                 canSave = true;
                 callback && callback();
             };
-            if (document.readyState === 'complete') {
+            if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
                 store();
             }
             else {
@@ -517,7 +510,7 @@ define(["utils", "capture"], function(Utils, Capture) {
                 httpCache.set(encodeURI(resource.url), resource);
             }
         }
-        if (save) {
+        if (Jazzcat.defaults.persist && save) {
             httpCache.save();
         }
     };
@@ -530,7 +523,8 @@ define(["utils", "capture"], function(Utils, Capture) {
         execCallback: 'Jazzcat.exec',
         loadCallback: 'Jazzcat.load',
         concat: true,
-        projectName: ''
+        projectName: '',
+        persist: true // useful for debugging
     };
 
     return Jazzcat;

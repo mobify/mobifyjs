@@ -444,22 +444,23 @@ Capture.prototype.insertMobifyScripts = function() {
         mobifyjsScript.setAttribute("class", "mobify");
     }
 
-    // Since you can't move nodes from one document to another,
-    // we must clone it first using importNode:
-    // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
-    var mobifyjsClone = doc.importNode(mobifyjsScript, false);
     var head = this.headEl;
-    head.insertBefore(mobifyjsClone, head.firstChild);
 
-    // If main script exists, re-inject it as well.
+    // If main script exists, re-inject it.
     var mainScript = document.getElementById("main-executable");
     if (mainScript) {
+        // Since you can't move nodes from one document to another,
+        // we must clone it first using importNode:
+        // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
         var mainClone = doc.importNode(mainScript, false);
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
-        this.bodyEl.appendChild(mainClone);
+        head.insertBefore(mainClone, head.firstChild)
     }
+    // reinject mobify.js file
+    var mobifyjsClone = doc.importNode(mobifyjsScript, false);
+    head.insertBefore(mobifyjsClone, head.firstChild);
 };
 
 /**

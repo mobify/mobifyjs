@@ -43,6 +43,7 @@ var jazzcatPerformanceIndex = function(req, res) {
  */
 var jazzcatMainExec = function(){
     var capturing = window.Mobify && window.Mobify.capturing || false;
+    Jazzcat.defaults.persist = false;
     if (capturing) {
         // Initiate capture
         Mobify.Capture.init(function(capture){

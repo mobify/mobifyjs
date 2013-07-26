@@ -4,7 +4,7 @@ var path = require('path');
 
 var LONG_CACHE_CONTROL = "public,max-age=31536000, s-maxage=900"; // one year
 var SHORT_CACHE_CONTROL = "public,max-age=300"; // five minutes
-var NO_CLIENT_CACHE = "max-age=0, s-maxage=31536000, no-store";
+var NO_CACHE = "max-age=0, no-store";
 
 /*global module:false*/
 module.exports = function(grunt) {
@@ -242,7 +242,7 @@ module.exports = function(grunt) {
             performance: {
                 options: {
                     bucket: 'mobify',
-                    headers: { "Cache-Control": NO_CLIENT_CACHE},
+                    headers: { "Cache-Control": NO_CACHE},
                 },
                 upload: [
                     { // examples
