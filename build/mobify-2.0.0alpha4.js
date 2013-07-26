@@ -1631,16 +1631,16 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      *
      *   After:
      *
+     *   <script>Jazzcat.httpCache.load();<\/script>
+     *   <script src="//jazzcat.mobify.com/jsonp/Jazzcat.load/http%3A%2F%2Fcode.jquery.com%2Fjquery.js"></script>
      *   <script>Jazzcat.exec("http://code.jquery.com/jquery.js")</script>
      *   <script>$(function() { alert("helo joe"); })</script>
      *
-     * Note that this is only the first part of the Jazzcat transformation. The
-     * bootloader script is inserted by the overriden `Capture.enabled` 
-     * function.
      * 
      * Takes an option argument, `options`, an object whose properties define 
      * options that alter jazzcat's javascript loading, caching and execution 
-     * behaviour. Right now the options are:
+     * behaviour. Right now the options default to `Jazzcat.defaults` which
+     * can be overridden. Additionally, you can specify these options as well:
      *
      * - `cacheOverrideTime` :  An integer value greater than 10 that will 
      *                          override the freshness implied by the HTTP 
