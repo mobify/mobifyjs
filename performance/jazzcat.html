@@ -137,13 +137,20 @@ $("form").submit(function(e) {
         var averagedMobifyResults = mobifyResults.map(function(testSet){
             return parseFloat(average(testSet).toFixed(1));
         });
+        var stdDevMobifyResults = mobifyResults.map(function(testSet){
+            return stdDev(testSet).toFixed(1);
+        });
 
         var averagedNativeResults = nativeResults.map(function(testSet){
             return parseFloat(average(testSet).toFixed(1));
         });
 
-        var mobifyResultsMsg = "Mobify results: " + averagedMobifyResults.join(", ");
-        var nativeResultsMsg = "Native results: " + averagedNativeResults.join(", ");
+        var stdDevNativeResults = nativeResults.map(function(testSet){
+            return stdDev(testSet).toFixed(1);
+        });
+
+        var mobifyResultsMsg = "Mobify results: " + averagedMobifyResults.join(", ") + "</br>" + "Standard Dev: " + stdDevMobifyResults;
+        var nativeResultsMsg = "Native results: " + averagedNativeResults.join(", ") + "</br>" + "Standard Dev: " + stdDevNativeResults;;
 
         // console.log(mobifyResultsMsg);
         // console.log(nativeResultsMsg);
@@ -155,18 +162,29 @@ $("form").submit(function(e) {
     });
 });
 
-/**
- * Returns the average of an array of numbers.
- */
+// /**
+//  * Returns the average of an array of numbers.
+//  */
+
+var sum = function(a, b) {
+    return a + b;
+}
+
 var average = function(array) {
-    var sum = array.reduce(function(prev, curr) {
-        return prev + curr;
-    });
-    return sum / array.length;
+    return array.reduce(sum) / array.length;
+};
+
+var stdDev = function(data) {
+    var dataMean = average(data);
+    var dev = data.map(function(x) {
+        return (x - dataMean) * (x - dataMean) 
+    }).reduce(sum, 0)/data.length;
+
+    return Math.sqrt(dev);
 };
 
 
-var createPoints = function(x, y) {
+var zip = function(x, y) {
     var points = [];
     for (var i = 0; i < x.length; i++) {
         points.push({x: x[i], y: y[i]});
@@ -200,13 +218,13 @@ var renderChart = function(scripts, mobifyData, nativeData) {
             name: "Jazzcat",
             markerType: "square",
             color: "LightCoral",
-            dataPoints: createPoints(scripts, mobifyData)
+            dataPoints: zip(scripts, mobifyData)
         }, {
             type: "line",
             showInLegend: true,
             name: "Native",
             color: "LightSeaGreen",
-            dataPoints: createPoints(scripts, nativeData)
+            dataPoints: zip(scripts, nativeData)
         }]
     });
 
