@@ -283,11 +283,12 @@ define(["utils", "capture"], function(Utils, Capture) {
      *   <script>Jazzcat.exec("http://code.jquery.com/jquery.js")</script>
      *   <script>$(function() { alert("helo joe"); })</script>
      *
-     * Note that this only the first part of the Jazzcat transformation. The
-     * bootloader script is inserted by the overriden `Capture.enabled` function.
+     * Note that this is only the first part of the Jazzcat transformation. The
+     * bootloader script is inserted by the overriden `Capture.enabled` 
+     * function.
      * 
      * Takes an option argument, `options`, an object whose properties define 
-     * optiosn that alter jazzcat's javascript loading, caching and execution 
+     * options that alter jazzcat's javascript loading, caching and execution 
      * behaviour. Right now the options are:
      *
      * - `cacheOverrideTime` :  An integer value greater than 10 that will 
@@ -366,7 +367,7 @@ define(["utils", "capture"], function(Utils, Capture) {
                     }
                 }
 
-                // Rewriting script to grab contents from localstorage
+                // Rewriting script to grab contents from our in-memory cache
                 // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
                 script.innerHTML =  options.execCallback + "('" + url + "');";
                 // Remove the src attribute
