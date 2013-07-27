@@ -445,7 +445,6 @@ Capture.prototype.insertMobifyScripts = function() {
     }
 
     var head = this.headEl;
-
     // If main script exists, re-inject it.
     var mainScript = document.getElementById("main-executable");
     if (mainScript) {
