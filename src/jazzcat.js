@@ -81,7 +81,6 @@ define(["utils", "capture"], function(Utils, Capture) {
         } catch(err) {
             return;
         }
-
         for (key in data) {
             if (data.hasOwnProperty(key) && !httpCache.utils.isStale(data[key], staleOptions)) {
                 httpCache.set(key, data[key]);
@@ -509,7 +508,7 @@ define(["utils", "capture"], function(Utils, Capture) {
                 httpCache.set(encodeURI(resource.url), resource);
             }
         }
-        if (Jazzcat.defaults.persist && save) {
+        if (save) {
             httpCache.save();
         }
     };
@@ -523,7 +522,6 @@ define(["utils", "capture"], function(Utils, Capture) {
         loadCallback: 'Jazzcat.load',
         concat: true,
         projectName: '',
-        persist: true // useful for debugging
     };
 
     return Jazzcat;

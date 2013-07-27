@@ -43,7 +43,9 @@ var jazzcatPerformanceIndex = function(req, res) {
  */
 var jazzcatMainExec = function(){
     var capturing = window.Mobify && window.Mobify.capturing || false;
-    Jazzcat.defaults.persist = false;
+    Jazzcat.httpCache.save = function() {
+        return console.log("mocking save to do nothing");
+    }
     if (capturing) {
         // Initiate capture
         Mobify.Capture.init(function(capture){
@@ -91,7 +93,7 @@ var jazzcatPerformanceRunner = function(req, res) {
     // Append timestamp in order to ensure the mobify.js does not always
     // get loaded cached, and also ensures the second load of mobify.js
     // on a test does not load again.
-    var library = '/build/mobify.min.js';
+    var library = '/build/mobify.js';
     //var library = '/build/mobify.js'; // uncomment for debugging
     library += "?" + new Date().getTime();
 
