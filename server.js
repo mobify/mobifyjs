@@ -6,7 +6,6 @@ var fs = require('fs');
 var Url = require('url');
 var hbs = require('hbs');
 
-
 /**
  * Used for test "capture captures the complete document" in `tests/capture.html`.
  */
@@ -44,7 +43,9 @@ var jazzcatPerformanceIndex = function(req, res) {
  */
 var jazzcatMainExec = function(){
     var capturing = window.Mobify && window.Mobify.capturing || false;
-    Mobify.Jazzcat.combineScripts.defaults.base = ""
+    Jazzcat.httpCache.save = function() {
+        return console.log("mocking save to do nothing");
+    }
     if (capturing) {
         // Initiate capture
         Mobify.Capture.init(function(capture){
@@ -52,10 +53,23 @@ var jazzcatMainExec = function(){
             // Grab reference to a newly created document
             var capturedDoc = capture.capturedDoc;
 
+            var matchType = location.href.match(/responseType=([^&;]*)/);
+            var responseType = (matchType && matchType[1]) || 'jsonp';
+
+            var matchConcat = location.href.match(/concat=([^&;]*)/);
+            var concat = (matchConcat && matchConcat[1] === 'true');
+            if (concat === null) {
+                concat = true;
+            }
+
             // Grab all scripts to be concatenated into one request
             if (!/disableJazzcat=1/.test(location.href)) {
                 var scripts = capturedDoc.querySelectorAll('script');
-                Mobify.Jazzcat.combineScripts(scripts, capturedDoc);
+                Mobify.Jazzcat.optimizeScripts(scripts, {
+                    responseType: responseType,
+                    base: '',
+                    concat: concat
+                });
             }
 
             // Render source DOM to document
@@ -79,7 +93,8 @@ var jazzcatPerformanceRunner = function(req, res) {
     // Append timestamp in order to ensure the mobify.js does not always
     // get loaded cached, and also ensures the second load of mobify.js
     // on a test does not load again.
-    var library = '/build/mobify.min.js';
+    var library = '/build/mobify.js';
+    //var library = '/build/mobify.js'; // uncomment for debugging
     library += "?" + new Date().getTime();
 
     res.header('Connection', 'close');
@@ -112,6 +127,7 @@ var jazzcatJsonp = function(req, res) {
  * Implements the Jazzcat JS API.
  */
 var jazzcatJs = function(req, res) {
+
     var scripts = JSON.parse(req.params.scripts);
     var scriptData = scripts.map(function(script){
         var pathname = Url.parse(script).pathname;
@@ -153,13 +169,13 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get('/build/mobify.min.js', cachedResponse);
+app.get('/build/mobify(.min)?.js', cachedResponse);
 app.get('/tests/fixtures/split.html', slowResponse);
 app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
 app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);
 
-app.get('/jsonp/Jazzcat.combo.load/:scripts', jazzcatJsonp);
-app.get('/js/Jazzcat.combo.load/:scripts', jazzcatJs);
+app.get('/jsonp/Jazzcat.load/:scripts', jazzcatJsonp);
+app.get('/js/:scripts', jazzcatJs);
 
 
 if (require.main === module) {

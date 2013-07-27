@@ -1,0 +1,30 @@
+
+<!doctype html>
+<html>
+<head>
+<script>
+var begin = +new Date;
+
+window.onload = function() {
+    var end = +new Date;
+
+    var diff = end - begin;
+
+    var msg = "onload time: " + diff + " for 12 scripts.";
+    console.log(msg);
+
+    // use a setTimeout to not break the onload time in the inspector
+    // (the red line)
+    setTimeout(function(){
+        alert(msg);
+    }, 20);
+};
+</script>
+<title>Combined scripts</title>
+</head>
+<body>
+    
+        <script src="/mobifyjs/performance/resources/combined-6.js"></script>
+
+</body>
+</html>
