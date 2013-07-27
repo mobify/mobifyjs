@@ -1650,7 +1650,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      *                          a plain JavaScript response, which does not
      *                          use localStorage to manage script caching.
      *                          (warning - `js` responses are currently
-     *                          experimental and do not minify).
+     *                          experimental and may have issues with cache
+     *                          headers).
      * - `concat`:              A boolean that specifies whether or not script
      *                          requests should be concatenated (split between
      *                          head and body).
