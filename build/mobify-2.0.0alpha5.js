@@ -1638,11 +1638,22 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      * Takes an option argument, `options`, an object whose properties define 
      * options that alter jazzcat's javascript loading, caching and execution 
      * behaviour. Right now the options default to `Jazzcat.defaults` which
-     * can be overridden. Additionally, you can specify these options as well:
+     * can be overridden. More details on options:
      *
      * - `cacheOverrideTime` :  An integer value greater than 10 that will 
      *                          override the freshness implied by the HTTP 
      *                          caching headers set on the reource.
+     * - `responseType` :       This value defaults to `jsonp`, which will
+     *                          make a request for a jsonp response which
+     *                          loads scripts into the httpCache object.
+     *                          Can also specify `js`, which will send back
+     *                          a plain JavaScript response, which does not
+     *                          use localStorage to manage script caching.
+     *                          (warning - `js` responses are currently
+     *                          experimental and do not minify).
+     * - `concat`:              A boolean that specifies whether or not script
+     *                          requests should be concatenated (split between
+     *                          head and body).
      */
 
     Jazzcat.optimizeScripts = function(scripts, options) {
