@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+<script>
+var begin = +new Date;
+
+window.onload = function() {
+    var end = +new Date;
+
+    var diff = end - begin;
+
+    var msg = "onload time: " + diff + " for 12 scripts.";
+    alert(msg);
+    console.log(msg);
+};
+</script>
+<title>Seperate scripts</title>
+</head>
+<body>
+    
+    
+        <script src="/mobifyjs/performance/resources/samplescripts/jquery.1.10.js"></script>
+
+        <script src="/mobifyjs/performance/resources/samplescripts/jquery.alertify.js"></script>
+
+        <script src="/mobifyjs/performance/resources/samplescripts/jquery.dropdown.js"></script>
+    
+        <script src="/mobifyjs/performance/resources/samplescripts/jquery.icheck.min.js"></script>
+
+        <script src="/mobifyjs/performance/resources/samplescripts/jquery.typeahead.min.js"></script>
+
+        <script src="/mobifyjs/performance/resources/samplescripts/underscore.js"></script>
+    
+    
+</body>
+</html>

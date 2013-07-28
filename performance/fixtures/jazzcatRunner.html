@@ -6,7 +6,7 @@
 /**
  * Calculate the running time and send it to the parent.
  */
-window.onload = function() {
+onReady = function() {
     var end = +new Date;
 
     var begin;
@@ -20,11 +20,9 @@ window.onload = function() {
 
     console.log((Mobify.Capture ? "Mobify " : "Native ") + "onload time: " + diff + " for {{scripts.length}} scripts.");
 
-    // Cleanup cache!
-    localStorage.removeItem("Mobify-Combo-Cache-v1.0");
-
     parent.postMessage(diff, "*");
 };
+document.addEventListener("DOMContentLoaded", onReady, false);
 </script>
 <title>Performance Runner for Jazzcat</title>
 </head>
