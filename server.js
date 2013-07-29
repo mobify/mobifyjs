@@ -1,10 +1,13 @@
 /**
  * Server for testing Mobify.js!
  */
+var http = require('http');
 var express = require('express');
 var fs = require('fs');
 var Url = require('url');
 var hbs = require('hbs');
+
+http.globalAgent.maxSockets = 100;
 
 /**
  * Used for test "capture captures the complete document" in `tests/capture.html`.
