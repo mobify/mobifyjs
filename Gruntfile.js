@@ -118,7 +118,7 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/unblockify.html',
                         'http://localhost:3000/tests/cssOptimize.html'
                     ],
-                    concurrency: 4,
+                    concurrency: 16,
                     tunneled: true,
                     detailedError: true,
                     browsers: [
