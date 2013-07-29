@@ -1760,7 +1760,10 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         if (!jsonp && concat) {
             for (var i=0, len=scripts.length; i<len; i++) {
                 var script = scripts[i];
-                script.parentNode.removeChild(script);
+                // Only remove scripts if they are external
+                if (script.getAttribute(options.attribute)) {
+                    script.parentNode.removeChild(script);
+                }
             }
         }
 
