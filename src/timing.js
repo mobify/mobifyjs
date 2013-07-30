@@ -14,7 +14,7 @@ define([], function() {
 
     var sort = function() {
         var comparator = function(a, b) {
-            return a[1] < b[1] ? -1 : 1;
+            return a[1] - b[1];
         };
         timings.sort(comparator);
     };

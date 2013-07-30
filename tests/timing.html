@@ -51,6 +51,15 @@
             equal(Timing.timings.shift()[0], 'first', 'first was first');
             equal(Timing.timings.shift()[0], 'second', 'second was second');
         });
+
+        test('sort is stable', 1, function() {
+            Timing.record("first", 1);
+            Timing.record("second", 1);
+            Timing.sort()
+
+            equal(Timing.timings[0][0], "first", "first is still first");
+            equal(Timing.timings[1][0], "second", "second is stil second");
+        });
     });
 </script>
 </body>
