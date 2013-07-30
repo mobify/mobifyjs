@@ -60,6 +60,17 @@ module.exports = function(grunt) {
                     out: "./build/mobify-<%= pkg.version %>.js"
                 }
             },
+            // Mobify.js Library with added timing API
+            timing: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: "true",
+                    name: "mobify-library-timing",
+                    out: "./build/mobify-timing-<%= pkg.version %>.js"
+                }
+            },
             // Building experimental features
             experimental: {
                 options: {
@@ -86,12 +97,20 @@ module.exports = function(grunt) {
         uglify: {
             full: {
                 files: {
-                    'build/mobify-<%= pkg.version %>.min.js': ['build/mobify-<%= pkg.version %>.js']
+                    'build/mobify-<%= pkg.version %>.min.js':
+                        ['build/mobify-<%= pkg.version %>.js']
+                }
+            },
+            timing: {
+                files: {
+                    'build/mobify-timing-<%= pkg.version %>.min.js':
+                        ['build/mobify-timing-<%= pkg.version %>.js']
                 }
             },
             experimental: {
                 files: {
-                    'build/mobify-experimental-<%= pkg.version %>.min.js': ['build/mobify-experimental-<%= pkg.version %>.js']
+                    'build/mobify-experimental-<%= pkg.version %>.min.js':
+                        ['build/mobify-experimental-<%= pkg.version %>.js']
                 }
             },
             custom: {
@@ -333,8 +352,9 @@ module.exports = function(grunt) {
     // Builds librarys, and custom library if mobify-custom.js is present
     grunt.registerTask('build', function() {
         // Then build mobify.js library
-        grunt.task.run("requirejs:full", "uglify:full")
-        grunt.task.run("requirejs:experimental", "uglify:experimental")
+        grunt.task.run("requirejs:full", "uglify:full");
+        grunt.task.run("requirejs:timing", "uglify:timing");
+        grunt.task.run("requirejs:experimental", "uglify:experimental");
         // Build custom library if it exists
         if (grunt.file.exists("mobify-custom.js")) {
             grunt.task.run("requirejs:custom", "uglify:custom");
