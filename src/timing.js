@@ -19,10 +19,6 @@ define([], function() {
         timings.sort(comparator);
     };
 
-    // slurp up timing point left by the tag
-    window.Mobify && window.Mobify.points && window.Mobify.points[0] &&
-    record("start", window.Mobify.points[0]);
-
     return {
         record: record,
         sort: sort,

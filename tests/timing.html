@@ -25,15 +25,11 @@
     require(["timing"], function(Timing) {
         QUnit.start();
 
-        test('grabs inital point', 1, function() {
-            ok(Timing.timings[0]);
-        });
-
         test('records an event', 3, function() {
             var eventName = 'test1';
             Timing.record(eventName);
 
-            var eventTiming = Timing.timings[1];
+            var eventTiming = Timing.timings[0];
 
             equal(eventTiming[0], eventName, "correct event name recorded");
             ok(eventTiming[1], "a timing was recorded");
@@ -54,7 +50,7 @@
 
             equal(Timing.timings.shift()[0], 'first', 'first was first');
             equal(Timing.timings.shift()[0], 'second', 'second was second');
-        })
+        });
     });
 </script>
 </body>
