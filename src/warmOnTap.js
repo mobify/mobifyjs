@@ -4,7 +4,7 @@
 // Developer can pass an optional parameter specifying selector match for elements to trigger on
 // Defaults to some common targets.
 
-define(["warmOnTap"], function(warmOnTap) {
+define(["./warmOnTap.js"], function(warmOnTap) {
 	return function(selector){
 		var defaultSelector = ['A', 'INPUT', 'BUTTON', 'SELECT'];
 		if (!selector) selector = defaultSelector;

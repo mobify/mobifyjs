@@ -1,4 +1,4 @@
-define(["utils"], function(Utils) {
+define(["./utils.js"], function(Utils) {
 
 var ResizeImages = window.ResizeImages = {};
 

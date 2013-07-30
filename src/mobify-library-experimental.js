@@ -1,4 +1,4 @@
-require(["utils", "capture", "resizeImages", "keepWarm", "dnsPrefetch", "speedClick", "jazzcat"], 
+require(["./utils.js", "./capture.js", "./resizeImages.js", "./keepWarm.js", "./dnsPrefetch.js", "./speedClick.js", "./jazzcat.js"], 
     function(Utils, Capture, ResizeImages, keepWarm, dnsPrefetch, speedClick, Jazzcat) {
     
     Mobify.Utils = Utils;

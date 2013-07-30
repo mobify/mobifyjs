@@ -21,7 +21,7 @@
  * into the cache using a bootloader request to Jazzcat. Scripts are then
  * executed directly from the cache.
  */
-define(["utils", "capture"], function(Utils, Capture) {
+define(["./utils.js", "./capture.js"], function(Utils, Capture) {
     /**
      * An HTTP 1.1 compliant localStorage backed cache.
      */

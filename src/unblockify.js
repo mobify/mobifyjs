@@ -1,4 +1,4 @@
-define(["utils", "capture"], function(Utils, Capture) {
+define(["./utils.js", "./capture.js"], function(Utils, Capture) {
 
 var Unblockify = {}
 

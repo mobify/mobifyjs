@@ -1,4 +1,4 @@
-require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "cssOptimize", "external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize) {
+require(["./utils.js", "./capture.js", "./resizeImages.js", "./jazzcat.js", "./unblockify.js", "./cssOptimize.js", "./external/picturefill.js"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
