@@ -2028,8 +2028,8 @@ define('timing',[], function() {
     var timings = [];
 
     /**
-     * Takes an event `name`, and an optional date, whihc will default to now when 
-     * unspecified, and records them.
+     * Takes an event `name`, and an optional date, which will default to now 
+     * when unspecified, and records them.
      */
     var record = function(name, date) {
         timings.push([name, date || Date.now()]);
