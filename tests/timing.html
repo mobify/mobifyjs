@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>timing.js Tests</title>
+  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/require.js" id="requirejs"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
+</head>
+<body>
+
+<div id="qunit"></div>
+
+<div id="qunit-fixtures">
+<script>
+    // Fake the initial timing point we expect from the tag
+    window.Mobify = {points: [Date.now()]};
+</script>
+</div>
+
+<script>
+    QUnit.config.autostart = false;
+    require.config({"baseUrl": "../src/"});
+    require(["timing"], function(Timing) {
+        QUnit.start();
+
+        test('records an event', 3, function() {
+            var eventName = 'test1';
+            Timing.record(eventName);
+
+            var eventTiming = Timing.timings[0];
+
+            equal(eventTiming[0], eventName, "correct event name recorded");
+            ok(eventTiming[1], "a timing was recorded");
+
+            var now = Date.now();
+
+            ok(now - eventTiming[1] < 5, "recorded event time close to now");
+
+            // tear down
+            Timing.timings.pop();
+        });
+
+        test('sort sorts', 2, function() {
+            Timing.record('second', 2);
+            Timing.record('first', 1);
+
+            Timing.sort();
+
+            equal(Timing.timings.shift()[0], 'first', 'first was first');
+            equal(Timing.timings.shift()[0], 'second', 'second was second');
+        });
+
+        test('sort is stable', 2, function() {
+            Timing.record("first", 1);
+            Timing.record("second", 1);
+            Timing.sort()
+
+            equal(Timing.timings[0][0], "first", "first is still first");
+            equal(Timing.timings[1][0], "second", "second is stil second");
+        });
+    });
+</script>
+</body>
+</html>
