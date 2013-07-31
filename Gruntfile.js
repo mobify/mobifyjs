@@ -68,7 +68,7 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: "true",
                     name: "mobify-library-timing",
-                    out: "./build/mobify-timing-<%= pkg.version %>.js"
+                    out: "./build/mobify-timing.js"
                 }
             },
             // Building experimental features
@@ -103,8 +103,8 @@ module.exports = function(grunt) {
             },
             timing: {
                 files: {
-                    'build/mobify-timing-<%= pkg.version %>.min.js':
-                        ['build/mobify-timing-<%= pkg.version %>.js']
+                    'build/mobify-timing-.min.js':
+                        ['build/mobify-timing.js']
                 }
             },
             experimental: {
