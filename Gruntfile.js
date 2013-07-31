@@ -103,7 +103,7 @@ module.exports = function(grunt) {
             },
             timing: {
                 files: {
-                    'build/mobify-timing-.min.js':
+                    'build/mobify-timing.min.js':
                         ['build/mobify-timing.js']
                 }
             },
