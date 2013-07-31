@@ -137,7 +137,7 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/jazzcat.html',
                         'http://localhost:3000/tests/unblockify.html',
                         'http://localhost:3000/tests/cssOptimize.html',
-                        'httpp://localhost:3000/tests/timing.js'
+                        'http://localhost:3000/tests/timing.js'
                     ],
                     concurrency: 16,
                     tunneled: true,
