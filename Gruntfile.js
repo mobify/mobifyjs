@@ -14,7 +14,7 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         localConfig: (function(){
                         try {
-                            return grunt.file.readJSON('localConfig.json')
+                            return grunt.file.readJSON('localConfig.json');
                         } catch(e) {
                             return {};
                         }
@@ -32,7 +32,8 @@ module.exports = function(grunt) {
                   'http://localhost:3000/tests/jazzcat.html',
                   'http://localhost:3000/tests/resizeImages.html',
                   'http://localhost:3000/tests/unblockify.html',
-                  'http://localhost:3000/tests/cssOptimize.html'
+                  'http://localhost:3000/tests/cssOptimize.html',
+                  'http://localhost:3000/tests/timing.html'
                 ]
               }
             }
@@ -45,7 +46,7 @@ module.exports = function(grunt) {
                     base: '.',
                     server: path.resolve("./server")
                 }
-            },
+            }
         },
         requirejs: {
             // Building full Mobify.js library
@@ -56,7 +57,18 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "mobify-library",
-                    out: "./build/mobify-<%= pkg.version %>.js",
+                    out: "./build/mobify-<%= pkg.version %>.js"
+                }
+            },
+            // Mobify.js Library with added timing API
+            timing: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: "true",
+                    name: "mobify-library-timing",
+                    out: "./build/mobify-timing.js"
                 }
             },
             // Building experimental features
@@ -67,7 +79,7 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "mobify-library-experimental",
-                    out: "./build/mobify-experimental-<%= pkg.version %>.js",
+                    out: "./build/mobify-experimental-<%= pkg.version %>.js"
                 }
             },
             // Building custom Mobify.js library (must copy mobify-custom.js.example -> mobify-custom.js)
@@ -78,26 +90,34 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "../mobify-custom.js",
-                    out: "./build/custom/mobify.js",
+                    out: "./build/custom/mobify.js"
                 }
-            },
+            }
         },
         uglify: {
             full: {
                 files: {
-                    'build/mobify-<%= pkg.version %>.min.js': ['build/mobify-<%= pkg.version %>.js']
+                    'build/mobify-<%= pkg.version %>.min.js':
+                        ['build/mobify-<%= pkg.version %>.js']
+                }
+            },
+            timing: {
+                files: {
+                    'build/mobify-timing.min.js':
+                        ['build/mobify-timing.js']
                 }
             },
             experimental: {
                 files: {
-                    'build/mobify-experimental-<%= pkg.version %>.min.js': ['build/mobify-experimental-<%= pkg.version %>.js']
+                    'build/mobify-experimental-<%= pkg.version %>.min.js':
+                        ['build/mobify-experimental-<%= pkg.version %>.js']
                 }
             },
             custom: {
                 files: {
                     'build/custom/mobify.min.js': ['build/custom/mobify.js']
                 }
-            },
+            }
         },
         watch: {
             files: ["src/**/*.js",
@@ -116,9 +136,10 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/resizeImages.html',
                         'http://localhost:3000/tests/jazzcat.html',
                         'http://localhost:3000/tests/unblockify.html',
-                        'http://localhost:3000/tests/cssOptimize.html'
+                        'http://localhost:3000/tests/cssOptimize.html',
+                        'http://localhost:3000/tests/timing.html'
                     ],
-                    concurrency: 4,
+                    concurrency: 16,
                     tunneled: true,
                     detailedError: true,
                     browsers: [
@@ -331,8 +352,9 @@ module.exports = function(grunt) {
     // Builds librarys, and custom library if mobify-custom.js is present
     grunt.registerTask('build', function() {
         // Then build mobify.js library
-        grunt.task.run("requirejs:full", "uglify:full")
-        grunt.task.run("requirejs:experimental", "uglify:experimental")
+        grunt.task.run("requirejs:full", "uglify:full");
+        grunt.task.run("requirejs:timing", "uglify:timing");
+        grunt.task.run("requirejs:experimental", "uglify:experimental");
         // Build custom library if it exists
         if (grunt.file.exists("mobify-custom.js")) {
             grunt.task.run("requirejs:custom", "uglify:custom");

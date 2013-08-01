@@ -25,6 +25,7 @@
         <script x-src="http://uncached/2/" class="combine"></script>
         <script x-src="http://uncached/2/" class="combine"></script>
         <script x-src="http://excluded/"></script>
+        <script class="combine"></script>
 </textarea>
 
 <!-- Fixtures for ensuring `optimizeScripts` executes scripts in the right order. -->
@@ -562,7 +563,7 @@
                 }
             });
 
-            asyncTest('optimizeScripts', 16, function() {
+            asyncTest('optimizeScripts', 18, function() {
                 httpCache.reset({
                     'http://cached/': {
                         'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
@@ -585,6 +586,7 @@
                             uncachedHead2: scripts[4],
                             uncachedBody2: scripts[5],
                             excluded: scripts[6],
+                            inline: scripts[7]
                         }
                     };
 
@@ -728,6 +730,23 @@
                     expected_ie = "<html><head><title></title><script class=\"combine\" x-src=\"//jazzcat.mobify.com/js/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script x-src=\"http://excluded/\"><\/script></head><body><script class=\"combine\" x-src=\"//jazzcat.mobify.com/js/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script class=\"combine\" x-src=\"//jazzcat.mobify.com/js/%5B%22http%3A%2F%2Fcached%2F%22%5D\"><\/script></body></html>";
 
                     ok((html === expected || html === expected_ie), "Separate, JS response type");
+
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([],
+                                                 [scripts.inline],
+                                                 {concat: true, responseType: 'js'});
+                    expected = "<html><head><title></title></head><body><script class=\"combine\"><\/script></body></html>";
+
+                    equal(html, expected, "Regression, ensure inline scripts don't get removed, JS response type");
+
+
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([],
+                                                 [scripts.inline],
+                                                 {concat: true, responseType: 'jsonp'});
+                    expected = "<html><head><title></title></head><body><script>Jazzcat.httpCache.load();<\/script><script class=\"combine\"><\/script></body></html>";
+
+                    equal(html, expected, "Regression, ensure inline scripts don't get removed, jsonp response type");
 
 
                     start();

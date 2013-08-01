@@ -2021,6 +2021,33 @@ var defaults = CssOptimize._defaults = {
 
 return CssOptimize;
 });
+/**
+ * An API to record timing for Mobify.js 2.0
+ */
+define('timing',[], function() {
+    var timings = [];
+
+    /**
+     * Takes an event `name`, and an optional date, which will default to now 
+     * when unspecified, and records them.
+     */
+    var record = function(name, date) {
+        timings.push([name, date || Date.now()]);
+    };
+
+    var sort = function() {
+        var comparator = function(a, b) {
+            return a[1] - b[1];
+        };
+        timings.sort(comparator);
+    };
+
+    return {
+        record: record,
+        sort: sort,
+        timings: timings
+    };
+});
 define('external/picturefill',["utils", "capture"], function(Utils, Capture) {
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
@@ -2163,7 +2190,10 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
 return;
 
 });
-require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "cssOptimize", "external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize) {
+require(["utils", "capture", "resizeImages", "jazzcat", "unblockify",
+        "cssOptimize", "timing", "external/picturefill"], 
+        function(Utils, Capture, ResizeImages, Jazzcat, Unblockify,
+                 CssOptimize, Timing) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
@@ -2171,10 +2201,11 @@ require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "cssOptimi
     Mobify.Jazzcat = Jazzcat;
     Mobify.CssOptimize = CssOptimize;
     Mobify.Unblockify = Unblockify;
+    Mobify.Timing = Timing;
     Mobify.api = "2.0"; // v6 tag backwards compatibility change
     return Mobify;
 
 }, undefined, true);
 // relPath, forceSync;
-define("mobify-library", function(){});
+define("mobify-library-timing", function(){});
 }());

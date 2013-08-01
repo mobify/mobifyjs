@@ -1,10 +1,13 @@
 /**
  * Server for testing Mobify.js!
  */
+var http = require('http');
 var express = require('express');
 var fs = require('fs');
 var Url = require('url');
 var hbs = require('hbs');
+
+http.globalAgent.maxSockets = 100;
 
 /**
  * Used for test "capture captures the complete document" in `tests/capture.html`.
@@ -93,7 +96,7 @@ var jazzcatPerformanceRunner = function(req, res) {
     // Append timestamp in order to ensure the mobify.js does not always
     // get loaded cached, and also ensures the second load of mobify.js
     // on a test does not load again.
-    var library = '/build/mobify.js';
+    var library = '/build/mobify.min.js';
     //var library = '/build/mobify.js'; // uncomment for debugging
     library += "?" + new Date().getTime();
 
