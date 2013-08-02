@@ -60,17 +60,32 @@ any element that loads external resources!**):
 
 If you want to use the [Image API](/mobifyjs/v2/docs/image-resizer/)
 without [Capturing](/mobifyjs/v2/docs/capturing/), you must change
-`src` to `data-src` for every <code>&lt;img&gt;</code> and 
+`src` to `x-src` (this is configurable) for every <code>&lt;img&gt;</code> and 
 <code>&lt;picture&gt;</code> element you have in your site (you
 also may want to add <code>&lt;noscript&gt;</code> fallbacks if you're worried
-about browsers with JavaScript disabled/unavailable).
+about browsers with JavaScript disabled/unavailable). This snippet will
+load mobify.js asynchronously in order to be able to start loading images before
+the DOM is ready.
 
-Then, paste the following tag before <code>&lt;/body&gt;</code>:
+Then, paste the following tag before <code>&lt;/head&gt;</code>, or top of
+<code>&lt;body&gt;</code>:
 
-    <script src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha5.min.js">
+    <script async src="/build/mobify.min.js"></script>
     <script>
-      var images = document.querySelectorAll("img, picture");
-      Mobify.ResizeImages.resize(images);
+        var intervalId = setInterval(function(){
+            if (window.Mobify) {
+                var images = document.querySelectorAll('img[x-src]');
+                if (images.length > 0) {
+                    Mobify.ResizeImages.resize( images, {
+                        maxWidth: 320   
+                    });
+                }
+                // When the document has finished loading, stop loading images.
+                if (Mobify.Utils.domIsReady()) {
+                    clearInterval(intervalId)
+                }
+            }
+        }, 30);
     </script>
 
 ## Where to next?
