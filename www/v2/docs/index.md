@@ -36,7 +36,7 @@ any element that loads external resources!**):
     <script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];e.src?a.src=e.src:e.innerHTML&&(a.innerHTML=e.innerHTML),a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h=function(){var c=new Date;c.setTime(c.getTime()+18e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e){var a=b.createElement("script");if(a.onerror=h,"string"==typeof e)g(a,"main-executable","mobify",{src:e});else{var c="var main = "+e.toString()+"; main();";g(a,"main-executable","mobify",{innerHTML:c})}}},f.onerror=h,g(f,"mobify-js","mobify",{src:d})})}(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&+match[2]<4?!1:match[3]&&+match[4]<11?!1:!0:!1},
 
     // path to mobify.js
-    "//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha5.min.js",
+    "//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha6.min.js",
 
     // calls to APIs go here (or path to a main.js)
     function() {
@@ -60,17 +60,32 @@ any element that loads external resources!**):
 
 If you want to use the [Image API](/mobifyjs/v2/docs/image-resizer/)
 without [Capturing](/mobifyjs/v2/docs/capturing/), you must change
-`src` to `data-src` for every <code>&lt;img&gt;</code> and 
+`src` to `x-src` (this is configurable) for every <code>&lt;img&gt;</code> and 
 <code>&lt;picture&gt;</code> element you have in your site (you
 also may want to add <code>&lt;noscript&gt;</code> fallbacks if you're worried
-about browsers with JavaScript disabled/unavailable).
+about browsers with JavaScript disabled/unavailable). This snippet will
+load mobify.js asynchronously in order to be able to start loading images before
+the DOM is ready.
 
-Then, paste the following tag before <code>&lt;/body&gt;</code>:
+Then, paste the following tag before <code>&lt;/head&gt;</code>, or top of
+<code>&lt;body&gt;</code>:
 
-    <script src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha5.min.js">
+    <script async src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha6.min.js"></script>
     <script>
-      var images = document.querySelectorAll("img, picture");
-      Mobify.ResizeImages.resize(images);
+        var intervalId = setInterval(function(){
+            if (window.Mobify) {
+                var images = document.querySelectorAll('img[x-src]');
+                if (images.length > 0) {
+                    Mobify.ResizeImages.resize( images, {
+                        maxWidth: 320   
+                    });
+                }
+                // When the document has finished loading, stop checking for new images
+                if (Mobify.Utils.domIsReady()) {
+                    clearInterval(intervalId)
+                }
+            }
+        }, 30);
     </script>
 
 ## Where to next?

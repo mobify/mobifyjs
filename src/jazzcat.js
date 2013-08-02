@@ -160,7 +160,7 @@ define(["utils", "capture"], function(Utils, Capture) {
                 canSave = true;
                 callback && callback();
             };
-            if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+            if (Utils.domIsReady()) {
                 store();
             }
             else {
