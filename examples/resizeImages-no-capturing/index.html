@@ -23,7 +23,7 @@
                 });
             }
             // When the document has finished loading, stop loading images.
-            if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+            if (Mobify.Utils.domIsReady()) {
                 clearInterval(intervalId)
             }
         }
