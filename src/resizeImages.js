@@ -290,7 +290,7 @@ var capturing = window.Mobify && window.Mobify.capturing || false;
 
 var defaults = {
       proto: '//',
-      host: 'ir0.mobify.com',
+      host: 'mobifycdn.net/ir0.mobify.com',
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
       sourceAttribute: "x-src",
       targetAttribute: (capturing ? "x-src" : "src"),

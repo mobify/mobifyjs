@@ -531,7 +531,7 @@ define(["utils", "capture"], function(Utils, Capture) {
     Jazzcat.defaults = {
         selector: 'script',
         attribute: 'x-src',
-        base: '//jazzcat.mobify.com',
+        base: '//mobifycdn.net/jazzcat.mobify.com',
         responseType: 'jsonp',
         execCallback: 'Jazzcat.exec',
         loadCallback: 'Jazzcat.load',

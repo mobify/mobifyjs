@@ -77,7 +77,7 @@ var restoreOriginalHref = CssOptimize.restoreOriginalHref = function(event) {
 };
 
 var defaults = CssOptimize._defaults = {
-    protoAndHost: '//jazzcat.mobify.com',
+    protoAndHost: '//mobifycdn.net/jazzcat.mobify.com',
     endpoint: 'cssoptimizer',
     projectName: 'oss-' + location.hostname.replace(/[^\w]/g, '-'),
     targetAttribute: 'x-href',
