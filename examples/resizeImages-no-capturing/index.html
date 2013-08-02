@@ -12,20 +12,28 @@
     width: 49%;
 }
 </style>
+<script async src="/build/mobify.min.js"></script>
+<script>
+    var intervalId = setInterval(function(){
+        if (window.Mobify) {
+            var images = document.querySelectorAll('img[x-src]');
+            if (images.length > 0) {
+                Mobify.ResizeImages.resize( images, {
+                    maxWidth: 320   
+                });
+            }
+            // When the document has finished loading, stop loading images.
+            if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+                clearInterval(intervalId)
+            }
+        }
+    }, 30);
+</script>
 </head>
 <body class="foo">
 <div class="images">
     <img x-src="/mobifyjs/examples/assets/images/forest.jpg">
     <img x-src="/mobifyjs/examples/assets/images/mountains.jpg">
 </div>
-
-<script src="/build/mobify.js"></script>
-<script>
-    // Resize images using Mobify Image Resizer
-    var images = document.querySelectorAll('img');
-    Mobify.ResizeImages.resize( images, {
-        maxWidth: 320   
-    });
-</script>
 </body>
 </html>

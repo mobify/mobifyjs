@@ -186,6 +186,9 @@ ResizeImages._rewriteSrcAttribute = function(element, opts, srcVal){
         if (Utils.httpUrl(url)) {
             element.setAttribute(opts.targetAttribute, ResizeImages.getImageURL(url, opts));
             element.setAttribute('data-orig-src', srcVal);
+            if (!capturing) {
+                element.removeAttribute(opts.sourceAttribute);
+            }
             if(opts.onerror) {
                 element.setAttribute('onerror', opts.onerror);
             }
