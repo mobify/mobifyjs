@@ -80,7 +80,7 @@ Then, paste the following tag before <code>&lt;/head&gt;</code>, or top of
                         maxWidth: 320   
                     });
                 }
-                // When the document has finished loading, stop checking for images
+                // When the document has finished loading, stop checking for new images
                 if (Mobify.Utils.domIsReady()) {
                     clearInterval(intervalId)
                 }
