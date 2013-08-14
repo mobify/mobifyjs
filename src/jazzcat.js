@@ -518,7 +518,9 @@ define(["utils", "capture"], function(Utils, Capture) {
         }
 
         while (resource = resources[i++]) {
-            if (resource.status == 'ready') {
+            if (resource.status == 'ready' && 200 <= resource.statusCode &&
+                300 > resource.statusCode) {
+
                 save = true;
                 httpCache.set(encodeURI(resource.url), resource);
             }

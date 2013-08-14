@@ -164,7 +164,17 @@
                     'cache-control': 'public,max-age=' + TEN_MINUTES
                 }
             },
-            'invalid-expires': {'headers': {'expires': 'invalid'}}
+            'invalid-expires': {'headers': {'expires': 'invalid'}},
+            'bad-status-code': {
+                'url': 'bad-status-code',
+                'statusCode': 494,
+                'status': 'ready'
+            },
+            'good-status-code': {
+                'url': 'good-status-code',
+                'statusCode': 200,
+                'status': 'ready'
+            }
         };
 
         // Fix <\/script>.
@@ -752,6 +762,23 @@
             // TODO: Add test to ensure save doesn't get called more then once
             // before onload.
 
+            test('Jazzcat.load - drops resources with non-200 status codes', function() {
+                var good = 'good-status-code';
+                var bad = 'bad-status-code';
+
+                var resources = [];
+                resources.push(resourceFixtures['bad-status-code']);
+                resources.push(resourceFixtures['good-status-code']);
+
+                Jazzcat.httpCache.reset();
+                Jazzcat.load(resources);
+                
+                ok(Jazzcat.httpCache.get(good), "saves good resource");
+                ok(!Jazzcat.httpCache.get(bad), "drops bad one");
+
+                // teardown
+                Jazzcat.httpCache.reset();
+            });
         }
     });
 </script>
