@@ -57,9 +57,8 @@ Router.prototype.match = function() {
 	return null;
 };
 
-// Some mockable "private" references to document and window
+// mockable "private" reference to document
 Router._document = window.document;
-Router._window = window;
 
 /**
  * Takes a selector `sel` and returns a function that will search for elements 
