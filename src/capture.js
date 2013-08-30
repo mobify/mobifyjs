@@ -104,7 +104,7 @@ var Capture = function(doc, prefix) {
     Utils.extend(this, capturedDOMFragments);
 };
 
-var init = Capture.init = function(callback, doc, prefix) {
+Capture.init = function(callback, doc, prefix) {
     var doc = doc || document;
 
     var createCapture = function(callback, doc, prefix) {
@@ -130,6 +130,112 @@ var init = Capture.init = function(callback, doc, prefix) {
             }
         }, false);
     }
+};
+
+/**
+ * Creates an iframe and inserts it into a document, and makes the iframe
+ * as seamless as possible through CSS
+ * TODO: Test out Seamless attribute when available in latest browsers
+ */
+Capture.insertSeamlessIframe = function(doc){
+    var doc = doc || document;
+    var iframe = window.iframe = doc.createElement("iframe");
+    // set attribute to make the iframe appear seamless to the user
+    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%; height:100%;box-sizing:border-box;background-color: transparent;border: 0px none transparent;padding: 0px;'
+    // Insert the iframe into the doc
+    var plaintext = doc.getElementsByTagName('plaintext')[0];
+    doc.body.insertBefore(iframe, plaintext);
+    // Open iframe an force all links and forms to target the parent
+    var innerDoc = iframe.contentDocument;
+    innerDoc.open();
+    // TODO: What if a site already has a base tag?
+    innerDoc.write('<base target="_parent" />');
+    return innerDoc;
+}
+
+/**
+ * Streaming capturing is a batshit loco insane way of being able to modify
+ * streaming chunks of markup before the browser can request resources.
+ * There are two key things to note when reading this code:
+ *  1. Since we use the plaintext tag to capture the markup and prevent resources
+ *     from loading, we cannot simply document.write back into the main document,
+ *     since whatever we `document.write` into the document will also get swallowed up
+ *     by the plaintext tag. We also can't `document.open/document.write` into the main
+ *     document either because document.open will blow away the current document, which
+ *     would leave the plaintext object for dead. We have attempted to relocate the
+ *     plaintext element into a different document to free up the main document, but
+ *     this was not successful.
+ *  2. We must stream into a "captured" DOM so that we can continue to chunk
+ *     data while still being able to use DOM operations on each chunk.
+ *     TODO: It might be nice to bypass the captured dom if someone wants to
+ *           modify the markup in a streaming way with regular expressions.
+ */
+Capture.initStreamingCapture = function(chunkCallback, options) {
+    var prefix = options && options.prefix || 'x-';
+    var sourceDoc = options && options.sourceDoc || document;
+    // if no destination document specified, create iframe and use its document
+    destDoc = options && options.destDoc || Capture.insertSeamlessIframe(sourceDoc);
+
+    // currently, the only way to reconstruct the destination DOM without
+    // breaking script execution order is through document.write.
+    // TODO: Figure out way without document.write, and then make
+    //       `docWriteIntoDest` configurable through options
+    var docWriteIntoDest = true;
+
+    // Create a "captured" DOM. This is the playground DOM that the user will
+    // have that will stream into the destDoc per chunk after being manipulated
+    var capturedDoc = sourceDoc.implementation.createHTMLDocument("");
+    var plaintext = sourceDoc.getElementsByTagName('plaintext')[0];
+
+    // Track what has been written to captured and destination docs for each chunk
+    var writtenToCapturedDoc = '';
+    var writtenToDestDoc = '';
+
+    // poll plaintext for data until the document is ready
+    var intervalId = setInterval(function(){
+        var html = plaintext.textContent;
+        var toWrite = html.substring(writtenToCapturedDoc.length);
+        // Only write up to the end of a tag
+        // it is OK if this catches a &gt; or &lt; because we just care about
+        // escaping attributes that fetch resources for this chunk
+        toWrite = toWrite.substring(0, toWrite.lastIndexOf('>') + 1);
+
+        // Escape resources for chunk and remove target=self
+        toWrite = Capture.disable(toWrite, prefix).replace(/target="_self"/gi, '');
+
+        // Write escaped chunk to captured document
+        capturedDoc.write(toWrite);
+        writtenToCapturedDoc += toWrite;
+
+        // Execute chunk callback to allow users to make modifications to capturedDoc
+        chunkCallback(capturedDoc);
+
+        // Grab outerHTML of capturedDoc and write the diff to destDoc
+        html = capturedDoc.documentElement.outerHTML || Utils.outerHTML(capturedDoc.documentElement);
+        toWrite = html.substring(writtenToDestDoc.length);
+        // Unescape chunk
+        toWrite = Capture.enable(toWrite, prefix);
+
+        destDoc.write(toWrite);
+        writtenToDestDoc += toWrite;
+
+        // TODO:
+        // * insert library back into the captured document
+        // * Move Viewport tag into main document
+        // * Move title tag into main document
+        // * Potentially move every tag in head that is not a resources into the main
+        // * Move HTML/HEAD attributes into HTML/HEAD tags in iframe
+        // * What to do about refer?
+        // * Fix window.location maybe???
+
+        // if document is ready, stop polling and close Captured document
+        if (Utils.domIsReady(sourceDoc)) {
+            clearInterval(intervalId);
+            destDoc.close();
+            //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
+        }
+    }, 10);
+
 };
 
 /**
