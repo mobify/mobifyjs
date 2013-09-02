@@ -169,6 +169,18 @@ Capture.insertSeamlessIframe = function(doc){
  *     data while still being able to use DOM operations on each chunk.
  *     TODO: It might be nice to bypass the captured dom if someone wants to
  *           modify the markup in a streaming way with regular expressions.
+ *
+ * How it works
+ * ============
+ * As data from the server gets loaded up on the client, that data is being
+ * swallowed up by the plaintext tag which was inserted into the document
+ * in the bootloader mobify.js tag. With `initStreamingCapture`, we poll
+ * the plaintext tag for new data. We take the delta, we rewrite all resources
+ * in that delta using a regular expression to prevent it from loading resources
+ * when rendered in the captured document. `chunkCallback` is then executed with
+ * the captured document in order to users to make modifications to the DOM. We
+ * then take the delta of this capturedDocument and render it into the
+ * destination document (which by default is a "seamless" iframe).
  */
 Capture.initStreamingCapture = function(chunkCallback, options) {
     var prefix = options && options.prefix || 'x-';
@@ -234,7 +246,7 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
             destDoc.close();
             //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
         }
-    }, 10);
+    }, 30); // TODO: How often should we poll?
 
 };
 
@@ -415,7 +427,7 @@ Capture.prototype.restore = function() {
     var doc = self.doc;
 
     var restore = function() {
-        doc.removeEventListener('DOMContentLoaded', restore, false);
+        doc.removeEventListener('readystatechange', restore, false);
 
         setTimeout(function() {
             doc.open();
@@ -424,10 +436,10 @@ Capture.prototype.restore = function() {
         }, 15);
     };
 
-    if (/complete|interactive|loaded/.test(doc.readyState)) {
+    if (Utils.domIsReady(doc)) {
         restore();
     } else {
-        doc.addEventListener('DOMContentLoaded', restore, false);
+        doc.addEventListener('readystatechange', restore, false);
     }
 };
 
