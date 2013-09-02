@@ -14,13 +14,16 @@ http.globalAgent.maxSockets = 100;
  */
 var slowResponse = function(req, res) {
     var split = fs.readFileSync(__dirname + req.path, 'utf8').split('<!-- SPLIT -->')
-
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write(split[0]);
-
-    setTimeout(function() {
-        res.write(split[1]);
-        res.end();
+    var chunk = 1;
+    var iid = setInterval(function() {
+        res.write(split[chunk]);
+        chunk++;
+        if (chunk === split.length){
+            clearInterval(iid);
+            res.end();
+        }
     }, 5000);
 }
 
@@ -173,7 +176,7 @@ app.use(function(req, res, next) {
 });
 
 app.get('/build/mobify(.min)?.js', cachedResponse);
-app.get('/tests/fixtures/split.html', slowResponse);
+app.get('/tests/fixtures/split*', slowResponse);
 app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
 app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);
 

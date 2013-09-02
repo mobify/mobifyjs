@@ -202,21 +202,31 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
     // Track what has been written to captured and destination docs for each chunk
     var writtenToCapturedDoc = '';
     var writtenToDestDoc = '';
+    var pollInterval = 50; // milliseconds
 
-    // poll plaintext for data until the document is ready
-    var intervalId = setInterval(function(){
+    var pollPlaintext = function(){
+        var finished = Utils.domIsReady(sourceDoc);
+
         var html = plaintext.textContent;
         var toWrite = html.substring(writtenToCapturedDoc.length);
+
         // Only write up to the end of a tag
         // it is OK if this catches a &gt; or &lt; because we just care about
         // escaping attributes that fetch resources for this chunk
         toWrite = toWrite.substring(0, toWrite.lastIndexOf('>') + 1);
+
+        // If there is nothing to write, check again.
+        if (toWrite === '' && !finished) {
+            setTimeout(pollPlaintext, pollInterval);
+            return;
+        }
 
         // Escape resources for chunk and remove target=self
         toWrite = Capture.disable(toWrite, prefix).replace(/target="_self"/gi, '');
 
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
+        console.log(toWrite)
         writtenToCapturedDoc += toWrite;
 
         // Execute chunk callback to allow users to make modifications to capturedDoc
@@ -224,12 +234,15 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
         // Grab outerHTML of capturedDoc and write the diff to destDoc
         html = capturedDoc.documentElement.outerHTML || Utils.outerHTML(capturedDoc.documentElement);
-        toWrite = html.substring(writtenToDestDoc.length);
+        //console.log("Written to dest doc: " + writtenToDestDoc);
+        toWrite = html.substring(writtenToDestDoc.length, html.lastIndexOf('</body></html>'));
+        writtenToDestDoc += toWrite;
+
         // Unescape chunk
         toWrite = Capture.enable(toWrite, prefix);
-
-        destDoc.write(toWrite);
-        writtenToDestDoc += toWrite;
+        if (docWriteIntoDest) {
+            destDoc.write(toWrite);
+        }
 
         // TODO:
         // * insert library back into the captured document
@@ -242,11 +255,15 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
         // if document is ready, stop polling and close Captured document
         if (Utils.domIsReady(sourceDoc)) {
-            clearInterval(intervalId);
             destDoc.close();
             //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
         }
-    }, 30); // TODO: How often should we poll?
+        else {
+            setTimeout(pollPlaintext, pollInterval);
+        }
+    };
+
+    pollPlaintext();
 
 };
 
