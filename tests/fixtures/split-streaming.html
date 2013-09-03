@@ -19,9 +19,6 @@ function() {
             var images = capturedDoc.querySelectorAll('img, picture');
             Mobify.ResizeImages.resize(images);
             // simplify html
-            if (capturedDoc.querySelectorAll('.second').length) {
-                debugger;
-            }
             Mobify.Utils.removeBySelector('.second', capturedDoc);
         });
     }

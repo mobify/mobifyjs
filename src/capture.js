@@ -277,7 +277,6 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
         // if document is ready, stop polling and close Captured document
         if (Utils.domIsReady(sourceDoc)) {
-            debugger;
             destDoc.close();
             //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
         }
