@@ -309,6 +309,16 @@ define(["utils", "capture"], function(Utils, Capture) {
             return scripts;
         }
 
+        // Remove mobify script(s) from scripts array
+        if (/mobify/i.test(scripts[0].className)) {
+            var scripts = Array.prototype.slice.call(scripts);
+            scripts.splice(0, 1);
+            // Check for main executable as well
+            if (scripts.length > 0 && /mobify/i.test(scripts[0].className)) {
+                scripts.splice(0, 1);
+            }
+        }
+
         options = Utils.extend({}, Jazzcat.defaults, options || {});
         var jsonp = (options.responseType === 'jsonp');
         var concat = options.concat;
@@ -345,6 +355,11 @@ define(["utils", "capture"], function(Utils, Capture) {
 
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
+
+            // Skip script if it has been optimized already
+            if (script.hasAttribute('optimized')) {
+                continue;
+            }
 
             url = script.getAttribute(options.attribute);
 
@@ -437,6 +452,8 @@ define(["utils", "capture"], function(Utils, Capture) {
         var loadScript;
         if (urls && urls.length) {
             loadScript = document.createElement('script');
+            // Set the script to "optimized"
+            loadScript.setAttribute('optimized', '');
             loadScript.setAttribute(options.attribute, Jazzcat.getURL(urls, options));
         }
         return loadScript;

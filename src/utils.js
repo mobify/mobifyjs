@@ -67,11 +67,16 @@ Utils.httpUrl = function(url) {
  * outerHTML polyfill - https://gist.github.com/889005
  */
 Utils.outerHTML = function(el){
-    var div = document.createElement('div');
-    div.appendChild(el.cloneNode(true));
-    var contents = div.innerHTML;
-    div = null;
-    return contents;
+    if (el.outerHTML) {
+        return el.outerHTML;
+    }
+    else {
+        var div = document.createElement('div');
+        div.appendChild(el.cloneNode(true));
+        var contents = div.innerHTML;
+        div = null;
+        return contents;
+    }
 };
 
 Utils.removeBySelector = function(selector, doc) {

@@ -148,8 +148,6 @@ Capture.insertSeamlessIframe = function(doc){
     // Open iframe an force all links and forms to target the parent
     var innerDoc = iframe.contentDocument;
     innerDoc.open();
-    // TODO: What if a site already has a base tag?
-    innerDoc.write('<base target="_parent" />');
     return innerDoc;
 }
 
@@ -197,10 +195,33 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
     // Create a "captured" DOM. This is the playground DOM that the user will
     // have that will stream into the destDoc per chunk after being manipulated
     var capturedDoc = sourceDoc.implementation.createHTMLDocument("");
+    capturedDoc.open("text/html", "replace");
+
+    // Start the captured doc with the original pieces of the source doc
+    var startCapturedHtml = Capture.getDoctype(sourceDoc) +
+                 Capture.openTag(sourceDoc.documentElement) +
+                 Capture.openTag(sourceDoc.head) +
+                 extractHTMLStringFromElement(sourceDoc.head) +
+                 '<base target="_parent" />';
+
+    // insert mobify.js (and main) into captured doc
+    var mobifyLibrary = Capture.getMobifyLibrary(sourceDoc);
+    startCapturedHtml += Utils.outerHTML(mobifyLibrary);
+
+    // If there is a main exec, insert it as well
+    var main = Capture.getMain();
+    if (main) {
+        startCapturedHtml += Utils.outerHTML(main);
+    }
+
+    // Start the captured doc off write! (pun intended)
+    capturedDoc.write(startCapturedHtml);
+
+    // Grab the plaintext element from the source document
     var plaintext = sourceDoc.getElementsByTagName('plaintext')[0];
 
     // Track what has been written to captured and destination docs for each chunk
-    var writtenToCapturedDoc = '';
+    var plaintextBuffer = '';
     var writtenToDestDoc = '';
     var pollInterval = 50; // milliseconds
 
@@ -208,7 +229,7 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         var finished = Utils.domIsReady(sourceDoc);
 
         var html = plaintext.textContent;
-        var toWrite = html.substring(writtenToCapturedDoc.length);
+        var toWrite = html.substring(plaintextBuffer.length);
 
         // Only write up to the end of a tag
         // it is OK if this catches a &gt; or &lt; because we just care about
@@ -226,13 +247,13 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
-        writtenToCapturedDoc += toWrite;
+        plaintextBuffer += toWrite;
 
         // Execute chunk callback to allow users to make modifications to capturedDoc
         chunkCallback(capturedDoc);
 
         // Grab outerHTML of capturedDoc and write the diff to destDoc
-        html = capturedDoc.documentElement.outerHTML || Utils.outerHTML(capturedDoc.documentElement);
+        html = Utils.outerHTML(capturedDoc.documentElement);
         toWrite = html.substring(writtenToDestDoc.length, html.lastIndexOf('</body></html>'));
         writtenToDestDoc += toWrite;
 
@@ -347,8 +368,9 @@ Capture.openTag = function(element) {
 /**
  * Return a string for the doctype of the current document.
  */
-Capture.prototype.getDoctype = function() {
-    var doctypeEl = this.doc.doctype || [].filter.call(this.doc.childNodes, function(el) {
+Capture.getDoctype = function(doc) {
+    var doc = doc || document;
+    var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
             return el.nodeType == Node.DOCUMENT_TYPE_NODE
         })[0];
 
@@ -371,7 +393,7 @@ Capture.prototype.getDoctype = function() {
     var htmlEl = doc.getElementsByTagName('html')[0];
 
     captured = {
-        doctype: this.getDoctype(),
+        doctype: Capture.getDoctype(doc),
         htmlOpenTag: Capture.openTag(htmlEl),
         headOpenTag: Capture.openTag(headEl),
         bodyOpenTag: Capture.openTag(bodyEl),
@@ -510,7 +532,7 @@ Capture.prototype.createDocumentFragments = function() {
  */
 Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
-    var html = Capture.enable(doc.documentElement.outerHTML || Utils.outerHTML(doc.documentElement), this.prefix);
+    var html = Capture.enable(Utils.outerHTML(doc.documentElement), this.prefix);
     var htmlWithDoctype = this.doctype + html;
     return htmlWithDoctype;
 };
@@ -546,27 +568,39 @@ Capture.prototype.getCapturedDoc = function(options) {
     return this.capturedDoc;
 };
 
-/**
- * Insert Mobify scripts back into the captured doc
- * in order for the library to work post-document.write
- */
-Capture.prototype.insertMobifyScripts = function() {
-    var doc = this.capturedDoc;
-    // After document.open(), all objects will be removed.
-    // To provide our library functionality afterwards, we
-    // must re-inject the script.
-    var mobifyjsScript = document.getElementById("mobify-js");
+Capture.getMobifyLibrary = function(doc) {
+    var doc = doc || document;
+    var mobifyjsScript = doc.getElementById("mobify-js");
 
     // v6 tag backwards compatibility change
     if (!mobifyjsScript) {
-        mobifyjsScript = document.getElementsByTagName("script")[0];
+        mobifyjsScript = doc.getElementsByTagName("script")[0];
         mobifyjsScript.id = "mobify-js";
         mobifyjsScript.setAttribute("class", "mobify");
     }
 
-    var head = this.headEl;
+    return mobifyjsScript;
+};
+
+Capture.getMain = function(doc) {
+    var doc = doc || document;
+    var mainScript = doc.getElementById("main-executable");
+    return mainScript;
+}
+
+/**
+ * Insert Mobify scripts back into the captured doc
+ * in order for the library to work post-document.write
+ */
+Capture.insertMobifyScripts = function(doc) {
+    // After document.open(), all objects will be removed.
+    // To provide our library functionality afterwards, we
+    // must re-inject the script.
+    var mobifyjsScript = Capture.getMobifyLibrary(doc);
+
+    var head = doc.head;
     // If main script exists, re-inject it.
-    var mainScript = document.getElementById("main-executable");
+    var mainScript = Capture.getMain(doc);
     if (mainScript) {
         // Since you can't move nodes from one document to another,
         // we must clone it first using importNode:
@@ -589,7 +623,7 @@ Capture.prototype.renderCapturedDoc = function(options) {
     var doc = this.capturedDoc;
 
     // Insert the mobify scripts back into the captured doc
-    this.insertMobifyScripts();
+    Capture.insertMobifyScripts(doc);
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists
