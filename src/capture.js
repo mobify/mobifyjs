@@ -237,7 +237,7 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         // escaping attributes that fetch resources for this chunk
         toWrite = toWrite.substring(0, toWrite.lastIndexOf('>') + 1);
 
-        // If there is nothing to write, check again.
+        // If there is nothing to write, return and check again.
         if (toWrite === '' && !finished) {
             setTimeout(pollPlaintext, pollInterval);
             return;
@@ -276,7 +276,8 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         // * Fix window.location maybe???
 
         // if document is ready, stop polling and close Captured document
-        if (Utils.domIsReady(sourceDoc)) {
+        if (finished) {
+            window.capturedDoc = capturedDoc; // attach to window for easy debugging
             destDoc.close();
             //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
         }

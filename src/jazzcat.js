@@ -298,7 +298,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      *                          requests should be concatenated (split between
      *                          head and body).
      */
-
+    var loaded = false;
     Jazzcat.optimizeScripts = function(scripts, options) {
         if (options && options.cacheOverrideTime !== undefined) {
             Utils.extend(httpCache.options,
@@ -323,9 +323,6 @@ define(["utils", "capture"], function(Utils, Capture) {
         var jsonp = (options.responseType === 'jsonp');
         var concat = options.concat;
 
-        // load data from localStorage
-        httpCache.load(httpCache.options);
-
         // helper method for inserting the loader script
         // before the first uncached script in the "uncached" array
         var insertLoader = function(script, urls) {
@@ -347,10 +344,13 @@ define(["utils", "capture"], function(Utils, Capture) {
                 urls: []
             }
         };
-        // Insert the httpCache loader before the first script
-        if (jsonp) {
+
+        // Load what we have in http cache, and insert loader into document
+        if (jsonp && loaded === false) {
+            httpCache.load(httpCache.options);
             var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
             scripts[0].parentNode.insertBefore(httpLoaderScript, scripts[0]);
+            loaded = true;
         }
 
         for (var i=0, len=scripts.length; i<len; i++) {
