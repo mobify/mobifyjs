@@ -298,6 +298,8 @@ define(["utils", "capture"], function(Utils, Capture) {
      *                          requests should be concatenated (split between
      *                          head and body).
      */
+    // loaded indicates if we have loaded the cached and inserted the loader
+    // into the document
     var loaded = false;
     Jazzcat.optimizeScripts = function(scripts, options) {
         if (options && options.cacheOverrideTime !== undefined) {
@@ -345,28 +347,29 @@ define(["utils", "capture"], function(Utils, Capture) {
             }
         };
 
-        // Load what we have in http cache, and insert loader into document
-        if (jsonp && loaded === false) {
-            httpCache.load(httpCache.options);
-            var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-            scripts[0].parentNode.insertBefore(httpLoaderScript, scripts[0]);
-            loaded = true;
-        }
-
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
 
             // Skip script if it has been optimized already
-            if (script.hasAttribute('optimized')) {
+            if (script.hasAttribute('optimized') || script.hasAttribute('skip-optimize')) {
                 continue;
             }
 
-            url = script.getAttribute(options.attribute);
-
             // skip if the script is inline
+            url = script.getAttribute(options.attribute);
             if (!url) continue;
             url = Utils.absolutify(url);
             if (!Utils.httpUrl(url)) continue;
+
+            // TODO: Check for async/defer
+
+            // Load what we have in http cache, and insert loader into document
+            if (jsonp && !loaded) {
+                httpCache.load(httpCache.options);
+                var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
+                script.parentNode.insertBefore(httpLoaderScript, script);
+                loaded = true;
+            }
 
             var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
 
