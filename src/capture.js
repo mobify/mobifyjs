@@ -202,6 +202,7 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
                  Capture.openTag(sourceDoc.documentElement) +
                  Capture.openTag(sourceDoc.head) +
                  extractHTMLStringFromElement(sourceDoc.head) +
+                 // TODO: What if the site already has a base tag?
                  '<base target="_parent" />';
 
     // insert mobify.js (and main) into captured doc
@@ -242,12 +243,14 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
             return;
         }
 
+        // Write our progress to plaintext buffer
+        plaintextBuffer += toWrite;
+
         // Escape resources for chunk and remove target=self
         toWrite = Capture.disable(toWrite, prefix).replace(/target="_self"/gi, '');
 
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
-        plaintextBuffer += toWrite;
 
         // Execute chunk callback to allow users to make modifications to capturedDoc
         chunkCallback(capturedDoc);
@@ -274,6 +277,7 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
         // if document is ready, stop polling and close Captured document
         if (Utils.domIsReady(sourceDoc)) {
+            debugger;
             destDoc.close();
             //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
         }

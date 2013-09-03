@@ -13,12 +13,15 @@ function() {
         // Grab reference to a newly created document
         Mobify.Capture.initStreamingCapture(function(capturedDoc){
             // optimize scripts
-            var scripts = capturedDoc.querySelectorAll('script');
-            Mobify.Jazzcat.optimizeScripts(scripts);
+            // var scripts = capturedDoc.querySelectorAll('script');
+            // Mobify.Jazzcat.optimizeScripts(scripts);
             // optimize images
             var images = capturedDoc.querySelectorAll('img, picture');
             Mobify.ResizeImages.resize(images);
             // simplify html
+            if (capturedDoc.querySelectorAll('.second').length) {
+                debugger;
+            }
             Mobify.Utils.removeBySelector('.second', capturedDoc);
         });
     }
