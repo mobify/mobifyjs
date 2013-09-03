@@ -279,12 +279,14 @@ ResizeImages.resize = function(elements, options) {
         var element = elements[i];
 
         // For an `img`, simply modify the src attribute
-        if (element.nodeName === 'IMG') {
+        if (element.nodeName === 'IMG' && !element.hasAttribute('optimized')) {
+            element.setAttribute('optimized', '');
             ResizeImages._rewriteSrcAttribute(element, opts);
         }
         // For a `picture`, (potentially) nuke src on `img`, and
         // pass all `source` elements into modifyImages recursively
-        else if (element.nodeName === 'PICTURE') {
+        else if (element.nodeName === 'PICTURE' && !element.hasAttribute('optimized')) {
+            element.setAttribute('optimized', '');
             ResizeImages._crawlPictureElement(element, opts);
         }
     }

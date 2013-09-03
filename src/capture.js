@@ -226,7 +226,6 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
-        console.log(toWrite)
         writtenToCapturedDoc += toWrite;
 
         // Execute chunk callback to allow users to make modifications to capturedDoc
@@ -234,7 +233,6 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
         // Grab outerHTML of capturedDoc and write the diff to destDoc
         html = capturedDoc.documentElement.outerHTML || Utils.outerHTML(capturedDoc.documentElement);
-        //console.log("Written to dest doc: " + writtenToDestDoc);
         toWrite = html.substring(writtenToDestDoc.length, html.lastIndexOf('</body></html>'));
         writtenToDestDoc += toWrite;
 

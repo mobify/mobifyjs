@@ -10,25 +10,27 @@
 function() {
     // Grab reference to a newly created document
     Mobify.Capture.initStreamingCapture(function(capturedDoc){
+        var images = capturedDoc.querySelectorAll('img, picture');
+        Mobify.ResizeImages.resize(images);
         Mobify.Utils.removeBySelector('.second', capturedDoc);
     });
 });</script>
 </head>
 <body>
     <div class="first">
-        <img src="fake.png"></img>
+        <img src="/mobifyjs/examples/assets/images/grumpycat.jpg"></img>
         <p>First chunk</p>
     </div>
     <!-- SPLIT -->
     <div class="second">
-        <img src="fake.png"></img>
+        <img src="/mobifyjs/examples/assets/images/office-small.jpg"></img>
         <p>Second chunk A</p>
         <!-- SPLIT -->
         <p>Second chunk B</p>
     </div>
     <!-- SPLIT -->
     <div class="third">
-        <img src="fake.png"></img>
+        <img src="/mobifyjs/examples/assets/images/leaves-small.jpg"></img>
         <p>Third chunk</p>
     </div>
     <!-- SPLIT -->
