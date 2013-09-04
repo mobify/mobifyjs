@@ -151,20 +151,6 @@ Capture.insertSeamlessIframe = function(doc){
     return innerDoc;
 }
 
-Capture.cloneAndAppend = function(el, destDoc, onload) {
-    var cloneEl = destDoc.importNode(el, false);
-    cloneEl.onload = onload;
-    cloneEl.removeAttribute('type');
-    // TODO: use prefix in options for this:
-    if (el.innerHTML !== '') {
-        cloneEl.innerHTML = el.innerHTML;
-    }
-    destDoc.head.appendChild(cloneEl);
-    if (cloneEl.hasAttribute('x-src')) {
-        cloneEl.setAttribute('src', cloneEl.getAttribute('x-src'));
-    }
-}
-
 /**
  * Streaming capturing is a batshit loco insane way of being able to modify
  * streaming chunks of markup before the browser can request resources.
@@ -266,23 +252,12 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
 
-
-
         // In Webkit, resources requested in a non-src iframe do not have a
-        // referer attached. This is an issue for browsers like Typekit.
-        // We get around this by loading this script in the source document
-        // first, and the inner script will used the inflight or cached request,
-        // and the lack of referer isn't an issue.
+        // referer attached. This is an issue for scripts like Typekit.
+        // We get around this by loading this by manipulating the browsers
+        // history to trick it into thinking it is an src iframe.
         // AKA an insane hack for an insane hack.
-        var typekit = capturedDoc.querySelectorAll('script[x-src*="typekit"]')[0];
-        if (typekit) {
-            var typekitExec = typekit.nextElementSibling;
-            typekit.setAttribute('skip-optimize', '');
-            Capture.cloneAndAppend(typekit, sourceDoc, function() {
-                Capture.cloneAndAppend(typekitExec, sourceDoc);
-            });
-        }
-
+        iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href)
 
         // Execute chunk callback to allow users to make modifications to capturedDoc
         chunkCallback(capturedDoc);
