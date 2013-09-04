@@ -298,7 +298,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      *                          requests should be concatenated (split between
      *                          head and body).
      */
-    // loaded indicates if we have loaded the cached and inserted the loader
+    // `loaded` indicates if we have loaded the cached and inserted the loader
     // into the document
     var loaded = false;
     Jazzcat.optimizeScripts = function(scripts, options) {
@@ -368,6 +368,7 @@ define(["utils", "capture"], function(Utils, Capture) {
                 httpCache.load(httpCache.options);
                 var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
                 script.parentNode.insertBefore(httpLoaderScript, script);
+                // ensure this doesn't happen again for this page load
                 loaded = true;
             }
 

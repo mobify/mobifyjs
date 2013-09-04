@@ -151,6 +151,20 @@ Capture.insertSeamlessIframe = function(doc){
     return innerDoc;
 }
 
+Capture.cloneAndAppend = function(el, destDoc, onload) {
+    var cloneEl = destDoc.importNode(el, false);
+    cloneEl.onload = onload;
+    cloneEl.removeAttribute('type');
+    // TODO: use prefix in options for this:
+    if (el.innerHTML !== '') {
+        cloneEl.innerHTML = el.innerHTML;
+    }
+    destDoc.head.appendChild(cloneEl);
+    if (cloneEl.hasAttribute('x-src')) {
+        cloneEl.setAttribute('src', cloneEl.getAttribute('x-src'));
+    }
+}
+
 /**
  * Streaming capturing is a batshit loco insane way of being able to modify
  * streaming chunks of markup before the browser can request resources.
@@ -185,6 +199,7 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
     var sourceDoc = options && options.sourceDoc || document;
     // if no destination document specified, create iframe and use its document
     destDoc = options && options.destDoc || Capture.insertSeamlessIframe(sourceDoc);
+    var pollInterval = options && options.pollInterval || 100; // milliseconds
 
     // currently, the only way to reconstruct the destination DOM without
     // breaking script execution order is through document.write.
@@ -224,7 +239,6 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
     // Track what has been written to captured and destination docs for each chunk
     var plaintextBuffer = '';
     var writtenToDestDoc = '';
-    var pollInterval = 50; // milliseconds
 
     var pollPlaintext = function(){
         var finished = Utils.domIsReady(sourceDoc);
@@ -252,6 +266,24 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
 
+
+
+        // In Webkit, resources requested in a non-src iframe do not have a
+        // referer attached. This is an issue for browsers like Typekit.
+        // We get around this by loading this script in the source document
+        // first, and the inner script will used the inflight or cached request,
+        // and the lack of referer isn't an issue.
+        // AKA an insane hack for an insane hack.
+        var typekit = capturedDoc.querySelectorAll('script[x-src*="typekit"]')[0];
+        if (typekit) {
+            var typekitExec = typekit.nextElementSibling;
+            typekit.setAttribute('skip-optimize', '');
+            Capture.cloneAndAppend(typekit, sourceDoc, function() {
+                Capture.cloneAndAppend(typekitExec, sourceDoc);
+            });
+        }
+
+
         // Execute chunk callback to allow users to make modifications to capturedDoc
         chunkCallback(capturedDoc);
 
@@ -267,12 +299,12 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         }
 
         // TODO:
-        // * insert library back into the captured document
+        // * ~~Insert library back into the captured document~~
         // * Move Viewport tag into main document
         // * Move title tag into main document
         // * Potentially move every tag in head that is not a resources into the main
-        // * Move HTML/HEAD attributes into HTML/HEAD tags in iframe
-        // * What to do about refer?
+        // * ~~Move HTML/HEAD attributes into HTML/HEAD tags in iframe~~
+        // * ~~Solve referer issue~~
         // * Fix window.location maybe???
 
         // if document is ready, stop polling and close Captured document
