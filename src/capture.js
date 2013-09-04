@@ -216,6 +216,14 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         startCapturedHtml += Utils.outerHTML(main);
     }
 
+    // In Webkit, resources requested in a non-src iframe do not have a
+    // referer attached. This is an issue for scripts like Typekit.
+    // We get around this by manipulating the browsers
+    // history to trick it into thinking it is an src iframe.
+    // AKA an insane hack for an insane hack.
+    iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href)
+
+
     // Start the captured doc off write! (pun intended)
     capturedDoc.write(startCapturedHtml);
 
@@ -252,13 +260,6 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
 
-        // In Webkit, resources requested in a non-src iframe do not have a
-        // referer attached. This is an issue for scripts like Typekit.
-        // We get around this by loading this by manipulating the browsers
-        // history to trick it into thinking it is an src iframe.
-        // AKA an insane hack for an insane hack.
-        iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href)
-
         // Execute chunk callback to allow users to make modifications to capturedDoc
         chunkCallback(capturedDoc);
 
@@ -280,7 +281,8 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         // * Potentially move every tag in head that is not a resources into the main
         // * ~~Move HTML/HEAD attributes into HTML/HEAD tags in iframe~~
         // * ~~Solve referer issue~~
-        // * Fix window.location maybe???
+        // * Fix window.location. Maybe:
+        //   - window.addEventListener("popstate", function(e) { ... });
 
         // if document is ready, stop polling and close Captured document
         if (finished) {

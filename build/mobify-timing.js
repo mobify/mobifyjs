@@ -476,11 +476,16 @@ Utils.httpUrl = function(url) {
  * outerHTML polyfill - https://gist.github.com/889005
  */
 Utils.outerHTML = function(el){
-    var div = document.createElement('div');
-    div.appendChild(el.cloneNode(true));
-    var contents = div.innerHTML;
-    div = null;
-    return contents;
+    if (el.outerHTML) {
+        return el.outerHTML;
+    }
+    else {
+        var div = document.createElement('div');
+        div.appendChild(el.cloneNode(true));
+        var contents = div.innerHTML;
+        div = null;
+        return contents;
+    }
 };
 
 Utils.removeBySelector = function(selector, doc) {
@@ -722,8 +727,6 @@ Capture.insertSeamlessIframe = function(doc){
     // Open iframe an force all links and forms to target the parent
     var innerDoc = iframe.contentDocument;
     innerDoc.open();
-    // TODO: What if a site already has a base tag?
-    innerDoc.write('<base target="_parent" />');
     return innerDoc;
 }
 
@@ -761,6 +764,7 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
     var sourceDoc = options && options.sourceDoc || document;
     // if no destination document specified, create iframe and use its document
     destDoc = options && options.destDoc || Capture.insertSeamlessIframe(sourceDoc);
+    var pollInterval = options && options.pollInterval || 100; // milliseconds
 
     // currently, the only way to reconstruct the destination DOM without
     // breaking script execution order is through document.write.
@@ -771,42 +775,74 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
     // Create a "captured" DOM. This is the playground DOM that the user will
     // have that will stream into the destDoc per chunk after being manipulated
     var capturedDoc = sourceDoc.implementation.createHTMLDocument("");
+    capturedDoc.open("text/html", "replace");
+
+    // Start the captured doc with the original pieces of the source doc
+    var startCapturedHtml = Capture.getDoctype(sourceDoc) +
+                 Capture.openTag(sourceDoc.documentElement) +
+                 Capture.openTag(sourceDoc.head) +
+                 extractHTMLStringFromElement(sourceDoc.head) +
+                 // TODO: What if the site already has a base tag?
+                 '<base target="_parent" />';
+
+    // insert mobify.js (and main) into captured doc
+    var mobifyLibrary = Capture.getMobifyLibrary(sourceDoc);
+    startCapturedHtml += Utils.outerHTML(mobifyLibrary);
+
+    // If there is a main exec, insert it as well
+    var main = Capture.getMain();
+    if (main) {
+        startCapturedHtml += Utils.outerHTML(main);
+    }
+
+    // Start the captured doc off write! (pun intended)
+    capturedDoc.write(startCapturedHtml);
+
+    // Grab the plaintext element from the source document
     var plaintext = sourceDoc.getElementsByTagName('plaintext')[0];
 
     // Track what has been written to captured and destination docs for each chunk
-    var writtenToCapturedDoc = '';
+    var plaintextBuffer = '';
     var writtenToDestDoc = '';
-    var pollInterval = 50; // milliseconds
 
     var pollPlaintext = function(){
         var finished = Utils.domIsReady(sourceDoc);
 
         var html = plaintext.textContent;
-        var toWrite = html.substring(writtenToCapturedDoc.length);
+        var toWrite = html.substring(plaintextBuffer.length);
 
         // Only write up to the end of a tag
         // it is OK if this catches a &gt; or &lt; because we just care about
         // escaping attributes that fetch resources for this chunk
         toWrite = toWrite.substring(0, toWrite.lastIndexOf('>') + 1);
 
-        // If there is nothing to write, check again.
+        // If there is nothing to write, return and check again.
         if (toWrite === '' && !finished) {
             setTimeout(pollPlaintext, pollInterval);
             return;
         }
+
+        // Write our progress to plaintext buffer
+        plaintextBuffer += toWrite;
 
         // Escape resources for chunk and remove target=self
         toWrite = Capture.disable(toWrite, prefix).replace(/target="_self"/gi, '');
 
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
-        writtenToCapturedDoc += toWrite;
+
+        // In Webkit, resources requested in a non-src iframe do not have a
+        // referer attached. This is an issue for scripts like Typekit.
+        // We get around this by loading this by manipulating the browsers
+        // history to trick it into thinking it is an src iframe.
+        // AKA an insane hack for an insane hack.
+        iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href)
 
         // Execute chunk callback to allow users to make modifications to capturedDoc
         chunkCallback(capturedDoc);
 
         // Grab outerHTML of capturedDoc and write the diff to destDoc
-        html = capturedDoc.documentElement.outerHTML || Utils.outerHTML(capturedDoc.documentElement);
+        html = Utils.outerHTML(capturedDoc.documentElement);
         toWrite = html.substring(writtenToDestDoc.length, html.lastIndexOf('</body></html>'));
         writtenToDestDoc += toWrite;
 
@@ -817,16 +853,17 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         }
 
         // TODO:
-        // * insert library back into the captured document
+        // * ~~Insert library back into the captured document~~
         // * Move Viewport tag into main document
         // * Move title tag into main document
         // * Potentially move every tag in head that is not a resources into the main
-        // * Move HTML/HEAD attributes into HTML/HEAD tags in iframe
-        // * What to do about refer?
+        // * ~~Move HTML/HEAD attributes into HTML/HEAD tags in iframe~~
+        // * ~~Solve referer issue~~
         // * Fix window.location maybe???
 
         // if document is ready, stop polling and close Captured document
-        if (Utils.domIsReady(sourceDoc)) {
+        if (finished) {
+            window.capturedDoc = capturedDoc; // attach to window for easy debugging
             destDoc.close();
             //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
         }
@@ -921,8 +958,9 @@ Capture.openTag = function(element) {
 /**
  * Return a string for the doctype of the current document.
  */
-Capture.prototype.getDoctype = function() {
-    var doctypeEl = this.doc.doctype || [].filter.call(this.doc.childNodes, function(el) {
+Capture.getDoctype = function(doc) {
+    var doc = doc || document;
+    var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
             return el.nodeType == Node.DOCUMENT_TYPE_NODE
         })[0];
 
@@ -945,7 +983,7 @@ Capture.prototype.getDoctype = function() {
     var htmlEl = doc.getElementsByTagName('html')[0];
 
     captured = {
-        doctype: this.getDoctype(),
+        doctype: Capture.getDoctype(doc),
         htmlOpenTag: Capture.openTag(htmlEl),
         headOpenTag: Capture.openTag(headEl),
         bodyOpenTag: Capture.openTag(bodyEl),
@@ -1084,7 +1122,7 @@ Capture.prototype.createDocumentFragments = function() {
  */
 Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
-    var html = Capture.enable(doc.documentElement.outerHTML || Utils.outerHTML(doc.documentElement), this.prefix);
+    var html = Capture.enable(Utils.outerHTML(doc.documentElement), this.prefix);
     var htmlWithDoctype = this.doctype + html;
     return htmlWithDoctype;
 };
@@ -1120,27 +1158,39 @@ Capture.prototype.getCapturedDoc = function(options) {
     return this.capturedDoc;
 };
 
-/**
- * Insert Mobify scripts back into the captured doc
- * in order for the library to work post-document.write
- */
-Capture.prototype.insertMobifyScripts = function() {
-    var doc = this.capturedDoc;
-    // After document.open(), all objects will be removed.
-    // To provide our library functionality afterwards, we
-    // must re-inject the script.
-    var mobifyjsScript = document.getElementById("mobify-js");
+Capture.getMobifyLibrary = function(doc) {
+    var doc = doc || document;
+    var mobifyjsScript = doc.getElementById("mobify-js");
 
     // v6 tag backwards compatibility change
     if (!mobifyjsScript) {
-        mobifyjsScript = document.getElementsByTagName("script")[0];
+        mobifyjsScript = doc.getElementsByTagName("script")[0];
         mobifyjsScript.id = "mobify-js";
         mobifyjsScript.setAttribute("class", "mobify");
     }
 
-    var head = this.headEl;
+    return mobifyjsScript;
+};
+
+Capture.getMain = function(doc) {
+    var doc = doc || document;
+    var mainScript = doc.getElementById("main-executable");
+    return mainScript;
+}
+
+/**
+ * Insert Mobify scripts back into the captured doc
+ * in order for the library to work post-document.write
+ */
+Capture.insertMobifyScripts = function(doc) {
+    // After document.open(), all objects will be removed.
+    // To provide our library functionality afterwards, we
+    // must re-inject the script.
+    var mobifyjsScript = Capture.getMobifyLibrary(doc);
+
+    var head = doc.head;
     // If main script exists, re-inject it.
-    var mainScript = document.getElementById("main-executable");
+    var mainScript = Capture.getMain(doc);
     if (mainScript) {
         // Since you can't move nodes from one document to another,
         // we must clone it first using importNode:
@@ -1163,7 +1213,7 @@ Capture.prototype.renderCapturedDoc = function(options) {
     var doc = this.capturedDoc;
 
     // Insert the mobify scripts back into the captured doc
-    this.insertMobifyScripts();
+    Capture.insertMobifyScripts(doc);
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists
@@ -1803,7 +1853,9 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      *                          requests should be concatenated (split between
      *                          head and body).
      */
-
+    // `loaded` indicates if we have loaded the cached and inserted the loader
+    // into the document
+    var loaded = false;
     Jazzcat.optimizeScripts = function(scripts, options) {
         if (options && options.cacheOverrideTime !== undefined) {
             Utils.extend(httpCache.options,
@@ -1814,12 +1866,19 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             return scripts;
         }
 
+        // Remove mobify script(s) from scripts array
+        if (/mobify/i.test(scripts[0].className)) {
+            var scripts = Array.prototype.slice.call(scripts);
+            scripts.splice(0, 1);
+            // Check for main executable as well
+            if (scripts.length > 0 && /mobify/i.test(scripts[0].className)) {
+                scripts.splice(0, 1);
+            }
+        }
+
         options = Utils.extend({}, Jazzcat.defaults, options || {});
         var jsonp = (options.responseType === 'jsonp');
         var concat = options.concat;
-
-        // load data from localStorage
-        httpCache.load(httpCache.options);
 
         // helper method for inserting the loader script
         // before the first uncached script in the "uncached" array
@@ -1842,21 +1901,31 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 urls: []
             }
         };
-        // Insert the httpCache loader before the first script
-        if (jsonp) {
-            var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-            scripts[0].parentNode.insertBefore(httpLoaderScript, scripts[0]);
-        }
 
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
 
-            url = script.getAttribute(options.attribute);
+            // Skip script if it has been optimized already
+            if (script.hasAttribute('optimized') || script.hasAttribute('skip-optimize')) {
+                continue;
+            }
 
             // skip if the script is inline
+            url = script.getAttribute(options.attribute);
             if (!url) continue;
             url = Utils.absolutify(url);
             if (!Utils.httpUrl(url)) continue;
+
+            // TODO: Check for async/defer
+
+            // Load what we have in http cache, and insert loader into document
+            if (jsonp && !loaded) {
+                httpCache.load(httpCache.options);
+                var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
+                script.parentNode.insertBefore(httpLoaderScript, script);
+                // ensure this doesn't happen again for this page load
+                loaded = true;
+            }
 
             var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
 
@@ -1942,6 +2011,8 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         var loadScript;
         if (urls && urls.length) {
             loadScript = document.createElement('script');
+            // Set the script to "optimized"
+            loadScript.setAttribute('optimized', '');
             loadScript.setAttribute(options.attribute, Jazzcat.getURL(urls, options));
         }
         return loadScript;
