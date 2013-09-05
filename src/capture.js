@@ -132,6 +132,14 @@ Capture.init = function(callback, doc, prefix) {
     }
 };
 
+var applyMethodToDifferentObject = function(srcObj, destObj, method) {
+    var oldMethod = srcObj[method];
+    srcObj[method] = function() {
+        oldMethod.apply(srcObj, arguments);
+        destObj[method].apply(destObj, arguments);
+    };
+}
+
 /**
  * Creates an iframe and inserts it into a document, and makes the iframe
  * as seamless as possible through CSS
@@ -139,16 +147,15 @@ Capture.init = function(callback, doc, prefix) {
  */
 Capture.insertSeamlessIframe = function(doc){
     var doc = doc || document;
-    var iframe = window.iframe = doc.createElement("iframe");
+    var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
     iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%; height:100%;box-sizing:border-box;background-color: transparent;border: 0px none transparent;padding: 0px;'
     // Insert the iframe into the doc
     var plaintext = doc.getElementsByTagName('plaintext')[0];
     doc.body.insertBefore(iframe, plaintext);
     // Open iframe an force all links and forms to target the parent
-    var innerDoc = iframe.contentDocument;
-    innerDoc.open();
-    return innerDoc;
+    iframe.contentDocument.open();
+    return iframe;
 }
 
 /**
@@ -183,8 +190,16 @@ Capture.insertSeamlessIframe = function(doc){
 Capture.initStreamingCapture = function(chunkCallback, options) {
     var prefix = options && options.prefix || 'x-';
     var sourceDoc = options && options.sourceDoc || document;
+    var destDoc;
+    var iframe;
     // if no destination document specified, create iframe and use its document
-    destDoc = options && options.destDoc || Capture.insertSeamlessIframe(sourceDoc);
+    if (options && options.destDoc) {
+        destDoc = options.destDoc;
+    }
+    else {
+        iframe = Capture.insertSeamlessIframe(sourceDoc);
+        destDoc = iframe.contentDocument;
+    }
     var pollInterval = options && options.pollInterval || 100; // milliseconds
 
     // currently, the only way to reconstruct the destination DOM without
@@ -216,13 +231,34 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         startCapturedHtml += Utils.outerHTML(main);
     }
 
-    // In Webkit, resources requested in a non-src iframe do not have a
-    // referer attached. This is an issue for scripts like Typekit.
-    // We get around this by manipulating the browsers
-    // history to trick it into thinking it is an src iframe.
-    // AKA an insane hack for an insane hack.
-    iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href)
+    if (iframe) {
+        // In Webkit, resources requested in a non-src iframe do not have a
+        // referer attached. This is an issue for scripts like Typekit.
+        // We get around this by manipulating the browsers
+        // history to trick it into thinking it is an src iframe.
+        // AKA an insane hack for an insane hack.
+        iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
 
+        // If someone uses window.location to navigate, we must ensure that the
+        // history in the parent window matches
+        window.history.replaceState({}, iframe.contentDocument.title, window.location.href);
+
+        // Override various history APIs in iframe and match that in the outer frame
+        var iframeHistory = iframe.contentWindow.history;
+        var parentHistory = window.parent.history
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'replaceState');
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'pushState');
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'go');
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'forward');
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'back');
+
+        var oldPushState = iframe.contentWindow.history.pushState;
+        iframe.contentWindow.history.pushState = function(state, title, url) {
+            oldPushState.apply(this, arguments);
+            window.parent.history.pushState(state, title, url);
+        }
+
+    }
 
     // Start the captured doc off write! (pun intended)
     capturedDoc.write(startCapturedHtml);
