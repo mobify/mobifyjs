@@ -2,46 +2,7 @@ define(["utils"], function(Utils) {
 
 var ResizeImages = window.ResizeImages = {};
 
-function getPhysicalScreenSize(devicePixelRatio) {
 
-    function multiplyByPixelRatio(sizes) {
-        var dpr = devicePixelRatio || 1;
-
-        sizes.width = Math.round(sizes.width * dpr);
-        sizes.height = Math.round(sizes.height * dpr);
-
-        return sizes;
-    }
-
-    var iOS = navigator.userAgent.match(/iphone|ipod|ipad/i);
-    var androidVersion = (navigator.userAgent.match(/android (\d)/i) || {})[1];
-
-    var sizes = {
-        width: window.outerWidth
-      , height: window.outerHeight
-    };
-
-    // Old Android and BB10 use physical pixels in outerWidth/Height, which is what we need
-    // New Android (4.0 and above) use CSS pixels, requiring devicePixelRatio multiplication
-    // iOS lies about outerWidth/Height when zooming, but does expose CSS pixels in screen.width/height
-
-    if (!iOS) {
-        if (androidVersion > 3) return multiplyByPixelRatio(sizes);
-        return sizes;
-    }
-
-    var isLandscape = window.orientation % 180;
-
-    if (isLandscape) {
-        sizes.height = screen.width;
-        sizes.width = screen.height;
-    } else {
-        sizes.width = screen.width;
-        sizes.height = screen.height;
-    }
-
-    return multiplyByPixelRatio(sizes);
-}
 
 var localStorageWebpKey = 'Mobify-Webp-Support-v2';
 
@@ -252,7 +213,7 @@ ResizeImages.resize = function(elements, options) {
 
     var dpr = opts.devicePixelRatio || window.devicePixelRatio;
 
-    var screenSize = getPhysicalScreenSize(dpr);
+    var screenSize = Utils.getPhysicalScreenSize(dpr);
 
     // If maxHeight/maxWidth are not specified, use screen dimentions
     // in device pixels

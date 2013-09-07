@@ -134,6 +134,9 @@ Capture.init = function(callback, doc, prefix) {
 
 var applyMethodToDifferentObject = function(srcObj, destObj, method) {
     var oldMethod = srcObj[method];
+    if (!oldMethod) {
+        return;
+    }
     srcObj[method] = function() {
         oldMethod.apply(srcObj, arguments);
         destObj[method].apply(destObj, arguments);
@@ -149,7 +152,7 @@ Capture.insertSeamlessIframe = function(doc){
     var doc = doc || document;
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
-    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%; height:100%;box-sizing:border-box;background-color: transparent;border: 0px none transparent;padding: 0px;'
+    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;background-color: transparent;border: 0px none transparent;padding: 0px;'
     // Insert the iframe into the doc
     var plaintext = doc.getElementsByTagName('plaintext')[0];
     doc.body.insertBefore(iframe, plaintext);
@@ -187,9 +190,11 @@ Capture.insertSeamlessIframe = function(doc){
  * then take the delta of this capturedDocument and render it into the
  * destination document (which by default is a "seamless" iframe).
  */
-Capture.initStreamingCapture = function(chunkCallback, options) {
+Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options) {
     var prefix = options && options.prefix || 'x-';
     var sourceDoc = options && options.sourceDoc || document;
+    // Grab the plaintext element from the source document
+    var plaintext = sourceDoc.getElementsByTagName('plaintext')[0];
     var destDoc;
     var iframe;
     // if no destination document specified, create iframe and use its document
@@ -202,6 +207,20 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
     }
     var pollInterval = options && options.pollInterval || 100; // milliseconds
 
+    // TODO Fix: For most devices, the width of the HTML element is 
+    // equivilent to the window.outerWidth. If they are not equal, we have
+    // some strange viewport problem.
+    //
+    // setTimeout(function(){
+    //     if (document.documentElement.offsetWidth !== window.outerWidth) {
+    //         var style = document.createElement('style');
+    //         style.innerHTML = 'html{ width: 320px; }';
+    //         document.head.appendChild(style);
+    //     }
+    //     alert(document.getElementsByTagName('html')[0].offsetWidth);
+    //     alert(window.outerWidth/window.devicePixelRatio);
+    // }, 500)
+
     // currently, the only way to reconstruct the destination DOM without
     // breaking script execution order is through document.write.
     // TODO: Figure out way without document.write, and then make
@@ -210,16 +229,24 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
     // Create a "captured" DOM. This is the playground DOM that the user will
     // have that will stream into the destDoc per chunk after being manipulated
-    var capturedDoc = sourceDoc.implementation.createHTMLDocument("");
+    // var capturedDoc = sourceDoc.implementation.createHTMLDocument("");
+    var captureIframe = sourceDoc.createElement("iframe");
+    captureIframe.id = 'captured-iframe';
+    captureIframe.style.cssText = 'display:none;'
+    sourceDoc.body.insertBefore(captureIframe, plaintext);
+    var capturedDoc = captureIframe.contentDocument;
     capturedDoc.open("text/html", "replace");
 
     // Start the captured doc with the original pieces of the source doc
     var startCapturedHtml = Capture.getDoctype(sourceDoc) +
                  Capture.openTag(sourceDoc.documentElement) +
                  Capture.openTag(sourceDoc.head) +
-                 extractHTMLStringFromElement(sourceDoc.head) +
-                 // TODO: What if the site already has a base tag?
-                 '<base target="_parent" />';
+                 // Even if there is another base tag in the site that sets
+                 // target, the first one declared will be used
+                 // TODO: Write tests to verify this for all of our browsers.
+                 '<base target="_parent" />' +
+                 // Grab and insert all existing HTML above plaintext tag
+                 extractHTMLStringFromElement(sourceDoc.head);
 
     // insert mobify.js (and main) into captured doc
     var mobifyLibrary = Capture.getMobifyLibrary(sourceDoc);
@@ -237,7 +264,11 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         // We get around this by manipulating the browsers
         // history to trick it into thinking it is an src iframe.
         // AKA an insane hack for an insane hack.
-        iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
+        try {
+            iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
+        } catch (e) {
+            console.log("Exception using replace state: " + e)
+        }
 
         // If someone uses window.location to navigate, we must ensure that the
         // history in the parent window matches
@@ -245,12 +276,12 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
         // Override various history APIs in iframe and match that in the outer frame
         var iframeHistory = iframe.contentWindow.history;
-        var parentHistory = window.parent.history
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'replaceState');
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'pushState');
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'go');
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'forward');
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'back');
+        var parentHistory = window.parent.history;
+        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'replaceState');
+        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'pushState');
+        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'go');
+        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'forward');
+        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'back');
 
         var oldPushState = iframe.contentWindow.history.pushState;
         iframe.contentWindow.history.pushState = function(state, title, url) {
@@ -260,11 +291,10 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
     }
 
+    startCapturedHtml = Capture.disable(startCapturedHtml, prefix);
+
     // Start the captured doc off write! (pun intended)
     capturedDoc.write(startCapturedHtml);
-
-    // Grab the plaintext element from the source document
-    var plaintext = sourceDoc.getElementsByTagName('plaintext')[0];
 
     // Track what has been written to captured and destination docs for each chunk
     var plaintextBuffer = '';
@@ -301,7 +331,8 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
 
         // Grab outerHTML of capturedDoc and write the diff to destDoc
         html = Utils.outerHTML(capturedDoc.documentElement);
-        toWrite = html.substring(writtenToDestDoc.length, html.lastIndexOf('</body></html>'));
+        var endIndex = (html.lastIndexOf('</body></html>') === -1) ? html.lastIndexOf('</head></html>') : html.lastIndexOf('</body></html>'); 
+        toWrite = html.substring(writtenToDestDoc.length, endIndex);
         writtenToDestDoc += toWrite;
 
         // Unescape chunk
@@ -317,13 +348,16 @@ Capture.initStreamingCapture = function(chunkCallback, options) {
         // * Potentially move every tag in head that is not a resources into the main
         // * ~~Move HTML/HEAD attributes into HTML/HEAD tags in iframe~~
         // * ~~Solve referer issue~~
-        // * Fix window.location. Maybe:
-        //   - window.addEventListener("popstate", function(e) { ... });
+        // * ~~Fix window.location.~~
+        // * Pass a capture object instead of a captured doc to the chunk callback
 
-        // if document is ready, stop polling and close Captured document
+        // if document is ready, stop polling and ensure all documents involved are closed
         if (finished) {
             window.capturedDoc = capturedDoc; // attach to window for easy debugging
+            capturedDoc.close();
             destDoc.close();
+            sourceDoc.close();
+            finishedCallback();
             //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
         }
         else {

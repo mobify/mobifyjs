@@ -437,6 +437,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      */
     Jazzcat.getHttpCacheLoaderScript = function() {
         var loadFromCacheScript = document.createElement('script');
+        loadFromCacheScript.type = 'text/mobify-script';
         loadFromCacheScript.innerHTML = (httpCache.options.overrideTime ?
           "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
           "Jazzcat.httpCache.load();" );
