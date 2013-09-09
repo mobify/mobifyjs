@@ -210,7 +210,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     // TODO Fix: For most devices, the width of the HTML element is 
     // equivilent to the window.outerWidth. If they are not equal, we have
     // some strange viewport problem.
-    //
+    
     // setTimeout(function(){
     //     if (document.documentElement.offsetWidth !== window.outerWidth) {
     //         var style = document.createElement('style');
@@ -218,8 +218,9 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     //         document.head.appendChild(style);
     //     }
     //     alert(document.getElementsByTagName('html')[0].offsetWidth);
+    //     alert(document.getElementsByTagName('body')[0].offsetWidth);
     //     alert(window.outerWidth/window.devicePixelRatio);
-    // }, 500)
+    // }, 5000)
 
     // currently, the only way to reconstruct the destination DOM without
     // breaking script execution order is through document.write.
@@ -267,7 +268,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         try {
             iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
         } catch (e) {
-            console.log("Exception using replace state: " + e)
+            // This will throw an exception on Firefox
         }
 
         // If someone uses window.location to navigate, we must ensure that the
@@ -277,18 +278,12 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // Override various history APIs in iframe and match that in the outer frame
         var iframeHistory = iframe.contentWindow.history;
         var parentHistory = window.parent.history;
-        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'replaceState');
-        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'pushState');
-        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'go');
-        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'forward');
-        // applyMethodToDifferentObject(iframeHistory, parentHistory, 'back');
-
-        var oldPushState = iframe.contentWindow.history.pushState;
-        iframe.contentWindow.history.pushState = function(state, title, url) {
-            oldPushState.apply(this, arguments);
-            window.parent.history.pushState(state, title, url);
-        }
-
+        // TODO: Use for loop.
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'replaceState');
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'pushState');
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'go');
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'forward');
+        applyMethodToDifferentObject(iframeHistory, parentHistory, 'back');
     }
 
     startCapturedHtml = Capture.disable(startCapturedHtml, prefix);
@@ -326,26 +321,46 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
 
+
+        if (iframe) {
+            // Move certain elements that should be in the top-level document,
+            // such as meta viewport tags and title tags
+            var elsToMove = capturedDoc.querySelectorAll('meta, title');
+            if (elsToMove.length > 0) {
+                for (var i = 0, len=elsToMove.length; i < len; i++) {
+                    var el = elsToMove[i];
+                    try {
+                        sourceDoc.head.appendChild(el);
+                    } catch (e) {
+                        // Some browsers will throw WRONG_DOCUMENT_ERR
+                        var elClone = sourceDoc.importNode(el, false);
+                        sourceDoc.head.appendChild(elClone);                        
+                    }
+                }
+            }
+        }
+
         // Execute chunk callback to allow users to make modifications to capturedDoc
         chunkCallback(capturedDoc);
 
-        // Grab outerHTML of capturedDoc and write the diff to destDoc
-        html = Utils.outerHTML(capturedDoc.documentElement);
-        var endIndex = (html.lastIndexOf('</body></html>') === -1) ? html.lastIndexOf('</head></html>') : html.lastIndexOf('</body></html>'); 
-        toWrite = html.substring(writtenToDestDoc.length, endIndex);
-        writtenToDestDoc += toWrite;
+        if (capturedDoc.documentElement) {
+            // Grab outerHTML of capturedDoc and write the diff to destDoc
+            html = Utils.outerHTML(capturedDoc.documentElement);
+            var endIndex = (html.lastIndexOf('</body></html>') === -1) ? html.lastIndexOf('</head></html>') : html.lastIndexOf('</body></html>'); 
+            toWrite = html.substring(writtenToDestDoc.length, endIndex);
+            writtenToDestDoc += toWrite;
 
-        // Unescape chunk
-        toWrite = Capture.enable(toWrite, prefix);
-        if (docWriteIntoDest) {
-            destDoc.write(toWrite);
+            // Unescape chunk
+            toWrite = Capture.enable(toWrite, prefix);
+            if (docWriteIntoDest) {
+                destDoc.write(toWrite);
+            }
         }
 
         // TODO:
         // * ~~Insert library back into the captured document~~
-        // * Move Viewport tag into main document
-        // * Move title tag into main document
-        // * Potentially move every tag in head that is not a resources into the main
+        // * ~~Move meta tags into main document~~
+        // * ~~Move title tag into main document~~
         // * ~~Move HTML/HEAD attributes into HTML/HEAD tags in iframe~~
         // * ~~Solve referer issue~~
         // * ~~Fix window.location.~~
@@ -357,7 +372,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
             capturedDoc.close();
             destDoc.close();
             sourceDoc.close();
-            finishedCallback();
+            finishedCallback && finishedCallback();
             //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
         }
         else {
