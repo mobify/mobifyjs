@@ -392,6 +392,8 @@ define(["utils", "capture"], function(Utils, Capture) {
                 // Rewriting script to grab contents from our in-memory cache
                 // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
                 script.innerHTML =  options.execCallback + "('" + url + "');";
+                script.type = 'text/mobify-script';
+
                 // Remove the src attribute
                 script.removeAttribute(options.attribute);
             }
@@ -416,8 +418,7 @@ define(["utils", "capture"], function(Utils, Capture) {
             insertLoader(toConcat['body'].firstScript, toConcat['body'].urls);
         }
 
-        // if responseType is js and we are concatenating,
-        // remove original scripts
+        // if responseType is js and we are concatenating, remove original scripts
         if (!jsonp && concat) {
             for (var i=0, len=scripts.length; i<len; i++) {
                 var script = scripts[i];
@@ -427,6 +428,10 @@ define(["utils", "capture"], function(Utils, Capture) {
                 }
             }
         }
+
+        // Set loaded to true incase `optimizeScripts` is called twice on the
+        // same pageload.
+        loaded = false;
 
         return scripts;
     };
@@ -560,7 +565,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         responseType: 'jsonp',
         execCallback: 'Jazzcat.exec',
         loadCallback: 'Jazzcat.load',
-        concat: true,
+        concat: false,
         projectName: '',
     };
 
