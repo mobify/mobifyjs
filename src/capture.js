@@ -688,27 +688,27 @@ Capture.getMain = function(doc) {
  * Insert Mobify scripts back into the captured doc
  * in order for the library to work post-document.write
  */
-Capture.insertMobifyScripts = function(doc) {
+Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     // After document.open(), all objects will be removed.
     // To provide our library functionality afterwards, we
     // must re-inject the script.
-    var mobifyjsScript = Capture.getMobifyLibrary(doc);
+    var mobifyjsScript = Capture.getMobifyLibrary(sourceDoc);
 
-    var head = doc.head;
+    var head = destDoc.head;
     // If main script exists, re-inject it.
-    var mainScript = Capture.getMain(doc);
+    var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {
         // Since you can't move nodes from one document to another,
         // we must clone it first using importNode:
         // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
-        var mainClone = doc.importNode(mainScript, false);
+        var mainClone = destDoc.importNode(mainScript, false);
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
         head.insertBefore(mainClone, head.firstChild)
     }
     // reinject mobify.js file
-    var mobifyjsClone = doc.importNode(mobifyjsScript, false);
+    var mobifyjsClone = destDoc.importNode(mobifyjsScript, false);
     head.insertBefore(mobifyjsClone, head.firstChild);
 };
 
@@ -716,16 +716,14 @@ Capture.insertMobifyScripts = function(doc) {
  * Render the captured document
  */
 Capture.prototype.renderCapturedDoc = function(options) {
-    var doc = this.capturedDoc;
-
     // Insert the mobify scripts back into the captured doc
-    Capture.insertMobifyScripts(doc);
+    Capture.insertMobifyScripts(this.doc, this.capturedDoc);
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists
     if (window.Mobify && window.Mobify.points) {
         var body = this.bodyEl;
-        var date = doc.createElement("div");
+        var date = this.capturedDoc.createElement("div");
         date.id = "mobify-point";
         date.setAttribute("style", "display: none;")
         date.innerHTML = window.Mobify.points[0];
