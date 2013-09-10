@@ -152,7 +152,7 @@ Capture.insertSeamlessIframe = function(doc){
     var doc = doc || document;
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
-    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;background-color: transparent;border: 0px none transparent;padding: 0px;'
+    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color: transparent;border: 0px none transparent;'
     // Insert the iframe into the doc
     var plaintext = doc.getElementsByTagName('plaintext')[0];
     doc.body.insertBefore(iframe, plaintext);
@@ -206,22 +206,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         destDoc = iframe.contentDocument;
     }
     var pollInterval = options && options.pollInterval || 100; // milliseconds
-
-    // TODO Fix: For most devices, the width of the HTML element is 
-    // equivilent to the window.outerWidth. If they are not equal, we have
-    // some strange viewport problem.
     
-    // setTimeout(function(){
-    //     if (document.documentElement.offsetWidth !== window.outerWidth) {
-    //         var style = document.createElement('style');
-    //         style.innerHTML = 'html{ width: 320px; }';
-    //         document.head.appendChild(style);
-    //     }
-    //     alert(document.getElementsByTagName('html')[0].offsetWidth);
-    //     alert(document.getElementsByTagName('body')[0].offsetWidth);
-    //     alert(window.outerWidth/window.devicePixelRatio);
-    // }, 5000)
-
     // currently, the only way to reconstruct the destination DOM without
     // breaking script execution order is through document.write.
     // TODO: Figure out way without document.write, and then make
@@ -334,10 +319,23 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
                     } catch (e) {
                         // Some browsers will throw WRONG_DOCUMENT_ERR
                         var elClone = sourceDoc.importNode(el, false);
-                        sourceDoc.head.appendChild(elClone);                        
+                        sourceDoc.head.appendChild(elClone);      
                     }
                 }
             }
+
+            // In Android 2.3, widths of iframes and cause an override of the width
+            // if the html element of the top-level document. We detect for that
+            // and change the width of the iframe
+            if (document.documentElement.offsetWidth !== window.outerWidth) {
+                var iframes = Array.prototype.slice.call(capturedDoc.querySelectorAll('iframe'));
+                //Utils.removeElements(capturedDoc.querySelectorAll('iframe'));
+                iframes.filter(function(iframe){
+                    iframe.width = '100%';
+                });
+            }
+            // var i = capturedDoc.createElement('iframe');
+            // capturedDoc.body.appendChild(i);
         }
 
         // Execute chunk callback to allow users to make modifications to capturedDoc
@@ -365,6 +363,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // * ~~Solve referer issue~~
         // * ~~Fix window.location.~~
         // * Pass a capture object instead of a captured doc to the chunk callback
+        // * ~~Fix iframe issue on Android 2.3~~
 
         // if document is ready, stop polling and ensure all documents involved are closed
         if (finished) {
