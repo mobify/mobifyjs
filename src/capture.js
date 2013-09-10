@@ -144,20 +144,15 @@ var applyMethodToDifferentObject = function(srcObj, destObj, method) {
 }
 
 /**
- * Creates an iframe and inserts it into a document, and makes the iframe
- * as seamless as possible through CSS
+ * Creates an iframe and makes it as seamless as possible through CSS
  * TODO: Test out Seamless attribute when available in latest browsers
  */
-Capture.insertSeamlessIframe = function(doc){
+Capture.createSeamlessIframe = function(doc){
     var doc = doc || document;
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
     iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color: transparent;border: 0px none transparent;'
-    // Insert the iframe into the doc
-    var plaintext = doc.getElementsByTagName('plaintext')[0];
-    doc.body.insertBefore(iframe, plaintext);
     // Open iframe an force all links and forms to target the parent
-    iframe.contentDocument.open();
     return iframe;
 }
 
@@ -192,6 +187,7 @@ Capture.insertSeamlessIframe = function(doc){
  */
 Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options) {
     var prefix = options && options.prefix || 'x-';
+    var pollInterval = options && options.pollInterval || 100; // milliseconds
     var sourceDoc = options && options.sourceDoc || document;
     // Grab the plaintext element from the source document
     var plaintext = sourceDoc.getElementsByTagName('plaintext')[0];
@@ -202,20 +198,24 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         destDoc = options.destDoc;
     }
     else {
-        iframe = Capture.insertSeamlessIframe(sourceDoc);
+        iframe = Capture.createSeamlessIframe(sourceDoc);
+        sourceDoc.body.insertBefore(iframe, plaintext);
         destDoc = iframe.contentDocument;
     }
-    var pollInterval = options && options.pollInterval || 100; // milliseconds
-    
     // currently, the only way to reconstruct the destination DOM without
     // breaking script execution order is through document.write.
     // TODO: Figure out way without document.write, and then make
     //       `docWriteIntoDest` configurable through options
     var docWriteIntoDest = true;
+    if (docWriteIntoDest) {
+        // Open the destination document
+        destDoc.open("text/html", "replace");
+    }
 
     // Create a "captured" DOM. This is the playground DOM that the user will
-    // have that will stream into the destDoc per chunk after being manipulated
-    // var capturedDoc = sourceDoc.implementation.createHTMLDocument("");
+    // have that will stream into the destDoc per chunk.
+    // Using an iframe instead of `implementation.createHTMLDocument` because
+    // you cannot document.write into a document created that way in Firefox
     var captureIframe = sourceDoc.createElement("iframe");
     captureIframe.id = 'captured-iframe';
     captureIframe.style.cssText = 'display:none;'
@@ -245,8 +245,8 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     }
 
     if (iframe) {
-        // In Webkit, resources requested in a non-src iframe do not have a
-        // referer attached. This is an issue for scripts like Typekit.
+        // In Webkit/Blink, resources requested in a non-src iframe do not have
+        // a referer attached. This is an issue for scripts like Typekit.
         // We get around this by manipulating the browsers
         // history to trick it into thinking it is an src iframe.
         // AKA an insane hack for an insane hack.
@@ -260,15 +260,14 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // history in the parent window matches
         window.history.replaceState({}, iframe.contentDocument.title, window.location.href);
 
-        // Override various history APIs in iframe and match that in the outer frame
-        var iframeHistory = iframe.contentWindow.history;
-        var parentHistory = window.parent.history;
-        // TODO: Use for loop.
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'replaceState');
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'pushState');
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'go');
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'forward');
-        applyMethodToDifferentObject(iframeHistory, parentHistory, 'back');
+        // Override various history APIs in iframe and ensure that they run in
+        // the parent document as well
+        // var iframeHistory = iframe.contentWindow.history;
+        // var parentHistory = window.parent.history;
+        // var historyMethods = ['replaceState', 'pushState', 'go', 'forward', 'back'];
+        // historyMethods.forEach(function(element) {
+        //     applyMethodToDifferentObject(iframeHistory, parentHistory, element);
+        // });
     }
 
     startCapturedHtml = Capture.disable(startCapturedHtml, prefix);
@@ -372,7 +371,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
             destDoc.close();
             sourceDoc.close();
             finishedCallback && finishedCallback();
-            //finishedCallback(); // TODO: what would a user want passed to this CB? Do we need it?
+            // TODO: Maybe remove captured-iframe and plaintext tags when finished?
         }
         else {
             setTimeout(pollPlaintext, pollInterval);
