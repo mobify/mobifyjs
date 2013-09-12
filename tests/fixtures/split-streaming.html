@@ -11,10 +11,14 @@ function() {
     var capturing = window.Mobify && window.Mobify.capturing || false;
     if (capturing) {
         // Grab reference to a newly created document
-        Mobify.Capture.initStreamingCapture(function(capturedDoc){
+        Mobify.Capture.initStreamingCapture(function(capture){
+            // Grab reference to the captured document in progres
+            var capturedDoc = capture.capturedDoc;
+
             // optimize scripts
             var scripts = capturedDoc.querySelectorAll('script');
             Mobify.Jazzcat.optimizeScripts(scripts);
+
             // optimize images
             var images = capturedDoc.querySelectorAll('img, picture');
             Mobify.ResizeImages.resize(images);

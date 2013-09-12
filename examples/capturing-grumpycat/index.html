@@ -9,7 +9,9 @@
 // calls to APIs go here (or path to a main.js)
 function() {
     // Grab reference to a newly created document
-    Mobify.Capture.initStreamingCapture(function(capturedDoc){
+    Mobify.Capture.initStreamingCapture(function(capture){
+        // Grab reference to the captured document in progres
+        var capturedDoc = capture.capturedDoc;
         var grumpyUrl = "/mobifyjs/examples/assets/images/grumpycat.jpg"
 
         var imgs = capturedDoc.getElementsByTagName("img");

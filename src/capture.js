@@ -86,22 +86,44 @@ function extractHTMLStringFromElement(container) {
     }).join('');
 }
 
+/**
+ * Takes a method on one source object and overrides it to call the method on
+ * a destination object (in addition to calling the method on the source object)
+ */
+var applyMethodToDifferentObject = function(srcObj, destObj, method) {
+    var oldMethod = srcObj[method];
+    if (!oldMethod) {
+        return;
+    }
+    srcObj[method] = function() {
+        oldMethod.apply(srcObj, arguments);
+        destObj[method].apply(destObj, arguments);
+    };
+}
+
+/**
+ * Creates an iframe and makes it as seamless as possible through CSS
+ * TODO: Test out Seamless attribute when available in latest browsers
+ */
+var createSeamlessIframe = function(doc){
+    var doc = doc || document;
+    var iframe = doc.createElement("iframe");
+    // set attribute to make the iframe appear seamless to the user
+    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color: transparent;border: 0px none transparent;'
+    // Open iframe an force all links and forms to target the parent
+    return iframe;
+}
+
 // cached div used repeatedly to create new elements
 var cachedDiv = document.createElement('div');
 
 // ##
 // # Constructor
 // ##
-var Capture = function(doc, prefix) {
-    this.doc = doc;
+var Capture = function(sourceDoc, prefix) {
+    this.sourceDoc = sourceDoc;
     this.prefix = prefix || "x-";
     if (window.Mobify) window.Mobify.prefix = this.prefix;
-
-    var capturedStringFragments = this.createDocumentFragmentsStrings();
-    Utils.extend(this, capturedStringFragments);
-
-    var capturedDOMFragments = this.createDocumentFragments();
-    Utils.extend(this, capturedDOMFragments);
 };
 
 Capture.init = function(callback, doc, prefix) {
@@ -109,6 +131,10 @@ Capture.init = function(callback, doc, prefix) {
 
     var createCapture = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
+        var capturedStringFragments = capture.createDocumentFragmentsStrings();
+        Utils.extend(capture, capturedStringFragments);
+        var capturedDOMFragments = capture.createDocumentFragments();
+        Utils.extend(capture, capturedDOMFragments);
         callback(capture);
     }
 
@@ -131,30 +157,6 @@ Capture.init = function(callback, doc, prefix) {
         }, false);
     }
 };
-
-var applyMethodToDifferentObject = function(srcObj, destObj, method) {
-    var oldMethod = srcObj[method];
-    if (!oldMethod) {
-        return;
-    }
-    srcObj[method] = function() {
-        oldMethod.apply(srcObj, arguments);
-        destObj[method].apply(destObj, arguments);
-    };
-}
-
-/**
- * Creates an iframe and makes it as seamless as possible through CSS
- * TODO: Test out Seamless attribute when available in latest browsers
- */
-Capture.createSeamlessIframe = function(doc){
-    var doc = doc || document;
-    var iframe = doc.createElement("iframe");
-    // set attribute to make the iframe appear seamless to the user
-    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color: transparent;border: 0px none transparent;'
-    // Open iframe an force all links and forms to target the parent
-    return iframe;
-}
 
 /**
  * Streaming capturing is a batshit loco insane way of being able to modify
@@ -189,18 +191,22 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var prefix = options && options.prefix || 'x-';
     var pollInterval = options && options.pollInterval || 100; // milliseconds
     var sourceDoc = options && options.sourceDoc || document;
+
+    // initiates capture object that will be passed to the callbacks
+    var capture = new Capture(sourceDoc, prefix);
+
     // Grab the plaintext element from the source document
     var plaintext = sourceDoc.getElementsByTagName('plaintext')[0];
     var destDoc;
     var iframe;
     // if no destination document specified, create iframe and use its document
     if (options && options.destDoc) {
-        destDoc = options.destDoc;
+        destDoc = capture.destDoc = options.destDoc;
     }
     else {
-        iframe = Capture.createSeamlessIframe(sourceDoc);
+        iframe = createSeamlessIframe(sourceDoc);
         sourceDoc.body.insertBefore(iframe, plaintext);
-        destDoc = iframe.contentDocument;
+        destDoc = capture.destDoc = iframe.contentDocument;
     }
     // currently, the only way to reconstruct the destination DOM without
     // breaking script execution order is through document.write.
@@ -220,8 +226,10 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     captureIframe.id = 'captured-iframe';
     captureIframe.style.cssText = 'display:none;'
     sourceDoc.body.insertBefore(captureIframe, plaintext);
-    var capturedDoc = captureIframe.contentDocument;
+    var capturedDoc = capture.capturedDoc = captureIframe.contentDocument;
     capturedDoc.open("text/html", "replace");
+
+
 
     // Start the captured doc with the original pieces of the source doc
     var startCapturedHtml = Capture.getDoctype(sourceDoc) +
@@ -252,9 +260,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // AKA an insane hack for an insane hack.
         try {
             iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
-        } catch (e) {
-            // This will throw an exception on Firefox
-        }
+        } catch (e) {} // This will throw an exception on Firefox 
 
         // If someone uses window.location to navigate, we must ensure that the
         // history in the parent window matches
@@ -262,12 +268,12 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
 
         // Override various history APIs in iframe and ensure that they run in
         // the parent document as well
-        // var iframeHistory = iframe.contentWindow.history;
-        // var parentHistory = window.parent.history;
-        // var historyMethods = ['replaceState', 'pushState', 'go', 'forward', 'back'];
-        // historyMethods.forEach(function(element) {
-        //     applyMethodToDifferentObject(iframeHistory, parentHistory, element);
-        // });
+        var iframeHistory = iframe.contentWindow.history;
+        var parentHistory = window.parent.history;
+        var historyMethods = ['replaceState', 'pushState', 'go', 'forward', 'back'];
+        historyMethods.forEach(function(element) {
+            applyMethodToDifferentObject(iframeHistory, parentHistory, element);
+        });
     }
 
     startCapturedHtml = Capture.disable(startCapturedHtml, prefix);
@@ -338,7 +344,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         }
 
         // Execute chunk callback to allow users to make modifications to capturedDoc
-        chunkCallback(capturedDoc);
+        chunkCallback(capture);
 
         if (capturedDoc.documentElement) {
             // Grab outerHTML of capturedDoc and write the diff to destDoc
@@ -361,16 +367,15 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // * ~~Move HTML/HEAD attributes into HTML/HEAD tags in iframe~~
         // * ~~Solve referer issue~~
         // * ~~Fix window.location.~~
-        // * Pass a capture object instead of a captured doc to the chunk callback
+        // * ~~Pass a capture object instead of a captured doc to the chunk callback~~
         // * ~~Fix iframe issue on Android 2.3~~
 
         // if document is ready, stop polling and ensure all documents involved are closed
         if (finished) {
-            window.capturedDoc = capturedDoc; // attach to window for easy debugging
             capturedDoc.close();
             destDoc.close();
             sourceDoc.close();
-            finishedCallback && finishedCallback();
+            finishedCallback && finishedCallback(capture);
             // TODO: Maybe remove captured-iframe and plaintext tags when finished?
         }
         else {
@@ -483,7 +488,7 @@ Capture.getDoctype = function(doc) {
  * in `extractedHTML` for later use.
  */
  Capture.prototype.createDocumentFragmentsStrings = function() {
-    var doc = this.doc;
+    var doc = this.sourceDoc;
     var headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head');
     var bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body');
     var htmlEl = doc.getElementsByTagName('html')[0];
@@ -580,9 +585,6 @@ Capture.prototype.restore = function() {
  * Set the content of an element with html from a string
  */
 Capture.prototype.setElementContentFromString = function(el, htmlString) {
-    // We must pass in document because elements created for dom insertion must be
-    // inserted into the same dom they are created by.
-    var doc = this.doc;
     for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
 };
 
@@ -644,7 +646,7 @@ Capture.prototype.render = function(htmlString) {
         escapedHTMLString = Capture.enable(htmlString);
     }
 
-    var doc = this.doc;
+    var doc = this.sourceDoc;
 
     // Set capturing state to false so that the user main code knows how to execute
     if (window.Mobify) window.Mobify.capturing = false;
@@ -717,7 +719,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
  */
 Capture.prototype.renderCapturedDoc = function(options) {
     // Insert the mobify scripts back into the captured doc
-    Capture.insertMobifyScripts(this.doc, this.capturedDoc);
+    Capture.insertMobifyScripts(this.sourceDoc, this.capturedDoc);
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists

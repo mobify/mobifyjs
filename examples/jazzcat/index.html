@@ -13,7 +13,10 @@ function() {
     if (capturing) {
         if (/streaming/.test(location.href)) {
             // Initiate capture
-            Mobify.Capture.initStreamingCapture(function(capturedDoc){
+            Mobify.Capture.initStreamingCapture(function(capture){
+                // Grab reference to the captured document in progres
+                var capturedDoc = capture.capturedDoc;
+                
                 // Grab all scripts to be concatenated into one request
                 var scripts = capturedDoc.querySelectorAll('script');
                 Mobify.Jazzcat.optimizeScripts(scripts);
