@@ -562,7 +562,7 @@ Capture.getDoctype = function(doc) {
  */
 Capture.prototype.restore = function() {
     var self = this;
-    var doc = self.doc;
+    var doc = self.sourceDoc;
 
     var restore = function() {
         doc.removeEventListener('readystatechange', restore, false);
