@@ -388,11 +388,10 @@ define(["utils", "capture"], function(Utils, Capture) {
                         toConcat[parent].urls.push(url);
                     }
                 }
-
+                script.type = 'text/mobify-script';
                 // Rewriting script to grab contents from our in-memory cache
                 // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
                 script.innerHTML =  options.execCallback + "('" + url + "');";
-                script.type = 'text/mobify-script';
 
                 // Remove the src attribute
                 script.removeAttribute(options.attribute);
