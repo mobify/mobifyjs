@@ -1,0 +1,12 @@
+{
+  "name": "mobifyjs",
+  "version": "2.0.0alpha5",
+  "main": "build/mobify.min.js",
+  "ignore": [
+    "node_modules",
+    "tests",
+    "performance",
+    "examples",
+    "www"
+  ]
+}

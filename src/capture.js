@@ -1,4 +1,4 @@
-define(["utils"], function(Utils) {
+define(["mobifyjs/utils"], function(Utils) {
 
 // ##
 // # Static Variables/Functions

@@ -49,8 +49,11 @@
 
     require.config({
         "baseUrl": "../src/",
-    })
-    require(["../src/capture.js"], function(Capture) {
+        "paths": {
+            "mobifyjs": "../src/"
+        }
+    });
+    require(["mobifyjs/capture"], function(Capture) {
         QUnit.start();
 
         // Test disabling attributes that cause resource loading
