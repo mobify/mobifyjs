@@ -185,7 +185,6 @@
             }
 
             ResizeImages.resize([img], {onerror: "onerr()" });
-            img.setAttribute("src", img.getAttribute("x-src"));
         });
 
         test('resizeImages - does not modify data URI', function() {
