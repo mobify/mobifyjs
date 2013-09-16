@@ -126,7 +126,7 @@ var Capture = function(sourceDoc, prefix) {
     if (window.Mobify) window.Mobify.prefix = this.prefix;
 };
 
-Capture.init = function(callback, doc, prefix) {
+Capture.init = Capture.initCapture = function(callback, doc, prefix) {
     var doc = doc || document;
 
     var createCapture = function(callback, doc, prefix) {
