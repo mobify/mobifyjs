@@ -311,6 +311,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-jekyll');
     grunt.loadNpmTasks('grunt-express');
+    grunt.loadNpmTasks('grunt-release');
 
     grunt.registerTask('test', ['express', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present

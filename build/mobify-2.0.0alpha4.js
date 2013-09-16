@@ -407,7 +407,7 @@ var requirejs, require, define;
 
 define("almond", function(){});
 
-define('mobifyjs/utils',[], function() {
+define('utils',[], function() {
 
 // ##
 // # Utility methods
@@ -553,7 +553,7 @@ Utils.matchMedia = function(doc) {
 return Utils;
 
 });
-define('mobifyjs/capture',["mobifyjs/utils"], function(Utils) {
+define('capture',["utils"], function(Utils) {
 
 // ##
 // # Static Variables/Functions
@@ -1044,7 +1044,7 @@ return Capture;
 
 });
 
-define('mobifyjs/resizeImages',["mobifyjs/utils"], function(Utils) {
+define('resizeImages',["utils"], function(Utils) {
 
 var ResizeImages = window.ResizeImages = {};
 
@@ -1379,7 +1379,7 @@ return ResizeImages;
  * into the cache using a bootloader request to Jazzcat. Scripts are then
  * executed directly from the cache.
  */
-define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+define('jazzcat',["utils", "capture"], function(Utils, Capture) {
     /**
      * An HTTP 1.1 compliant localStorage backed cache.
      */
@@ -1897,7 +1897,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
     return Jazzcat;
 });
 
-define('mobifyjs/unblockify',["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+define('unblockify',["utils", "capture"], function(Utils, Capture) {
 
 var Unblockify = {}
 
@@ -1930,12 +1930,11 @@ Unblockify.unblock = function(scripts) {
 return Unblockify;
 
 });
-
 /**
  * cssOptimize - Client code to a css optimization service
  */
 
-define('mobifyjs/cssOptimize',["mobifyjs/utils"], function(Utils) {
+define('cssOptimize',["utils"], function(Utils) {
 
 var CssOptimize = window.cssOptimize = {};
 
@@ -2019,8 +2018,7 @@ var defaults = CssOptimize._defaults = {
 
 return CssOptimize;
 });
-
-define('mobifyjs/external/picturefill',["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+define('external/picturefill',["utils", "capture"], function(Utils, Capture) {
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
@@ -2162,8 +2160,7 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
 return;
 
 });
-
-require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify", "mobifyjs/cssOptimize", "mobifyjs/external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize) {
+require(["utils", "capture", "resizeImages", "jazzcat", "unblockify", "cssOptimize", "external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
@@ -2175,7 +2172,6 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
     return Mobify;
 
 }, undefined, true);
-// relPath, forceSync
-;
+// relPath, forceSync;
 define("mobify-library", function(){});
 }());
