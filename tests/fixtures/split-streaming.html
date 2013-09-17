@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html class="foo">
 <head>
 <script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];e.src?a.src=e.src:e.innerHTML&&(a.innerHTML=e.innerHTML),a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h=function(){var c=new Date;c.setTime(c.getTime()+18e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e){var a=b.createElement("script");if(a.onerror=h,"string"==typeof e)g(a,"main-executable","mobify",{src:e});else{var c="var main = "+e.toString()+"; main();";g(a,"main-executable","mobify",{innerHTML:c})}}},f.onerror=h,g(f,"mobify-js","mobify",{src:d})})}(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&+match[2]<4?!1:match[3]&&+match[4]<11?!1:!0:!1},
@@ -15,40 +15,50 @@ function() {
             // Grab reference to the captured document in progres
             var capturedDoc = capture.capturedDoc;
 
-            // optimize scripts
-            var scripts = capturedDoc.querySelectorAll('script');
-            Mobify.Jazzcat.optimizeScripts(scripts);
+            // // optimize scripts
+            // var scripts = capturedDoc.querySelectorAll('script');
+            // Mobify.Jazzcat.optimizeScripts(scripts);
 
-            // optimize images
-            var images = capturedDoc.querySelectorAll('img, picture');
-            Mobify.ResizeImages.resize(images);
             // simplify html
-            Mobify.Utils.removeBySelector('.second', capturedDoc);
+            Mobify.Utils.removeBySelector('.first', capturedDoc);
         });
     }
 });
 </script>
-<script src='/mobifyjs/tests/resources/jquery-1.7.1.js'></script>
+<title>Streaming Capturing Test Page</title>
 </head>
 <body>
-    <div class="first">
-        <img src="/mobifyjs/examples/assets/images/grumpycat.jpg"></img>
-        <p>First chunk</p>
-    </div>
+    <h1>Start!</h1>
     <!-- SPLIT -->
-    <div class="second">
-        <img src="/mobifyjs/examples/assets/images/office-small.jpg"></img>
-        <p>Second chunk A</p>
+    <div>
         <!-- SPLIT -->
-        <p>Second chunk B</p>
-    </div>
-    <!-- SPLIT -->
-    <div class="third">
-        <img src="/mobifyjs/examples/assets/images/leaves-small.jpg"></img>
-        <p>Third chunk</p>
+        <div>
+            <div class="first">
+                <img src="/mobifyjs/examples/assets/images/grumpycat.jpg"></img>
+                <p>First chunk</p>
+            </div>
+            <!-- SPLIT -->
+            <div class="second">
+                <img src="/mobifyjs/examples/assets/images/office-small.jpg"></img>
+                <p>Second chunk A</p>
+                <!-- SPLIT -->
+                <p>Second chunk B</p>
+            </div>
+            <!-- SPLIT -->
+            <div class="third">
+                <img src="/mobifyjs/examples/assets/images/leaves-small.jpg"></img>
+                <p>Third chunk</p>
+            </div>
+        </div>
     </div>
     <!-- SPLIT -->
     <h1 id="complete">Complete!</h1>
-    <script>parent.postMessage("complete", "*");</script>
+    <script>
+        setTimeout(function(){
+            window.parent.parent.postMessage("complete", "*");
+        }, 20);
+    </script>
+    <script src='/mobifyjs/tests/resources/jquery-1.7.1.js'></script>
+
 </body>
 </html>

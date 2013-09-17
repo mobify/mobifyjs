@@ -8,20 +8,23 @@
 
 // calls to APIs go here (or path to a main.js)
 function() {
-    // Grab reference to a newly created document
-    Mobify.Capture.initStreamingCapture(function(capture){
-        // Grab reference to the captured document in progres
-        var capturedDoc = capture.capturedDoc;
-        var grumpyUrl = "/mobifyjs/examples/assets/images/grumpycat.jpg"
+    var capturing = window.Mobify && window.Mobify.capturing || false;
+    if (capturing) {
+        // Grab reference to a newly created document
+        Mobify.Capture.initStreamingCapture(function(capture){
+            // Grab reference to the captured document in progres
+            var capturedDoc = capture.capturedDoc;
+            var grumpyUrl = "/mobifyjs/examples/assets/images/grumpycat.jpg"
 
-        var imgs = capturedDoc.getElementsByTagName("img");
-        for(var i = 0; i < imgs.length; i++) {
-            var img = imgs[i];
-            var ogImage = img.getAttribute("x-src");
-            img.setAttribute("x-src", grumpyUrl);
-            img.setAttribute("old-src", ogImage);
-        }
-    });
+            var imgs = capturedDoc.getElementsByTagName("img");
+            for(var i = 0; i < imgs.length; i++) {
+                var img = imgs[i];
+                var ogImage = img.getAttribute("x-src");
+                img.setAttribute("x-src", grumpyUrl);
+                img.setAttribute("old-src", ogImage);
+            }
+        });
+    }
 });</script>
 <!-- END MOBIFY TAG -->
 <link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">

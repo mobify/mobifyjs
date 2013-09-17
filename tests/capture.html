@@ -47,10 +47,8 @@
     QUnit.config.autostart = false;
     QUnit.config.testTimeout = 30 * 1000;
 
-    require.config({
-        "baseUrl": "../src/",
-    })
-    require(["../src/capture.js"], function(Capture) {
+    require.config({"baseUrl": "../src/"});
+    require(["utils", "capture"], function(Utils, Capture) {
         QUnit.start();
 
         // Test disabling attributes that cause resource loading
@@ -254,6 +252,74 @@
 
             $("#qunit-fixture").append($iframe);
         });
+
+        /**
+         * Ensure the complete document is captured.
+         */
+        asyncTest("streaming capture captures the complete document", 1, function() {
+            var opts = {
+                id: "capture-complete",
+                src: "/tests/fixtures/split-streaming.html"
+            };
+            var $iframe = $("<iframe>", opts);
+            var el = $iframe[0];
+            setTimeout(function(){debugger}, 3000)
+
+            // Begin capturing on message. Restoring sends "complete".
+            $(window).on("message", function onMessage(event) {
+                var expectedHtml = '<html class="foo"><head><base target="_parent">\
+\n<script src="/mobifyjs/build/mobify.js" id="mobify-js" class="mobify"><\/script><script id="main-executable" class="mobify">var main = function () {\
+\n    var capturing = window.Mobify && window.Mobify.capturing || false;\
+\n    if (capturing) {\
+\n        // Grab reference to a newly created document\
+\n        Mobify.Capture.initStreamingCapture(function(capture){\
+\n            // Grab reference to the captured document in progres\
+\n            var capturedDoc = capture.capturedDoc;\
+\n\
+\n            // optimize scripts\
+\n            var scripts = capturedDoc.querySelectorAll(\'script\');\
+\n            Mobify.Jazzcat.optimizeScripts(scripts);\
+\n\
+\n            // simplify html\
+\n            Mobify.Utils.removeBySelector(\'.second\', capturedDoc);\
+\n        });\
+\n    }\
+\n}; main();<\/script>\
+\n<script>Jazzcat.httpCache.load();<\/script><script optimized="" src="//jazzcat.mobify.com/jsonp/Jazzcat.load/%5B%22http%3A%2F%2Flocalhost%3A3000%2Fmobifyjs%2Ftests%2Fresources%2Fjquery-1.7.1.js%22%5D"><\/script><script>Jazzcat.exec(\'http://localhost:3000/mobifyjs/tests/resources/jquery-1.7.1.js\');<\/script><script src="http://localhost:3000/mobifyjs/tests/resources/jquery-1.7.1.js"><\/script>\
+\n</head>\
+\n<body>\
+\n    <div class="first">\
+\n        <img src=\"/mobifyjs/examples/assets/images/grumpycat.jpg\">\
+\n        <p>First chunk</p>\
+\n    </div>\
+\n    \
+\n    \
+\n    \
+\n    <div class="third">\
+\n        <img src=\"/mobifyjs/examples/assets/images/leaves-small.jpg\">\
+\n        <p>Third chunk</p>\
+\n    </div>\
+\n    \
+\n    <h1 id="complete">Complete!</h1>\
+\n    <script>\
+\n        setTimeout(function(){\
+\n            window.parent.parent.postMessage("complete", "*");\
+\n        }, 20);\
+\n    <\/script>\
+\n\
+\n</body></html>';
+                // Grab outerHTML from the rendered page inside of our iframe
+                // (which, since we're using streaming capturing, is in an iframe!)
+                var html = Utils.outerHTML(el.contentDocument.documentElement.querySelectorAll('iframe')[0].contentDocument.documentElement);
+                event = event.originalEvent;
+                $(window).unbind("message", onMessage);
+                equal(html, expectedHtml, "html in iframe should equal expected html");
+                start();
+            });
+
+            $("#qunit-fixture").append($iframe);
+        });
+
     });
 </script>
 </body>

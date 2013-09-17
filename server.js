@@ -14,7 +14,7 @@ http.globalAgent.maxSockets = 100;
  */
 var slowResponse = function(req, res) {
     var split = fs.readFileSync(__dirname + req.path, 'utf8').split('<!-- SPLIT -->')
-    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'});
     res.write(split[0]);
     var chunk = 1;
     var iid = setInterval(function() {
