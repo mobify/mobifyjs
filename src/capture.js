@@ -331,13 +331,13 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
             if (elsToMove.length > 0) {
                 for (var i = 0, len=elsToMove.length; i < len; i++) {
                     var el = elsToMove[i];
-                    try {
-                        sourceDoc.head.appendChild(el);
-                    } catch (e) {
-                        // Some browsers will throw WRONG_DOCUMENT_ERR
-                        var elClone = sourceDoc.importNode(el, false);
-                        sourceDoc.head.appendChild(elClone);      
-                    }
+                    // try {
+                    //     sourceDoc.head.appendChild(el);
+                    // } catch (e) {
+                    // Some browsers will throw WRONG_DOCUMENT_ERR
+                    var elClone = sourceDoc.importNode(el, false);
+                    sourceDoc.head.appendChild(elClone);      
+                    // }
                 }
             }
 
