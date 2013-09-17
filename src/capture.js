@@ -229,8 +229,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var capturedDoc = capture.capturedDoc = captureIframe.contentDocument;
     capturedDoc.open("text/html", "replace");
 
-
-
     // Start the captured doc with the original pieces of the source doc
     var startCapturedHtml = Capture.getDoctype(sourceDoc) +
                  Capture.openTag(sourceDoc.documentElement) +
@@ -311,6 +309,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
 
+        ///<([a-zA-Z]*)\s?[^>]*><\/([a-zA-Z]*)>/.exec('><div></div>')
 
         if (iframe) {
             // Move certain elements that should be in the top-level document,
@@ -349,8 +348,19 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         if (capturedDoc.documentElement) {
             // Grab outerHTML of capturedDoc and write the diff to destDoc
             html = Utils.outerHTML(capturedDoc.documentElement);
+            // we could be grabbing from a captured document that has a head and no body.
             var endIndex = (html.lastIndexOf('</body></html>') === -1) ? html.lastIndexOf('</head></html>') : html.lastIndexOf('</body></html>'); 
             toWrite = html.substring(writtenToDestDoc.length, endIndex);
+
+            // outerHTML will always give us an balanced tree, which isn't what
+            // what to write into the destination document. Out temp solution
+            // is to not write out any empty nodes that are at the end. eg:
+            // '<h1>Hello/h1><div class="imdaboss"></div>' ->
+            // "<h1>Hello/h1><div class="imdaboss">"
+            toWrite = toWrite.replace(/(.*<([a-zA-Z]*)\s?[^>]*>)<\/[a-zA-Z]*>$/, function(match, p1){
+                //debugger;
+                return p1;
+            });
             writtenToDestDoc += toWrite;
 
             // Unescape chunk
@@ -372,6 +382,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
 
         // if document is ready, stop polling and ensure all documents involved are closed
         if (finished) {
+            debugger;
             capturedDoc.close();
             destDoc.close();
             sourceDoc.close();
