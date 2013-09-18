@@ -24,7 +24,7 @@ var slowResponse = function(req, res) {
             clearInterval(iid);
             res.end();
         }
-    }, 2000);
+    }, 1000);
 }
 
 /**

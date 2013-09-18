@@ -1,7 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html class="foo">
 <head>
-<script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];e.src?a.src=e.src:e.innerHTML&&(a.innerHTML=e.innerHTML),a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h=function(){var c=new Date;c.setTime(c.getTime()+18e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e){var a=b.createElement("script");if(a.onerror=h,"string"==typeof e)g(a,"main-executable","mobify",{src:e});else{var c="var main = "+e.toString()+"; main();";g(a,"main-executable","mobify",{innerHTML:c})}}},f.onerror=h,g(f,"mobify-js","mobify",{src:d})})}(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&+match[2]<4?!1:match[3]&&+match[4]<11?!1:!0:!1},
+<script>
+!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=e,a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h="mobify",i=function(){var c=new Date;c.setTime(c.getTime()+3e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e)if("string"==typeof e){var c=b.createElement("script");c.onerror=i,g(c,"main-executable",h,mainUrl)}else a.Mobify.mainExecutable=e.toString(),e()},f.onerror=i,g(f,"mobify-js",h,d)})}(window,document,function(){var a=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return a?a[1]&&+a[2]<4?!1:a[3]&&+a[4]<11?!1:!0:!1},
 
 // path to mobify.js
 "/mobifyjs/build/mobify.js",
@@ -10,20 +11,14 @@
 function() {
     var capturing = window.Mobify && window.Mobify.capturing || false;
     if (capturing) {
-        // Grab reference to a newly created document
         Mobify.Capture.initStreamingCapture(function(capture){
-            // Grab reference to the captured document in progres
             var capturedDoc = capture.capturedDoc;
-
-            // // optimize scripts
-            // var scripts = capturedDoc.querySelectorAll('script');
-            // Mobify.Jazzcat.optimizeScripts(scripts);
-
-            // simplify html
-            Mobify.Utils.removeBySelector('.first', capturedDoc);
+            Mobify.Utils.removeBySelector(".first", capturedDoc);
         });
     }
-});
+}
+
+);
 </script>
 <title>Streaming Capturing Test Page</title>
 </head>
@@ -34,19 +29,19 @@ function() {
         <!-- SPLIT -->
         <div>
             <div class="first">
-                <img src="/mobifyjs/examples/assets/images/grumpycat.jpg"></img>
+                <img src="/mobifyjs/examples/assets/images/grumpycat.jpg">
                 <p>First chunk</p>
             </div>
             <!-- SPLIT -->
             <div class="second">
-                <img src="/mobifyjs/examples/assets/images/office-small.jpg"></img>
+                <img src="/mobifyjs/examples/assets/images/office-small.jpg">
                 <p>Second chunk A</p>
                 <!-- SPLIT -->
                 <p>Second chunk B</p>
             </div>
             <!-- SPLIT -->
             <div class="third">
-                <img src="/mobifyjs/examples/assets/images/leaves-small.jpg"></img>
+                <img src="/mobifyjs/examples/assets/images/leaves-small.jpg">
                 <p>Third chunk</p>
             </div>
         </div>

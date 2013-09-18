@@ -334,10 +334,11 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
                     // try {
                     //     sourceDoc.head.appendChild(el);
                     // } catch (e) {
-                    // Some browsers will throw WRONG_DOCUMENT_ERR
+                        // Some browsers will throw WRONG_DOCUMENT_ERR
+                    // }
                     var elClone = sourceDoc.importNode(el, false);
                     sourceDoc.head.appendChild(elClone);      
-                    // }
+                    
                 }
             }
 
@@ -380,6 +381,9 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
                 destDoc.write(toWriteDest);
             }
         }
+
+        // TODO:
+        // * title being inserted back into sourceDoc multiple times
 
         // if document is ready, stop polling and ensure all documents involved are closed
         if (finished) {
@@ -693,7 +697,16 @@ Capture.getMobifyLibrary = function(doc) {
 
 Capture.getMain = function(doc) {
     var doc = doc || document;
-    var mainScript = doc.getElementById("main-executable");
+    var mainScript = undefined;
+    if (window.Mobify && window.Mobify.mainExecutable) {
+        mainScript = document.createElement('script');
+        mainScript.innerHTML = "var main = " + window.Mobify.mainExecutable + "; main();";
+        mainScript.id = 'main-executable';
+        mainScript.setAttribute("class", "mobify");
+    }
+    else {
+        mainScript = doc.getElementById("main-executable");
+    }
     return mainScript;
 }
 

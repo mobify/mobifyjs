@@ -263,57 +263,26 @@
             };
             var $iframe = $("<iframe>", opts);
             var el = $iframe[0];
-            setTimeout(function(){debugger}, 3000)
 
             // Begin capturing on message. Restoring sends "complete".
             $(window).on("message", function onMessage(event) {
-                var expectedHtml = '<html class="foo"><head><base target="_parent">\
-\n<script src="/mobifyjs/build/mobify.js" id="mobify-js" class="mobify"><\/script><script id="main-executable" class="mobify">var main = function () {\
-\n    var capturing = window.Mobify && window.Mobify.capturing || false;\
-\n    if (capturing) {\
-\n        // Grab reference to a newly created document\
-\n        Mobify.Capture.initStreamingCapture(function(capture){\
-\n            // Grab reference to the captured document in progres\
-\n            var capturedDoc = capture.capturedDoc;\
-\n\
-\n            // optimize scripts\
-\n            var scripts = capturedDoc.querySelectorAll(\'script\');\
-\n            Mobify.Jazzcat.optimizeScripts(scripts);\
-\n\
-\n            // simplify html\
-\n            Mobify.Utils.removeBySelector(\'.second\', capturedDoc);\
-\n        });\
-\n    }\
-\n}; main();<\/script>\
-\n<script>Jazzcat.httpCache.load();<\/script><script optimized="" src="//jazzcat.mobify.com/jsonp/Jazzcat.load/%5B%22http%3A%2F%2Flocalhost%3A3000%2Fmobifyjs%2Ftests%2Fresources%2Fjquery-1.7.1.js%22%5D"><\/script><script>Jazzcat.exec(\'http://localhost:3000/mobifyjs/tests/resources/jquery-1.7.1.js\');<\/script><script src="http://localhost:3000/mobifyjs/tests/resources/jquery-1.7.1.js"><\/script>\
-\n</head>\
-\n<body>\
-\n    <div class="first">\
-\n        <img src=\"/mobifyjs/examples/assets/images/grumpycat.jpg\">\
-\n        <p>First chunk</p>\
-\n    </div>\
-\n    \
-\n    \
-\n    \
-\n    <div class="third">\
-\n        <img src=\"/mobifyjs/examples/assets/images/leaves-small.jpg\">\
-\n        <p>Third chunk</p>\
-\n    </div>\
-\n    \
-\n    <h1 id="complete">Complete!</h1>\
-\n    <script>\
-\n        setTimeout(function(){\
-\n            window.parent.parent.postMessage("complete", "*");\
-\n        }, 20);\
-\n    <\/script>\
-\n\
-\n</body></html>';
+                // We remove spaces and linebreaks when grabbing the html
+                // because spacing and line breaks are completely inconsistent
+                // between browsers
+                var expectedHtml = "<htmlclass=\"foo\"><head><basetarget=\"_parent\"><scriptsrc=\"/mobifyjs/build/mobify.js\"><\/script><script>varmain=function(){varcapturing=window.Mobify&&window.Mobify.capturing||false;if(capturing){Mobify.Capture.initStreamingCapture(function(capture){varcapturedDoc=capture.capturedDoc;Mobify.Utils.removeBySelector(\".first\",capturedDoc);});}};main();<\/script><title>StreamingCapturingTestPage</title></head><body><h1>Start!</h1><div><div><divclass=\"second\"><imgsrc=\"/mobifyjs/examples/assets/images/office-small.jpg\"><p>SecondchunkA</p><p>SecondchunkB</p></div><divclass=\"third\"><imgsrc=\"/mobifyjs/examples/assets/images/leaves-small.jpg\"><p>Thirdchunk</p></div></div></div><h1id=\"complete\">Complete!</h1><script>setTimeout(function(){window.parent.parent.postMessage(\"complete\",\"*\");},20);<\/script><scriptsrc=\"/mobifyjs/tests/resources/jquery-1.7.1.js\"><\/script></body></html>"
                 // Grab outerHTML from the rendered page inside of our iframe
                 // (which, since we're using streaming capturing, is in an iframe!)
-                var html = Utils.outerHTML(el.contentDocument.documentElement.querySelectorAll('iframe')[0].contentDocument.documentElement);
+                var destDoc = el.contentDocument.documentElement.querySelectorAll('iframe')[0].contentDocument;
+                // Remove attributes because IE/FF display them in oppose it order of Webkit based browsers
+                destDoc.documentElement.removeAttribute("webdriver");
+                Array.prototype.slice.call(destDoc.querySelectorAll('.mobify')).filter(function(el){
+                    el.removeAttribute('id');
+                    el.removeAttribute('class');
+                })
+                var html = Utils.outerHTML(destDoc.documentElement);
                 event = event.originalEvent;
                 $(window).unbind("message", onMessage);
-                equal(html, expectedHtml, "html in iframe should equal expected html");
+                equal(html.replace(/(\r\n|\n|\r|\s)/gm,''), expectedHtml, "html in iframe should equal expected html");
                 start();
             });
 
