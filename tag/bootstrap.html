@@ -15,14 +15,9 @@ else if (!detector()) {
     return;
 }
 
-function attachScriptBeforeMobifyTag(script, id, classNames, data) {
+function attachScriptBeforeMobifyTag(script, id, classNames, src) {
     var mobifyTagScript = document.getElementsByTagName('script')[0];
-    if (data.src) {
-        script.src = data.src;
-    }
-    else {
-        script.innerHTML = data.innerHTML;
-    }
+    script.src = src;
     script.id = id;
     script.setAttribute("class", classNames);
     mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
@@ -38,8 +33,8 @@ setTimeout(function() {
     var scriptClasses = "mobify";
     var errorHandler = function() {
         var now = new Date();
-        // Set now to 30 minutes ahead
-        now.setTime(now.getTime() + 1800000);
+        // Set now to 5 minutes ahead
+        now.setTime(now.getTime() + 300000);
         document.cookie = 'mobify=0' +
                 '; expires=' + now.toGMTString() +
                 '; path=/';
@@ -48,19 +43,20 @@ setTimeout(function() {
     };
     mobifyjsScript.onload = function(){
         if (main) {
-            var mainScript = document.createElement('script');
-            mainScript.onerror = errorHandler;
-            var scriptId = "main-executable";
+            // if main is a path to a main file
             if (typeof main === 'string') {
-                attachScriptBeforeMobifyTag(mainScript, scriptId, scriptClasses, {src: mainUrl});
+                var mainScript = document.createElement('script');
+                mainScript.onerror = errorHandler;
+                attachScriptBeforeMobifyTag(mainScript, "main-executable", scriptClasses, mainUrl);
             } else {
-                var mainInnerHTML = "var main = " + main.toString() + "; main();";
-                attachScriptBeforeMobifyTag(mainScript, scriptId, scriptClasses, {innerHTML: mainInnerHTML});
+                // Set main on Mobify object to be used later for re-insertion
+                window.Mobify.mainExecutable = main.toString();
+                main();
             }
         }
     };
     mobifyjsScript.onerror = errorHandler;
-    attachScriptBeforeMobifyTag(mobifyjsScript, "mobify-js", scriptClasses, {src: mobifyjsUrl});
+    attachScriptBeforeMobifyTag(mobifyjsScript, "mobify-js", scriptClasses, mobifyjsUrl);
 
 });
 
@@ -73,7 +69,7 @@ setTimeout(function() {
         // - FireFox 4+
         // - Opera 11+
         // - 3DS
-        match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
+        var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
      
         if (!match) {
             return false;

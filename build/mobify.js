@@ -1,1 +1,1 @@
-mobify-2.0.0alpha6.js
+mobify-2.0.0alpha7.js
