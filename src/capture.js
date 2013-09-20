@@ -118,7 +118,7 @@ var createSeamlessIframe = function(doc){
  * Removes all closing tags from an html string
  */
 var removeCloseEndTags = function(html) {
-    var newHtml = html.replace(/(.*)<\/[a-zA-Z]*>$/, function(match, p1){
+    var newHtml = html.replace(/(.*)<\/[^>]*>$/i, function(match, p1){
         return p1
     });
     if (newHtml === html) {
