@@ -299,6 +299,12 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var pollPlaintext = function(){
         var finished = Utils.domIsReady(sourceDoc);
 
+        // if document is ready, set finished to true for users of the API
+        // to be able to act appropriately
+        if (finished) {
+            capture.finished = true;
+        }
+
         var html = plaintext.textContent;
         var toWrite = html.substring(plaintextBuffer.length);
 
@@ -331,14 +337,13 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
             if (elsToMove.length > 0) {
                 for (var i = 0, len=elsToMove.length; i < len; i++) {
                     var el = elsToMove[i];
-                    // try {
-                    //     sourceDoc.head.appendChild(el);
-                    // } catch (e) {
-                        // Some browsers will throw WRONG_DOCUMENT_ERR
-                    // }
-                    var elClone = sourceDoc.importNode(el, false);
-                    sourceDoc.head.appendChild(elClone);      
-                    
+                    // do not copy dom notes over twice
+                    if (el.hasAttribute('capture-moved')) {
+                        continue;
+                    }
+                    var elClone = sourceDoc.importNode(el, true);
+                    sourceDoc.head.appendChild(elClone);    
+                    el.setAttribute('capture-moved', '');
                 }
             }
 
