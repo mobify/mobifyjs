@@ -125,7 +125,7 @@ module.exports = function(grunt) {
                     concurrency: 16,
                     tunneled: true,
                     detailedError: true,
-                    browsers: [
+                    browsers: [ //https://saucelabs.com/docs/platforms
                         { // Only working version of IE compatable
                             browserName: 'internet explorer',
                             platform: 'Windows 2012',
@@ -152,6 +152,10 @@ module.exports = function(grunt) {
                         { // Latest Chrome on Linux (unknown distro)
                             browserName: 'chrome',
                             platform: 'Linux'
+                        },
+                        { // Latest Chrome on Linux (unknown distro)
+                            browserName: 'chrome',
+                            platform: 'OS X 10.8'
                         },
                         { // Lowest known working version of FF
                             browserName: 'firefox',
@@ -347,6 +351,6 @@ module.exports = function(grunt) {
     grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging', 's3:wwwstagingstatic']);
     grunt.registerTask('wwwproddeploy', ['jekyll:build', 's3:wwwprod', 's3:wwwprodstatic']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
-    grunt.registerTask('serve', ['express', 'watch']);
+    grunt.registerTask('serve', ['build', 'express', 'watch']);
     grunt.registerTask('preview', 'serve'); // alias to serve
 };

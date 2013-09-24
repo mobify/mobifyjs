@@ -201,9 +201,10 @@ Capture.init = Capture.initCapture = function(callback, doc, prefix) {
  * destination document (which by default is a "seamless" iframe).
  */
 Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options) {
-    var prefix = options && options.prefix || 'x-';
-    var pollInterval = options && options.pollInterval || 300; // milliseconds
-    var sourceDoc = options && options.sourceDoc || document;
+    options = options || {};
+    var prefix = options.prefix || 'x-';
+    var pollInterval = options.pollInterval || 300; // milliseconds
+    var sourceDoc = options.sourceDoc || document;
 
     // initiates capture object that will be passed to the callbacks
     var capture = new Capture(sourceDoc, prefix);
@@ -213,7 +214,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var destDoc;
     var iframe;
     // if no destination document specified, create iframe and use its document
-    if (options && options.destDoc) {
+    if (options.destDoc) {
         destDoc = capture.destDoc = options.destDoc;
     }
     else {
@@ -241,7 +242,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     sourceDoc.body.insertBefore(captureIframe, plaintext);
     var capturedDoc = capture.capturedDoc = captureIframe.contentDocument;
     capturedDoc.open("text/html", "replace");
-
     // Start the captured doc with the original pieces of the source doc
     var startCapturedHtml = Capture.getDoctype(sourceDoc) +
                  Capture.openTag(sourceDoc.documentElement) +
@@ -387,15 +387,12 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
             }
         }
 
-        // TODO:
-        // * title being inserted back into sourceDoc multiple times
-
         // if document is ready, stop polling and ensure all documents involved are closed
         if (finished) {
+            finishedCallback && finishedCallback(capture);
             capturedDoc.close();
             destDoc.close();
             sourceDoc.close();
-            finishedCallback && finishedCallback(capture);
             // TODO: Maybe remove captured-iframe and plaintext tags when finished?
         }
         else {

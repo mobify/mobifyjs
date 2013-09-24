@@ -13,13 +13,24 @@ function() {
         Mobify.Capture.initStreamingCapture(function(capture){
             var capturedDoc = capture.capturedDoc;
             Mobify.Utils.removeBySelector(".first", capturedDoc);
+            if (capture.finished) {
+
+            }
         });
+    } else {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.innerHTML = "console.log('Inserted!')";
+        document.head.appendChild(script);
     }
 }
 
 );
 </script>
+<!-- SPLIT -->
 <title>Streaming Capturing Test Page</title>
+<!-- SPLIT -->
+<meta>
 </head>
 <body>
     <h1>Start!</h1>
@@ -47,12 +58,12 @@ function() {
     </div>
     <!-- SPLIT -->
     <h1 id="complete">Complete!</h1>
+    <script src='/mobifyjs/tests/resources/jquery-1.7.1.js'></script>
     <script>
         setTimeout(function(){
             window.parent.parent.postMessage("complete", "*");
         }, 20);
     </script>
-    <script src='/mobifyjs/tests/resources/jquery-1.7.1.js'></script>
 
 </body>
 </html>
