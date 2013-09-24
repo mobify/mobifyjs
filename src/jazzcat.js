@@ -351,7 +351,7 @@ define(["utils", "capture"], function(Utils, Capture) {
             var script = scripts[i];
 
             // Skip script if it has been optimized already
-            if (script.hasAttribute('optimized') || script.hasAttribute('skip-optimize')) {
+            if (script.hasAttribute('mobify-optimized') || script.hasAttribute('skip-optimize')) {
                 continue;
             }
 
@@ -462,7 +462,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         if (urls && urls.length) {
             loadScript = document.createElement('script');
             // Set the script to "optimized"
-            loadScript.setAttribute('optimized', '');
+            loadScript.setAttribute('mobify-optimized', '');
             loadScript.setAttribute(options.attribute, Jazzcat.getURL(urls, options));
         }
         return loadScript;

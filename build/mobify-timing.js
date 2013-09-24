@@ -1627,14 +1627,14 @@ ResizeImages.resize = function(elements, options) {
         var element = elements[i];
 
         // For an `img`, simply modify the src attribute
-        if (element.nodeName === 'IMG' && !element.hasAttribute('optimized')) {
-            element.setAttribute('optimized', '');
+        if (element.nodeName === 'IMG' && !element.hasAttribute('mobify-optimized')) {
+            element.setAttribute('mobify-optimized', '');
             ResizeImages._rewriteSrcAttribute(element, opts);
         }
         // For a `picture`, (potentially) nuke src on `img`, and
         // pass all `source` elements into modifyImages recursively
-        else if (element.nodeName === 'PICTURE' && !element.hasAttribute('optimized')) {
-            element.setAttribute('optimized', '');
+        else if (element.nodeName === 'PICTURE' && !element.hasAttribute('mobify-optimized')) {
+            element.setAttribute('mobify-optimized', '');
             ResizeImages._crawlPictureElement(element, opts);
         }
     }
@@ -2019,7 +2019,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             var script = scripts[i];
 
             // Skip script if it has been optimized already
-            if (script.hasAttribute('optimized') || script.hasAttribute('skip-optimize')) {
+            if (script.hasAttribute('mobify-optimized') || script.hasAttribute('skip-optimize')) {
                 continue;
             }
 
@@ -2130,7 +2130,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
         if (urls && urls.length) {
             loadScript = document.createElement('script');
             // Set the script to "optimized"
-            loadScript.setAttribute('optimized', '');
+            loadScript.setAttribute('mobify-optimized', '');
             loadScript.setAttribute(options.attribute, Jazzcat.getURL(urls, options));
         }
         return loadScript;
@@ -2330,8 +2330,9 @@ CssOptimize.optimize = function(elements, options) {
         element = elements[i];
         if (element.nodeName === 'LINK' &&
             element.getAttribute('rel') === 'stylesheet' &&
-            element.getAttribute(opts.targetAttribute)) {
-
+            element.getAttribute(opts.targetAttribute) &&
+            !element.hasAttribute('mobify-optimized')) {
+            element.setAttribute('mobify-optimized', '');
             CssOptimize._rewriteHref(element, opts);
         }
     }

@@ -56,8 +56,9 @@ CssOptimize.optimize = function(elements, options) {
         element = elements[i];
         if (element.nodeName === 'LINK' &&
             element.getAttribute('rel') === 'stylesheet' &&
-            element.getAttribute(opts.targetAttribute)) {
-
+            element.getAttribute(opts.targetAttribute) &&
+            !element.hasAttribute('mobify-optimized')) {
+            element.setAttribute('mobify-optimized', '');
             CssOptimize._rewriteHref(element, opts);
         }
     }

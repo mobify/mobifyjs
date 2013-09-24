@@ -451,10 +451,10 @@
                         concat: true
                     });
 
-                    // Remove the `optimized` attribute because Firefox and
+                    // Remove the `mobify-optimized` attribute because Firefox and
                     // Chrome serialize our attributes in different orders
                     Array.prototype.slice.call(doc.querySelectorAll('script')).forEach(function(script){
-                        script.removeAttribute('optimized');
+                        script.removeAttribute('mobify-optimized');
                     });
                     // verify that things we wanted to load from cache did and other things did not
                     var enabledDocumentString = Capture.enable(Utils.outerHTML(doc.documentElement));
@@ -625,12 +625,12 @@
                             responseType: responseType
                         });
                         
-                        // Remove the `optimized` and `class` attribute because
+                        // Remove the `mobify-optimized` and `class` attribute because
                         // Firefox and Chrome serialize our attributes in different orders
                         var scripts = doc.querySelectorAll('script');
                         Array.prototype.slice.call(scripts).forEach(function(script){
                             script.removeAttribute('class');
-                            script.removeAttribute('optimized');
+                            script.removeAttribute('mobify-optimized');
                         });
                         html = Utils.outerHTML(doc.documentElement);
                         return Capture.enable(html, 'x-');
