@@ -76,6 +76,7 @@
     /</script>/
 </textarea>
 
+
 <textarea id="test-jazzcat-exec-document-write-override">
     <script src="/build/mobify.js"></script>
     <script>
@@ -97,8 +98,13 @@
 <!-- Tests -->
 <script>
     QUnit.config.autostart = false;
-    require.config({"baseUrl": "../src/"});
-    require(["capture", "jazzcat", "utils"], function(Capture, Jazzcat, Utils) {
+    require.config({
+        "baseUrl": "../src/",
+        "paths": {
+            "mobifyjs": "../src/"
+        }
+    });
+    require(["mobifyjs/capture", "mobifyjs/jazzcat", "mobifyjs/utils"], function(Capture, Jazzcat, Utils) {
         QUnit.start();
 
         var httpCache = Jazzcat.httpCache;
@@ -467,6 +473,7 @@
                     Array.prototype.slice.call(doc.querySelectorAll('script')).forEach(function(script){
                         script.removeAttribute('mobify-optimized');
                     });
+
                     // verify that things we wanted to load from cache did and other things did not
                     var enabledDocumentString = Capture.enable(Utils.outerHTML(doc.documentElement));
 

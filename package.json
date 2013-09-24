@@ -17,7 +17,8 @@
     "grunt-s3": "0.2.0-alpha.2",
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-jekyll": "~0.3.6",
-    "grunt-express": "~0.3.6"
+    "grunt-express": "~0.3.6",
+    "grunt-release": "~0.5.1"
   },
   "engine": ">= 0.10.1",
   "repository": {

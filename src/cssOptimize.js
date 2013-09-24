@@ -2,7 +2,7 @@
  * cssOptimize - Client code to a css optimization service
  */
 
-define(["utils"], function(Utils) {
+define(["mobifyjs/utils"], function(Utils) {
 
 var CssOptimize = window.cssOptimize = {};
 

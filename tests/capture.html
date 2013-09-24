@@ -47,8 +47,13 @@
     QUnit.config.autostart = false;
     QUnit.config.testTimeout = 30 * 1000;
 
-    require.config({"baseUrl": "../src/"});
-    require(["utils", "capture"], function(Utils, Capture) {
+    require.config({
+        "baseUrl": "../src/",
+        "paths": {
+            "mobifyjs": "../src/"
+        }
+    });
+    require(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         QUnit.start();
 
         // Test disabling attributes that cause resource loading
