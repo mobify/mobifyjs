@@ -730,7 +730,7 @@ var createSeamlessIframe = function(doc){
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
     iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color: transparent;border: 0px none transparent;'
-    // Open iframe an force all links and forms to target the parent
+    iframe.setAttribute('seamless', '');
     return iframe;
 }
 
@@ -947,8 +947,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
 
         // Write escaped chunk to captured document
         capturedDoc.write(toWrite);
-
-        ///<([a-zA-Z]*)\s?[^>]*><\/([a-zA-Z]*)>/.exec('><div></div>')
 
         if (iframe) {
             // Move certain elements that should be in the top-level document,
@@ -1968,7 +1966,7 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
      */
     // `loaded` indicates if we have loaded the cached and inserted the loader
     // into the document
-    var loaded = false;
+    Jazzcat.loaderInserted = false;
     Jazzcat.optimizeScripts = function(scripts, options) {
         if (options && options.cacheOverrideTime !== undefined) {
             Utils.extend(httpCache.options,
@@ -2032,12 +2030,12 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
             // TODO: Check for async/defer
 
             // Load what we have in http cache, and insert loader into document
-            if (jsonp && !loaded) {
+            if (jsonp && !Jazzcat.loaderInserted) {
                 httpCache.load(httpCache.options);
                 var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
                 script.parentNode.insertBefore(httpLoaderScript, script);
                 // ensure this doesn't happen again for this page load
-                loaded = true;
+                Jazzcat.loaderInserted = true;
             }
 
             var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
@@ -2095,10 +2093,6 @@ define('jazzcat',["utils", "capture"], function(Utils, Capture) {
                 }
             }
         }
-
-        // Set loaded to true incase `optimizeScripts` is called twice on the
-        // same pageload.
-        loaded = false;
 
         return scripts;
     };
