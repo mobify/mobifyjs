@@ -300,7 +300,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      */
     // `loaded` indicates if we have loaded the cached and inserted the loader
     // into the document
-    var loaded = false;
+    Jazzcat.loaderInserted = false;
     Jazzcat.optimizeScripts = function(scripts, options) {
         if (options && options.cacheOverrideTime !== undefined) {
             Utils.extend(httpCache.options,
@@ -364,12 +364,12 @@ define(["utils", "capture"], function(Utils, Capture) {
             // TODO: Check for async/defer
 
             // Load what we have in http cache, and insert loader into document
-            if (jsonp && !loaded) {
+            if (jsonp && !Jazzcat.loaderInserted) {
                 httpCache.load(httpCache.options);
                 var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
                 script.parentNode.insertBefore(httpLoaderScript, script);
                 // ensure this doesn't happen again for this page load
-                loaded = true;
+                Jazzcat.loaderInserted = true;
             }
 
             var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
@@ -427,10 +427,6 @@ define(["utils", "capture"], function(Utils, Capture) {
                 }
             }
         }
-
-        // Set loaded to true incase `optimizeScripts` is called twice on the
-        // same pageload.
-        loaded = false;
 
         return scripts;
     };

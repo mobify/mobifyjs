@@ -209,6 +209,9 @@
 
                 var results = Jazzcat.optimizeScripts(scripts);
 
+                // cleanup for next Jazzcat test
+                Jazzcat.loaderInserted = false;
+
                 ok(!/Jazzcat/.test(results[0].innerHTML), "Jazzcat does not affect incompatible browsers");
             });
 
@@ -356,6 +359,9 @@
 
                 var results = Jazzcat.optimizeScripts(scripts);
 
+                // cleanup for next Jazzcat test
+                Jazzcat.loaderInserted = false;
+
                 httpCache.save(function(err) {
                     if (err) throw err;
 
@@ -388,6 +394,8 @@
             asyncTest('optimizeScripts - Cold cache', 1, function() {
                 var scripts = $($("#optimizeScripts-coldcache-source").text()).filter("script").toArray();
                 var results = Jazzcat.optimizeScripts(scripts);
+                // cleanup for next Jazzcat test
+                Jazzcat.loaderInserted = false;
 
                 var html = '';
                 html += "<textarea>" + results.map(function(el) {
@@ -450,6 +458,9 @@
                         cacheOverrideTime: 10,
                         concat: true
                     });
+
+                    // cleanup for next Jazzcat test
+                    Jazzcat.loaderInserted = false;
 
                     // Remove the `mobify-optimized` attribute because Firefox and
                     // Chrome serialize our attributes in different orders
@@ -624,6 +635,9 @@
                             concat: concat,
                             responseType: responseType
                         });
+
+                        // cleanup for next Jazzcat test
+                        Jazzcat.loaderInserted = false;
                         
                         // Remove the `mobify-optimized` and `class` attribute because
                         // Firefox and Chrome serialize our attributes in different orders
