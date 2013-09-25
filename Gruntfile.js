@@ -56,7 +56,7 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "mobify-library",
-                    out: "./build/mobify-<%= pkg.version %>.js"
+                    out: "./build/mobify.js"
                 }
             },
             // Building custom Mobify.js library (must copy mobify-custom.js.example -> mobify-custom.js)
@@ -74,8 +74,8 @@ module.exports = function(grunt) {
         uglify: {
             full: {
                 files: {
-                    'build/mobify-<%= pkg.version %>.min.js':
-                        ['build/mobify-<%= pkg.version %>.js']
+                    'build/mobify.min.js':
+                        ['build/mobify.js']
                 }
             },
             custom: {
@@ -202,15 +202,28 @@ module.exports = function(grunt) {
                 headers: { "Cache-Control": SHORT_CACHE_CONTROL },
                 maxOperations: 6
             },
-            build: {
+            devBuild: {
                 options: {
                     bucket: 'mobify',
                     gzip: true
                 },
                 upload: [
-                    { // build
-                        src: "build/**/*",
-                        dest: "mobifyjs/build/",
+                    { // unminified dev build
+                        src: "build/mobify.js",
+                        dest: "mobifyjs/build/mobify-<%= pkg.version %>.js",
+                        rel: "build",
+                    }
+                ]
+            },
+            prodBuild: {
+                options: {
+                    bucket: 'mobify',
+                    gzip: true
+                },
+                upload: [
+                    { // minified production build
+                        src: "build/mobify.min.js",
+                        dest: "mobifyjs/build/mobify-<%= pkg.version %>.min.js",
                         rel: "build",
                     }
                 ]
@@ -328,7 +341,7 @@ module.exports = function(grunt) {
         }
     });
     grunt.registerTask('default', 'build');
-    grunt.registerTask('deploy', ['build', 's3:build', 's3:examples']);
+    grunt.registerTask('deploy', ['build', 's3:devBuild', 's3:prodBuild', 's3:examples']);
     grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging', 's3:wwwstagingstatic']);
     grunt.registerTask('wwwproddeploy', ['jekyll:build', 's3:wwwprod', 's3:wwwprodstatic']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
