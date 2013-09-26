@@ -236,6 +236,13 @@
 
         });
 
+
+        test("removeCloseEndTagsAtEndOfString", function(){
+            var html = "<html><head></head><body><h1></h1></body ></html>";
+            var expectedHtml = "<html><head></head><body><h1>";
+            equal(Capture.removeCloseEndTagsAtEndOfString(html), expectedHtml);
+        })
+
         /**
          * Ensure the complete document is captured.
          */
