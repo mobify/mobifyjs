@@ -884,7 +884,11 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // AKA an insane hack for an insane hack.
         try {
             iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
-        } catch (e) {} // This will throw an exception on Firefox 
+        } catch (e) {
+            // Accessing the iframes history api in Firefox throws an error. But this
+            // isn't a concern since Firefox is sending the referer header correctly
+            // https://bugzilla.mozilla.org/show_bug.cgi?id=591801
+        }
 
         // If someone uses window.location to navigate, we must ensure that the
         // history in the parent window matches
