@@ -87,10 +87,11 @@ function extractHTMLStringFromElement(container) {
 }
 
 /**
- * Takes a method on one source object and overrides it to call the method on
- * a destination object (in addition to calling the method on the source object)
+ * Takes a method name and applies that methon on a source object and overrides
+ * it to call the method on a destination object with the same arguments 
+ * (in addition to calling the method on the source object)
  */
-var applyMethodToDifferentObject = function(srcObj, destObj, method) {
+var callMethodOnDestObjFromSourceObj = function(srcObj, destObj, method) {
     var oldMethod = srcObj[method];
     if (!oldMethod) {
         return;
@@ -283,7 +284,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         var parentHistory = window.parent.history;
         var historyMethods = ['replaceState', 'pushState', 'go', 'forward', 'back'];
         historyMethods.forEach(function(element) {
-            applyMethodToDifferentObject(iframeHistory, parentHistory, element);
+            callMethodOnDestObjFromSourceObj(iframeHistory, parentHistory, element);
         });
     }
 
