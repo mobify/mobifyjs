@@ -127,6 +127,10 @@ var Capture = function(sourceDoc, prefix) {
     if (window.Mobify) window.Mobify.prefix = this.prefix;
 };
 
+/**
+ * Initiate a buffered capture. `init` is an alias to `initCapture` for
+ * backwards compatibility.
+ */
 Capture.init = Capture.initCapture = function(callback, doc, prefix) {
     var doc = doc || document;
 
@@ -160,7 +164,7 @@ Capture.init = Capture.initCapture = function(callback, doc, prefix) {
 };
 
 /**
- * Streaming capturing is a batshit loco insane way of being able to modify
+ * Streaming capturing is a batsh*t loco insane way of being able to modify
  * streaming chunks of markup before the browser can request resources.
  * There are two key things to note when reading this code:
  *  1. Since we use the plaintext tag to capture the markup and prevent resources
@@ -255,7 +259,8 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // In Webkit/Blink, resources requested in a non-src iframe do not have
         // a referer attached. This is an issue for scripts like Typekit.
         // We get around this by manipulating the browsers
-        // history to trick it into thinking it is an src iframe.
+        // history to trick it into thinking it is an src iframe, which causes
+        // the referer to be sent.
         // AKA an insane hack for an insane hack.
         try {
             iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
