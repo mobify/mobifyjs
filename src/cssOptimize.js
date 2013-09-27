@@ -2,7 +2,7 @@
  * cssOptimize - Client code to a css optimization service
  */
 
-define(["utils"], function(Utils) {
+define(["mobifyjs/utils"], function(Utils) {
 
 var CssOptimize = window.cssOptimize = {};
 
@@ -56,8 +56,9 @@ CssOptimize.optimize = function(elements, options) {
         element = elements[i];
         if (element.nodeName === 'LINK' &&
             element.getAttribute('rel') === 'stylesheet' &&
-            element.getAttribute(opts.targetAttribute)) {
-
+            element.getAttribute(opts.targetAttribute) &&
+            !element.hasAttribute('mobify-optimized')) {
+            element.setAttribute('mobify-optimized', '');
             CssOptimize._rewriteHref(element, opts);
         }
     }

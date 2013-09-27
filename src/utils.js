@@ -67,11 +67,16 @@ Utils.httpUrl = function(url) {
  * outerHTML polyfill - https://gist.github.com/889005
  */
 Utils.outerHTML = function(el){
-    var div = document.createElement('div');
-    div.appendChild(el.cloneNode(true));
-    var contents = div.innerHTML;
-    div = null;
-    return contents;
+    if (el.outerHTML) {
+        return el.outerHTML;
+    }
+    else {
+        var div = document.createElement('div');
+        div.appendChild(el.cloneNode(true));
+        var contents = div.innerHTML;
+        div = null;
+        return contents;
+    }
 };
 
 Utils.removeBySelector = function(selector, doc) {
@@ -158,6 +163,47 @@ Utils.matchMedia = function(doc) {
 Utils.domIsReady = function(doc) {
     var doc = doc || document;
     return doc.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading";
+}
+
+Utils.getPhysicalScreenSize = function(devicePixelRatio) {
+
+    function multiplyByPixelRatio(sizes) {
+        var dpr = devicePixelRatio || 1;
+
+        sizes.width = Math.round(sizes.width * dpr);
+        sizes.height = Math.round(sizes.height * dpr);
+
+        return sizes;
+    }
+
+    var iOS = navigator.userAgent.match(/ip(hone|od|ad)/i);
+    var androidVersion = (navigator.userAgent.match(/android (\d)/i) || {})[1];
+
+    var sizes = {
+        width: window.outerWidth
+      , height: window.outerHeight
+    };
+
+    // Old Android and BB10 use physical pixels in outerWidth/Height, which is what we need
+    // New Android (4.0 and above) use CSS pixels, requiring devicePixelRatio multiplication
+    // iOS lies about outerWidth/Height when zooming, but does expose CSS pixels in screen.width/height
+
+    if (!iOS) {
+        if (androidVersion > 3) return multiplyByPixelRatio(sizes);
+        return sizes;
+    }
+
+    var isLandscape = window.orientation % 180;
+
+    if (isLandscape) {
+        sizes.height = screen.width;
+        sizes.width = screen.height;
+    } else {
+        sizes.width = screen.width;
+        sizes.height = screen.height;
+    }
+
+    return multiplyByPixelRatio(sizes);
 }
 
 return Utils;

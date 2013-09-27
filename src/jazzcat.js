@@ -21,7 +21,7 @@
  * into the cache using a bootloader request to Jazzcat. Scripts are then
  * executed directly from the cache.
  */
-define(["utils", "capture"], function(Utils, Capture) {
+define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
     /**
      * An HTTP 1.1 compliant localStorage backed cache.
      */
@@ -298,12 +298,16 @@ define(["utils", "capture"], function(Utils, Capture) {
      *                          requests should be concatenated (split between
      *                          head and body).
      */
-
+    // `loaded` indicates if we have loaded the cached and inserted the loader
+    // into the document
+    Jazzcat.cacheLoaderInserted = false;
     Jazzcat.optimizeScripts = function(scripts, options) {
         if (options && options.cacheOverrideTime !== undefined) {
             Utils.extend(httpCache.options,
               {overrideTime: options.cacheOverrideTime});
         }
+        var scripts = Array.prototype.slice.call(scripts);
+
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || Jazzcat.isIncompatibleBrowser()) {
             return scripts;
@@ -312,9 +316,6 @@ define(["utils", "capture"], function(Utils, Capture) {
         options = Utils.extend({}, Jazzcat.defaults, options || {});
         var jsonp = (options.responseType === 'jsonp');
         var concat = options.concat;
-
-        // load data from localStorage
-        httpCache.load(httpCache.options);
 
         // helper method for inserting the loader script
         // before the first uncached script in the "uncached" array
@@ -337,21 +338,37 @@ define(["utils", "capture"], function(Utils, Capture) {
                 urls: []
             }
         };
-        // Insert the httpCache loader before the first script
-        if (jsonp) {
-            var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-            scripts[0].parentNode.insertBefore(httpLoaderScript, scripts[0]);
-        }
 
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
 
-            url = script.getAttribute(options.attribute);
+            // Skip script if it has been optimized already, or if you have a "skip-optimize" class
+            if (script.hasAttribute('mobify-optimized') ||
+                script.hasAttribute('skip-optimize') ||
+                /mobify/i.test(script.className)){
+                continue;
+            }
 
             // skip if the script is inline
-            if (!url) continue;
+            url = script.getAttribute(options.attribute);
+            if (!url) {
+                continue;
+            }
             url = Utils.absolutify(url);
-            if (!Utils.httpUrl(url)) continue;
+            if (!Utils.httpUrl(url)) {
+                continue;
+            }
+
+            // TODO: Check for async/defer
+
+            // Load what we have in http cache, and insert loader into document
+            if (jsonp && !Jazzcat.cacheLoaderInserted) {
+                httpCache.load(httpCache.options);
+                var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
+                script.parentNode.insertBefore(httpLoaderScript, script);
+                // ensure this doesn't happen again for this page load
+                Jazzcat.cacheLoaderInserted = true;
+            }
 
             var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
 
@@ -369,10 +386,11 @@ define(["utils", "capture"], function(Utils, Capture) {
                         toConcat[parent].urls.push(url);
                     }
                 }
-
+                script.type = 'text/mobify-script';
                 // Rewriting script to grab contents from our in-memory cache
                 // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
                 script.innerHTML =  options.execCallback + "('" + url + "');";
+
                 // Remove the src attribute
                 script.removeAttribute(options.attribute);
             }
@@ -397,8 +415,7 @@ define(["utils", "capture"], function(Utils, Capture) {
             insertLoader(toConcat['body'].firstScript, toConcat['body'].urls);
         }
 
-        // if responseType is js and we are concatenating,
-        // remove original scripts
+        // if responseType is js and we are concatenating, remove original scripts
         if (!jsonp && concat) {
             for (var i=0, len=scripts.length; i<len; i++) {
                 var script = scripts[i];
@@ -418,6 +435,7 @@ define(["utils", "capture"], function(Utils, Capture) {
      */
     Jazzcat.getHttpCacheLoaderScript = function() {
         var loadFromCacheScript = document.createElement('script');
+        loadFromCacheScript.type = 'text/mobify-script';
         loadFromCacheScript.innerHTML = (httpCache.options.overrideTime ?
           "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
           "Jazzcat.httpCache.load();" );
@@ -437,6 +455,8 @@ define(["utils", "capture"], function(Utils, Capture) {
         var loadScript;
         if (urls && urls.length) {
             loadScript = document.createElement('script');
+            // Set the script to "optimized"
+            loadScript.setAttribute('mobify-optimized', '');
             loadScript.setAttribute(options.attribute, Jazzcat.getURL(urls, options));
         }
         return loadScript;
@@ -538,7 +558,7 @@ define(["utils", "capture"], function(Utils, Capture) {
         responseType: 'jsonp',
         execCallback: 'Jazzcat.exec',
         loadCallback: 'Jazzcat.load',
-        concat: true,
+        concat: false,
         projectName: '',
     };
 

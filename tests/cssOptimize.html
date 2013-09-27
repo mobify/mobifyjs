@@ -20,9 +20,14 @@
 
 <script>
     QUnit.config.autostart = false;
-    require.config({"baseUrl": "../src/"});
+    require.config({
+        "baseUrl": "../src/",
+        "paths": {
+            "mobifyjs": "../src/"
+        }
+    });
     
-    require(["utils", "cssOptimize"], function(Utils, CssOptimize) {
+    require(["mobifyjs/utils", "mobifyjs/cssOptimize"], function(Utils, CssOptimize) {
         QUnit.start();
         
         test("cssOptimize - optimize (rewrites a <link> element's href)", function() {

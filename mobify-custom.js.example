@@ -1,4 +1,4 @@
-require(["utils", "capture", "resizeImages", "jazzcat", "unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
+require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
     var Mobify = window.Mobify = window.Mobify || {};
 
     // DECLARE LIBRARIES ATTACHED TO MOBIFY OBJECT HERE
@@ -18,14 +18,16 @@ require(["utils", "capture", "resizeImages", "jazzcat", "unblockify"], function(
     var capturing = window.Mobify && window.Mobify.capturing || false;
     if (capturing) {
         // Grab reference to a newly created document
-        var capture = Capture.init(function(capture){
+        Mobify.Capture.initStreamingCapture(function(capture){
+            // optimize scripts
             var capturedDoc = capture.capturedDoc;
-
             var scripts = capturedDoc.querySelectorAll('script');
-            Mobify.Jazzcat.combineScripts(scripts, capturedDoc, {cacheOverrideTime: 1});
+            Mobify.Jazzcat.optimizeScripts(scripts);
+            // // optimize images
+            var images = capturedDoc.querySelectorAll('img, picture');
+            Mobify.ResizeImages.resize(images);
 
-            // Render source DOM to document
-            capture.renderCapturedDoc();
+            //capture.renderCapturedDoc();
         });
     }
 
