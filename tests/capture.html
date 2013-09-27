@@ -238,8 +238,8 @@
 
 
         test("removeCloseEndTagsAtEndOfString", function(){
-            var html = "<html><head></head><body><h1></h1></body ></html>";
-            var expectedHtml = "<html><head></head><body><h1>";
+            var html = "<html><head>\n</head>\n<body><h1></h1></body ></html>";
+            var expectedHtml = "<html><head>\n</head>\n<body><h1>";
             equal(Capture.removeCloseEndTagsAtEndOfString(html), expectedHtml);
         })
 

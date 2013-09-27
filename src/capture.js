@@ -405,14 +405,9 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
  * Removes all closing tags from an html string
  */
 Capture.removeCloseEndTagsAtEndOfString = function(html) {
-    var newHtml = undefined;
-    while (newHtml !== html) {
-        html = (newHtml !== undefined) ? newHtml : html;
-        newHtml = html.replace(/(.*)<\/[^>]*>$/i, function(match, p1){
+    return html.replace(/(.*?)((<\/[^>]+>)+)$/gi, function(match, p1){
             return p1
-        });
-    }
-    return newHtml;
+    });
 }
 
 Capture.removeTargetSelf = function(html) {
