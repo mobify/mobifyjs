@@ -769,7 +769,7 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
     plaintextBuffer += toWrite;
 
     // Escape resources for chunk and remove target=self
-    toWrite = Capture.disable(toWrite, capture.prefix).replace(/target="_self"/gi, '');
+    toWrite = Capture.removeTargetSelf(Capture.disable(toWrite, capture.prefix));
 
     // Write escaped chunk to captured document
     capture.capturedDoc.write(toWrite);
@@ -1033,6 +1033,10 @@ Capture.removeCloseEndTagsAtEndOfString = function(html) {
         });
     }
     return newHtml;
+}
+
+Capture.removeTargetSelf = function(html) {
+    return html.replace(/target=("_self"|\'_self\')/gi, '');
 }
 
 /**

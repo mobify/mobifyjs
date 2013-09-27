@@ -243,6 +243,12 @@
             equal(Capture.removeCloseEndTagsAtEndOfString(html), expectedHtml);
         })
 
+        test("removeTargetSelf", function(){
+            var html = "<a href='' target=\"_self\" target='_self'>";
+            var expectedHtml = "<a href=''  >";
+            equal(Capture.removeTargetSelf(html), expectedHtml);
+        })
+
         /**
          * Ensure the complete document is captured.
          */
@@ -304,6 +310,7 @@
         // TESTS TO WRITE FOR STREAMING CAPTURING:
         // * Verify that scripts execute in the correct order using streaming capturing
         // * Ensure navigation works correctly
+        // * Ensure that referer is being sent with requests made within the iframe
 
     });
 </script>
