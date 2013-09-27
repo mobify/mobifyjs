@@ -1991,13 +1991,6 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
         }
         var scripts = Array.prototype.slice.call(scripts);
 
-        // Remove mobify script(s) from scripts array
-        scripts = scripts.filter(function(script){
-            if (!/mobify/i.test(script.className)) {
-                return script;
-            }
-        });
-        
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || Jazzcat.isIncompatibleBrowser()) {
             return scripts;
@@ -2033,7 +2026,9 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
             var script = scripts[i];
 
             // Skip script if it has been optimized already, or if you have a "skip-optimize" class
-            if (script.hasAttribute('mobify-optimized') || script.hasAttribute('skip-optimize')) {
+            if (script.hasAttribute('mobify-optimized') ||
+                script.hasAttribute('skip-optimize') ||
+                /mobify/i.test(script.className)){
                 continue;
             }
 
