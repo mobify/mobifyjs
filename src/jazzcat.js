@@ -300,7 +300,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
      */
     // `loaded` indicates if we have loaded the cached and inserted the loader
     // into the document
-    Jazzcat.loaderInserted = false;
+    Jazzcat.cacheLoaderInserted = false;
     Jazzcat.optimizeScripts = function(scripts, options) {
         if (options && options.cacheOverrideTime !== undefined) {
             Utils.extend(httpCache.options,
@@ -357,19 +357,23 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
 
             // skip if the script is inline
             url = script.getAttribute(options.attribute);
-            if (!url) continue;
+            if (!url) {
+                continue;
+            }
             url = Utils.absolutify(url);
-            if (!Utils.httpUrl(url)) continue;
+            if (!Utils.httpUrl(url)) {
+                continue;
+            }
 
             // TODO: Check for async/defer
 
             // Load what we have in http cache, and insert loader into document
-            if (jsonp && !Jazzcat.loaderInserted) {
+            if (jsonp && !Jazzcat.cacheLoaderInserted) {
                 httpCache.load(httpCache.options);
                 var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
                 script.parentNode.insertBefore(httpLoaderScript, script);
                 // ensure this doesn't happen again for this page load
-                Jazzcat.loaderInserted = true;
+                Jazzcat.cacheLoaderInserted = true;
             }
 
             var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
