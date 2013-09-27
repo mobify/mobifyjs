@@ -712,16 +712,21 @@ Capture.getMobifyLibrary = function(doc) {
     return mobifyjsScript;
 };
 
+/**
+ * Grabs the main function/src/script if it exists
+ */
 Capture.getMain = function(doc) {
     var doc = doc || document;
     var mainScript = undefined;
     if (window.Mobify && window.Mobify.mainExecutable) {
+        // Checks for main executable string on Mobify object and creates a script
+        // out of it
         mainScript = document.createElement('script');
-        mainScript.innerHTML = "var main = " + window.Mobify.mainExecutable + "; main();";
+        mainScript.innerHTML = "var main = " + window.Mobify.mainExecutable.toString() + "; main();";
         mainScript.id = 'main-executable';
         mainScript.setAttribute("class", "mobify");
-    }
-    else {
+    } else {
+        // Older tags used to insert the main executable by themselves. 
         mainScript = doc.getElementById("main-executable");
     }
     return mainScript;
