@@ -184,9 +184,10 @@ ResizeImages._crawlPictureElement = function(el, opts) {
     var sources = el.getElementsByTagName('source');
     // If source elements are erased from the dom, leave the
     // picture element alone.
-    if (sources.length === 0) {
+    if (sources.length === 0 || el.hasAttribute('mobify-optimized')) {
         return;
     }
+    el.setAttribute('mobify-optimized', '');
 
     // Grab optional `data-src` attribute on `picture`.
     // Used for preventing writing the same src multiple times for
@@ -246,8 +247,7 @@ ResizeImages.resize = function(elements, options) {
         }
         // For a `picture`, (potentially) nuke src on `img`, and
         // pass all `source` elements into modifyImages recursively
-        else if (element.nodeName === 'PICTURE' && !element.hasAttribute('mobify-optimized')) {
-            element.setAttribute('mobify-optimized', '');
+        else if (element.nodeName === 'PICTURE') {
             ResizeImages._crawlPictureElement(element, opts);
         }
     }
