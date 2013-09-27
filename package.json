@@ -1,6 +1,6 @@
 {
   "name": "mobifyjs",
-  "version": "2.0.0alpha6",
+  "version": "2.0.0alpha7",
   "description": "The Mobify.js client side adaptation library.",
   "author": "Mobify <dev@mobify.com>",
   "dependencies": {
@@ -17,7 +17,8 @@
     "grunt-s3": "0.2.0-alpha.2",
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-jekyll": "~0.3.6",
-    "grunt-express": "~0.3.6"
+    "grunt-express": "~0.3.6",
+    "grunt-release": "~0.5.1"
   },
   "engine": ">= 0.10.1",
   "repository": {
