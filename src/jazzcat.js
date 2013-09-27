@@ -306,19 +306,18 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
             Utils.extend(httpCache.options,
               {overrideTime: options.cacheOverrideTime});
         }
+        var scripts = Array.prototype.slice.call(scripts);
+
+        // Remove mobify script(s) from scripts array
+        scripts = scripts.filter(function(script){
+            if (!/mobify/i.test(script.className)) {
+                return script;
+            }
+        });
+        
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || Jazzcat.isIncompatibleBrowser()) {
             return scripts;
-        }
-
-        // Remove mobify script(s) from scripts array
-        if (/mobify/i.test(scripts[0].className)) {
-            var scripts = Array.prototype.slice.call(scripts);
-            scripts.splice(0, 1);
-            // Check for main executable as well
-            if (scripts.length > 0 && /mobify/i.test(scripts[0].className)) {
-                scripts.splice(0, 1);
-            }
         }
 
         options = Utils.extend({}, Jazzcat.defaults, options || {});
@@ -350,7 +349,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
 
-            // Skip script if it has been optimized already
+            // Skip script if it has been optimized already, or if you have a "skip-optimize" class
             if (script.hasAttribute('mobify-optimized') || script.hasAttribute('skip-optimize')) {
                 continue;
             }

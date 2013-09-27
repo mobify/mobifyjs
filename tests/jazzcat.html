@@ -26,6 +26,7 @@
         <script x-src="http://uncached/2/" class="combine"></script>
         <script x-src="http://excluded/"></script>
         <script class="combine"></script>
+        <script x-src="http://cdn.mobify.com/mobify.js"class="mobify combine"></script>
 </textarea>
 
 <!-- Fixtures for ensuring `optimizeScripts` executes scripts in the right order. -->
@@ -595,7 +596,7 @@
                 }
             });
 
-            asyncTest('optimizeScripts', 18, function() {
+            asyncTest('optimizeScripts', 19, function() {
                 httpCache.reset({
                     'http://cached/': {
                         'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
@@ -618,7 +619,8 @@
                             uncachedHead2: scripts[4],
                             uncachedBody2: scripts[5],
                             excluded: scripts[6],
-                            inline: scripts[7]
+                            inline: scripts[7],
+                            mobifyscript: scripts[8]
                         }
                     };
 
@@ -788,11 +790,19 @@
 
                     equal(html, expected, "Regression, ensure inline scripts don't get removed, jsonp response type");
 
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([],
+                                                 [scripts.mobifyscript],
+                                                 {concat: true, responseType: 'jsonp'});
+                    expected = "<html><head><title></title></head><body><script src=\"http://cdn.mobify.com/mobify.js\"><\/script></body></html>";
+
+                    equal(html, expected, "Ensure mobify scripts get removed, jsonp response type");
 
                     start();
                 });
             });
 
+            
 
             // TODO: Add test to ensure save doesn't get called more then once
             // before onload.
