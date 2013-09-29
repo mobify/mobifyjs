@@ -362,6 +362,8 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         startCapturedHtml += Utils.outerHTML(main);
     }
 
+    var startDestHtml = Capture.getDoctype(sourceDoc);
+
     if (iframe) {
         // In Webkit/Blink, resources requested in a non-src iframe do not have
         // a referer attached. This is an issue for scripts like Typekit.
@@ -393,8 +395,9 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
 
     startCapturedHtml = Capture.disable(startCapturedHtml, prefix);
 
-    // Start the captured doc off write! (pun intended)
+    // Start the captured doc and dest doc off write! (pun intended)
     capturedDoc.write(startCapturedHtml);
+    destDoc.write(startDestHtml);
 
 
     pollPlaintext(capture, chunkCallback, finishedCallback, options);
