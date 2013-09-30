@@ -79,6 +79,23 @@ Utils.outerHTML = function(el){
     }
 };
 
+/**
+ * Return a string for the doctype of the current document.
+ */
+Utils.getDoctype = function(doc) {
+    doc = doc || document;
+    var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
+            return el.nodeType == Node.DOCUMENT_TYPE_NODE
+        })[0];
+
+    if (!doctypeEl) return '';
+
+    return '<!DOCTYPE HTML'
+        + (doctypeEl.publicId ? ' PUBLIC "' + doctypeEl.publicId + '"' : '')
+        + (doctypeEl.systemId ? ' "' + doctypeEl.systemId + '"' : '')
+        + '>';
+};
+
 Utils.removeBySelector = function(selector, doc) {
     doc = doc || document;
 

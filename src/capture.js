@@ -342,7 +342,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var capturedDoc = capture.capturedDoc = captureIframe.contentDocument;
     capturedDoc.open("text/html", "replace");
     // Start the captured doc with the original pieces of the source doc
-    var startCapturedHtml = Capture.getDoctype(sourceDoc) +
+    var startCapturedHtml = Utils.getDoctype(sourceDoc) +
                  Capture.openTag(sourceDoc.documentElement) +
                  Capture.openTag(sourceDoc.head) +
                  // Even if there is another base tag in the site that sets
@@ -362,7 +362,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         startCapturedHtml += Utils.outerHTML(main);
     }
 
-    var startDestHtml = Capture.getDoctype(sourceDoc);
+    var startDestHtml = Utils.getDoctype(sourceDoc);
 
     if (iframe) {
         // In Webkit/Blink, resources requested in a non-src iframe do not have
@@ -497,23 +497,6 @@ Capture.openTag = function(element) {
 };
 
 /**
- * Return a string for the doctype of the current document.
- */
-Capture.getDoctype = function(doc) {
-    var doc = doc || document;
-    var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
-            return el.nodeType == Node.DOCUMENT_TYPE_NODE
-        })[0];
-
-    if (!doctypeEl) return '';
-
-    return '<!DOCTYPE HTML'
-        + (doctypeEl.publicId ? ' PUBLIC "' + doctypeEl.publicId + '"' : '')
-        + (doctypeEl.systemId ? ' "' + doctypeEl.systemId + '"' : '')
-        + '>';
-};
-
-/**
  * Returns an object containing the state of the original page. Caches the object
  * in `extractedHTML` for later use.
  */
@@ -524,7 +507,7 @@ Capture.getDoctype = function(doc) {
     var htmlEl = doc.getElementsByTagName('html')[0];
 
     captured = {
-        doctype: Capture.getDoctype(doc),
+        doctype: Utils.getDoctype(doc),
         htmlOpenTag: Capture.openTag(htmlEl),
         headOpenTag: Capture.openTag(headEl),
         bodyOpenTag: Capture.openTag(bodyEl),
