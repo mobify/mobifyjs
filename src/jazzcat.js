@@ -29,7 +29,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         cache: {},
         options: {},
         utils: {}
-    }
+    };
 
     var localStorageKey = 'Mobify-Jazzcat-Cache-v1.0';
 
@@ -122,7 +122,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
                 try {
                     serialized = JSON.stringify(resources);
                 } catch(e) {
-                    canSave = true
+                    canSave = true;
                     return callback && callback(e);
                 }
 
@@ -136,7 +136,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
                         return callback && callback(e);
                     }
                     // Find the least recently used resource.
-                    for (key in resources) {
+                    for (var key in resources) {
                         if (!resources.hasOwnProperty(key)) continue;
                         resource = resources[key];
 
@@ -185,7 +185,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
             if (match = ccDirectives.exec(directive)) {
                 obj[match[1]] = true;
             } else if (match = ccMaxAge.exec(directive)) {
-                obj[match[1]] = parseInt(match[2]);
+                obj[match[1]] = parseInt(match[2], 10);
             }
         });
 
@@ -252,8 +252,8 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         // match[1] == Firefox <= 11, // match[3] == Opera 11|12
         // These browsers have problems with document.write after a document.write
         if ((match && match[1] && +match[2] < 12) || (match && match[3])
-            || (!Utils.supportsLocalStorage())
-            || (!window.JSON)) {
+             || (!Utils.supportsLocalStorage())
+             || (!window.JSON)) {
             return true;
         }
 
@@ -306,7 +306,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
             Utils.extend(httpCache.options,
               {overrideTime: options.cacheOverrideTime});
         }
-        var scripts = Array.prototype.slice.call(scripts);
+        scripts = Array.prototype.slice.call(scripts);
 
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || Jazzcat.isIncompatibleBrowser()) {
@@ -381,7 +381,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
                     }
                     else {
                         if (toConcat[parent].firstScript === undefined) {
-                            toConcat[parent].firstScript = script
+                            toConcat[parent].firstScript = script;
                         }
                         toConcat[parent].urls.push(url);
                     }
@@ -407,7 +407,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
                 }
                 else {
                     if (toConcat[parent].firstScript === undefined) {
-                        toConcat[parent].firstScript = script
+                        toConcat[parent].firstScript = script;
                     }
                     toConcat[parent].urls.push(url);
                 }
@@ -478,7 +478,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         return options.base +
                (options.projectName ? '/project-' + options.projectName : '') +
                '/' + options.responseType +
-               (options.responseType === 'jsonp' ? '/' + options.loadCallback : '') + 
+               (options.responseType === 'jsonp' ? '/' + options.loadCallback : '') +
                '/' + encodeURIComponent(JSON.stringify(urls.slice().sort())); // TODO only sort for jsonp
     };
 
