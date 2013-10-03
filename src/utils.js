@@ -185,7 +185,7 @@ Utils.domIsReady = function(doc) {
 Utils.getPhysicalScreenSize = function(devicePixelRatio) {
 
     function multiplyByPixelRatio(sizes) {
-        var dpr = devicePixelRatio || 1;
+        var dpr = devicePixelRatio || window.devicePixelRatio || 1;
 
         sizes.width = Math.round(sizes.width * dpr);
         sizes.height = Math.round(sizes.height * dpr);
@@ -211,7 +211,6 @@ Utils.getPhysicalScreenSize = function(devicePixelRatio) {
     }
 
     var isLandscape = window.orientation % 180;
-
     if (isLandscape) {
         sizes.height = screen.width;
         sizes.width = screen.height;
