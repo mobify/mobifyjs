@@ -26,7 +26,8 @@
         <script x-src="http://uncached/2/" class="combine"></script>
         <script x-src="http://excluded/"></script>
         <script class="combine"></script>
-        <script x-src="http://cdn.mobify.com/mobify.js"class="mobify combine"></script>
+        <script x-src="http://cdn.mobify.com/mobify.js" class="mobify combine"></script>
+        <script x-src="http://uncached/" class="combine" onload="console.log('foo')"></script>
 </textarea>
 
 <!-- Fixtures for ensuring `optimizeScripts` executes scripts in the right order. -->
@@ -596,7 +597,7 @@
                 }
             });
 
-            asyncTest('optimizeScripts', 19, function() {
+            asyncTest('optimizeScripts', 20, function() {
                 httpCache.reset({
                     'http://cached/': {
                         'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
@@ -620,7 +621,8 @@
                             uncachedBody2: scripts[5],
                             excluded: scripts[6],
                             inline: scripts[7],
-                            mobifyscript: scripts[8]
+                            mobifyscript: scripts[8],
+                            scriptWithOnload: scripts[9]
                         }
                     };
 
@@ -798,6 +800,12 @@
 
                     equal(html, expected, "Ensure mobify scripts get removed, jsonp response type");
 
+                    var scripts = generateScripts();
+                    var html = getHTMLWithLoader([],
+                                                 [scripts.scriptWithOnload],
+                                                 {concat: false});
+                    expected = "<html><head><title></title></head><body><script>Jazzcat.httpCache.load();<\/script><script src=\"//jazzcat.mobify.com/jsonp/Jazzcat.load/%5B%22http%3A%2F%2Funcached%2F%22%5D\"><\/script><script>Jazzcat.exec('http://uncached/');console.log('foo')<\/script></body></html>";
+                    equal(html, expected, "Script with onload handler");
                     start();
                 });
             });

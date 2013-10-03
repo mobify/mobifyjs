@@ -2008,7 +2008,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
         var insertLoader = function(script, urls) {
             if (script) {
                 var loader = Jazzcat.getLoaderScript(urls, options);
-                // insert the loader directly before the first uncached script
+                // insert the loader directly before the script
                 script.parentNode.insertBefore(loader, script);
             }
         };
@@ -2076,6 +2076,12 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
                 // Rewriting script to grab contents from our in-memory cache
                 // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
                 script.innerHTML =  options.execCallback + "('" + url + "');";
+
+                if (script.hasAttribute('onload')){
+                    var onload = script.getAttribute('onload');
+                    script.innerHTML += onload;
+                    script.removeAttribute('onload');
+                }
 
                 // Remove the src attribute
                 script.removeAttribute(options.attribute);
