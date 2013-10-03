@@ -1,6 +1,6 @@
 (function () {
 /**
- * almond 0.2.5 Copyright (c) 2011-2012, The Dojo Foundation All Rights Reserved.
+ * almond 0.2.6 Copyright (c) 2011-2012, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/almond for details
  */
@@ -383,6 +383,11 @@ var requirejs, require, define;
         }
         return req;
     };
+
+    /**
+     * Expose module registry for debugging and tooling
+     */
+    requirejs._defined = defined;
 
     define = function (name, deps, callback) {
 
@@ -1735,7 +1740,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
         cache: {},
         options: {},
         utils: {}
-    }
+    };
 
     var localStorageKey = 'Mobify-Jazzcat-Cache-v1.0';
 
@@ -1828,7 +1833,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
                 try {
                     serialized = JSON.stringify(resources);
                 } catch(e) {
-                    canSave = true
+                    canSave = true;
                     return callback && callback(e);
                 }
 
@@ -1842,7 +1847,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
                         return callback && callback(e);
                     }
                     // Find the least recently used resource.
-                    for (key in resources) {
+                    for (var key in resources) {
                         if (!resources.hasOwnProperty(key)) continue;
                         resource = resources[key];
 
@@ -1891,7 +1896,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
             if (match = ccDirectives.exec(directive)) {
                 obj[match[1]] = true;
             } else if (match = ccMaxAge.exec(directive)) {
-                obj[match[1]] = parseInt(match[2]);
+                obj[match[1]] = parseInt(match[2], 10);
             }
         });
 
@@ -1958,8 +1963,8 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
         // match[1] == Firefox <= 11, // match[3] == Opera 11|12
         // These browsers have problems with document.write after a document.write
         if ((match && match[1] && +match[2] < 12) || (match && match[3])
-            || (!Utils.supportsLocalStorage())
-            || (!window.JSON)) {
+             || (!Utils.supportsLocalStorage())
+             || (!window.JSON)) {
             return true;
         }
 
@@ -2012,7 +2017,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
             Utils.extend(httpCache.options,
               {overrideTime: options.cacheOverrideTime});
         }
-        var scripts = Array.prototype.slice.call(scripts);
+        scripts = Array.prototype.slice.call(scripts);
 
         // Fastfail if there are no scripts or if required features are missing.
         if (!scripts.length || Jazzcat.isIncompatibleBrowser()) {
@@ -2028,7 +2033,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
         var insertLoader = function(script, urls) {
             if (script) {
                 var loader = Jazzcat.getLoaderScript(urls, options);
-                // insert the loader directly before the first uncached script
+                // insert the loader directly before the script
                 script.parentNode.insertBefore(loader, script);
             }
         };
@@ -2087,15 +2092,21 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
                     }
                     else {
                         if (toConcat[parent].firstScript === undefined) {
-                            toConcat[parent].firstScript = script
+                            toConcat[parent].firstScript = script;
                         }
                         toConcat[parent].urls.push(url);
                     }
                 }
                 script.type = 'text/mobify-script';
                 // Rewriting script to grab contents from our in-memory cache
-                // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
-                script.innerHTML =  options.execCallback + "('" + url + "');";
+                // ex. <script>Jazzcat.exec("http://code.jquery.com/jquery.js")</script>
+                if (script.hasAttribute('onload')){
+                    var onload = script.getAttribute('onload');
+                    script.innerHTML =  options.execCallback + "('" + url + "', '" + onload.replace(/'/g, '\\\'') + "');";
+                    script.removeAttribute('onload');
+                } else {
+                    script.innerHTML =  options.execCallback + "('" + url + "');";
+                }
 
                 // Remove the src attribute
                 script.removeAttribute(options.attribute);
@@ -2107,7 +2118,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
                 }
                 else {
                     if (toConcat[parent].firstScript === undefined) {
-                        toConcat[parent].firstScript = script
+                        toConcat[parent].firstScript = script;
                     }
                     toConcat[parent].urls.push(url);
                 }
@@ -2178,7 +2189,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
         return options.base +
                (options.projectName ? '/project-' + options.projectName : '') +
                '/' + options.responseType +
-               (options.responseType === 'jsonp' ? '/' + options.loadCallback : '') + 
+               (options.responseType === 'jsonp' ? '/' + options.loadCallback : '') +
                '/' + encodeURIComponent(JSON.stringify(urls.slice().sort())); // TODO only sort for jsonp
     };
 
@@ -2188,12 +2199,19 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
      * Execute the script at `url` using `document.write`. If the scripts
      * can't be retrieved from the cache, load it using an external script.
      */
-    Jazzcat.exec = function(url) {
+    Jazzcat.exec = function(url, onload) {
         var resource = httpCache.get(url, true);
         var out;
+        var onloadAttrAndVal = '';
+        if (onload) {
+            onload = ';' + onload + ';';
+            onloadAttrAndVal = ' onload="' + onload + '"';
+        } else {
+            onload = '';
+        }
 
         if (!resource) {
-            out = 'src="' + url + '">';
+            out = 'src="' + url + '"' + onloadAttrAndVal + '>';
         } else {
             out = 'data-orig-src="' + url + '"';
             // Explanation below uses [] to stand for <>.
@@ -2218,7 +2236,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
             //   like 'i' when expression is matched.
             //
             // Talk to Roman if you want to know more about this.
-            out += '>' + resource.body.replace(scriptSplitRe, '$1\\$2');
+            out += '>' + resource.body.replace(scriptSplitRe, '$1\\$2') + onload;
         }
 
         // `document.write` is used to ensure scripts are executed in order,
@@ -2226,7 +2244,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
         // http://hsivonen.iki.fi/script-execution/
         // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
         // This call seems to do nothing in Opera 11/12
-        Jazzcat.write.call(document, '<script ' + out + '<\/script>');
+        Jazzcat.write.call(document, '<script ' + out +'<\/script>');
     };
 
     /**
