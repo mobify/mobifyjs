@@ -110,7 +110,7 @@ var createSeamlessIframe = function(doc){
     var doc = doc || document;
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
-    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color: transparent;border: 0px none transparent;'
+    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color: transparent;border: 0px none transparent;overflow: auto;'
     iframe.setAttribute('seamless', '');
     return iframe;
 }
@@ -331,6 +331,28 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         destDoc.open("text/html", "replace");
     }
 
+    // We must explicitly set the width of the window on the html of the source
+    // document, so that when we create the `startCapturedHtml` string,
+    // eventually the html of the destination document will also be set to
+    // that width. This is necessary because in some browsers, (iOS6/7, Android 2.3)
+    // there is a rendering bug where if the `pre` and `iframe` tags that are larger
+    // then the width of their container, it will force the destination iframe
+    // to grow larger because the width of the `pre/iframe`.
+    var setWidth = function(){
+        var width = Utils.getPhysicalScreenSize().width/(window.devicePixelRatio || 1);
+        width = (width >= 320) ? width : 320;
+        width = width.toString() + "px";
+        sourceDoc.documentElement.style.maxWidth = width;
+        iframe.style.width = width;
+        destDoc.documentElement !== null && (destDoc.documentElement.style.maxWidth = width);
+    }
+    setWidth();
+    window.onresize = function(){
+        setTimeout(function(){
+            setWidth()
+        }, 0);
+    }
+
     // Create a "captured" DOM. This is the playground DOM that the user will
     // have that will stream into the destDoc per chunk.
     // Using an iframe instead of `implementation.createHTMLDocument` because
@@ -398,7 +420,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     // Start the captured doc and dest doc off write! (pun intended)
     capturedDoc.write(startCapturedHtml);
     destDoc.write(startDestHtml);
-
 
     pollPlaintext(capture, chunkCallback, finishedCallback, options);
 
