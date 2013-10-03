@@ -2188,7 +2188,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
         if (!resource) {
             out = 'src="' + url + '"' + onloadAttrAndVal + '>';
         } else {
-            out = 'data-orig-src="' + url + '"' + onloadAttrAndVal;
+            out = 'data-orig-src="' + url + '"';
             // Explanation below uses [] to stand for <>.
             // Inline scripts appear to work faster than data URIs on many OSes
             // (e.g. Android 2.3.x, iOS 5, likely most of early 2013 device market)
@@ -2211,7 +2211,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
             //   like 'i' when expression is matched.
             //
             // Talk to Roman if you want to know more about this.
-            out += '>' + resource.body.replace(scriptSplitRe, '$1\\$2');
+            out += '>' + resource.body.replace(scriptSplitRe, '$1\\$2') + onload;
         }
 
         // `document.write` is used to ensure scripts are executed in order,
@@ -2219,7 +2219,7 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
         // http://hsivonen.iki.fi/script-execution/
         // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
         // This call seems to do nothing in Opera 11/12
-        Jazzcat.write.call(document, '<script ' + out + onload +'<\/script>');
+        Jazzcat.write.call(document, '<script ' + out +'<\/script>');
     };
 
     /**
