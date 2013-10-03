@@ -388,13 +388,13 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
                 }
                 script.type = 'text/mobify-script';
                 // Rewriting script to grab contents from our in-memory cache
-                // ex. <script>Jazzcat.combo.exec("http://code.jquery.com/jquery.js")</script>                    
-                script.innerHTML =  options.execCallback + "('" + url + "');";
-
+                // ex. <script>Jazzcat.exec("http://code.jquery.com/jquery.js")</script>
                 if (script.hasAttribute('onload')){
                     var onload = script.getAttribute('onload');
-                    script.innerHTML += onload;
+                    script.innerHTML =  options.execCallback + "('" + url + "', '" + onload.replace(/'/g, '\\\'') + "');";
                     script.removeAttribute('onload');
+                } else {
+                    script.innerHTML =  options.execCallback + "('" + url + "');";
                 }
 
                 // Remove the src attribute
@@ -488,14 +488,21 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
      * Execute the script at `url` using `document.write`. If the scripts
      * can't be retrieved from the cache, load it using an external script.
      */
-    Jazzcat.exec = function(url) {
+    Jazzcat.exec = function(url, onload) {
         var resource = httpCache.get(url, true);
         var out;
+        var onloadAttrAndVal = '';
+        if (onload) {
+            onload = ';' + onload + ';';
+            onloadAttrAndVal = ' onload="' + onload + '"';
+        } else {
+            onload = '';
+        }
 
         if (!resource) {
-            out = 'src="' + url + '">';
+            out = 'src="' + url + '"' + onloadAttrAndVal + '>';
         } else {
-            out = 'data-orig-src="' + url + '"';
+            out = 'data-orig-src="' + url + '"' + onloadAttrAndVal;
             // Explanation below uses [] to stand for <>.
             // Inline scripts appear to work faster than data URIs on many OSes
             // (e.g. Android 2.3.x, iOS 5, likely most of early 2013 device market)
@@ -526,7 +533,7 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         // http://hsivonen.iki.fi/script-execution/
         // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
         // This call seems to do nothing in Opera 11/12
-        Jazzcat.write.call(document, '<script ' + out + '<\/script>');
+        Jazzcat.write.call(document, '<script ' + out + onload +'<\/script>');
     };
 
     /**
