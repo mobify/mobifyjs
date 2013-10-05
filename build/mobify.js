@@ -853,6 +853,7 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
         capture.capturedDoc.close();
         capture.destDoc.close();
         capture.sourceDoc.close();
+        Utils.removeElements([capture.captureIframe, capture.plaintext])
         plaintextBuffer = '';
         writtenToDestDoc = '';
         // TODO: Maybe remove captured-iframe and plaintext tags when finished?
@@ -958,7 +959,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         destDoc = capture.destDoc = options.destDoc;
     }
     else {
-        iframe = createSeamlessIframe(sourceDoc);
+        iframe = capture.iframe = createSeamlessIframe(sourceDoc);
         sourceDoc.body.insertBefore(iframe, plaintext);
         destDoc = capture.destDoc = iframe.contentDocument;
     }
@@ -989,16 +990,16 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     }
     setWidth();
     window.onresize = function(){
-        setTimeout(function(){
-            setWidth()
-        }, 0);
+       setTimeout(function(){
+           setWidth()
+       }, 0);
     }
 
     // Create a "captured" DOM. This is the playground DOM that the user will
     // have that will stream into the destDoc per chunk.
     // Using an iframe instead of `implementation.createHTMLDocument` because
     // you cannot document.write into a document created that way in Firefox
-    var captureIframe = sourceDoc.createElement("iframe");
+    var captureIframe = capture.captureIframe = sourceDoc.createElement("iframe");
     captureIframe.id = 'captured-iframe';
     captureIframe.style.cssText = 'display:none;'
     sourceDoc.body.insertBefore(captureIframe, plaintext);
@@ -1067,12 +1068,12 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
 };
 
 /**
- * Removes all closing tags from an html string
+ * Removes closing tags from the end of an HTML string.
  */
 Capture.removeClosingTagsAtEndOfString = function(html) {
-    return html.replace(/(.*?)((<\/[^>]+>)+)$/gi, function(match, p1){
-            return p1
-    });
+    var match = html.match(/((<\/[^>]+>)+)$/);
+    if (!match) return html;
+    return html.substring(0, html.length - match[0].length);
 }
 
 Capture.removeTargetSelf = function(html) {
