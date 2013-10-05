@@ -426,12 +426,12 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
 };
 
 /**
- * Removes all closing tags from an html string
+ * Removes closing tags from the end of an HTML string.
  */
 Capture.removeClosingTagsAtEndOfString = function(html) {
-    return html.replace(/(.*?)((<\/[^>]+>)+)$/gi, function(match, p1){
-            return p1
-    });
+    var match = html.match(/((<\/[^>]+>)+)$/);
+    if (!match) return html;
+    return html.substring(0, html.length - match[0].length);
 }
 
 Capture.removeTargetSelf = function(html) {
