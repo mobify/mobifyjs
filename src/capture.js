@@ -212,7 +212,10 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
         capture.capturedDoc.close();
         capture.destDoc.close();
         capture.sourceDoc.close();
-        Utils.removeElements([capture.captureIframe, capture.plaintext])
+        Utils.removeElements([capture.captureIframe, capture.plaintext]);
+        capture.captureIframe = null;
+        capture.plaintext = null;
+        capture.capturedDoc = null;
         plaintextBuffer = '';
         writtenToDestDoc = '';
         // TODO: Maybe remove captured-iframe and plaintext tags when finished?
