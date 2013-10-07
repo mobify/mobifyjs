@@ -212,9 +212,12 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
         capture.capturedDoc.close();
         capture.destDoc.close();
         capture.sourceDoc.close();
+        Utils.removeElements([capture.captureIframe, capture.plaintext]);
+        capture.captureIframe = null;
+        capture.plaintext = null;
+        capture.capturedDoc = null;
         plaintextBuffer = '';
         writtenToDestDoc = '';
-        // TODO: Maybe remove captured-iframe and plaintext tags when finished?
     }
     else {
         setTimeout(function(){
@@ -310,16 +313,15 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
 
     // Grab the plaintext element from the source document
     var plaintext = capture.plaintext = sourceDoc.getElementsByTagName('plaintext')[0];
-    var destDoc;
     var iframe;
     // if no destination document specified, create iframe and use its document
     if (options.destDoc) {
-        destDoc = capture.destDoc = options.destDoc;
+        capture.destDoc = options.destDoc;
     }
     else {
-        iframe = createSeamlessIframe(sourceDoc);
+        iframe = capture.iframe = createSeamlessIframe(sourceDoc);
         sourceDoc.body.insertBefore(iframe, plaintext);
-        destDoc = capture.destDoc = iframe.contentDocument;
+        capture.destDoc = iframe.contentDocument;
     }
     // currently, the only way to reconstruct the destination DOM without
     // breaking script execution order is through document.write.
@@ -328,7 +330,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var docWriteIntoDest = capture.docWriteIntoDest = true;
     if (docWriteIntoDest) {
         // Open the destination document
-        destDoc.open("text/html", "replace");
+        capture.destDoc.open("text/html", "replace");
     }
 
     // We must explicitly set the width of the window on the html of the source
@@ -344,25 +346,25 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         width = width.toString() + "px";
         sourceDoc.documentElement.style.maxWidth = width;
         iframe.style.width = width;
-        destDoc.documentElement !== null && (destDoc.documentElement.style.maxWidth = width);
+        capture.destDoc.documentElement !== null && (capture.destDoc.documentElement.style.maxWidth = width);
     }
     setWidth();
     window.onresize = function(){
-        setTimeout(function(){
-            setWidth()
-        }, 0);
+       setTimeout(function(){
+           setWidth()
+       }, 0);
     }
 
     // Create a "captured" DOM. This is the playground DOM that the user will
     // have that will stream into the destDoc per chunk.
     // Using an iframe instead of `implementation.createHTMLDocument` because
     // you cannot document.write into a document created that way in Firefox
-    var captureIframe = sourceDoc.createElement("iframe");
-    captureIframe.id = 'captured-iframe';
-    captureIframe.style.cssText = 'display:none;'
-    sourceDoc.body.insertBefore(captureIframe, plaintext);
-    var capturedDoc = capture.capturedDoc = captureIframe.contentDocument;
-    capturedDoc.open("text/html", "replace");
+    capture.captureIframe = sourceDoc.createElement("iframe");
+    capture.captureIframe.id = 'captured-iframe';
+    capture.captureIframe.style.cssText = 'display:none;'
+    sourceDoc.body.insertBefore(capture.captureIframe, plaintext);
+    capture.capturedDoc = capture.captureIframe.contentDocument;
+    capture.capturedDoc.open("text/html", "replace");
     // Start the captured doc with the original pieces of the source doc
     var startCapturedHtml = Utils.getDoctype(sourceDoc) +
                  Capture.openTag(sourceDoc.documentElement) +
@@ -418,20 +420,20 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     startCapturedHtml = Capture.disable(startCapturedHtml, prefix);
 
     // Start the captured doc and dest doc off write! (pun intended)
-    capturedDoc.write(startCapturedHtml);
-    destDoc.write(startDestHtml);
+    capture.capturedDoc.write(startCapturedHtml);
+    capture.destDoc.write(startDestHtml);
 
     pollPlaintext(capture, chunkCallback, finishedCallback, options);
 
 };
 
 /**
- * Removes all closing tags from an html string
+ * Removes closing tags from the end of an HTML string.
  */
 Capture.removeClosingTagsAtEndOfString = function(html) {
-    return html.replace(/(.*?)((<\/[^>]+>)+)$/gi, function(match, p1){
-            return p1
-    });
+    var match = html.match(/((<\/[^>]+>)+)$/);
+    if (!match) return html;
+    return html.substring(0, html.length - match[0].length);
 }
 
 Capture.removeTargetSelf = function(html) {
