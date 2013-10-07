@@ -974,14 +974,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         capture.destDoc.open("text/html", "replace");
     }
 
-    // We must explicitly set the width of the window on the html of the source
-    // document, so that when we create the `startCapturedHtml` string,
-    // eventually the html of the destination document will also be set to
-    // that width. This is necessary because in some browsers, (iOS6/7, Android 2.3)
-    // there is a rendering bug where if the `pre` and `iframe` tags that are larger
-    // then the width of their container, it will force the destination iframe
-    // to grow larger because the width of the `pre/iframe`.
-    var setWidth = function(){
+    var explicitlySetWidth = function() {
         var width = Utils.getPhysicalScreenSize().width/(window.devicePixelRatio || 1);
         width = (width >= 320) ? width : 320;
         width = width.toString() + "px";
@@ -989,11 +982,21 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         iframe.style.width = width;
         capture.destDoc.documentElement !== null && (capture.destDoc.documentElement.style.maxWidth = width);
     }
-    setWidth();
-    window.onresize = function(){
-       setTimeout(function(){
-           setWidth()
-       }, 0);
+    // We must explicitly set the width of the window on the html of the source
+    // document, so that when we create the `startCapturedHtml` string,
+    // eventually the html of the destination document will also be set to
+    // that width. This is necessary because in some browsers, (iOS6/7, Android 2.3)
+    // there is a rendering bug where if the `pre` and `iframe` tags that are larger
+    // then the width of their container, it will force the destination iframe
+    // to grow larger because the width of the `pre/iframe`.
+    if (/ip(hone|od|ad)|android\s2\./i.test(navigator.userAgent)) {
+        alert('I should only pop up for Android 2.X!')
+        explicitlySetWidth();
+        window.onresize = function(){
+           setTimeout(function(){
+               explicitlySetWidth();
+           }, 0);
+        }
     }
 
     // Create a "captured" DOM. This is the playground DOM that the user will
