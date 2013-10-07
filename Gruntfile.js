@@ -43,6 +43,7 @@ module.exports = function(grunt) {
                     hostname: '0.0.0.0',
                     port: 3000,
                     base: '.',
+                    debug: true,
                     server: path.resolve("./server")
                 }
             }
