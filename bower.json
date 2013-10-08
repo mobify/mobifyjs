@@ -1,6 +1,6 @@
 {
   "name": "mobifyjs",
-  "version": "2.0.0alpha10",
+  "version": "2.0.0alpha11",
   "main": "build/mobify.min.js",
   "ignore": [
     "node_modules",
