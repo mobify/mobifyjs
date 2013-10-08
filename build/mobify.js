@@ -990,7 +990,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     // then the width of their container, it will force the destination iframe
     // to grow larger because the width of the `pre/iframe`.
     if (/ip(hone|od|ad)|android\s2\./i.test(navigator.userAgent)) {
-        alert('I should only pop up for Android 2.X!')
         explicitlySetWidth();
         window.onresize = function(){
            setTimeout(function(){
