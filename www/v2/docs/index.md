@@ -76,16 +76,14 @@ Then, paste the following tag before <code>&lt;/head&gt;</code>, or top of
             if (window.Mobify) {
                 var images = document.querySelectorAll('img[x-src]');
                 if (images.length > 0) {
-                    Mobify.ResizeImages.resize( images, {
-                        maxWidth: 320   
-                    });
+                    Mobify.ResizeImages.resize(images);
                 }
                 // When the document has finished loading, stop checking for new images
                 if (Mobify.Utils.domIsReady()) {
                     clearInterval(intervalId)
                 }
             }
-        }, 30);
+        }, 100);
     </script>
 
 ## Where to next?
