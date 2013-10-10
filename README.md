@@ -7,7 +7,7 @@ Templating and more. Mobify.js also provides a
 loaded, giving developers the ability to enable the listed features above
 without changing any backend markup.
 
-For instructions on how to use the library, follow the instructions on [mobifyjs.com](https://www.mobifyjs.com/)
+For instructions on how to use the library, follow the instructions on [mobifyjs.com](http://www.mobifyjs.com/)
 or build the docs site manually in the instructions below.
 
 ## Development
@@ -101,7 +101,7 @@ older browsers)
 
 ##  Docs
 
-The compiled documentation for Mobify.js can be found online at [mobifyjs.com](https://www.mobifyjs.com/).
+The compiled documentation for Mobify.js can be found online at [mobifyjs.com](http://www.mobifyjs.com/).
 
 The static site is built with [Jekyll](http://jekyllrb.com/). Run the following commands to get the docs running locally:
 
