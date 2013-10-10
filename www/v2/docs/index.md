@@ -70,7 +70,7 @@ the DOM is ready.
 Then, paste the following tag before <code>&lt;/head&gt;</code>, or top of
 <code>&lt;body&gt;</code>:
 
-    <script async src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha6.min.js"></script>
+    <script async src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha11.min.js"></script>
     <script>
         var intervalId = setInterval(function(){
             if (window.Mobify) {
