@@ -991,11 +991,13 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     // to grow larger because the width of the `pre/iframe`.
     if (/ip(hone|od|ad)|android\s2\./i.test(navigator.userAgent)) {
         explicitlySetWidth();
-        window.onorientationchange = function(){
-           setTimeout(function(){
-               explicitlySetWidth();
-           }, 0);
-        }
+        var supportsOrientationChange = "onorientationchange" in window;
+        var orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+        window.addEventListener(orientationEvent, function() {
+            setTimeout(function(){
+                explicitlySetWidth();
+            }, 0);
+        });
     }
 
     // Create a "captured" DOM. This is the playground DOM that the user will
