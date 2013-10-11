@@ -74,7 +74,7 @@ Then, paste the following tag before <code>&lt;/head&gt;</code>, or top of
     <script>
         var intervalId = setInterval(function(){
             if (window.Mobify) {
-                var images = document.querySelectorAll('img[x-src]');
+                var images = document.querySelectorAll('img[x-src], picture');
                 if (images.length > 0) {
                     Mobify.ResizeImages.resize(images);
                 }

@@ -350,7 +350,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     // to grow larger because the width of the `pre/iframe`.
     if (/ip(hone|od|ad)|android\s2\./i.test(navigator.userAgent)) {
         explicitlySetWidth();
-        window.onresize = function(){
+        window.onorientationchange = function(){
            setTimeout(function(){
                explicitlySetWidth();
            }, 0);
