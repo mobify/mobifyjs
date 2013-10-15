@@ -348,13 +348,16 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     // there is a rendering bug where if the `pre` and `iframe` tags that are larger
     // then the width of their container, it will force the destination iframe
     // to grow larger because the width of the `pre/iframe`.
-    if (/ip(hone|od|ad)|android\s2\./i.test(navigator.userAgent)) {
+    var match = /ip(hone|od|ad)|android\s2\./i.exec(navigator.userAgent);
+    if (match) {
         explicitlySetWidth();
-        window.onresize = function(){
-           setTimeout(function(){
-               explicitlySetWidth();
-           }, 0);
-        }
+        var ios = (match[1] !== undefined);
+        var orientationEvent = ios ? "orientationchange" : "resize";
+        window.addEventListener(orientationEvent, function() {
+            setTimeout(function(){
+                explicitlySetWidth();
+            }, 0);
+        });
     }
 
     // Create a "captured" DOM. This is the playground DOM that the user will
