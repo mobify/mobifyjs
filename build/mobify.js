@@ -993,7 +993,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     if (match) {
         explicitlySetWidth();
         var ios = (match[1] !== undefined);
-        debugger;
         var orientationEvent = ios ? "orientationchange" : "resize";
         window.addEventListener(orientationEvent, function() {
             setTimeout(function(){
