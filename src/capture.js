@@ -338,7 +338,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         width = (width >= 320) ? width : 320;
         width = width.toString() + "px";
         sourceDoc.documentElement.style.maxWidth = width;
-        iframe.style.width = width;
         capture.destDoc.documentElement !== null && (capture.destDoc.documentElement.style.maxWidth = width);
     }
     // We must explicitly set the width of the window on the html of the source
