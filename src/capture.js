@@ -111,6 +111,7 @@ var createSeamlessIframe = function(doc){
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
     iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color:transparent;border: 0px none transparent;'
+    iframe.setAttribute('scrolling', 'no');
     iframe.setAttribute('seamless', '');
     return iframe;
 }
@@ -399,14 +400,15 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // destination document.
         if (!ios) {
             var cachedHeight;
+            var webkit = /webkit/i.test(navigator.userAgent);
             var setIframeHeight = function(){
                 if (capture.destDoc.documentElement === null || capture.destDoc.body === null) {
                     return;
                 }
-                var height = capture.destDoc.documentElement.scrollHeight || capture.destDoc.body.scrollHeight;
+                var height = (webkit ? capture.destDoc.documentElement : capture.destDoc.body).scrollHeight;
                 if (height !== 0 && cachedHeight !== height) {
-                    cachedHeight = height;
                     iframe.style.height = height + 'px';
+                    cachedHeight = height;
                 }
             }
             var iid = setInterval(setIframeHeight, 1000);
