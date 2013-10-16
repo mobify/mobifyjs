@@ -1041,10 +1041,10 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         if (!ios) {
             var cachedHeight;
             var setIframeHeight = function(){
-                if (capture.destDoc.body === null) {
+                if (capture.destDoc.documentElement === null || capture.destDoc.body === null) {
                     return;
                 }
-                var height = capture.destDoc.body.scrollHeight;
+                var height = capture.destDoc.documentElement.scrollHeight || capture.destDoc.body.scrollHeight;
                 if (height !== 0 && cachedHeight !== height) {
                     cachedHeight = height;
                     iframe.style.height = height + 'px';
