@@ -1040,16 +1040,31 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         // destination document.
         if (!ios) {
             var cachedHeight;
+            var webkit = /webkit/i.test(navigator.userAgent);
             var setIframeHeight = function(){
+                var heightElement = webkit ? capture.destDoc.documentElement : capture.destDoc.body;
                 if (capture.destDoc.documentElement === null || capture.destDoc.body === null) {
                     return;
                 }
-                var height = capture.destDoc.documentElement.scrollHeight || capture.destDoc.body.scrollHeight;
-                if (height !== 0 && cachedHeight !== height) {
-                    cachedHeight = height;
+                // Sometimes, documentElement can have a scroll height of 0. If so, attempt to grab
+                // body instead.
+                var height = heightElement.scrollHeight;
+                // if we couldn't properly find the height, let the iframe scroll.
+                if (height === 0) {
+                    return;
+                }
+
+                // If we can get the height, we will turn iframe scrolling off
+                // and set the height outselves
+                capture.iframe.setAttribute('scrolling', 'no');
+
+                // if the height has changed, set it.
+                if (cachedHeight !== height) {
                     iframe.style.height = height + 'px';
+                    cachedHeight = height;
                 }
             }
+            setIframeHeight();
             var iid = setInterval(setIframeHeight, 1000);
         }
 

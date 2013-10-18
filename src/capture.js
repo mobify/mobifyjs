@@ -111,7 +111,6 @@ var createSeamlessIframe = function(doc){
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
     iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color:transparent;border: 0px none transparent;'
-    iframe.setAttribute('scrolling', 'no');
     iframe.setAttribute('seamless', '');
     return iframe;
 }
@@ -408,12 +407,15 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
                 }
                 // Sometimes, documentElement can have a scroll height of 0. If so, attempt to grab
                 // body instead.
-                var height = heightElement.scrollHeight || capture.destDoc.body.scrollHeight;
+                var height = heightElement.scrollHeight;
                 // if we couldn't properly find the height, let the iframe scroll.
                 if (height === 0) {
-                    capture.iframe.removeAttribute('scrolling');
                     return;
                 }
+
+                // If we can get the height, we will turn iframe scrolling off
+                // and set the height outselves
+                capture.iframe.setAttribute('scrolling', 'no');
 
                 // if the height has changed, set it.
                 if (cachedHeight !== height) {
@@ -421,6 +423,7 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
                     cachedHeight = height;
                 }
             }
+            setIframeHeight();
             var iid = setInterval(setIframeHeight, 1000);
         }
 
