@@ -763,6 +763,7 @@ var writtenToDestDoc = '';
 var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
     var finished = Utils.domIsReady(capture.sourceDoc);
     var pollInterval = options.pollInterval || 300; // milliseconds
+    var prefix = options.prefix + 'href'
 
     // if document is ready, set finished to true for users of the API
     // to be able to act appropriately
@@ -796,8 +797,12 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
     capture.capturedDoc.write(toWrite);
 
     // Move certain elements that should be in the top-level document,
-    // such as meta viewport tags and title tags
-    var elsToMove = capture.capturedDoc.querySelectorAll('meta, title');
+    // such as meta viewport tags and title tags.
+    // We also want to move stylesheets into the head, because
+    // resources loaded via document.write do not initiate the
+    // loading bar (consistent across all browsers).
+    var href = options.prefix + 'href';
+    var elsToMove = capture.capturedDoc.querySelectorAll('meta, title, link[' + href + ']');
     if (elsToMove.length > 0) {
         for (var i = 0, len=elsToMove.length; i < len; i++) {
             var el = elsToMove[i];
@@ -806,6 +811,8 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
                 continue;
             }
             var elClone = capture.sourceDoc.importNode(el, true);
+            var src = elClone.getAttribute(href);
+            elClone.setAttribute('href', src);
             capture.sourceDoc.head.appendChild(elClone);
             el.setAttribute('capture-moved', '');
         }
@@ -1034,40 +1041,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var startDestHtml = Utils.getDoctype(sourceDoc);
 
     if (iframe) {
-        // All browsers except iOS do not expand the height of the iframe
-        // container to the height of the content within. To compensate for that,
-        // we must set the height manually whenever it changes by polling the
-        // destination document.
-        if (!ios) {
-            var cachedHeight;
-            var webkit = /webkit/i.test(navigator.userAgent);
-            var setIframeHeight = function(){
-                var heightElement = webkit ? capture.destDoc.documentElement : capture.destDoc.body;
-                if (capture.destDoc.documentElement === null || capture.destDoc.body === null) {
-                    return;
-                }
-                // Sometimes, documentElement can have a scroll height of 0. If so, attempt to grab
-                // body instead.
-                var height = heightElement.scrollHeight;
-                // if we couldn't properly find the height, let the iframe scroll.
-                if (height === 0) {
-                    return;
-                }
-
-                // If we can get the height, we will turn iframe scrolling off
-                // and set the height outselves
-                capture.iframe.setAttribute('scrolling', 'no');
-
-                // if the height has changed, set it.
-                if (cachedHeight !== height) {
-                    iframe.style.height = height + 'px';
-                    cachedHeight = height;
-                }
-            }
-            setIframeHeight();
-            var iid = setInterval(setIframeHeight, 1000);
-        }
-
         // In Webkit/Blink, resources requested in a non-src iframe do not have
         // a referer attached. This is an issue for scripts like Typekit.
         // We get around this by manipulating the browsers
