@@ -677,6 +677,8 @@ var affectedTagRe = new RegExp('<(' + Utils.keys(disablingMap).join('|') + ')([\
 var attributeDisablingRes = {};
 var attributesToEnable = {};
 
+var important = ' !important;';
+
 // Populate `attributesToEnable` and `attributeDisablingRes`.
 for (var tagName in disablingMap) {
     if (!disablingMap.hasOwnProperty(tagName)) continue;
@@ -750,8 +752,9 @@ var callMethodOnDestObjFromSourceObj = function(srcObj, destObj, method) {
 var createSeamlessIframe = function(doc){
     var doc = doc || document;
     var iframe = doc.createElement("iframe");
-    // set attribute to make the iframe appear seamless to the user
-    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color:transparent;border:0px none transparent;'
+    // set attribute to make the iframe appear seamless to the user,
+    // and do our best to prevent them from being overridden by user stylesheet
+    iframe.style.cssText = 'opacity: 100' + important + 'visibility: visable' + important + 'display:block' + important + 'position:absolute' + important + 'top:0' + important + 'left:0' + important + 'width:100%;height:100%;box-sizing:border-box' + important + 'padding:0px' +  important + 'margin:0px' +  important + 'background-color:transparent;border:0px none transparent' + important;
     iframe.setAttribute('scrolling', 'no');
     iframe.setAttribute('seamless', '');
     return iframe;
@@ -957,6 +960,11 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var prefix = options.prefix = options.prefix || 'x-';
     var sourceDoc = options.sourceDoc || document;
 
+    // http://kitt.hodsden.org/blog/2013/07/5_ways_hide_element_css
+    var preventHiding = 'opacity: 100' + important + 'visibility: visable' + important + 'display:block' + important + 'position:static' + important;
+    sourceDoc.body.style.cssText = preventHiding;
+    sourceDoc.documentElement.style.cssText = preventHiding;
+
     // initiates capture object that will be passed to the callbacks
     var capture = new Capture(sourceDoc, prefix);
 
@@ -1063,8 +1071,8 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
 
                  // if the height has changed, set it.
                  if (height !== 0 && cachedHeight !== height) {
-                     iframe.style.height = height + 'px';
-                     cachedHeight = height;
+                    iframe.style.height = height + 'px';
+                    cachedHeight = height;
                  }
              }
              setIframeHeight();
