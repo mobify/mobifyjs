@@ -183,15 +183,33 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
          * Treats invalid headers as stale.
          */
       , isStale: function(resource) {
-            var headers = resource.headers || {}
+            var ONE_DAY_IN_MS = 24 * 60 * 60 * 1000
+              , headers = resource.headers || {}
               , cacheControl = headers['cache-control']
               , now = Date.now()
               , date = Date.parse(headers.date)
+              , lastModified = headers['last-modified']
+              , modifiedAge
+              , age
               , expires;
 
-              // Fresh if less than 10 minutes old
+            // Fresh if less than 10 minutes old
             if (date && (now < date + 600 * 1000)) {
                return false;
+            }
+
+            // Fresh if less than 10% of difference between date and 
+            // last-modified old, up to a day
+            if (lastModified && date) {
+                lastModified = Date.parse(lastModified);
+                modifiedAge = date - lastModified;
+                age = now - date;
+                // If the age is less than 10% of the time between the last 
+                // modification and the response, and the age is less than a 
+                // day, then it is not stale
+                if ((age < 0.1 * modifiedAge) && (age < ONE_DAY_IN_MS)) {
+                    return false;
+                }
             }
 
             // If `max-age` and `date` are present, and no other cache

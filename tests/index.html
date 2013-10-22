@@ -156,13 +156,15 @@
         var $ = Mobify.$
           , httpCache = Mobify.httpCache
             // Time offsets in seconds
-          , TWO_WEEKS = 14 * 24 * 60 * 60
+          , ONE_WEEK = 7 * 24 * 60 * 60
+          , TWO_WEEKS = 2 * ONE_WEEK
           , TEN_MINUTES = 600
-          , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
             // UTC dates
           , UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString()
           , UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString()
+          , UTC_ONE_WEEK_AGO = (new Date(Date.now() - (ONE_WEEK * 1000))).toUTCString()
           , UTC_NOW = (new Date()).toUTCString()
+          , UTC_TWELVE_HOURS_AGO = (new Date(Date.now() - (12 * 60 * 60 * 1000))).toUTCString()
 
             // I don't fit in `localStorage` in Chrome or Safari...
             // But I do seem to fit in FF.
@@ -190,7 +192,7 @@
                 return document.implementation.createDocument(ns, 'html', null)
             }
 
-        module('combo')
+        module('combo');
 
         test('Mobify.cssURL - It exists', function() {
             ok(Mobify.cssURL({}));
@@ -458,7 +460,7 @@
                 });
             });
 
-        test('httpCache.utils.isStale', 9, function() {
+        test('httpCache.utils.isStale', 10, function() {
             var isStale = httpCache.utils.isStale
               , resources = {
                     'stale-expires': {
@@ -510,6 +512,12 @@
                         'date': UTC_NOW
                     }
                 }
+                , 'fresh-by-10-percent-heuristic': {
+                    'headers': {
+                        'date': UTC_TWELVE_HOURS_AGO
+                      , 'last-modified': UTC_TWO_WEEKS_AGO
+                    }
+                }
             };
         
 
@@ -523,6 +531,8 @@
             ok(isStale(resources['invalid-expires']), 'Invalid expires is stale');
             // Test our ten minute minimum
             ok(!isStale(resources['new-no-cache-headers']), 'No cache headers but less than 10 minutes old');
+            // Test ten percent heuristic
+            ok(!isStale(resources['fresh-by-10-percent-heuristic']), 'No cache headers but fresh by last modified 10% heuristic');
 
         });
 
