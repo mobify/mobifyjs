@@ -1058,8 +1058,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
                  // If so, set the height of it to 100% and attempt to get it again.
                  var height = heightElement.scrollHeight;
                  if (height === 0) {
-                    //capture.destDoc.documentElement.style.height = '100%';
-                    //capture.destDoc.body.style.height = '100%';
                     height = capture.destDoc.height;
                  }
 
