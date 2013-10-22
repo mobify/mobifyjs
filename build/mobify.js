@@ -751,7 +751,8 @@ var createSeamlessIframe = function(doc){
     var doc = doc || document;
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
-    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color:transparent;border:0px none transparent;overflow:auto;'
+    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color:transparent;border:0px none transparent;'
+    iframe.setAttribute('scrolling', 'no');
     iframe.setAttribute('seamless', '');
     return iframe;
 }
@@ -1041,6 +1042,37 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var startDestHtml = Utils.getDoctype(sourceDoc);
 
     if (iframe) {
+         // All browsers except iOS do not expand the height of the iframe
+         // container to the height of the content within. To compensate for that,
+         // we must set the height manually whenever it changes by polling the
+         // destination document.
+         if (!ios) {
+             var cachedHeight;
+             var webkit = /webkit/i.test(navigator.userAgent);
+             var setIframeHeight = function(){
+                 var heightElement = webkit ? capture.destDoc.documentElement : capture.destDoc.body;
+                 if (capture.destDoc.documentElement === null || capture.destDoc.body === null) {
+                     return;
+                 }
+                 // Sometimes, documentElement can have a scroll height of 0.
+                 // If so, set the height of it to 100% and attempt to get it again.
+                 var height = heightElement.scrollHeight;
+                 if (height === 0) {
+                    //capture.destDoc.documentElement.style.height = '100%';
+                    //capture.destDoc.body.style.height = '100%';
+                    height = capture.destDoc.height;
+                 }
+
+                 // if the height has changed, set it.
+                 if (height !== 0 && cachedHeight !== height) {
+                     iframe.style.height = height + 'px';
+                     cachedHeight = height;
+                 }
+             }
+             setIframeHeight();
+             var iid = setInterval(setIframeHeight, 1000);
+         }
+
         // In Webkit/Blink, resources requested in a non-src iframe do not have
         // a referer attached. This is an issue for scripts like Typekit.
         // We get around this by manipulating the browsers
