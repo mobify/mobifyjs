@@ -550,7 +550,6 @@
             // Test our ten minute minimum
             ok(!isStale(resources['new-no-cache-headers']), 'No cache headers but less than 10 minutes old');
             // Test ten percent heuristic
-            debugger;
             ok(!isStale(resources['fresh-by-10-percent-heuristic']), 'No cache headers but fresh by last modified 10% heuristic');
 
         });
