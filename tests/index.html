@@ -460,7 +460,7 @@
                 });
             });
 
-        test('httpCache.utils.isStale', 10, function() {
+        test('httpCache.utils.isStale', 12, function() {
             var isStale = httpCache.utils.isStale
               , resources = {
                     'stale-expires': {
@@ -476,6 +476,21 @@
                           , 'cache-control': 'public,max-age=' + TEN_MINUTES
                         }
                     }
+                  , 'no-cache': {
+                        'headers': {
+                            'date': UTC_TWELVE_HOURS_AGO
+                          , 'last-modified': UTC_TWO_WEEKS_AGO
+                          , 'cache-control': 'no-cache'
+                        }
+                    }
+
+                  , 'no-store': {
+                        'headers': {
+                            'date': UTC_TWELVE_HOURS_AGO
+                          , 'last-modified': UTC_TWO_WEEKS_AGO
+                          , 'cache-control': 'no-store'
+                        }
+                  } 
 
                   , 'fresh-expires': {
                         'headers': {
@@ -524,6 +539,8 @@
 
             ok(isStale(resources['stale-expires']));
             ok(isStale(resources['stale-cache-control']));
+            ok(isStale(resources['no-cache']));
+            ok(isStale(resources['no-store']));
             ok(!isStale(resources['fresh-expires']));
             ok(!isStale(resources['fresh-cache-control']));
             ok(isStale(resources['no-headers']), 'No cache headers is stale');
