@@ -198,10 +198,32 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
                return false;
             }
 
+            // If `max-age` and `date` are present, and no other cache
+            // directives exist, then we are stale if we are older.
+            if (cacheControl && date) {
+                cacheControl = ccParse(cacheControl);
+
+                if ((cacheControl['max-age']) &&
+                    (!cacheControl['no-store']) &&
+                    (!cacheControl['no-cache'])) {
+                    // Convert the max-age directive to ms.
+                    return now > (date + (cacheControl['max-age'] * 1000));
+                } else {
+                    // there was no max-age or this was marked no-store or 
+                    // no-cache, and so is stale
+                    return true;
+                }
+            }
+
+            // If `expires` is present, we are stale if we are older.
+            if (headers.expires && (expires = Date.parse(headers.expires))) {
+                return now > expires;
+            }
+
             // Fresh if less than 10% of difference between date and 
             // last-modified old, up to a day
-            if (lastModified && date) {
-                lastModified = Date.parse(lastModified);
+            if (lastModified && (lastModified = Date.parse(lastModified)) &&
+              date) {
                 modifiedAge = date - lastModified;
                 age = now - date;
                 // If the age is less than 10% of the time between the last 
@@ -210,25 +232,6 @@ var ccDirectives = /^\s*(public|private|no-cache|no-store)\s*$/
                 if ((age < 0.1 * modifiedAge) && (age < ONE_DAY_IN_MS)) {
                     return false;
                 }
-            }
-
-            // If `max-age` and `date` are present, and no other cache
-            // directives exist, then we are stale if we are older.
-            if (cacheControl && date) {
-                cacheControl = ccParse(cacheControl);
-
-                if ((cacheControl['max-age']) &&
-                    (!cacheControl['private']) &&
-                    (!cacheControl['no-store']) &&
-                    (!cacheControl['no-cache'])) {
-                    // Convert the max-age directive to ms.
-                    return now > (date + (cacheControl['max-age'] * 1000));
-                }
-            }
-
-            // If `expires` is present, we are stale if we are older.
-            if (date = Date.parse(headers.expires)) {
-                return now > date;
             }
 
             // Otherwise, we are stale.
