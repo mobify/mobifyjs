@@ -156,13 +156,14 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
     // Write escaped chunk to captured document
     capture.capturedDoc.write(toWrite);
 
-    // Move certain elements that should be in the top-level document,
+    // Move certain elements that should be in the parent document,
     // such as meta viewport tags and title tags.
     // We also want to move stylesheets into the head, because
     // resources loaded via document.write do not initiate the
-    // loading bar (consistent across all browsers).
+    // loading bar (consistent across all browsers), and moving them into
+    // top level document forces it to without causing an additional request.
     var href = options.prefix + 'href';
-    var elsToMove = capture.capturedDoc.querySelectorAll('meta, title, link[' + href + ']');
+    var elsToMove = capture.capturedDoc.querySelectorAll('meta, title, link[' + href + '][rel="stylesheet"]');
     if (elsToMove.length > 0) {
         for (var i = 0, len=elsToMove.length; i < len; i++) {
             var el = elsToMove[i];
@@ -171,9 +172,15 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
                 continue;
             }
             var elClone = capture.sourceDoc.importNode(el, true);
-            var src = elClone.getAttribute(href);
-            elClone.setAttribute('href', src);
-            capture.sourceDoc.head.appendChild(elClone);
+            if (elClone.nodeName === 'LINK') {
+                // http://stackoverflow.com/questions/12825248/enable-disable-stylesheet-using-javascript-in-chrome
+                var src = elClone.getAttribute(href);
+                elClone.setAttribute('href', src);
+                capture.sourceDoc.head.appendChild(elClone);
+                elClone.disabled = true;
+            } else {
+                capture.sourceDoc.head.appendChild(elClone);
+            }
             el.setAttribute('capture-moved', '');
         }
     }
@@ -181,6 +188,7 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
     // In Android 2.3, widths of iframes can override of the width
     // of the html element of the top-level document (which can inadvertently. We detect for that
     // and change the width of the iframe
+    // TODO: with max-widths set, this may not be necessary. -sj
     if (document.documentElement.offsetWidth !== window.outerWidth) {
         var iframes = Array.prototype.slice.call(capture.capturedDoc.querySelectorAll('iframe'));
         iframes.forEach(function(iframe){
