@@ -677,8 +677,6 @@ var affectedTagRe = new RegExp('<(' + Utils.keys(disablingMap).join('|') + ')([\
 var attributeDisablingRes = {};
 var attributesToEnable = {};
 
-var important = ' !important;';
-
 // Populate `attributesToEnable` and `attributeDisablingRes`.
 for (var tagName in disablingMap) {
     if (!disablingMap.hasOwnProperty(tagName)) continue;
