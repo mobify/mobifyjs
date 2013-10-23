@@ -112,8 +112,7 @@ var createSeamlessIframe = function(doc){
     var doc = doc || document;
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user,
-    // and do our best to prevent them from being overridden by user stylesheet
-    iframe.style.cssText = 'opacity: 100' + important + 'visibility: visable' + important + 'display:block' + important + 'position:absolute' + important + 'top:0' + important + 'left:0' + important + 'width:100%;height:100%;box-sizing:border-box' + important + 'padding:0px' +  important + 'margin:0px' +  important + 'background-color:transparent;border:0px none transparent' + important;
+    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color:transparent;border:0px none transparent;';
     iframe.setAttribute('scrolling', 'no');
     iframe.setAttribute('seamless', '');
     return iframe;
@@ -319,7 +318,9 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     var prefix = options.prefix = options.prefix || 'x-';
     var sourceDoc = options.sourceDoc || document;
 
+    // Do our best to prevent user stylesheet from overriding parent body/html
     // http://kitt.hodsden.org/blog/2013/07/5_ways_hide_element_css
+    var important = ' !important;';
     var preventHiding = 'opacity: 100' + important + 'visibility: visable' + important + 'display:block' + important + 'position:static' + important;
     sourceDoc.body.style.cssText = preventHiding;
     sourceDoc.documentElement.style.cssText = preventHiding;
