@@ -112,11 +112,11 @@
             var detector = function (userAgent){
                 // We're enabled for:
                 // - WebKit based browsers
-                // - IE 10
+                // - IE 10+
                 // - FireFox 4+
                 // - Opera 11+
                 // - 3DS
-                match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(userAgent);
+                match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(userAgent);
 
                 if (!match) {
                     return false;
@@ -130,6 +130,10 @@
                 if (match[3] && +match[4] < 11) {
                     return false;
                 }
+                // match[5] == IE
+                if (match[5] && +match[6] < 6) {
+                    return false;
+                }
 
                 return true;
             };
@@ -138,6 +142,7 @@
             ok(detector("Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1"), "Firefox 16");
             ok(detector("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15"), "Chrome");
             ok(detector("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)"), "IE 10");
+            ok(detector("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"), "IE 11");
             ok(detector("Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02"), "Opera 12");
             ok(detector("Opera/9.80 (X11; Linux x86_64; U; Ubuntu/10.10 (maverick); pl) Presto/2.7.62 Version/11.01"), "Opera 11");
             ok(detector("Mozilla/5.0 (Nintendo 3DS; U; ; en) Version/1.7498.US"), "Nintendo 3DS");
