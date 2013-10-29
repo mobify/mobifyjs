@@ -25,7 +25,7 @@ module.exports = function(grunt) {
         qunit: {
             all: {
               options: {
-                timeout: 10000,
+                timeout: 20000,
                 urls: [
                   'http://localhost:3000/tests/mobify-library.html',
                   'http://localhost:3000/tests/capture.html',
@@ -100,9 +100,9 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/mobify-library.html',
                         'http://localhost:3000/tests/capture.html',
                         'http://localhost:3000/tests/resizeImages.html',
-                        'http://localhost:3000/tests/jazzcat.html',
-                        'http://localhost:3000/tests/unblockify.html',
-                        'http://localhost:3000/tests/cssOptimize.html',
+                        // 'http://localhost:3000/tests/jazzcat.html',
+                        // 'http://localhost:3000/tests/unblockify.html',
+                        // 'http://localhost:3000/tests/cssOptimize.html',
                     ],
                     concurrency: 16,
                     tunneled: true,
