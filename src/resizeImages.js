@@ -2,8 +2,6 @@ define(["mobifyjs/utils"], function(Utils) {
 
 var ResizeImages = window.ResizeImages = {};
 
-
-
 var localStorageWebpKey = 'Mobify-Webp-Support-v2';
 
 function persistWebpSupport(supported) {
@@ -201,6 +199,24 @@ ResizeImages._crawlPictureElement = function(el, opts) {
 };
 
 /**
+ * Searches a list of target dimensions for the smallest one that is greater than 
+ * the passed value and return it, or return the greatst value if none are 
+ * greater
+ */
+var targetDims = [480, 960, 1024, 1280, 2048, 4000];
+ResizeImages._getBinnedDimension = function(dim) {
+    var resultDim = 0;
+
+    for(var i = 0, len = targetDims.length; i < len; i++) {
+        resultDim = targetDims[i];
+        if(resultDim >= dim) {
+            break;
+        }
+    }
+    return resultDim;
+};
+
+/**
  * Searches the collection for image elements and modifies them to use
  * the Image Resize service. Pass `options` to modify how the images are 
  * resized.
@@ -216,10 +232,10 @@ ResizeImages.resize = function(elements, options) {
 
     var screenSize = Utils.getPhysicalScreenSize(dpr);
 
-    // If maxHeight/maxWidth are not specified, use screen dimentions
+    // If maxHeight/maxWidth are not specified, use screen dimensions
     // in device pixels
-    var width = opts.maxWidth || screenSize.width;
-    var height = opts.maxHeight || screenSize.height;
+    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
+    var height = opts.maxHeight || ResizeImages._getBinnedDimension(screenSize.height);
 
     // Otherwise, compute device pixels
     if (dpr && opts.maxWidth) {
