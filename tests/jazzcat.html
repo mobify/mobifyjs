@@ -112,13 +112,16 @@
         var httpCache = Jazzcat.httpCache;
 
         // Time offsets in seconds.
-        var TWO_WEEKS = 14 * 24 * 60 * 60;
+        var ONE_WEEK = 7 * 24 * 60 * 60;
+        var TWO_WEEKS = 2 * ONE_WEEK;
         var FOUR_WEEKS = 2 * TWO_WEEKS;
         var TEN_MINUTES = 600;
 
         // UTC dates.
         var UTC_TWO_WEEKS_FROM_NOW = (new Date(Date.now() + (TWO_WEEKS * 1000))).toUTCString();
         var UTC_TWO_WEEKS_AGO = (new Date(Date.now() - (TWO_WEEKS * 1000))).toUTCString();
+        var UTC_ONE_WEEK_AGO = (new Date(Date.now() - (ONE_WEEK * 1000))).toUTCString();
+        var UTC_TWELVE_HOURS_AGO = (new Date(Date.now() - (12 * 60 * 60 * 1000))).toUTCString();
         var UTC_NOW = (new Date()).toUTCString();
 
         // Too big for localStorage in Chrome, Webkit, and Firefox
@@ -131,11 +134,30 @@
             'stale-expires': {'headers': {'expires': UTC_TWO_WEEKS_AGO}},
             'stale-cache-control': {
                 'headers': {
-                    'date': UTC_TWO_WEEKS_AGO,
+                    'date': UTC_TWELVE_HOURS_AGO,
+                    'last-modified': UTC_TWO_WEEKS_AGO, 
                     'cache-control': 'public,max-age=' + TEN_MINUTES
                 }
             },
-            'fresh-expires': {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}},
+            'no-cache': {
+                'headers': {
+                    'date': UTC_TWELVE_HOURS_AGO,
+                    'last-modified': UTC_TWO_WEEKS_AGO,
+                    'cache-control': 'no-cache'
+                }
+            },
+            'no-store': {
+                'headers': {
+                    'date': UTC_TWELVE_HOURS_AGO,
+                    'last-modified': UTC_TWO_WEEKS_AGO,
+                    'cache-control': 'no-store'
+                }
+            },
+            'fresh-expires': {
+                'headers': {
+                    'expires': UTC_TWO_WEEKS_FROM_NOW
+                }
+            },
             'fresh-cache-control': {
                 'headers': {
                     'date': UTC_NOW,
@@ -156,6 +178,12 @@
                 'headers': {
                     'date': UTC_TWO_WEEKS_AGO,
                     'cache-control': 'max-age=' + FOUR_WEEKS
+                }
+            },
+            'fresh-by-10-percent-heuristic': {
+                'headers': {
+                    'date': UTC_TWELVE_HOURS_AGO,
+                    'last-modified': UTC_TWO_WEEKS_AGO
                 }
             },
             'uncacheable': {
@@ -225,11 +253,13 @@
 
         } else {
 
-            test('httpCache.utils.isStale', 9, function() {
+            test('httpCache.utils.isStale', 12, function() {
                 var isStale = httpCache.utils.isStale;
 
                 ok(isStale(resourceFixtures['stale-expires']));
                 ok(isStale(resourceFixtures['stale-cache-control']));
+                ok(isStale(resourceFixtures['no-cache']));
+                ok(isStale(resourceFixtures['no-store']));
                 ok(!isStale(resourceFixtures['fresh-expires']));
                 ok(!isStale(resourceFixtures['fresh-cache-control']));
                 ok(isStale(resourceFixtures['no-headers']), 'No cache headers is stale');
@@ -238,6 +268,7 @@
                 ok(isStale(resourceFixtures['invalid-expires']), 'Invalid expires is stale');
                 // Test our ten minute minimum
                 ok(!isStale(resourceFixtures['new-no-cache-headers']), 'No cache headers but less than 10 minutes old');
+                ok(!isStale(resourceFixtures['fresh-by-10-percent-heuristic']), 'No cache headers but fresh by last modified 10% heuristic');
             });
 
             test('httpCache.isStale with cacheOverride', function() {
