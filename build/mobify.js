@@ -922,12 +922,23 @@ Capture.init = Capture.initCapture = function(callback, doc, prefix) {
     // for some IE10s.
     else {
         var created = false;
-        doc.addEventListener("readystatechange", function() {
+        
+        var create = function() {
             if (!created) {
                 created = true;
+                iid && clearInterval(iid);
                 createCapture(callback, doc, prefix);
             }
-        }, false);
+        }
+        // backup with polling incase readystatechange doesn't fire
+        // (happens with some Android 2.3 browsers)
+        var iid = setInterval(function(){
+            if (Utils.domIsReady(doc)) {
+                create();
+            }
+        }, 100);
+        doc.addEventListener("readystatechange", create, false);
+
     }
 };
 
