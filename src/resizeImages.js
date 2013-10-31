@@ -122,7 +122,7 @@ ResizeImages.getImageURL = function(url, options) {
     }
 
     if (opts.maxWidth) {
-        bits.push(options.maxWidth)
+        bits.push(options.maxWidth);
 
         if (opts.maxHeight) {
             bits.push(options.maxHeight);
