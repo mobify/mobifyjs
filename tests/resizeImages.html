@@ -57,6 +57,10 @@
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
+    <div id="resizeImages-produces-binned-sizes">
+        <img x-src="http://www.example.com/foo.jpg" />
+    <div>
+
 </div>
 
 <script>
@@ -343,6 +347,63 @@
             strictEqual(gbd(2049), 4000);
             strictEqual(gbd(4001), 4000);
         });
+
+        test('resize', function() {
+            // setup
+            var origGPSS = Utils.getPhysicalScreenSize;
+            var fakeWidth, fakeHeight;
+            var fakeGetPhyscialScreenSize = function() {
+                return {
+                    width: fakeWidth,
+                    height: fakeHeight
+                };
+            };
+            Utils.getPhysicalScreenSize = fakeGetPhyscialScreenSize;
+            var imgs = $("#resizeImages-produces-binned-sizes img");
+
+            // tests
+            var clonedImgs = imgs.clone();
+            fakeWidth = 320;
+            fakeHeight = 480;
+
+            ResizeImages.resize(clonedImgs);
+
+            strictEqual(clonedImgs.first().attr("src"), 
+                        "//ir0.mobify.com/project-oss-localhost/webp/480/480/http://www.example.com/foo.jpg");
+
+
+            clonedImgs = imgs.clone();
+            fakeWidth = 480;
+            fakeHeight = 960;
+
+            ResizeImages.resize(clonedImgs);
+
+            debugger;
+
+            strictEqual(clonedImgs.first().attr("src"), 
+                        "//ir0.mobify.com/project-oss-localhost/webp/960/960/http://www.example.com/foo.jpg");
+
+            clonedImgs = imgs.clone();
+            fakeWidth = 720;
+            fakeHeight = 1280;
+
+            ResizeImages.resize(clonedImgs);
+
+            strictEqual(clonedImgs.first().attr("src"), 
+                        "//ir0.mobify.com/project-oss-localhost/webp/1280/1280/http://www.example.com/foo.jpg");
+
+            clonedImgs = imgs.clone();
+            fakeWidth = 6000;
+            fakeHeight = 6000;
+
+            ResizeImages.resize(clonedImgs);
+
+            strictEqual(clonedImgs.first().attr("src"), 
+                        "//ir0.mobify.com/project-oss-localhost/webp/4000/4000/http://www.example.com/foo.jpg");
+
+            // tear down
+            Utils.getPhysicalScreenSize = origGPSS;
+        })
     });
 
 

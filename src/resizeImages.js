@@ -234,8 +234,10 @@ ResizeImages.resize = function(elements, options) {
 
     // If maxHeight/maxWidth are not specified, use screen dimensions
     // in device pixels
-    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
-    var height = opts.maxHeight || ResizeImages._getBinnedDimension(screenSize.height);
+    var largestDim = Math.max(screenSize.width, screenSize.height);
+    var binnedLargestDim = ResizeImages._getBinnedDimension(largestDim);
+    var width = opts.maxWidth || binnedLargestDim;
+    var height = opts.maxHeight || binnedLargestDim;
 
     // Otherwise, compute device pixels
     if (dpr && opts.maxWidth) {
