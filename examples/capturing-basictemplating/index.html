@@ -1,96 +1,37 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<script>
-(function(window, document, detector, mobifyjsUrl, mainUrl) {
+<script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=e,a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h="mobify",i=function(){var c=new Date;c.setTime(c.getTime()+3e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e)if("string"==typeof e){var c=b.createElement("script");c.onerror=i,g(c,"main-executable",h,mainUrl)}else a.Mobify.mainExecutable=e.toString(),e()},f.onerror=i,g(f,"mobify-js",h,d)})}(window,document,function(){var a=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return a?a[1]&&+a[2]<4?!1:a[3]&&+a[4]<11?!1:!0:!1},
 
-// if mobify=(1|0) override is set in hash or cookie, force mobify on/off.
-var override = /((; )|#|&|^)mobify=(\d)/.exec(location.hash + '; ' + document.cookie);
-if (override && override[1]) {
-    // if mobify=0, do not run mobify.
-    if (!+override[1]) return;
-}
-// else do not run mobify if Mobify object exists, or detector fails.
-else if (this.Mobify || !detector()) {
-    return;
-}
+// path to mobify.js
+"/mobifyjs/build/mobify.min.js",
 
-// Start Mobify object with initial timestamp when loaded.
-// Uncomment when needed for performance testing.
-window.Mobify = {points: [+new Date]};
+// calls to APIs go here (or path to a main.js)
+function() {
+    var capturing = window.Mobify && window.Mobify.capturing || false;
 
-function attachScriptBeforeMobifyTag(script, src, id, classNames) {
-    var mobifyTagScript = document.getElementsByTagName('script')[0];
+    if (capturing) {
+        console.log("Executing main during capturing phase!")
 
-    script.src = src;
-    script.id = id;
-    script.setAttribute("class", classNames);
-    mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
-}
+        // Grab reference to a newly created document
+        Mobify.Capture.init(function(capture){
+            var capturedDoc = capture.capturedDoc;
 
-document.write('<plaintext style="display:none">');
+            var newHtml = "<html><head>{style}<\/head><body><h1>Completely new document, grabs list of links from original document:<\/h1> {links} <\/body><\/html>";
+            newHtml = newHtml.replace("{style}", capturedDoc.getElementsByTagName("link")[0].outerHTML);
 
-// On next tick, load library and main executable
-setTimeout(function() {
-    var Mobify = window.Mobify = window.Mobify || {};
-    Mobify.capturing = true;
-    var mobifyjsScript = document.createElement('script');
-    var errorHandler = function() {
-        var now = new Date();
-        // Set now to 30 minutes ahead
-        now.setTime(now.getTime() + 1800000);
-        document.cookie = 'mobify=0' +
-                '; expires=' + now.toGMTString() +
-                '; path=/';
-        // Reload the page (location.reload has problems in FF)
-        window.location = window.location.href;
-    };
-    mobifyjsScript.onload = function(){
-        if (mainUrl) {
-            var mainScript = document.createElement('script');
-            mainScript.onerror = errorHandler;
-            attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
-        }
-    };
-    mobifyjsScript.onerror = errorHandler;
-    attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
+            var links = "<ul>" + [].map.call(capturedDoc.getElementsByTagName("a"), 
+                                    function(el){ 
+                                        return "<li>" + el.href + "<\/li>"
+                                    }).join("") + "</li>";
+            newHtml = newHtml.replace("{links}", links);
 
-});
+            newHtmlEscaped = Mobify.Capture.enable(newHtml, capture.prefix);
 
-})( window, document,
-    // detector function
-    function (){
-        // We're enabled for:
-        // - WebKit based browsers
-        // - IE 10
-        // - FireFox 4+
-        // - Opera 11+
-        // - 3DS
-        match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
-     
-        if (!match) {
-            return false;
-        }
-     
-        // match[1] == Firefox
-        if (match[1] && +match[2] < 4) {
-            return false;
-        }
-        // match[3] == Opera
-        if (match[3] && +match[4] < 11) {
-            return false;
-        }
-
-        return true;
-    },
-
-    // path to mobify.js
-    '/mobifyjs/build/mobify.min.js',
-
-    // path to main executable 
-    '/mobifyjs/examples/capturing-basictemplating/main.js'
-);
-</script>
+            capture.render(newHtmlEscaped)
+        });
+    }
+});</script>
 <!-- END MOBIFY TAG -->
 <link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
 <title>Mobify.js image gallary example</title>

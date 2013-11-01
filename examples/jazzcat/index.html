@@ -2,97 +2,43 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>Mobify.js Jazzcat example</title>
-<script>
-(function(window, document, detector, mobifyjsUrl, mainUrl) {
+<script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=e,a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h="mobify",i=function(){var c=new Date;c.setTime(c.getTime()+3e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e)if("string"==typeof e){var c=b.createElement("script");c.onerror=i,g(c,"main-executable",h,mainUrl)}else a.Mobify.mainExecutable=e.toString(),e()},f.onerror=i,g(f,"mobify-js",h,d)})}(window,document,function(){var a=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return a?a[1]&&+a[2]<4?!1:a[3]&&+a[4]<11?!1:!0:!1},
 
-// if mobify=(1|0) override is set in hash or cookie, force mobify on/off.
-var override = /((; )|#|&|^)mobify=(\d)/.exec(location.hash + '; ' + document.cookie);
-if (override && override[1]) {
-    // if mobify=0, do not run mobify.
-    if (!+override[1]) return;
-}
-// else do not run mobify if Mobify object exists, or detector fails.
-else if (this.Mobify || !detector()) {
-    return;
-}
+// path to mobify.js
+"/mobifyjs/build/mobify.js",
 
-// Start Mobify object with initial timestamp when loaded.
-// Uncomment when needed for performance testing.
-window.Mobify = {points: [+new Date]};
-
-function attachScriptBeforeMobifyTag(script, src, id, classNames) {
-    var mobifyTagScript = document.getElementsByTagName('script')[0];
-
-    script.src = src;
-    script.id = id;
-    script.setAttribute("class", classNames);
-    mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
-}
-
-document.write('<plaintext style="display:none">');
-
-// On next tick, load library and main executable
-setTimeout(function() {
-    var Mobify = window.Mobify = window.Mobify || {};
-    Mobify.capturing = true;
-    var mobifyjsScript = document.createElement('script');
-    var errorHandler = function() {
-        var now = new Date();
-        // Set now to 30 minutes ahead
-        now.setTime(now.getTime() + 1800000);
-        document.cookie = 'mobify=0' +
-                '; expires=' + now.toGMTString() +
-                '; path=/';
-        // Reload the page (location.reload has problems in FF)
-        window.location = window.location.href;
-    };
-    mobifyjsScript.onload = function(){
-        if (mainUrl) {
-            var mainScript = document.createElement('script');
-            mainScript.onerror = errorHandler;
-            attachScriptBeforeMobifyTag(mainScript, mainUrl, "mobify-js-main", "mobify");
+// calls to APIs go here (or path to a main.js)
+function() {
+    var capturing = window.Mobify && window.Mobify.capturing || false;
+    if (capturing) {
+        if (/streaming/.test(location.href)) {
+            // Initiate capture
+            Mobify.Capture.initStreamingCapture(function(capture){
+                // Grab reference to the captured document in progres
+                var capturedDoc = capture.capturedDoc;
+                
+                // Grab all scripts to be concatenated into one request
+                var scripts = capturedDoc.querySelectorAll('script');
+                Mobify.Jazzcat.optimizeScripts(scripts);
+            });
         }
-    };
-    mobifyjsScript.onerror = errorHandler;
-    attachScriptBeforeMobifyTag(mobifyjsScript, mobifyjsUrl, "mobify-js", "mobify");
+        else {
+            // Initiate capture
+            Mobify.Capture.init(function(capture){
 
-});
+                // Grab reference to a newly created document
+                var capturedDoc = capture.capturedDoc;
 
-})( window, document,
-    // detector function
-    function (){
-        // We're enabled for:
-        // - WebKit based browsers
-        // - IE 10
-        // - FireFox 4+
-        // - Opera 11+
-        // - 3DS
-        match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
-     
-        if (!match) {
-            return false;
+                // Grab all scripts to be concatenated into one request
+                var scripts = capturedDoc.querySelectorAll('script');
+                Mobify.Jazzcat.optimizeScripts(scripts);
+
+                // Render source DOM to document
+                capture.renderCapturedDoc();
+            });
         }
-     
-        // match[1] == Firefox
-        if (match[1] && +match[2] < 4) {
-            return false;
-        }
-        // match[3] == Opera
-        if (match[3] && +match[4] < 11) {
-            return false;
-        }
-
-        return true;
-    },
-
-    // path to mobify.js
-    '/mobifyjs/build/mobify.js',
-
-    // path to main executable 
-    '/mobifyjs/examples/jazzcat/main.js'  
-);
-
-</script>
+    }
+});</script>
 
 
 <style>
@@ -106,25 +52,11 @@ body {
 </head>
 <body class="foo">
 <h3>Open your web inspector to see the changes made by Jazzcat</h3>
-<script>
-// Grab the total time since starting capturing and send it
-// to the parent for testing in performance.html
-var end = +new Date;
-var begin;
-if (window.Mobify.points) {
-    begin = window.Mobify.points[0];
-} else {
-    begin = document.getElementById("mobify-point").innerText;
-}
-var diff = end - begin;
-parent.postMessage(diff, "*");
-</script>
 
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" class="grabMe"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js" class="grabMe"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" class="grabMe" onload="console.log('Onload fires!')"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js" onload="console.log('loaded jquery!');" class="grabMe"></script>
 <script src="//ajax.googleapis.com/ajax/libs/webfont/1.1.2/webfont.js" class="grabMe"></script>
-
+<script src="//nonense.url/should/not/load" onload="console.log('uh-oh, this shouldn't ever run')"></script>
 
 </body>
 </html>

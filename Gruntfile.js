@@ -1,5 +1,10 @@
 // http://stackoverflow.com/questions/13567312/working-project-structure-that-uses-grunt-js-to-combine-javascript-files-using-r
 var fs = require("fs");
+var path = require('path');
+
+var LONG_CACHE_CONTROL = "public,max-age=31536000, s-maxage=900"; // one year
+var SHORT_CACHE_CONTROL = "public,max-age=300"; // five minutes
+var NO_CACHE = "max-age=0, no-store";
 
 /*global module:false*/
 module.exports = function(grunt) {
@@ -9,7 +14,7 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         localConfig: (function(){
                         try {
-                            return grunt.file.readJSON('localConfig.json')
+                            return grunt.file.readJSON('localConfig.json');
                         } catch(e) {
                             return {};
                         }
@@ -20,48 +25,28 @@ module.exports = function(grunt) {
         qunit: {
             all: {
               options: {
+                timeout: 10000,
                 urls: [
                   'http://localhost:3000/tests/mobify-library.html',
                   'http://localhost:3000/tests/capture.html',
                   'http://localhost:3000/tests/jazzcat.html',
                   'http://localhost:3000/tests/resizeImages.html',
                   'http://localhost:3000/tests/unblockify.html',
+                  'http://localhost:3000/tests/cssOptimize.html',
                 ]
               }
             }
         },
-        connect: {
-            server: {
+        express: {
+            custom: {
                 options: {
                     hostname: '0.0.0.0',
                     port: 3000,
                     base: '.',
-                    middleware: function(connect, options) {
-                        /**
-                         * A "slow" response which is served in two chunks.
-                         */
-                        var splitPath = '/tests/fixtures/split.html';
-                        var split = fs.readFileSync(__dirname + splitPath, 'utf8').split('<!-- SPLIT -->')
-
-                        var splitHandler = function(req, res, next) {
-                            if (req.url != splitPath) return next();
-
-                            res.writeHead(200, {'Content-Type': 'text/html'});
-                            res.write(split[0]);
-
-                            setTimeout(function() {
-                                res.write(split[1]);
-                                res.end();
-                            }, 5000);
-                        };
-
-                        return [
-                            splitHandler,
-                            connect.static(__dirname)
-                        ];
-                    }
+                    debug: true,
+                    server: path.resolve("./server")
                 }
-            },
+            }
         },
         requirejs: {
             // Building full Mobify.js library
@@ -72,18 +57,7 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "mobify-library",
-                    out: "./build/mobify-<%= pkg.version %>.js",
-                }
-            },
-            // Building experimental features
-            experimental: {
-                options: {
-                    almond: true,
-                    mainConfigFile: "./src/config.js",
-                    optimize: "none",
-                    keepBuildDir: true,
-                    name: "mobify-library-experimental",
-                    out: "./build/mobify-experimental-<%= pkg.version %>.js",
+                    out: "./build/mobify.js"
                 }
             },
             // Building custom Mobify.js library (must copy mobify-custom.js.example -> mobify-custom.js)
@@ -94,26 +68,22 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "../mobify-custom.js",
-                    out: "./build/custom/mobify.js",
+                    out: "./build/custom/mobify.js"
                 }
-            },
+            }
         },
         uglify: {
             full: {
                 files: {
-                    'build/mobify-<%= pkg.version %>.min.js': ['build/mobify-<%= pkg.version %>.js']
-                }
-            },
-            experimental: {
-                files: {
-                    'build/mobify-experimental-<%= pkg.version %>.min.js': ['build/mobify-experimental-<%= pkg.version %>.js']
+                    'build/mobify.min.js':
+                        ['build/mobify.js']
                 }
             },
             custom: {
                 files: {
                     'build/custom/mobify.min.js': ['build/custom/mobify.js']
                 }
-            },
+            }
         },
         watch: {
             files: ["src/**/*.js",
@@ -131,11 +101,13 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/capture.html',
                         'http://localhost:3000/tests/resizeImages.html',
                         'http://localhost:3000/tests/jazzcat.html',
+                        'http://localhost:3000/tests/unblockify.html',
+                        'http://localhost:3000/tests/cssOptimize.html',
                     ],
-                    concurrency: 4,
+                    concurrency: 16,
                     tunneled: true,
                     detailedError: true,
-                    browsers: [
+                    browsers: [ //https://saucelabs.com/docs/platforms
                         { // Only working version of IE compatable
                             browserName: 'internet explorer',
                             platform: 'Windows 2012',
@@ -162,6 +134,10 @@ module.exports = function(grunt) {
                         { // Latest Chrome on Linux (unknown distro)
                             browserName: 'chrome',
                             platform: 'Linux'
+                        },
+                        { // Latest Chrome on Linux (unknown distro)
+                            browserName: 'chrome',
+                            platform: 'OS X 10.8'
                         },
                         { // Lowest known working version of FF
                             browserName: 'firefox',
@@ -223,54 +199,153 @@ module.exports = function(grunt) {
             options: {
                 key: '<%= localConfig.aws.key %>',
                 secret: '<%= localConfig.aws.secret %>',
-                bucket: '<%= localConfig.aws.bucket %>',
                 access: "public-read",
-                headers: { "Cache-Control": "max-age=1200" },
+                headers: { "Cache-Control": SHORT_CACHE_CONTROL },
+                maxOperations: 6
             },
-            build: {
+            devBuild: {
+                options: {
+                    bucket: 'mobify',
+                    gzip: true
+                },
                 upload: [
-                    { // build
-                        src: "build/**/*",
-                        dest: "mobifyjs/build/",
+                    { // unminified dev build
+                        src: "build/mobify.js",
+                        dest: "mobifyjs/build/mobify-<%= pkg.version %>.js",
                         rel: "build",
-                        gzip: true
+                    }
+                ]
+            },
+            prodBuild: {
+                options: {
+                    bucket: 'mobify',
+                    gzip: true
+                },
+                upload: [
+                    { // minified production build
+                        src: "build/mobify.min.js",
+                        dest: "mobifyjs/build/mobify-<%= pkg.version %>.min.js",
+                        rel: "build",
                     }
                 ]
             },
             examples: {
+                options: {
+                    bucket: 'mobify',
+                    gzip: true
+                },
                 upload: [
                     { // examples
                         src: "examples/**/*",
                         dest: "mobifyjs/examples/",
                         rel: "examples",
-                        gzip: true
                     }
                 ]
-            }
+            },
+            performance: {
+                options: {
+                    bucket: 'mobify',
+                    headers: { "Cache-Control": NO_CACHE},
+                },
+                upload: [
+                    { // examples
+                        src: "performance/**/*",
+                        dest: "mobifyjs/performance/",
+                        rel: "performance",
+                    }
+                ]
+            },
+            wwwstaging: {
+                options: {
+                    bucket: 'www-staging.mobify.com',
+                },
+                upload: [
+                    {
+                       src: "www/_site/**/*",
+                       dest: "mobifyjs",
+                       rel: "www/_site"
+                    },
+                ]
+            },
+            wwwstagingstatic: {
+                options: {
+                    bucket: 'www-staging.mobify.com',
+                    headers: { "Cache-Control": LONG_CACHE_CONTROL }
+                },
+                upload: [
+                    {
+                        src: "www/_site/static/**/*",
+                        dest: "mobifyjs",
+                        rel: "www/_site",
+                    }
+                ]
+            },
+            wwwprod: {
+                options: {
+                    bucket: 'www.mobify.com',
+                },
+                upload: [
+                    {
+                       src: "www/_site/**/*",
+                       dest: "mobifyjs",
+                       rel: "www/_site"
+                    },
+                ]
+            },
+            wwwprodstatic: {
+                options: {
+                    bucket: 'www.mobify.com',
+                    headers: { "Cache-Control": LONG_CACHE_CONTROL }
+                },
+                upload: [
+                    {
+                        src: "www/_site/static/**/*",
+                        dest: "mobifyjs",
+                        rel: "www/_site",
+                    }
+                ]
+            },
+        },
+        jekyll: {
+            server: {
+                src: './www',
+                dest: './www/_site',
+                server: true,
+                server_port: 4000,
+                watch: true
+            },
+            build: {
+                src: './www',
+                dest: './www/_site',
+            },
         }
     });
 
     grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-qunit');
-    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-saucelabs');
     grunt.loadNpmTasks('grunt-s3');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-jekyll');
+    grunt.loadNpmTasks('grunt-express');
+    grunt.loadNpmTasks('grunt-release');
 
-    grunt.registerTask('test', ['connect', 'qunit']);
+    grunt.registerTask('test', ['express', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present
     grunt.registerTask('build', function() {
         // Then build mobify.js library
-        grunt.task.run("requirejs:full", "uglify:full")
-        grunt.task.run("requirejs:experimental", "uglify:experimental")
+        grunt.task.run("requirejs:full", "uglify:full");
         // Build custom library if it exists
         if (grunt.file.exists("mobify-custom.js")) {
             grunt.task.run("requirejs:custom", "uglify:custom");
         }
     });
     grunt.registerTask('default', 'build');
-    grunt.registerTask('deploy', ['build', 's3']);
+    grunt.registerTask('deploy', ['build', 's3:devBuild', 's3:prodBuild', 's3:examples']);
+    grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging', 's3:wwwstagingstatic']);
+    grunt.registerTask('wwwproddeploy', ['jekyll:build', 's3:wwwprod', 's3:wwwprodstatic']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
-    grunt.registerTask('preview', ['connect', 'watch']);
+    grunt.registerTask('serve', ['build', 'express', 'watch']);
+    grunt.registerTask('preview', 'serve'); // alias to serve
 };

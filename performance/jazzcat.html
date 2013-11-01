@@ -1,0 +1,236 @@
+<!doctype html>
+<html>
+<head>
+    <title>Performance tests for Jazzcat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>.hide { display: none; }</style>
+</head>
+<body>
+    <h1>Performance test for Jazzcat</h1>
+    <form>
+        <p>Number of steps: <input type="text" name="range" value="5"></p>
+        <p>Step size: <input type="text" name="stepsize" value="5"></p>
+        <p>Runs runs per step: <input type="text" name="runs" value="5"></p>
+        <p>Capture on native: <input type="checkbox" name="captureNative"></p>
+        <p>
+            <input type="radio" name="responseType" value="jsonp" checked>jsonp
+            <input type="radio" name="responseType" value="js">js
+        </p>
+        <p>Concatenate: <input type="checkbox" name="concat" checked></p>
+        <input type="submit" value="Run Test">
+    </form>
+
+    <p class="loader hide">Running...</p>
+
+    <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+
+    <script src="/mobifyjs/performance/resources/jquery.js"></script>
+    <script>
+
+/**
+ * Creates an iframe for `url` and executes `callback` on message from the iframe.
+ */
+var createIframe = function(url, callback) {
+    var cb = function(event) {
+        window.removeEventListener("message", cb);
+        var diff = event.data;
+        callback && callback(diff);
+    };
+
+    window.addEventListener("message", cb);
+
+    var iframes = document.getElementsByTagName("iframe");
+    if (iframes.length) {
+        iframes[0].parentNode.removeChild(iframes[0]);
+    }
+
+    var iframe = document.createElement("iframe");
+    iframe.src = url;
+    iframe.className = 'hide';
+    document.getElementsByTagName("body")[0].appendChild(iframe);
+};
+
+/**
+ * Returns an array of arrays of `length` by `runs`.
+ */
+var create2dArray = function(length, runs) {
+    var array = new Array(length);
+    for (var i = 0; i < length; i++) {
+        array[i] = new Array(runs);
+    }
+    return array;
+};
+
+/**
+ * Run the test calling `complete` when done.
+ */
+var run = function(complete) {
+    if (i === scriptRange.length) return complete();
+
+    var baseUrl = "/performance/jazzcat/runner/" + scriptRange[i];
+    var mobifyUrl = baseUrl + '#mobify=1' +
+                    '&responseType=' + window.responseType +
+                    '&concat=' + window.concat;
+    var nativeUrl;
+    if (window.captureNative) {
+        nativeUrl = baseUrl + '#mobify=1&disableJazzcat=1';
+    }
+    else {
+        nativeUrl = baseUrl + '#mobify=0';
+    }
+
+
+    var j = 0;
+
+    var runTestLoop = function(callback) {
+        if (j === runsPerTest) return callback();
+
+        createIframe(mobifyUrl, function(diff) {
+            mobifyResults[i][j] = diff;
+
+            createIframe(nativeUrl, function(diff) {
+                nativeResults[i][j] = diff;
+                j++;
+                runTestLoop(callback);
+            })
+        });
+    };
+
+    runTestLoop(function() {
+        i++;
+        run(complete);
+    })
+};
+
+
+/**
+ * Start the performance test!
+ */
+$("form").submit(function(e) {
+    e.preventDefault();
+
+    // TODO: being lazy, do this without globals
+    var form = this;
+    window.scriptRange = new Array(parseInt(form.range.value));
+    window.stepSize = parseInt(form.stepsize.value);
+    window.runsPerTest = parseInt(form.runs.value);
+    window.captureNative = form.captureNative.checked;
+    window.concat = form.concat.checked;
+    window.responseType = $('form input[name="responseType"]:checked').val();
+    window.mobifyResults = create2dArray(scriptRange.length, runsPerTest);
+    window.nativeResults = create2dArray(scriptRange.length, runsPerTest);
+    window.i = 0;
+
+    // Always start with 1 script for first test
+    scriptRange[0] = 1;
+    for (var i = 1; i < scriptRange.length; i++) {
+        scriptRange[i] = i * stepSize;
+    }
+
+    $("p.loader").removeClass("hide");
+    var scriptsMsg = "Scripts Used: " + scriptRange.join(", ");
+    $("body").append($("<p>" + scriptsMsg + "</p>"));
+
+
+    run(function() {
+        var averagedMobifyResults = mobifyResults.map(function(testSet){
+            return parseFloat(average(testSet).toFixed(1));
+        });
+        var stdDevMobifyResults = mobifyResults.map(function(testSet){
+            return stdDev(testSet).toFixed(1);
+        });
+
+        var averagedNativeResults = nativeResults.map(function(testSet){
+            return parseFloat(average(testSet).toFixed(1));
+        });
+
+        var stdDevNativeResults = nativeResults.map(function(testSet){
+            return stdDev(testSet).toFixed(1);
+        });
+
+        var mobifyResultsMsg = "Mobify results: " + averagedMobifyResults.join(", ") + "</br>" + "Standard Dev: " + stdDevMobifyResults;
+        var nativeResultsMsg = "Native results: " + averagedNativeResults.join(", ") + "</br>" + "Standard Dev: " + stdDevNativeResults;;
+
+        // console.log(mobifyResultsMsg);
+        // console.log(nativeResultsMsg);
+        $("body").append($("<p>" + mobifyResultsMsg + "</p>"));
+        $("body").append($("<p>" + nativeResultsMsg + "</p>"));
+        $("p.loader").addClass("hide");
+
+        renderChart(scriptRange, averagedMobifyResults, averagedNativeResults);
+    });
+});
+
+// /**
+//  * Returns the average of an array of numbers.
+//  */
+
+var sum = function(a, b) {
+    return a + b;
+}
+
+var average = function(array) {
+    return array.reduce(sum) / array.length;
+};
+
+var stdDev = function(data) {
+    var dataMean = average(data);
+    var dev = data.map(function(x) {
+        return (x - dataMean) * (x - dataMean) 
+    }).reduce(sum, 0)/data.length;
+
+    return Math.sqrt(dev);
+};
+
+
+var zip = function(x, y) {
+    var points = [];
+    for (var i = 0; i < x.length; i++) {
+        points.push({x: x[i], y: y[i]});
+    }
+    // console.log(points);
+    return points;
+};
+
+/**
+ * Renders a chart with the results of the testing data.
+ */
+var renderChart = function(scripts, mobifyData, nativeData) {
+    var chart = new CanvasJS.Chart("chartContainer", {
+        zoomEnabled: true,
+        panEnabled: true,
+        axisX: {
+            title: "# of Scripts"
+        },
+        axisY: {
+            title: "Time (seconds)",
+            includeZero: false
+        },
+        theme: "theme2",
+        legend: {
+            verticalAlign: "center",
+            horizontalAlign: "right",
+        },
+        data: [{
+            type: "line",
+            showInLegend: true,
+            name: "Jazzcat",
+            markerType: "square",
+            color: "LightCoral",
+            dataPoints: zip(scripts, mobifyData)
+        }, {
+            type: "line",
+            showInLegend: true,
+            name: "Native",
+            color: "LightSeaGreen",
+            dataPoints: zip(scripts, nativeData)
+        }]
+    });
+
+    chart.render();
+};
+
+</script>
+<script src="/mobifyjs/performance/resources/canvasjs.min.js"></script>
+</body>
+</html>

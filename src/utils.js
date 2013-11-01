@@ -43,15 +43,57 @@ Utils.clone = function(obj) {
     return target;
 };
 
+// Some url helpers
+/**
+ * Takes a url, relative or absolute, and absolutizes it relative to the current 
+ * document's location/base, with the assistance of an a element.
+ */
+var _absolutifyAnchor = document.createElement("a");
+Utils.absolutify = function(url) {
+    _absolutifyAnchor.href = url;
+    return _absolutifyAnchor.href;
+};
+
+/**
+ * Takes an absolute url, returns true if it is an http/s url, false otherwise 
+ * (e.g. mailto:, gopher://, data:, etc.)
+ */
+var _httpUrlRE = /^https?/;
+Utils.httpUrl = function(url) {
+    return _httpUrlRE.test(url);
+};
+
 /**
  * outerHTML polyfill - https://gist.github.com/889005
  */
 Utils.outerHTML = function(el){
-    var div = document.createElement('div');
-    div.appendChild(el.cloneNode(true));
-    var contents = div.innerHTML;
-    div = null;
-    return contents;
+    if (el.outerHTML) {
+        return el.outerHTML;
+    }
+    else {
+        var div = document.createElement('div');
+        div.appendChild(el.cloneNode(true));
+        var contents = div.innerHTML;
+        div = null;
+        return contents;
+    }
+};
+
+/**
+ * Return a string for the doctype of the current document.
+ */
+Utils.getDoctype = function(doc) {
+    doc = doc || document;
+    var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
+            return el.nodeType == Node.DOCUMENT_TYPE_NODE
+        })[0];
+
+    if (!doctypeEl) return '';
+
+    return '<!DOCTYPE HTML'
+        + (doctypeEl.publicId ? ' PUBLIC "' + doctypeEl.publicId + '"' : '')
+        + (doctypeEl.systemId ? ' "' + doctypeEl.systemId + '"' : '')
+        + '>';
 };
 
 Utils.removeBySelector = function(selector, doc) {
@@ -70,6 +112,115 @@ Utils.removeElements = function(elements, doc) {
     }
     return elements;
 };
+
+// localStorage detection as seen in such great libraries as Modernizr
+// https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
+// Exposing on Jazzcat for use in qunit tests
+var cachedLocalStorageSupport;
+Utils.supportsLocalStorage = function() {
+    if (cachedLocalStorageSupport !== undefined) {
+        return cachedLocalStorageSupport;
+    }
+    var mod = 'modernizr';
+    try {
+        localStorage.setItem(mod, mod);
+        localStorage.removeItem(mod);
+        cachedLocalStorageSupport = true;
+    } catch(e) {
+        cachedLocalStorageSupport = false
+    }
+    return cachedLocalStorageSupport;
+};
+
+// matchMedia polyfill generator
+// (allows you to specify which document to run polyfill on)
+Utils.matchMedia = function(doc) {
+    "use strict";
+
+    var bool,
+        docElem = doc.documentElement,
+        refNode = docElem.firstElementChild || docElem.firstChild,
+        // fakeBody required for <FF4 when executed in <head>
+        fakeBody = doc.createElement("body"),
+        div = doc.createElement("div");
+
+    div.id = "mq-test-1";
+    div.style.cssText = "position:absolute;top:-100em";
+    fakeBody.style.background = "none";
+    fakeBody.appendChild(div);
+
+    return function(q){
+        div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
+
+        docElem.insertBefore(fakeBody, refNode);
+        bool = div.offsetWidth === 42;
+        docElem.removeChild(fakeBody);
+
+        return {
+           matches: bool,
+           media: q
+        };
+    };
+};
+
+// readyState: loading --> interactive --> complete
+//                      |               |
+//                      |               |
+//                      v               v
+// Event:        DOMContentLoaded    onload
+//
+// iOS 4.3 and some Android 2.X.X have a non-typical "loaded" readyState,
+// which is an acceptable readyState to start capturing on, because
+// the data is fully loaded from the server at that state.
+// For some IE (IE10 on Lumia 920 for example), interactive is not 
+// indicative of the DOM being ready, therefore "complete" is the only acceptable
+// readyState for IE10
+// Credit to https://github.com/jquery/jquery/commit/0f553ed0ca0c50c5f66377e9f2c6314f822e8f25
+// for the IE10 fix
+Utils.domIsReady = function(doc) {
+    var doc = doc || document;
+    return doc.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading";
+}
+
+Utils.getPhysicalScreenSize = function(devicePixelRatio) {
+
+    function multiplyByPixelRatio(sizes) {
+        var dpr = devicePixelRatio || window.devicePixelRatio || 1;
+
+        sizes.width = Math.round(sizes.width * dpr);
+        sizes.height = Math.round(sizes.height * dpr);
+
+        return sizes;
+    }
+
+    var iOS = navigator.userAgent.match(/ip(hone|od|ad)/i);
+    var androidVersion = (navigator.userAgent.match(/android (\d)/i) || {})[1];
+
+    var sizes = {
+        width: window.outerWidth
+      , height: window.outerHeight
+    };
+
+    // Old Android and BB10 use physical pixels in outerWidth/Height, which is what we need
+    // New Android (4.0 and above) use CSS pixels, requiring devicePixelRatio multiplication
+    // iOS lies about outerWidth/Height when zooming, but does expose CSS pixels in screen.width/height
+
+    if (!iOS) {
+        if (androidVersion > 3) return multiplyByPixelRatio(sizes);
+        return sizes;
+    }
+
+    var isLandscape = window.orientation % 180;
+    if (isLandscape) {
+        sizes.height = screen.width;
+        sizes.width = screen.height;
+    } else {
+        sizes.width = screen.width;
+        sizes.height = screen.height;
+    }
+
+    return multiplyByPixelRatio(sizes);
+}
 
 return Utils;
 

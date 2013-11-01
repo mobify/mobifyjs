@@ -1,4 +1,4 @@
-define(["utils"], function(Utils) {
+define(["mobifyjs/utils"], function(Utils) {
 
 // ##
 // # Static Variables/Functions
@@ -25,6 +25,7 @@ var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 // Map of all attributes we should disable (to prevent resources from downloading)
 var disablingMap = {
     img:    ['src'],
+    source: ['src'],
     iframe: ['src'],
     script: ['src', 'type'],
     link:   ['href'],
@@ -85,40 +86,199 @@ function extractHTMLStringFromElement(container) {
     }).join('');
 }
 
+/**
+ * Takes a method name and applies that methon on a source object and overrides
+ * it to call the method on a destination object with the same arguments 
+ * (in addition to calling the method on the source object)
+ */
+var callMethodOnDestObjFromSourceObj = function(srcObj, destObj, method) {
+    var oldMethod = srcObj[method];
+    if (!oldMethod) {
+        return;
+    }
+    srcObj[method] = function() {
+        oldMethod.apply(srcObj, arguments);
+        destObj[method].apply(destObj, arguments);
+    };
+}
+
+/**
+ * Creates an iframe and makes it as seamless as possible through CSS
+ * TODO: Test out Seamless attribute when available in latest browsers
+ */
+var createSeamlessIframe = function(doc){
+    var doc = doc || document;
+    var iframe = doc.createElement("iframe");
+    // set attribute to make the iframe appear seamless to the user
+    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color:transparent;border:0px none transparent;'
+    iframe.setAttribute('scrolling', 'no');
+    iframe.setAttribute('seamless', '');
+    return iframe;
+}
+
+// Track what has been written to captured and destination docs for each chunk
+var plaintextBuffer = '';
+var writtenToDestDoc = '';
+
+var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
+    var finished = Utils.domIsReady(capture.sourceDoc);
+    var pollInterval = options.pollInterval || 300; // milliseconds
+    var prefix = options.prefix + 'href'
+
+    // if document is ready, set finished to true for users of the API
+    // to be able to act appropriately
+    if (finished) {
+        capture.finished = true;
+    }
+
+    var html = capture.plaintext.textContent;
+    var toWrite = html.substring(plaintextBuffer.length);
+
+    // Only write up to the end of a tag
+    // it is OK if this catches a &gt; or &lt; because we just care about
+    // escaping attributes that fetch resources for this chunk
+    toWrite = toWrite.substring(0, toWrite.lastIndexOf('>') + 1);
+
+    // If there is nothing to write, return and check again.
+    if (toWrite === '' && !finished) {
+        setTimeout(function(){
+            pollPlaintext(capture, chunkCallback, finishedCallback, options);
+        }, pollInterval);
+        return;
+    }
+
+    // Write our progress to plaintext buffer
+    plaintextBuffer += toWrite;
+
+    // Escape resources for chunk and remove target=self
+    toWrite = Capture.removeTargetSelf(Capture.disable(toWrite, capture.prefix));
+
+    // Write escaped chunk to captured document
+    capture.capturedDoc.write(toWrite);
+
+    // Move certain elements that should be in the parent document,
+    // such as meta viewport tags and title tags.
+    // We also want to move stylesheets into the head, because
+    // resources loaded via document.write do not initiate the
+    // loading bar (consistent across all browsers), and moving them into
+    // top level document forces it to without causing an additional request.
+    var href = options.prefix + 'href';
+    var elsToMove = capture.capturedDoc.querySelectorAll('meta, title, link[' + href + '][rel="stylesheet"]');
+    if (elsToMove.length > 0) {
+        for (var i = 0, len=elsToMove.length; i < len; i++) {
+            var el = elsToMove[i];
+            // do not copy dom notes over twice
+            if (el.hasAttribute('capture-moved')) {
+                continue;
+            }
+            var elClone = capture.sourceDoc.importNode(el, true);
+            if (elClone.nodeName === 'LINK') {
+                // http://stackoverflow.com/questions/12825248/enable-disable-stylesheet-using-javascript-in-chrome
+                var src = elClone.getAttribute(href);
+                elClone.setAttribute('href', src);
+                capture.sourceDoc.head.appendChild(elClone);
+                elClone.disabled = true;
+            } else {
+                capture.sourceDoc.head.appendChild(elClone);
+            }
+            el.setAttribute('capture-moved', '');
+        }
+    }
+
+    // In Android 2.3, widths of iframes can override of the width
+    // of the html element of the top-level document (which can inadvertently. We detect for that
+    // and change the width of the iframe
+    // TODO: with max-widths set, this may not be necessary. -sj
+    if (document.documentElement.offsetWidth !== window.outerWidth) {
+        var iframes = Array.prototype.slice.call(capture.capturedDoc.querySelectorAll('iframe'));
+        iframes.forEach(function(iframe){
+            iframe.width = '100%';
+        });
+    }
+
+    // Execute chunk callback to allow users to make modifications to capturedDoc
+    chunkCallback(capture);
+
+    if (capture.capturedDoc.documentElement) {
+        // Grab outerHTML of capturedDoc and write the diff to destDoc
+        capturedHtml = Utils.outerHTML(capture.capturedDoc.documentElement);
+        // we could be grabbing from a captured document that has a head and no body.
+        var toWriteDest = capturedHtml.substring(writtenToDestDoc.length);
+
+        // outerHTML will always give us an balanced tree, which isn't what
+        // we want to write into the destination document. The solution for
+        // this is to simply never write out closing tags if they
+        // are at the end of the `toWriteDest` string. If those end tags
+        // were truly from the document, rather then generated by outerHTML,
+        // then they will come in on the next chunk.
+        toWriteDest = Capture.removeClosingTagsAtEndOfString(toWriteDest);
+
+        writtenToDestDoc += toWriteDest;
+
+        // Unescape chunk
+        toWriteDest = Capture.enable(toWriteDest, capture.prefix);
+        if (capture.docWriteIntoDest) {
+            capture.destDoc.write(toWriteDest);
+        }
+    }
+
+    // if document is ready, stop polling and ensure all documents involved are closed
+    if (finished) {
+        finishedCallback && finishedCallback(capture);
+        capture.capturedDoc.close();
+        capture.destDoc.close();
+        capture.sourceDoc.close();
+        Utils.removeElements([capture.captureIframe, capture.plaintext]);
+        capture.captureIframe = null;
+        capture.plaintext = null;
+        capture.capturedDoc = null;
+        plaintextBuffer = '';
+        writtenToDestDoc = '';
+    }
+    else {
+        setTimeout(function(){
+            pollPlaintext(capture, chunkCallback, finishedCallback, options);
+        }, pollInterval);
+    }
+};
+
 // cached div used repeatedly to create new elements
 var cachedDiv = document.createElement('div');
 
 // ##
 // # Constructor
 // ##
-var Capture = function(doc, prefix) {
-    this.doc = doc;
+var Capture = function(sourceDoc, prefix) {
+    this.sourceDoc = sourceDoc;
     this.prefix = prefix || "x-";
-
-    var capturedStringFragments = this.createDocumentFragmentsStrings();
-    Utils.extend(this, capturedStringFragments);
-
-    var capturedDOMFragments = this.createDocumentFragments();
-    Utils.extend(this, capturedDOMFragments);
+    if (window.Mobify) window.Mobify.prefix = this.prefix;
 };
 
-var init = Capture.init = function(callback, doc, prefix) {
+/**
+ * Initiate a buffered capture. `init` is an alias to `initCapture` for
+ * backwards compatibility.
+ */
+Capture.init = Capture.initCapture = function(callback, doc, prefix) {
     var doc = doc || document;
 
     var createCapture = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
+        var capturedStringFragments = capture.createDocumentFragmentsStrings();
+        Utils.extend(capture, capturedStringFragments);
+        var capturedDOMFragments = capture.createDocumentFragments();
+        Utils.extend(capture, capturedDOMFragments);
         callback(capture);
     }
-    // iOS 4.3, some Android 2.X.X have a non-typical "loaded" readyState,
-    // which is an acceptable readyState to start capturing on, because
-    // the data is fully loaded from the server at that state.
-    if (/complete|interactive|loaded/.test(doc.readyState)) {
+
+    if (Utils.domIsReady(doc)) {
         createCapture(callback, doc, prefix);
     }
     // We may be in "loading" state by the time we get here, meaning we are
     // not ready to capture. Next step after "loading" is "interactive",
-    // which is a valid state to start capturing on, and thus when ready
+    // which is a valid state to start capturing on (except IE), and thus when ready
     // state changes once, we know we are good to start capturing.
+    // Cannot rely on using DOMContentLoaded because this event prematurely fires
+    // for some IE10s.
     else {
         var created = false;
         doc.addEventListener("readystatechange", function() {
@@ -129,6 +289,205 @@ var init = Capture.init = function(callback, doc, prefix) {
         }, false);
     }
 };
+
+/**
+ * Streaming capturing is a batsh*t loco insane way of being able to modify
+ * streaming chunks of markup before the browser can request resources.
+ * There are two key things to note when reading this code:
+ *  1. Since we use the plaintext tag to capture the markup and prevent resources
+ *     from loading, we cannot simply document.write back into the main document,
+ *     since whatever we `document.write` into the document will also get swallowed up
+ *     by the plaintext tag. We also can't `document.open/document.write` into the main
+ *     document either because document.open will blow away the current document, which
+ *     would leave the plaintext object for dead. We have attempted to relocate the
+ *     plaintext element into a different document to free up the main document, but
+ *     this was not successful.
+ *  2. We must stream into a "captured" DOM so that we can continue to chunk
+ *     data while still being able to use DOM operations on each chunk.
+ *     TODO: It might be nice to bypass the captured dom if someone wants to
+ *           modify the markup in a streaming way with regular expressions.
+ *
+ * How it works
+ * ============
+ * As data from the server gets loaded up on the client, that data is being
+ * swallowed up by the plaintext tag which was inserted into the document
+ * in the bootloader mobify.js tag. With `initStreamingCapture`, we poll
+ * the plaintext tag for new data. We take the delta, we rewrite all resources
+ * in that delta using a regular expression to prevent it from loading resources
+ * when rendered in the captured document. `chunkCallback` is then executed with
+ * the captured document in order to users to make modifications to the DOM. We
+ * then take the delta of this capturedDocument and render it into the
+ * destination document (which by default is a "seamless" iframe).
+ */
+Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options) {
+    options = options || {};
+    var prefix = options.prefix = options.prefix || 'x-';
+    var sourceDoc = options.sourceDoc || document;
+
+    // initiates capture object that will be passed to the callbacks
+    var capture = new Capture(sourceDoc, prefix);
+
+    // Grab the plaintext element from the source document
+    var plaintext = capture.plaintext = sourceDoc.getElementsByTagName('plaintext')[0];
+    var iframe;
+    // if no destination document specified, create iframe and use its document
+    if (options.destDoc) {
+        capture.destDoc = options.destDoc;
+    }
+    else {
+        iframe = capture.iframe = createSeamlessIframe(sourceDoc);
+        sourceDoc.body.insertBefore(iframe, plaintext);
+        capture.destDoc = iframe.contentDocument;
+    }
+    // currently, the only way to reconstruct the destination DOM without
+    // breaking script execution order is through document.write.
+    // TODO: Figure out way without document.write, and then make
+    //       `docWriteIntoDest` configurable through options
+    var docWriteIntoDest = capture.docWriteIntoDest = true;
+    if (docWriteIntoDest) {
+        // Open the destination document
+        capture.destDoc.open("text/html", "replace");
+    }
+
+    var explicitlySetWidth = function() {
+        var width = Utils.getPhysicalScreenSize().width/(window.devicePixelRatio || 1);
+        width = (width >= 320) ? width : 320;
+        width = width.toString() + "px";
+        sourceDoc.documentElement.style.maxWidth = width;
+        capture.destDoc.documentElement !== null && (capture.destDoc.documentElement.style.maxWidth = width);
+    }
+    // We must explicitly set the width of the window on the html of the source
+    // document, so that when we create the `startCapturedHtml` string,
+    // eventually the html of the destination document will also be set to
+    // that width. This is necessary because in some browsers, (iOS6/7, Android 2.3)
+    // there is a rendering bug where if the `pre` and `iframe` tags that are larger
+    // then the width of their container, it will force the destination iframe
+    // to grow larger because the width of the `pre/iframe`.
+    var match = /ip(hone|od|ad)|android\s2\./i.exec(navigator.userAgent);
+    var ios = (match && match[1] !== undefined);
+    if (match) {
+        explicitlySetWidth();
+        var orientationEvent = ios ? "orientationchange" : "resize";
+        window.addEventListener(orientationEvent, function() {
+            setTimeout(function(){
+                explicitlySetWidth();
+            }, 0);
+        }, false);
+    }
+
+    // Create a "captured" DOM. This is the playground DOM that the user will
+    // have that will stream into the destDoc per chunk.
+    // Using an iframe instead of `implementation.createHTMLDocument` because
+    // you cannot document.write into a document created that way in Firefox
+    capture.captureIframe = sourceDoc.createElement("iframe");
+    capture.captureIframe.id = 'captured-iframe';
+    capture.captureIframe.style.cssText = 'display:none;'
+    sourceDoc.body.insertBefore(capture.captureIframe, plaintext);
+    capture.capturedDoc = capture.captureIframe.contentDocument;
+    capture.capturedDoc.open("text/html", "replace");
+    // Start the captured doc with the original pieces of the source doc
+    var startCapturedHtml = Utils.getDoctype(sourceDoc) +
+                 Capture.openTag(sourceDoc.documentElement) +
+                 Capture.openTag(sourceDoc.head) +
+                 // Even if there is another base tag in the site that sets
+                 // target, the first one declared will be used
+                 // TODO: Write tests to verify this for all of our browsers.
+                 '<base target="_parent" />' +
+                 // Grab and insert all existing HTML above plaintext tag
+                 extractHTMLStringFromElement(sourceDoc.head);
+
+    // insert mobify.js (and main) into captured doc
+    var mobifyLibrary = Capture.getMobifyLibrary(sourceDoc);
+    startCapturedHtml += Utils.outerHTML(mobifyLibrary);
+
+    // If there is a main exec, insert it as well
+    var main = Capture.getMain();
+    if (main) {
+        startCapturedHtml += Utils.outerHTML(main);
+    }
+
+    var startDestHtml = Utils.getDoctype(sourceDoc);
+
+    if (iframe) {
+         // All browsers except iOS do not expand the height of the iframe
+         // container to the height of the content within. To compensate for that,
+         // we must set the height manually whenever it changes by polling the
+         // destination document.
+         if (!ios) {
+             var cachedHeight;
+             var webkit = /webkit/i.test(navigator.userAgent);
+             var setIframeHeight = function(){
+                 var heightElement = webkit ? capture.destDoc.documentElement : capture.destDoc.body;
+                 if (capture.destDoc.documentElement === null || capture.destDoc.body === null) {
+                     return;
+                 }
+                 // Sometimes, documentElement can have a scroll height of 0.
+                 // If so, set the height of it to 100% and attempt to get it again.
+                 var height = heightElement.scrollHeight;
+                 if (height === 0) {
+                    height = capture.destDoc.height;
+                 }
+
+                 // if the height has changed, set it.
+                 if (height !== 0 && cachedHeight !== height) {
+                     iframe.style.height = height + 'px';
+                     cachedHeight = height;
+                 }
+             }
+             setIframeHeight();
+             var iid = setInterval(setIframeHeight, 1000);
+         }
+
+        // In Webkit/Blink, resources requested in a non-src iframe do not have
+        // a referer attached. This is an issue for scripts like Typekit.
+        // We get around this by manipulating the browsers
+        // history to trick it into thinking it is an src iframe, which causes
+        // the referer to be sent.
+        // AKA an insane hack for an insane hack.
+        try {
+            iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
+        } catch (e) {
+            // Accessing the iframes history api in Firefox throws an error. But this
+            // isn't a concern since Firefox is sending the referer header correctly
+            // https://bugzilla.mozilla.org/show_bug.cgi?id=591801
+        }
+
+        // If someone uses window.location to navigate, we must ensure that the
+        // history in the parent window matches
+        window.history.replaceState({}, iframe.contentDocument.title, window.location.href);
+
+        // Override various history APIs in iframe and ensure that they run in
+        // the parent document as well
+        var iframeHistory = iframe.contentWindow.history;
+        var parentHistory = window.parent.history;
+        var historyMethods = ['replaceState', 'pushState', 'go', 'forward', 'back'];
+        historyMethods.forEach(function(element) {
+            callMethodOnDestObjFromSourceObj(iframeHistory, parentHistory, element);
+        });
+    }
+
+    startCapturedHtml = Capture.disable(startCapturedHtml, prefix);
+
+    // Start the captured doc and dest doc off write! (pun intended)
+    capture.capturedDoc.write(startCapturedHtml);
+    capture.destDoc.write(startDestHtml);
+
+    pollPlaintext(capture, chunkCallback, finishedCallback, options);
+
+};
+
+/**
+ * Removes closing tags from the end of an HTML string.
+ */
+Capture.removeClosingTagsAtEndOfString = function(html) {
+    var match = html.match(/((<\/[^>]+>)+)$/);
+    if (!match) return html;
+    return html.substring(0, html.length - match[0].length);
+}
+
+Capture.removeTargetSelf = function(html) {
+    return html.replace(/target=("_self"|\'_self\')/gi, '');
+}
 
 /**
  * Grab attributes from a string representation of an elements and clone them into dest element
@@ -210,33 +569,17 @@ Capture.openTag = function(element) {
 };
 
 /**
- * Return a string for the doctype of the current document.
- */
-Capture.prototype.getDoctype = function() {
-    var doctypeEl = this.doc.doctype || [].filter.call(this.doc.childNodes, function(el) {
-            return el.nodeType == Node.DOCUMENT_TYPE_NODE
-        })[0];
-
-    if (!doctypeEl) return '';
-
-    return '<!DOCTYPE HTML'
-        + (doctypeEl.publicId ? ' PUBLIC "' + doctypeEl.publicId + '"' : '')
-        + (doctypeEl.systemId ? ' "' + doctypeEl.systemId + '"' : '')
-        + '>';
-};
-
-/**
  * Returns an object containing the state of the original page. Caches the object
  * in `extractedHTML` for later use.
  */
  Capture.prototype.createDocumentFragmentsStrings = function() {
-    var doc = this.doc;
+    var doc = this.sourceDoc;
     var headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head');
     var bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body');
     var htmlEl = doc.getElementsByTagName('html')[0];
 
     captured = {
-        doctype: this.getDoctype(),
+        doctype: Utils.getDoctype(doc),
         htmlOpenTag: Capture.openTag(htmlEl),
         headOpenTag: Capture.openTag(headEl),
         bodyOpenTag: Capture.openTag(bodyEl),
@@ -304,10 +647,10 @@ Capture.prototype.getDoctype = function() {
  */
 Capture.prototype.restore = function() {
     var self = this;
-    var doc = self.doc;
+    var doc = self.sourceDoc;
 
     var restore = function() {
-        doc.removeEventListener('DOMContentLoaded', restore, false);
+        doc.removeEventListener('readystatechange', restore, false);
 
         setTimeout(function() {
             doc.open();
@@ -316,10 +659,10 @@ Capture.prototype.restore = function() {
         }, 15);
     };
 
-    if (/complete|interactive|loaded/.test(doc.readyState)) {
+    if (Utils.domIsReady(doc)) {
         restore();
     } else {
-        doc.addEventListener('DOMContentLoaded', restore, false);
+        doc.addEventListener('readystatechange', restore, false);
     }
 };
 
@@ -327,9 +670,6 @@ Capture.prototype.restore = function() {
  * Set the content of an element with html from a string
  */
 Capture.prototype.setElementContentFromString = function(el, htmlString) {
-    // We must pass in document because elements created for dom insertion must be
-    // inserted into the same dom they are created by.
-    var doc = this.doc;
     for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
 };
 
@@ -375,7 +715,7 @@ Capture.prototype.createDocumentFragments = function() {
  */
 Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
-    var html = Capture.enable(doc.documentElement.outerHTML || Utils.outerHTML(doc.documentElement), this.prefix);
+    var html = Capture.enable(Utils.outerHTML(doc.documentElement), this.prefix);
     var htmlWithDoctype = this.doctype + html;
     return htmlWithDoctype;
 };
@@ -391,7 +731,7 @@ Capture.prototype.render = function(htmlString) {
         escapedHTMLString = Capture.enable(htmlString);
     }
 
-    var doc = this.doc;
+    var doc = this.sourceDoc;
 
     // Set capturing state to false so that the user main code knows how to execute
     if (window.Mobify) window.Mobify.capturing = false;
@@ -411,60 +751,85 @@ Capture.prototype.getCapturedDoc = function(options) {
     return this.capturedDoc;
 };
 
-/**
- * Insert Mobify scripts back into the captured doc
- * in order for the library to work post-document.write
- */
-Capture.prototype.insertMobifyScripts = function() {
-    var doc = this.capturedDoc;
-
-    // After document.open(), all objects will be removed.
-    // To provide our library functionality afterwards, we
-    // must re-inject the script.
-    var mobifyjsScript = document.getElementById("mobify-js");
+Capture.getMobifyLibrary = function(doc) {
+    var doc = doc || document;
+    var mobifyjsScript = doc.getElementById("mobify-js");
 
     // v6 tag backwards compatibility change
     if (!mobifyjsScript) {
-        mobifyjsScript = document.getElementsByTagName("script")[0];
+        mobifyjsScript = doc.getElementsByTagName("script")[0];
         mobifyjsScript.id = "mobify-js";
         mobifyjsScript.setAttribute("class", "mobify");
     }
 
-    // Since you can't move nodes from one document to another,
-    // we must clone it first using importNode:
-    // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
-    var mobifyjsClone = doc.importNode(mobifyjsScript, false);
-    var head = this.headEl;
-    head.insertBefore(mobifyjsClone, head.firstChild);
+    return mobifyjsScript;
+};
 
-    // If main exists, re-inject it as well.
-    var mainScript = document.getElementById("mobify-js-main");
-    if (mainScript) {
-        var mainClone = doc.importNode(mainScript, false);
-        this.bodyEl.appendChild(mainClone);
+/**
+ * Grabs the main function/src/script if it exists
+ */
+Capture.getMain = function(doc) {
+    var doc = doc || document;
+    var mainScript = undefined;
+    if (window.Mobify && window.Mobify.mainExecutable) {
+        // Checks for main executable string on Mobify object and creates a script
+        // out of it
+        mainScript = document.createElement('script');
+        mainScript.innerHTML = "var main = " + window.Mobify.mainExecutable.toString() + "; main();";
+        mainScript.id = 'main-executable';
+        mainScript.setAttribute("class", "mobify");
+    } else {
+        // Older tags used to insert the main executable by themselves. 
+        mainScript = doc.getElementById("main-executable");
     }
+    return mainScript;
+}
+
+/**
+ * Insert Mobify scripts back into the captured doc
+ * in order for the library to work post-document.write
+ */
+Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
+    // After document.open(), all objects will be removed.
+    // To provide our library functionality afterwards, we
+    // must re-inject the script.
+    var mobifyjsScript = Capture.getMobifyLibrary(sourceDoc);
+
+    var head = destDoc.head;
+    // If main script exists, re-inject it.
+    var mainScript = Capture.getMain(sourceDoc);
+    if (mainScript) {
+        // Since you can't move nodes from one document to another,
+        // we must clone it first using importNode:
+        // https://developer.mozilla.org/en-US/docs/DOM/document.importNode
+        var mainClone = destDoc.importNode(mainScript, false);
+        if (!mainScript.src) {
+            mainClone.innerHTML = mainScript.innerHTML;
+        }
+        head.insertBefore(mainClone, head.firstChild)
+    }
+    // reinject mobify.js file
+    var mobifyjsClone = destDoc.importNode(mobifyjsScript, false);
+    head.insertBefore(mobifyjsClone, head.firstChild);
 };
 
 /**
  * Render the captured document
  */
 Capture.prototype.renderCapturedDoc = function(options) {
-    var doc = this.capturedDoc;
-
     // Insert the mobify scripts back into the captured doc
-    this.insertMobifyScripts();
+    Capture.insertMobifyScripts(this.sourceDoc, this.capturedDoc);
 
     // Inject timing point (because of blowing away objects on document.write)
     // if it exists
     if (window.Mobify && window.Mobify.points) {
         var body = this.bodyEl;
-        var date = doc.createElement("div");
+        var date = this.capturedDoc.createElement("div");
         date.id = "mobify-point";
         date.setAttribute("style", "display: none;")
         date.innerHTML = window.Mobify.points[0];
         body.insertBefore(date, body.firstChild);
     }
-
 
     this.render();
 };

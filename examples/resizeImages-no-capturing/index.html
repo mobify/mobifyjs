@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Mobify.js Image Resizer Without Capturing</title>
+
+<link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
+<style>
+.images {
+    width: 1024px;
+}
+.images img {
+    width: 49%;
+}
+</style>
+<script async src="/mobifyjs/build/mobify.min.js"></script>
+<script>
+    var intervalId = setInterval(function(){
+        if (window.Mobify) {
+            var images = document.querySelectorAll('img[x-src]');
+            if (images.length > 0) {
+                Mobify.ResizeImages.resize( images, {
+                    maxWidth: 320   
+                });
+            }
+            // When the document has finished loading, stop checking for new images
+            if (Mobify.Utils.domIsReady()) {
+                clearInterval(intervalId)
+            }
+        }
+    }, 30);
+</script>
+</head>
+<body class="foo">
+<div class="images">
+    <img x-src="/mobifyjs/examples/assets/images/forest.jpg">
+    <img x-src="/mobifyjs/examples/assets/images/mountains.jpg">
+</div>
+</body>
+</html>

@@ -7,41 +7,72 @@ title: Mobify.js Examples
 
 ----
 
-## Manual Image Resizing
+## Image Resizing - IMG
 
 This example uses the [Image Resizer API](/mobifyjs/v2/docs/image-resizer/)
-in Mobify.js to scale large images to be 320 pixel in width. The key thing to
+in Mobify.js to resize img elements to the width of the browser. The key thing to
 note is that the markup is completely semantic (no use of special `data-`
 attributes), yet through the use of Capturing, we are able to restrict the
 page to only download the resized images.
 
-* [Manual Image Resizing Example](http://cdn.mobify.com/mobifyjs/examples/resizeImages/index.html){: target='_blank' }
+* [Image Resizing](http://cdn.mobify.com/mobifyjs/examples/resizeImages-img-element/index.html){: target='_blank' }
 
 The following markup:
 
-    <div class="images">
-        <img src="/mobifyjs/examples/assets/images/forest.jpg">
-        <img src="/mobifyjs/examples/assets/images/mountains.jpg">
-    </div>
+    <img src="/mobifyjs/examples/assets/images/forest.jpg">
+    <img src="/mobifyjs/examples/assets/images/mountains.jpg">
 
 is modified into this on the fly:
 
-    <div class="images">
-        <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/forest.jpg">
-        <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/mountains.jpg">
-    </div>
+    <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/forest.jpg">
+    <img src="//ir0.mobify.com/320/http://localhost:3000/mobifyjs/examples/assets/images/mountains.jpg">
 
 The original image assets do not download.
 
-The API can also be used to automatically detect browser width.
+You can find the source code here:
+
+* [index.html](https://github.com/mobify/mobifyjs/tree/v2.0/examples/resizeImages-img-element/index.html
+){: target='_blank' }
+
+## Image Resizing - PICTURE
+
+This example uses the [Image Resizer API](/mobifyjs/v2/docs/image-resizer/)
+in Mobify.js to resize picture elements to the width of the browser.
+
+The problem with the `picture` element is that using it to specify the same image at different widths can be extremely tedious. Nobody wants to generate 4 versions of every image at all of the possible resolutions, and constantly update those 
+versions in the markup. Scaling image widths can be automated. (although the
+`picture` element is the best solution for art direction).
+
+To solve this problem, Mobify.js allows for alternate `picture` markup that
+allows you to specify widths as attributes on `source` elements, instead of
+specifying a different image for each breakpoint. 
+
+* [Image Resizing](http://cdn.mobify.com/mobifyjs/examples/resizeImages-picture-element/index.html){: target='_blank' }
+
+The following markup (URLs shortened for example):
+
+    <picture data-src="extralarge.jpg">
+        <source src="alternate_art.png" media="(min-width: 320px)" data-width="320">
+        <source media="(min-width: 800px)" data-width="400">
+        <source media="(min-width: 1000px)" data-width="500">
+        <img src="small.jpg">
+    </picture>
+
+is modified into this on the fly:
+
+    <picture data-src="extralarge.jpg">
+        <source src="//ir0.mobify.com/project-oss-localhost/webp/320/1418/http://localhost:3000/mobifyjs/examples/assets/images/alternate_art.png" media="(min-width: 320px)" data-width="320">
+        <source media="(min-width: 800px)" data-width="400" src="//ir0.mobify.com/project-oss-localhost/webp/400/1418/http://localhost:3000/mobifyjs/examples/assets/images/extralarge.jpg">
+        <source media="(min-width: 1000px)" data-width="500" src="//ir0.mobify.com/project-oss-localhost/webp/500/1418/http://localhost:3000/mobifyjs/examples/assets/images/extralarge.jpg">
+        <img data-orig-src="small.jpg">
+    </picture>
 
 You can find the source code here:
 
-* [index.html](https://github.com/mobify/mobifyjs/tree/v2.0/examples/resizeImages/index.html
+* [index.html](https://github.com/mobify/mobifyjs/tree/v2.0/examples/resizeImages-picture-element/index.html
 ){: target='_blank' }
-* [main.js](https://github.com/mobify/mobifyjs/tree/v2.0/examples/resizeImages/mobify+main.js){: target='_blank' }
 
-## Capturing - Picture Polyfill
+## Picture Polyfill
 
 The Picture element is the official W3C HTML extension for 
 dealing with adaptive images. There are [polyfills that exist in 
@@ -50,7 +81,7 @@ scottjehl.github.com/picturefill/), but none of them are able to
 do a perfect polyfill - the best polyfill implemented thus far 
 requires a `<noscript>` tag surrounding an `img` element in 
 order to support browsers without Javascript. Using Capturing, 
-you can avoid this madness completely.
+you can avoid this completely.
 
 Open the example and be sure to fire up the network tab 
 in web inspector to see which resources get downloaded:
@@ -74,9 +105,8 @@ is only available in the example, not the library itself - yet):
 
 * [index.html](https://github.com/mobify/mobifyjs/tree/v2.0/examples/capturing-picturepolyfill/index.html
 ){: target='_blank' }
-* [main.js](https://github.com/mobify/mobifyjs/tree/v2.0/examples/capturing-picturepolyfill/main.js){: target='_blank' }
 
-Original polyfill example:
+Original polyfill example from Scott Jehl:
 
 * [Original Picture Polyfill example (not using Capturing)](http://scottjehl.github.com/picturefill/){: target='_blank' }
 
@@ -95,7 +125,6 @@ on the site did not download.
 Source code on Github:
 
 * [index.html](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-grumpycat/index.html){: target='_blank' }
-* [main.js](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-grumpycat/index.html){: target='_blank' }
 
 ## Capturing - Media Queries
 
@@ -112,26 +141,20 @@ evaluated by the media query are loaded.
 Source code on Github:
 
 * [index.html](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-mediaquery/index.html){: target='_blank' }
-* [main.js](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-mediaquery/main.js){: target='_blank' }
 
 ## Capturing - Basic Templating
 
-The primary function of Mobify.js 1.1 was client-side templating 
-to completely rewrite the pages of your existing site when
-responsive doesn't offer enough flexibility, or when changing 
-the backend is simply too painful and tedious. It is 
-particularly helpful when you need a mobile presence fast. This 
-is no longer the primary function of Mobify.js, but it is still 
-possible. 
+In this example, we use Templating to completely rewrite the original HTML
+in this page, using Capturing to prevent any of the original resources from loading.
 
-Check out this basic example:
+Check out the example (notice the CSS in the original markup does not
+load):
 
 * [Templating Example](http://cdn.mobify.com/mobifyjs/examples/capturing-basictemplating/index.html){: target='_blank' }
 
 Source code on Github:
 
 * [index.html](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-basictemplating/index.html){: target='_blank' }
-* [base.html](https://github.com/mobify/mobifyjs/blob/v2.0/examples/capturing-basictemplating/main.js){: target='_blank' }
 
 ----
 

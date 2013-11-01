@@ -80,14 +80,6 @@ So your final konf might look something like this:
 
 	} {/data}
 
-## Responsive UI Modules
-
-We've begun a library of UI modules that work with Mobify.js to help you
-create mobile sites faster. These modules are fully responsive, and will
-easily integrate into new and existing sites alike.
-[Check out the first few](/mobifyjs/modules/), more are on the way.
-
-
 ## Cloud Enhancements
 
 The Mobify Cloud offers additional services that can enhance any

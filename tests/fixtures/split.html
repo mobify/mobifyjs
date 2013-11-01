@@ -15,7 +15,7 @@
             // Standalone
             if (window == parent) {
                 var script = document.createElement("script");
-                script.src = "/build/mobify-2.0.0alpha1.min.js";
+                script.src = "/build/mobify.js";
                 script.onload = function() {
                     restore(Mobify.Capture);
                 };
@@ -24,7 +24,7 @@
 
             // Iframed
             } else {
-                parent.require(["../src/capture.js"], function(Capture) {
+                parent.require(["capture"], function(Capture) {
                     restore(Capture);
                 });
             }

@@ -7,71 +7,88 @@ title: Mobify.js Documentation
 
 ## What is Mobify.js?
 
-Mobify.js is a library for adapting websites across a number of different kinds
-of devices. Core to Mobify.js is its ability to capture and  manipulate the DOM
-before any resources have downloaded, which unlocks the ability to do resource
-control, conditional loading, image resizing, javascript  concatination and
-more.
+Mobify.js is an open source library for improving responsive sites
+by providing responsive images, JS/CSS optimization, Adaptive
+Templating and more. Mobify.js also provides a 
+"Capturing" API for manipulating the DOM before any resources have
+loaded, giving developers the ability to enable the listed features above
+without changing any backend markup.
+
+## Getting started
+
+Let's get started by using the [Image API](/mobifyjs/v2/docs/image-resizer/)
+(one of many APIs available in mobify.js)
+to automatically resize and optimize images in your page.
+
+- Note: If you're using this API locally and your images aren't publicly
+available, the original images will load. To see the images resize, try this
+on an environment that is publicly available.
+
+<u>With Capturing</u>
+
+If you don't want to have to worry about changing `src` attributes, you can let
+[Capturing](/mobifyjs/v2/docs/capturing/) take care of that for you. It requires
+a special script tag that must
+be placed after the opening <code>&lt;head&gt;</code> tag (**must be placed above
+any element that loads external resources!**):
+[Unminified version on Github](https://github.com/mobify/mobifyjs/blob/v2.0/tag/bootstrap.html){: target='_blank' }
+
+    <script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=e,a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h="mobify",i=function(){var c=new Date;c.setTime(c.getTime()+3e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e)if("string"==typeof e){var c=b.createElement("script");c.onerror=i,g(c,"main-executable",h,mainUrl)}else a.Mobify.mainExecutable=e.toString(),e()},f.onerror=i,g(f,"mobify-js",h,d)})}(window,document,function(){var a=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return a?a[1]&&+a[2]<4?!1:a[3]&&+a[4]<11?!1:!0:!1},
+
+    // path to mobify.js
+    "//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha11.min.js",
+
+    // calls to APIs go here (or path to a main.js)
+    function() {
+      var capturing = window.Mobify && window.Mobify.capturing || false;
+
+      if (capturing) {
+        Mobify.Capture.init(function(capture){
+          var capturedDoc = capture.capturedDoc;
+
+          var images = capturedDoc.querySelectorAll("img, picture");
+          Mobify.ResizeImages.resize(images);
+            
+          // Render source DOM to document
+          capture.renderCapturedDoc();
+        });
+      }
+    });</script>
 
 
-## Instructions
+<u>Without Capturing</u>
 
-1. Install the Mobify.js tag on your site. It must be placed **immediately** after
-   the opening <head> tag: [Unminified version on Github](https://github.com/mobify/mobifyjs/blob/v2.0/tag/bootstrap.html){: target='_blank' }
+If you want to use the [Image API](/mobifyjs/v2/docs/image-resizer/)
+without [Capturing](/mobifyjs/v2/docs/capturing/), you must change
+`src` to `x-src` (this is configurable) for every <code>&lt;img&gt;</code> and 
+<code>&lt;picture&gt;</code> element you have in your site (you
+also may want to add <code>&lt;noscript&gt;</code> fallbacks if you're worried
+about browsers with JavaScript disabled/unavailable). This snippet will
+load mobify.js asynchronously in order to be able to start loading images before
+the DOM is ready.
 
-<pre id="mobify-tag"><code class="javascript">&lt;script>(function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=c,a.id=d,a.setAttribute("class",e),f.parentNode.insertBefore(a,f)}var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[1]){if(!+f[1])return}else if(this.Mobify||!c())return;a.Mobify={points:[+new Date]},b.write('&lt;plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h=function(){var c=new Date;c.setTime(c.getTime()+18e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e){var a=b.createElement("script");a.onerror=h,g(a,e,"mobify-js-main","mobify")}},f.onerror=h,g(f,d,"mobify-js","mobify")})})(window,document,function(){return match=/webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent),match?match[1]&&4>+match[2]?!1:match[3]&&11>+match[4]?!1:!0:!1},
+Then, paste the following tag before <code>&lt;/head&gt;</code>, or top of
+<code>&lt;body&gt;</code>:
 
-// path to mobify library
-"//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha3.min.js",
-// path to main executable
-"/PATH/TO/main.js");
-&lt;/script></code></pre>
-
-2. Create a new JavaScript file called `main.js`, and correctly
-   set the path in the above script by replacing /PATH/TO/ with the
-   path to your new script.
-
-3. Copy the following code into your `main.js`. It is an example which will
-   replace all images with grumpy cats on your site and will NOT load the
-   original images:
-
-<pre><code class="javascript">var capturing = window.Mobify && window.Mobify.capturing || false;
-if (capturing) {
-    console.log("Executing during capturing phase!");
-
-    // Instantiate capture and pass capture object upon completion
-    Mobify.Capture.init(function(capture){
-        var capturedDoc = capture.capturedDoc;
-
-        var grumpyUrl = "http://pics.blameitonthevoices.com/092012/small_grumpy%20cat%20caption.jpg";
-
-        var imgs = capturedDoc.getElementsByTagName("img");
-        for (var i = 0; i < imgs.length; i++) {
-            var img = imgs[i];
-            // To escape content, we prepend resources with "x-",
-            // so to change the src, you must set x-src. Read more:
-            // www.mobifyjs.com/v2/docs/capturing/#new-mobifycapturedocument-prefixx-
-            img.setAttribute("x-src", grumpyUrl);
-        }
-
-        // Render captured dom back to original document
-        capture.renderCapturedDoc();
-    });
-
-} else {
-    console.log("Executing during post-capturing phase!");
-}</code></pre>
-
-4. Browse to your site on a compatible browser - WebKit (Chrome, Safari, etc),
-  FF4 or greater, Opera 11/12, IE10. Also, browse to a page with images to see the
-  full effect of the grumpy cat!
-
-- Note: You may also want to open up network tab of the web inspector on your browser to see that
-        the original images from your site were not downloaded.
-
+    <script async src="//cdn.mobify.com/mobifyjs/build/mobify-2.0.0alpha11.min.js"></script>
+    <script>
+        var intervalId = setInterval(function(){
+            if (window.Mobify) {
+                var images = document.querySelectorAll('img[x-src], picture');
+                if (images.length > 0) {
+                    Mobify.ResizeImages.resize(images);
+                }
+                // When the document has finished loading, stop checking for new images
+                if (Mobify.Utils.domIsReady()) {
+                    clearInterval(intervalId)
+                }
+            }
+        }, 100);
+    </script>
 
 ## Where to next?
 
-* [Read our in-depth tutorial](./tutorial/)
-* [Capturing Reference](./capturing/)
+* [Capturing API Reference](./capturing/)
+* [Image API Reference](./image-resizer/)
+
 

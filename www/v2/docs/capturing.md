@@ -5,6 +5,8 @@ title: Mobify.js Documentation
 
 # Capturing
 
+- Capture and modify the DOM before any resources have loaded by delay the lookahead pre-parser.
+
 To use the Capturing API, you must first install the Mobify.js tag on your site.
 If you have not already, please refer to the  [quickstart guide](/mobifyjs/v2/docs/) to get setup.
 

@@ -2,13 +2,12 @@
 layout: page-license
 title: Mobify.js Open-Source Projects – License Agreement
 description:
-    Learn the terms and conditions under which you use Mobify.js open source
-    framework and modules.
+    Learn the terms and conditions under which you use Mobify.js open source library
 ---
 
 # License
 
-The Mobify.js framework, tools and modules are licensed under an [MIT license](https://github.com/mobify/mobifyjs/blob/v2.0/LICENSE).
+The Mobify.js library is licensed under an [MIT license](https://github.com/mobify/mobifyjs/blob/v2.0/LICENSE).
 
 Some other dependencies, tools, and assets are used under their respective licenses.
 

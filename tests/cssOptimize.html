@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>cssOptimize.js Tests</title>
+  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/require.js" id="requirejs"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
+</head>
+<body>
+
+<div id="qunit"></div>
+
+<div id="qunit-fixture">
+    <div id="disabled-stylesheet-link">
+        <link rel="stylesheet" x-href="/foo.css">
+    </div>
+</div>
+
+<script>
+    QUnit.config.autostart = false;
+    require.config({
+        "baseUrl": "../src/",
+        "paths": {
+            "mobifyjs": "../src/"
+        }
+    });
+    
+    require(["mobifyjs/utils", "mobifyjs/cssOptimize"], function(Utils, CssOptimize) {
+        QUnit.start();
+        
+        test("cssOptimize - optimize (rewrites a <link> element's href)", function() {
+            var links = document.querySelectorAll("#disabled-stylesheet-link link");
+
+            CssOptimize.optimize(links);
+            
+            strictEqual(links[0].getAttribute("x-href"), "//jazzcat.mobify.com/project-oss-localhost/cssoptimizer/http://localhost:3000/foo.css");
+        });
+
+        test("cssOptimize - getCssUrl", function() {
+            var styleSheetUrl = 'http://www.example.com/static/style.css'
+            var options = {
+                'bare': {},
+                'project': {
+                    projectName: 'amazing'
+                }
+            }
+            var expected = {
+                'bare': '//jazzcat.mobify.com/project-oss-localhost/cssoptimizer/' + styleSheetUrl,
+                'project': '//jazzcat.mobify.com/project-amazing/cssoptimizer/' + styleSheetUrl
+            }
+            for (var key in options) {
+                strictEqual(CssOptimize.getCssUrl(styleSheetUrl, options[key]), expected[key], key);
+            }
+        });
+
+        test('cssOptimize - _rewriteHref', function() {
+            var l = document.createElement("link");
+            var href =  "/style.css"
+            
+            l.setAttribute("x-href", "/style.css");
+            CssOptimize._rewriteHref(l, CssOptimize._defaults);
+            
+            strictEqual(l.getAttribute("x-href"), "//jazzcat.mobify.com/project-oss-localhost/cssoptimizer/http://localhost:3000/style.css", "rewrites a good URL");
+            strictEqual(l.getAttribute("onerror"), CssOptimize._defaults.onerror, 
+                  "sets onerror attribute correctly");
+            strictEqual(l.getAttribute("data-orig-href"), "/style.css",
+                  "sets data-orig-href attribute correctly");
+
+            href = "gopher://archie/style.css"
+            l.setAttribute("x-href", href)
+            CssOptimize._rewriteHref(l, CssOptimize._defaults);
+
+            strictEqual(l.getAttribute("x-href"), href, 
+                "doesn't change non-http url");
+
+        });
+
+        test('cssOptimize - restoreOriginalHref', function() {
+            var l = document.createElement('link'),
+                origHref = 'bar';
+            l.setAttribute('data-orig-href', origHref);
+            l.setAttribute('href', 'foo');
+
+            cssOptimize.restoreOriginalHref({target: l});
+
+            strictEqual(l.getAttribute('href'), origHref);
+        });
+    });
+</script>
+
+</body>
+</html>
