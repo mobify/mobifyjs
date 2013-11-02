@@ -751,15 +751,12 @@ var createSeamlessIframe = function(doc){
     var doc = doc || document;
     var iframe = doc.createElement("iframe");
     // set attribute to make the iframe appear seamless to the user
-    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;box-sizing:border-box;padding:0px;margin:0px;background-color:transparent;border:0px none transparent;'
-    iframe.setAttribute('scrolling', 'no');
-    iframe.setAttribute('seamless', '');
+    iframe.style.cssText = 'display:none;';
     return iframe;
 }
 
 // Track what has been written to captured and destination docs for each chunk
 var plaintextBuffer = '';
-var writtenToDestDoc = '';
 
 var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
     var finished = Utils.domIsReady(capture.sourceDoc);
@@ -797,14 +794,38 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
     // Write escaped chunk to captured document
     capture.capturedDoc.write(toWrite);
 
-    // Move certain elements that should be in the parent document,
-    // such as meta viewport tags and title tags.
-    // We also want to move stylesheets into the head, because
-    // resources loaded via document.write do not initiate the
-    // loading bar (consistent across all browsers), and moving them into
-    // top level document forces it to without causing an additional request.
+    // Execute chunk callback to allow users to make modifications to capturedDoc
+    chunkCallback(capture);
+
     var href = options.prefix + 'href';
-    var elsToMove = capture.capturedDoc.querySelectorAll('meta, title, link[' + href + '][rel="stylesheet"]');
+    var src = options.prefix + 'src';
+    var els = capture.capturedDoc.querySelectorAll('img, script, link');
+    for (var i = 0, len=els.length; i < len; i++) {
+        var el = els[i];
+        console.log(el.nodeName);
+        if (el.nodeName === 'LINK') {
+            // http://stackoverflow.com/questions/12825248/enable-disable-stylesheet-using-javascript-in-chrome
+            if (el.hasAttribute('href')) {
+                continue;
+            }
+            var setHref = el.getAttribute(href);
+            el.setAttribute('href', setHref);
+        } else if (el.nodeName === 'IMG' || el.nodeName === 'SCRIPT') {
+            // http://stackoverflow.com/questions/12825248/enable-disable-stylesheet-using-javascript-in-chrome
+            if (el.hasAttribute('src')) {
+                continue;
+            }
+            var setSrc = el.getAttribute(src);
+            if (setSrc) {
+                el.setAttribute('src', setSrc);
+            }
+            if (el.nodeName === 'SCRIPT') {
+                el.setAttribute('type', 'text/javascript')
+            }
+        }
+    }
+
+    var elsToMove = capture.capturedDoc.head.children;
     if (elsToMove.length > 0) {
         for (var i = 0, len=elsToMove.length; i < len; i++) {
             var el = elsToMove[i];
@@ -813,68 +834,36 @@ var pollPlaintext = function(capture, chunkCallback, finishedCallback, options){
                 continue;
             }
             var elClone = capture.sourceDoc.importNode(el, true);
-            if (elClone.nodeName === 'LINK') {
-                // http://stackoverflow.com/questions/12825248/enable-disable-stylesheet-using-javascript-in-chrome
-                var src = elClone.getAttribute(href);
-                elClone.setAttribute('href', src);
-                capture.sourceDoc.head.appendChild(elClone);
-                elClone.disabled = true;
-            } else {
-                capture.sourceDoc.head.appendChild(elClone);
-            }
+            capture.sourceDoc.head.appendChild(elClone);
             el.setAttribute('capture-moved', '');
         }
     }
 
-    // In Android 2.3, widths of iframes can override of the width
-    // of the html element of the top-level document (which can inadvertently. We detect for that
-    // and change the width of the iframe
-    // TODO: with max-widths set, this may not be necessary. -sj
-    if (document.documentElement.offsetWidth !== window.outerWidth) {
-        var iframes = Array.prototype.slice.call(capture.capturedDoc.querySelectorAll('iframe'));
-        iframes.forEach(function(iframe){
-            iframe.width = '100%';
-        });
-    }
-
-    // Execute chunk callback to allow users to make modifications to capturedDoc
-    chunkCallback(capture);
-
-    if (capture.capturedDoc.documentElement) {
-        // Grab outerHTML of capturedDoc and write the diff to destDoc
-        capturedHtml = Utils.outerHTML(capture.capturedDoc.documentElement);
-        // we could be grabbing from a captured document that has a head and no body.
-        var toWriteDest = capturedHtml.substring(writtenToDestDoc.length);
-
-        // outerHTML will always give us an balanced tree, which isn't what
-        // we want to write into the destination document. The solution for
-        // this is to simply never write out closing tags if they
-        // are at the end of the `toWriteDest` string. If those end tags
-        // were truly from the document, rather then generated by outerHTML,
-        // then they will come in on the next chunk.
-        toWriteDest = Capture.removeClosingTagsAtEndOfString(toWriteDest);
-
-        writtenToDestDoc += toWriteDest;
-
-        // Unescape chunk
-        toWriteDest = Capture.enable(toWriteDest, capture.prefix);
-        if (capture.docWriteIntoDest) {
-            capture.destDoc.write(toWriteDest);
+    var elsToMove = capture.capturedDoc.body.children;
+    if (elsToMove.length > 0) {
+        for (var i = 0, len=elsToMove.length; i < len; i++) {
+            var el = elsToMove[i];
+            // do not copy dom notes over twice
+            if (el.hasAttribute('capture-moved')) {
+                continue;
+            }
+            var elClone = capture.sourceDoc.importNode(el, true);
+            capture.sourceDoc.body.appendChild(elClone);
+            el.setAttribute('capture-moved', '');
         }
     }
 
     // if document is ready, stop polling and ensure all documents involved are closed
     if (finished) {
         finishedCallback && finishedCallback(capture);
-        capture.capturedDoc.close();
-        capture.destDoc.close();
-        capture.sourceDoc.close();
-        Utils.removeElements([capture.captureIframe, capture.plaintext]);
-        capture.captureIframe = null;
-        capture.plaintext = null;
-        capture.capturedDoc = null;
+        //capture.capturedDoc.close();
+        //capture.destDoc.close();
+        //capture.sourceDoc.close();
+        Utils.removeElements([capture.plaintext]);
+        //capture.captureIframe = null;
+        //capture.plaintext = null;
+        //capture.capturedDoc = null;
         plaintextBuffer = '';
-        writtenToDestDoc = '';
     }
     else {
         setTimeout(function(){
@@ -1001,32 +990,6 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
         capture.destDoc.open("text/html", "replace");
     }
 
-    var explicitlySetWidth = function() {
-        var width = Utils.getPhysicalScreenSize().width/(window.devicePixelRatio || 1);
-        width = (width >= 320) ? width : 320;
-        width = width.toString() + "px";
-        sourceDoc.documentElement.style.maxWidth = width;
-        capture.destDoc.documentElement !== null && (capture.destDoc.documentElement.style.maxWidth = width);
-    }
-    // We must explicitly set the width of the window on the html of the source
-    // document, so that when we create the `startCapturedHtml` string,
-    // eventually the html of the destination document will also be set to
-    // that width. This is necessary because in some browsers, (iOS6/7, Android 2.3)
-    // there is a rendering bug where if the `pre` and `iframe` tags that are larger
-    // then the width of their container, it will force the destination iframe
-    // to grow larger because the width of the `pre/iframe`.
-    var match = /ip(hone|od|ad)|android\s2\./i.exec(navigator.userAgent);
-    var ios = (match && match[1] !== undefined);
-    if (match) {
-        explicitlySetWidth();
-        var orientationEvent = ios ? "orientationchange" : "resize";
-        window.addEventListener(orientationEvent, function() {
-            setTimeout(function(){
-                explicitlySetWidth();
-            }, 0);
-        }, false);
-    }
-
     // Create a "captured" DOM. This is the playground DOM that the user will
     // have that will stream into the destDoc per chunk.
     // Using an iframe instead of `implementation.createHTMLDocument` because
@@ -1040,89 +1003,41 @@ Capture.initStreamingCapture = function(chunkCallback, finishedCallback, options
     // Start the captured doc with the original pieces of the source doc
     var startCapturedHtml = Utils.getDoctype(sourceDoc) +
                  Capture.openTag(sourceDoc.documentElement) +
-                 Capture.openTag(sourceDoc.head) +
-                 // Even if there is another base tag in the site that sets
-                 // target, the first one declared will be used
-                 // TODO: Write tests to verify this for all of our browsers.
-                 '<base target="_parent" />' +
+                 Capture.openTag(sourceDoc.head);
                  // Grab and insert all existing HTML above plaintext tag
-                 extractHTMLStringFromElement(sourceDoc.head);
+                 //extractHTMLStringFromElement(sourceDoc.head);
 
     // insert mobify.js (and main) into captured doc
-    var mobifyLibrary = Capture.getMobifyLibrary(sourceDoc);
-    startCapturedHtml += Utils.outerHTML(mobifyLibrary);
+    //var mobifyLibrary = Capture.getMobifyLibrary(sourceDoc);
+    //startCapturedHtml += Utils.outerHTML(mobifyLibrary);
 
     // If there is a main exec, insert it as well
-    var main = Capture.getMain();
-    if (main) {
-        startCapturedHtml += Utils.outerHTML(main);
-    }
+    // var main = Capture.getMain();
+    // if (main) {
+    //     startCapturedHtml += Utils.outerHTML(main);
+    // }
 
     var startDestHtml = Utils.getDoctype(sourceDoc);
 
-    if (iframe) {
-         // All browsers except iOS do not expand the height of the iframe
-         // container to the height of the content within. To compensate for that,
-         // we must set the height manually whenever it changes by polling the
-         // destination document.
-         if (!ios) {
-             var cachedHeight;
-             var webkit = /webkit/i.test(navigator.userAgent);
-             var setIframeHeight = function(){
-                 var heightElement = webkit ? capture.destDoc.documentElement : capture.destDoc.body;
-                 if (capture.destDoc.documentElement === null || capture.destDoc.body === null) {
-                     return;
-                 }
-                 // Sometimes, documentElement can have a scroll height of 0.
-                 // If so, set the height of it to 100% and attempt to get it again.
-                 var height = heightElement.scrollHeight;
-                 if (height === 0) {
-                    height = capture.destDoc.height;
-                 }
-
-                 // if the height has changed, set it.
-                 if (height !== 0 && cachedHeight !== height) {
-                     iframe.style.height = height + 'px';
-                     cachedHeight = height;
-                 }
-             }
-             setIframeHeight();
-             var iid = setInterval(setIframeHeight, 1000);
-         }
-
-        // In Webkit/Blink, resources requested in a non-src iframe do not have
-        // a referer attached. This is an issue for scripts like Typekit.
-        // We get around this by manipulating the browsers
-        // history to trick it into thinking it is an src iframe, which causes
-        // the referer to be sent.
-        // AKA an insane hack for an insane hack.
-        try {
-            iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
-        } catch (e) {
-            // Accessing the iframes history api in Firefox throws an error. But this
-            // isn't a concern since Firefox is sending the referer header correctly
-            // https://bugzilla.mozilla.org/show_bug.cgi?id=591801
-        }
-
-        // If someone uses window.location to navigate, we must ensure that the
-        // history in the parent window matches
-        window.history.replaceState({}, iframe.contentDocument.title, window.location.href);
-
-        // Override various history APIs in iframe and ensure that they run in
-        // the parent document as well
-        var iframeHistory = iframe.contentWindow.history;
-        var parentHistory = window.parent.history;
-        var historyMethods = ['replaceState', 'pushState', 'go', 'forward', 'back'];
-        historyMethods.forEach(function(element) {
-            callMethodOnDestObjFromSourceObj(iframeHistory, parentHistory, element);
-        });
+    // In Webkit/Blink, resources requested in a non-src iframe do not have
+    // a referer attached. This is an issue for scripts like Typekit.
+    // We get around this by manipulating the browsers
+    // history to trick it into thinking it is an src iframe, which causes
+    // the referer to be sent.
+    // AKA an insane hack for an insane hack.
+    try {
+        iframe.contentWindow.history.replaceState({}, iframe.contentDocument.title, window.location.href);
+    } catch (e) {
+        // Accessing the iframes history api in Firefox throws an error. But this
+        // isn't a concern since Firefox is sending the referer header correctly
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=591801
     }
 
     startCapturedHtml = Capture.disable(startCapturedHtml, prefix);
 
     // Start the captured doc and dest doc off write! (pun intended)
     capture.capturedDoc.write(startCapturedHtml);
-    capture.destDoc.write(startDestHtml);
+    //capture.destDoc.write(startDestHtml);
 
     pollPlaintext(capture, chunkCallback, finishedCallback, options);
 
