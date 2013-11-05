@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>img element onerror behaviour classifier</title>
+</head>
+<body>
+<style>
+img {
+    background-color: black;
+    border: 20px solid green;
+    min-width: 20px;
+    width: auto;
+}
+img:before {
+    content: attr(src);
+}
+</style>
+<script>
+window.ImageErrorHandler = function(event) {
+    console.dir(event);
+    event.target.setAttribute("style", "border: 20px solid red;");
+}
+</script>
+
+<img src ="http://garbage.domain.name.gfgrgrfgf/foo.jpg" onerror="ImageErrorHandler(event);" />
+<img src="/imagetests/textmime" onerror="ImageErrorHandler(event);" />
+<img src="/imagetests/emptyresponse" onerror="ImageErrorHandler(event);" />
+<img src="/imagetests/wrongmime" onerror="ImageErrorHandler(event);" />
+<img src="/imagetests/partialimage" onerror="ImageErrorHandler(event);" />
+<img src="/imagetests/abortedimage" onerror="ImageErrorHandler(event);" />
+<img src="/imagetests/notFound" onerror="ImageErrorHandler(event);" />
+<img src="/imagetests/serverError" onerror="ImageErrorHandler(event);" />
+<img src="/imagetests/fakejpeg" onerror="ImageErrorHandler(event);" />
+
+</body>
+</html>

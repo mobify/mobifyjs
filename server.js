@@ -4,6 +4,7 @@
 var http = require('http');
 var express = require('express');
 var fs = require('fs');
+var path = require('path');
 var Url = require('url');
 var hbs = require('hbs');
 
@@ -160,9 +161,56 @@ for (file in files) {
     scriptsObj[resourcesUrl + fileName] = fileData;
 }
 
-
-
 hbs.registerPartial('bootstrap', fs.readFileSync(__dirname + '/tag/bootstrap.html', 'utf8'));
+
+/**
+ * Image resizing error test cases
+ */
+
+var textMime = function(req, res) {
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Hello, World');
+};
+
+var emptyResponse = function(req, res) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.end();
+};
+
+var imageData = fs.readFileSync(path.normalize('./examples/assets/images/grumpycat.jpg'));
+
+var wrongMime = function(req, res) {
+    res.setHeader('Content-Type', 'image/png');
+    res.end(imageData);    
+}
+
+var partialImage = function(req, res) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.end(imageData.slice(0, 1024));
+};
+
+var abortedImage = function(req, res) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.write(imageData.slice(0, 1024));
+    res.abort();
+}
+
+var notFound = function(req, res) {
+    res.statusCode = 404;
+    res.setHeader('Cotnent-Type', 'text/plain');
+    res.end('Not Found!');
+};
+
+var serverError = function(req, res) {
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Faux Internal Server Error');
+};
+
+var fakeJPEG = function(req, res) {
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.end('asdf');
+};
 
 var app = express();
 
@@ -183,6 +231,14 @@ app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);
 app.get('/jsonp/Jazzcat.load/:scripts', jazzcatJsonp);
 app.get('/js/:scripts', jazzcatJs);
 
+app.get('/imagetests/textmime', textMime);
+app.get('/imagetests/emptyresponse', emptyResponse);
+app.get('/imagetests/wrongmime', wrongMime);
+app.get('/imagetests/partialimage', partialImage);
+app.get('/imagetests/abortedimage', abortedImage);
+app.get('/imagetests/notFound', notFound);
+app.get('/imagetests/serverError', serverError);
+app.get('/imagetests/fakejpeg', fakeJPEG);
 
 if (require.main === module) {
     app.use(express.static(__dirname));
