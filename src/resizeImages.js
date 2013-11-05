@@ -101,7 +101,7 @@ ResizeImages.supportsWebp = function(callback) {
  * Returns a URL suitable for use with the 'ir' service.
  */
 ResizeImages.getImageURL = function(url, options) {
-    var opts = Utils.clone(defaults);
+    var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
     }
@@ -203,7 +203,7 @@ ResizeImages._crawlPictureElement = function(el, opts) {
  * the passed value and return it, or return the greatst value if none are 
  * greater
  */
-var targetDims = [480, 960, 1024, 1280, 2048, 4000];
+var targetDims = [320, 640, 720, 1024, 1536, 2048, 4000];
 ResizeImages._getBinnedDimension = function(dim) {
     var resultDim = 0;
 
@@ -223,7 +223,7 @@ ResizeImages._getBinnedDimension = function(dim) {
  */
 
 ResizeImages.resize = function(elements, options) {
-    var opts = Utils.clone(defaults);
+    var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
     }
@@ -234,10 +234,8 @@ ResizeImages.resize = function(elements, options) {
 
     // If maxHeight/maxWidth are not specified, use screen dimensions
     // in device pixels
-    var largestDim = Math.max(screenSize.width, screenSize.height);
-    var binnedLargestDim = ResizeImages._getBinnedDimension(largestDim);
-    var width = opts.maxWidth || binnedLargestDim;
-    var height = opts.maxHeight || binnedLargestDim;
+    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
+    var height = opts.maxHeight || undefined;
 
     // Otherwise, compute device pixels
     if (dpr && opts.maxWidth) {
@@ -249,7 +247,9 @@ ResizeImages.resize = function(elements, options) {
 
     // Doing rounding for non-integer device pixel ratios
     opts.maxWidth = Math.ceil(width);
-    opts.maxHeight = Math.ceil(height);
+    if (opts.maxHeight && height) {
+        opts.maxHeight = Math.ceil(height);
+    }
 
     if (!opts.format && opts.webp) {
         opts.format = "webp";
@@ -275,7 +275,7 @@ ResizeImages.resize = function(elements, options) {
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
-var defaults = {
+ResizeImages.defaults = {
       proto: '//',
       host: 'ir0.mobify.com',
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
@@ -288,7 +288,8 @@ var defaults = {
 var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
     var origSrc;
     event.target.removeAttribute('onerror'); // remove ourselves
-    if (origSrc = event.target.getAttribute('data-orig-src')) {
+    origSrc = event.target.getAttribute('data-orig-src')
+    if (origSrc) {
         event.target.setAttribute('src', origSrc);
     }
 };
