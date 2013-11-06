@@ -203,7 +203,7 @@ ResizeImages._crawlPictureElement = function(el, opts) {
  * the passed value and return it, or return the greatst value if none are 
  * greater
  */
-var targetDims = [320, 640, 720, 1024, 1536, 2048, 4000];
+var targetDims = [320, 640, 768, 1080, 1536, 2048, 4000];
 ResizeImages._getBinnedDimension = function(dim) {
     var resultDim = 0;
 
