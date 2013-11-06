@@ -207,9 +207,9 @@ var targetDims = [320, 640, 720, 1024, 1536, 2048, 4000];
 ResizeImages._getBinnedDimension = function(dim) {
     var resultDim = 0;
 
-    for(var i = 0, len = targetDims.length; i < len; i++) {
+    for (var i = 0, len = targetDims.length; i < len; i++) {
         resultDim = targetDims[i];
-        if(resultDim >= dim) {
+        if (resultDim >= dim) {
             break;
         }
     }
