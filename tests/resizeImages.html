@@ -57,6 +57,10 @@
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
+    <div id="resizeImages-produces-binned-sizes">
+        <img x-src="http://www.example.com/foo.jpg" />
+    <div>
+
 </div>
 
 <script>
@@ -333,6 +337,85 @@
             }, 1000); // 1 second given for dataURI WEBP detection
 
         });
+
+        test('_getBinnedDimension', function() {
+            var gbd = ResizeImages._getBinnedDimension;
+            strictEqual(gbd(1), 320);
+            strictEqual(gbd(320), 320);
+            strictEqual(gbd(321), 640);
+            strictEqual(gbd(2048), 2048);
+            strictEqual(gbd(2049), 4000);
+            strictEqual(gbd(4001), 4000);
+        });
+
+        test('resize', function() {
+            // setup
+            var origGPSS = Utils.getPhysicalScreenSize;
+            var fakeWidth, fakeHeight;
+            var origWebpSupport = ResizeImages.defaults.supportsWebp;
+            var fakeGetPhyscialScreenSize = function() {
+                return {
+                    width: fakeWidth,
+                    height: fakeHeight
+                };
+            };
+
+            Utils.getPhysicalScreenSize = fakeGetPhyscialScreenSize;
+            ResizeImages.defaults.webp = false;
+
+            var imgs = $("#resizeImages-produces-binned-sizes img");
+
+            // tests
+            var clonedImgs = imgs.clone();
+            fakeWidth = 320;
+            fakeHeight = 480;
+
+            ResizeImages.resize(clonedImgs);
+
+            strictEqual(clonedImgs.first().attr("src"), 
+                        "//ir0.mobify.com/project-oss-localhost/320/http://www.example.com/foo.jpg");
+
+
+            clonedImgs = imgs.clone();
+            fakeWidth = 640;
+            fakeHeight = 960;
+
+            ResizeImages.resize(clonedImgs);
+
+            strictEqual(clonedImgs.first().attr("src"), 
+                        "//ir0.mobify.com/project-oss-localhost/640/http://www.example.com/foo.jpg");
+
+            clonedImgs = imgs.clone();
+            fakeWidth = 720;
+            fakeHeight = 1280;
+
+            ResizeImages.resize(clonedImgs);
+
+            strictEqual(clonedImgs.first().attr("src"), 
+                        "//ir0.mobify.com/project-oss-localhost/768/http://www.example.com/foo.jpg");
+
+            clonedImgs = imgs.clone();
+            fakeWidth = 2048;
+            fakeHeight = 1536;
+
+            ResizeImages.resize(clonedImgs);
+
+            strictEqual(clonedImgs.first().attr("src"), 
+                        "//ir0.mobify.com/project-oss-localhost/2048/http://www.example.com/foo.jpg");
+
+            clonedImgs = imgs.clone();
+            fakeWidth = 6000;
+            fakeHeight = 6000;
+
+            ResizeImages.resize(clonedImgs);
+
+            strictEqual(clonedImgs.first().attr("src"), 
+                        "//ir0.mobify.com/project-oss-localhost/4000/http://www.example.com/foo.jpg");
+
+            // tear down
+            Utils.getPhysicalScreenSize = origGPSS;
+            ResizeImages.defaults.webp = origWebpSupport;
+        })
     });
 
 
