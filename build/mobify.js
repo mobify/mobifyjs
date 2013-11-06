@@ -1483,8 +1483,6 @@ define('mobifyjs/resizeImages',["mobifyjs/utils"], function(Utils) {
 
 var ResizeImages = window.ResizeImages = {};
 
-
-
 var localStorageWebpKey = 'Mobify-Webp-Support-v2';
 
 function persistWebpSupport(supported) {
@@ -1584,7 +1582,7 @@ ResizeImages.supportsWebp = function(callback) {
  * Returns a URL suitable for use with the 'ir' service.
  */
 ResizeImages.getImageURL = function(url, options) {
-    var opts = Utils.clone(defaults);
+    var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
     }
@@ -1605,7 +1603,7 @@ ResizeImages.getImageURL = function(url, options) {
     }
 
     if (opts.maxWidth) {
-        bits.push(options.maxWidth)
+        bits.push(options.maxWidth);
 
         if (opts.maxHeight) {
             bits.push(options.maxHeight);
@@ -1682,13 +1680,31 @@ ResizeImages._crawlPictureElement = function(el, opts) {
 };
 
 /**
+ * Searches a list of target dimensions for the smallest one that is greater than 
+ * the passed value and return it, or return the greatst value if none are 
+ * greater
+ */
+var targetDims = [320, 640, 720, 1024, 1536, 2048, 4000];
+ResizeImages._getBinnedDimension = function(dim) {
+    var resultDim = 0;
+
+    for (var i = 0, len = targetDims.length; i < len; i++) {
+        resultDim = targetDims[i];
+        if (resultDim >= dim) {
+            break;
+        }
+    }
+    return resultDim;
+};
+
+/**
  * Searches the collection for image elements and modifies them to use
  * the Image Resize service. Pass `options` to modify how the images are 
  * resized.
  */
 
 ResizeImages.resize = function(elements, options) {
-    var opts = Utils.clone(defaults);
+    var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
     }
@@ -1697,10 +1713,10 @@ ResizeImages.resize = function(elements, options) {
 
     var screenSize = Utils.getPhysicalScreenSize(dpr);
 
-    // If maxHeight/maxWidth are not specified, use screen dimentions
+    // If maxHeight/maxWidth are not specified, use screen dimensions
     // in device pixels
-    var width = opts.maxWidth || screenSize.width;
-    var height = opts.maxHeight || screenSize.height;
+    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
+    var height = opts.maxHeight || undefined;
 
     // Otherwise, compute device pixels
     if (dpr && opts.maxWidth) {
@@ -1712,7 +1728,9 @@ ResizeImages.resize = function(elements, options) {
 
     // Doing rounding for non-integer device pixel ratios
     opts.maxWidth = Math.ceil(width);
-    opts.maxHeight = Math.ceil(height);
+    if (opts.maxHeight && height) {
+        opts.maxHeight = Math.ceil(height);
+    }
 
     if (!opts.format && opts.webp) {
         opts.format = "webp";
@@ -1738,7 +1756,7 @@ ResizeImages.resize = function(elements, options) {
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
-var defaults = {
+ResizeImages.defaults = {
       proto: '//',
       host: 'ir0.mobify.com',
       projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
@@ -1751,7 +1769,8 @@ var defaults = {
 var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
     var origSrc;
     event.target.removeAttribute('onerror'); // remove ourselves
-    if (origSrc = event.target.getAttribute('data-orig-src')) {
+    origSrc = event.target.getAttribute('data-orig-src')
+    if (origSrc) {
         event.target.setAttribute('src', origSrc);
     }
 };
