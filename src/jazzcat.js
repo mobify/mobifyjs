@@ -197,10 +197,15 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
      * less than ten minutes old. Treats invalid headers as stale.
      */
     httpCache.utils.isStale = function(resource, options) {
+        var ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
         var headers = resource.headers || {};
         var cacheControl = headers['cache-control'];
         var now = Date.now();
         var date = Date.parse(headers['date']);
+        var expires;
+        var lastModified = headers['last-modified'];
+        var age;
+        var modifiedAge;
         var overrideTime;
 
         // Fresh if less than 10 minutes old
@@ -221,17 +226,33 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
             cacheControl = httpCache.utils.ccParse(cacheControl);
 
             if ((cacheControl['max-age']) &&
-                (!cacheControl['private']) &&
                 (!cacheControl['no-store']) &&
                 (!cacheControl['no-cache'])) {
                 // Convert the max-age directive to ms.
                 return now > (date + (cacheControl['max-age'] * 1000));
+            } else {
+                // there was no max-age or this was marked no-store or 
+                // no-cache, and so is stale
+               return true;
             }
         }
 
         // If `expires` is present, we are stale if we are older.
-        if (date = Date.parse(headers.expires)) {
-            return now > date;
+        if (headers.expires && (expires = Date.parse(headers.expires))) {
+            return now > expires;
+        }
+
+        // Fresh if less than 10% of difference between date and 
+        // last-modified old, up to a day
+        if (lastModified && (lastModified = Date.parse(lastModified)) && date) {
+            modifiedAge = date - lastModified;
+            age = now - date;
+            // If the age is less than 10% of the time between the last 
+            // modification and the response, and the age is less than a 
+            // day, then it is not stale
+            if ((age < 0.1 * modifiedAge) && (age < ONE_DAY_IN_MS)) {
+                return false;
+            }
         }
 
         // Otherwise, we are stale.
