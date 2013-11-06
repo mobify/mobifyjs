@@ -181,19 +181,21 @@ var imageData = fs.readFileSync(path.normalize('./examples/assets/images/grumpyc
 
 var wrongMime = function(req, res) {
     res.setHeader('Content-Type', 'image/png');
-    res.end(imageData);    
-}
+    res.end(imageData);
+};
 
-var partialImage = function(req, res) {
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.end(imageData.slice(0, 1024));
+var partialImage = function(bytes) {
+    return function(req, res) {
+        res.setHeader('Content-Type', 'image/jpeg');
+        res.end(imageData.slice(0, bytes));
+    };
 };
 
 var abortedImage = function(req, res) {
     res.setHeader('Content-Type', 'image/jpeg');
     res.write(imageData.slice(0, 1024));
-    res.abort();
-}
+    res.socket.destroy();
+};
 
 var notFound = function(req, res) {
     res.statusCode = 404;
@@ -234,7 +236,8 @@ app.get('/js/:scripts', jazzcatJs);
 app.get('/imagetests/textmime', textMime);
 app.get('/imagetests/emptyresponse', emptyResponse);
 app.get('/imagetests/wrongmime', wrongMime);
-app.get('/imagetests/partialimage', partialImage);
+app.get('/imagetests/partialimage100b', partialImage(100));
+app.get('/imagetests/partialimage1k', partialImage(1024));
 app.get('/imagetests/abortedimage', abortedImage);
 app.get('/imagetests/notFound', notFound);
 app.get('/imagetests/serverError', serverError);

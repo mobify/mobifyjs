@@ -9,12 +9,10 @@
 img {
     background-color: black;
     border: 20px solid green;
-    min-width: 20px;
-    width: auto;
+    width: 100px;
+    margin-right: 10px;
 }
-img:before {
-    content: attr(src);
-}
+
 </style>
 <script>
 window.ImageErrorHandler = function(event) {
@@ -22,16 +20,47 @@ window.ImageErrorHandler = function(event) {
     event.target.setAttribute("style", "border: 20px solid red;");
 }
 </script>
+<div class="container">
+    <img src="http://garbage.domain.name.gfgrgrfgf/foo.jpg" onerror="ImageErrorHandler(event);" />
+    <span class="caption">http://garbage.domain.name.gfgrgrfgf/foo.jpg</span>
+</div>
+</script>
+<div class="container">
+    <img src="/imagetests/textmime" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/textmime</span>
+</div>
 
-<img src ="http://garbage.domain.name.gfgrgrfgf/foo.jpg" onerror="ImageErrorHandler(event);" />
-<img src="/imagetests/textmime" onerror="ImageErrorHandler(event);" />
-<img src="/imagetests/emptyresponse" onerror="ImageErrorHandler(event);" />
-<img src="/imagetests/wrongmime" onerror="ImageErrorHandler(event);" />
-<img src="/imagetests/partialimage" onerror="ImageErrorHandler(event);" />
-<img src="/imagetests/abortedimage" onerror="ImageErrorHandler(event);" />
-<img src="/imagetests/notFound" onerror="ImageErrorHandler(event);" />
-<img src="/imagetests/serverError" onerror="ImageErrorHandler(event);" />
-<img src="/imagetests/fakejpeg" onerror="ImageErrorHandler(event);" />
-
+<div class="container">
+    <img src="/imagetests/emptyresponse" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/emptyresponse</span>
+</div>
+<div class="container">
+    <img src="/imagetests/wrongmime" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/wrongmime</span>
+</div>
+<div class="container">
+    <img src="/imagetests/partialimage100b" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/partialimage100b</span>
+</div>
+<div class="container">
+    <img src="/imagetests/partialimage1k" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/partialimage1k</span>
+</div>
+<div class="container">
+    <img src="/imagetests/abortedimage" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/abortedimage</span>
+</div>
+<div class="container">
+    <img src="/imagetests/notFound" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/notFound</span>
+</div>
+<div class="container">
+    <img src="/imagetests/serverError" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/serverError</span>
+</div>
+<div class="container">
+    <img src="/imagetests/fakejpeg" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/fakejpeg</span>
+</div>
 </body>
 </html>
