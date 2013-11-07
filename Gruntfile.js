@@ -117,7 +117,7 @@ module.exports = function(grunt) {
                             browserName: 'internet explorer',
                             platform: 'Windows 8.1',
                             version: '11'
-                        }
+                        },
                         { // Lowest known working version of FF
                             browserName: 'opera',
                             platform: 'Windows 2003',
