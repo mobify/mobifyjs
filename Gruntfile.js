@@ -113,6 +113,11 @@ module.exports = function(grunt) {
                             platform: 'Windows 2012',
                             version: '10'
                         },
+                        { // Only working version of IE compatable
+                            browserName: 'internet explorer',
+                            platform: 'Windows 8.1',
+                            version: '11'
+                        }
                         { // Lowest known working version of FF
                             browserName: 'opera',
                             platform: 'Windows 2003',
