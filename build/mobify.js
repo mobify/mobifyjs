@@ -1351,7 +1351,22 @@ ResizeImages._crawlPictureElement = function(el, opts) {
 /**
  * Searches a list of target dimensions for the smallest one that is greater than 
  * the passed value and return it, or return the greatst value if none are 
- * greater
+ * greater.
+ *
+ * Popular device resolutions: 
+ * iPhone 3Gs - 320x480
+ * iPhone 4 - 640x960
+ * iPhone 5 - 650x1156
+ * 
+ * Galaxy SIII/Nexus 4/Nexus 7 - 720x1280
+ * Galaxy SIV/Nexus 5 - 1080x1920
+ * 
+ * iPad (non-retina) - 1024x768
+ * iPad (retina) - 2048x1536
+ *
+ * A larger list of target dimensions would include 720px, 800px, 1024px, 1280px 
+ * and 1920px but they have been omitted due tot heir proximity to other, larger 
+ * values
  */
 var targetDims = [320, 640, 768, 1080, 1536, 2048, 4000];
 ResizeImages._getBinnedDimension = function(dim) {
