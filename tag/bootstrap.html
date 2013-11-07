@@ -65,22 +65,25 @@ setTimeout(function() {
     function (){
         // We're enabled for:
         // - WebKit based browsers
-        // - IE 10
+        // - IE 10+
         // - FireFox 4+
         // - Opera 11+
         // - 3DS
-        var match = /webkit|msie\s10|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
-     
+        match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
+
         if (!match) {
             return false;
         }
-     
         // match[1] == Firefox
         if (match[1] && +match[2] < 4) {
             return false;
         }
         // match[3] == Opera
         if (match[3] && +match[4] < 11) {
+            return false;
+        }
+        // match[5] == IE
+        if (match[5] && +match[6] < 6) {
             return false;
         }
 
