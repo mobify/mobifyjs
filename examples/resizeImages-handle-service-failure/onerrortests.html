@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>img element onerror behaviour classifier</title>
+</head>
+<body>
+<style>
+img {
+    background-color: black;
+    border: 20px solid green;
+    width: 100px;
+    margin-right: 10px;
+}
+
+</style>
+<script>
+window.ImageErrorHandler = function(event) {
+    console.dir(event);
+    event.target.setAttribute("style", "border: 20px solid red;");
+}
+</script>
+<div class="container">
+    <img src="http://garbage.domain.name.gfgrgrfgf/foo.jpg" onerror="ImageErrorHandler(event);" />
+    <span class="caption">http://garbage.domain.name.gfgrgrfgf/foo.jpg</span>
+</div>
+</script>
+<div class="container">
+    <img src="/imagetests/textmime" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/textmime</span>
+</div>
+
+<div class="container">
+    <img src="/imagetests/emptyresponse" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/emptyresponse</span>
+</div>
+<div class="container">
+    <img src="/imagetests/wrongmime" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/wrongmime</span>
+</div>
+<div class="container">
+    <img src="/imagetests/partialimage100b" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/partialimage100b</span>
+</div>
+<div class="container">
+    <img src="/imagetests/partialimage1k" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/partialimage1k</span>
+</div>
+<div class="container">
+    <img src="/imagetests/abortedimage" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/abortedimage</span>
+</div>
+<div class="container">
+    <img src="/imagetests/notFound" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/notFound</span>
+</div>
+<div class="container">
+    <img src="/imagetests/serverError" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/serverError</span>
+</div>
+<div class="container">
+    <img src="/imagetests/fakejpeg" onerror="ImageErrorHandler(event);" />
+    <span class="caption">/imagetests/fakejpeg</span>
+</div>
+</body>
+</html>
