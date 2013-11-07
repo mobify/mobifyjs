@@ -18,8 +18,7 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
     var capturing = window.Mobify && window.Mobify.capturing || false;
     if (capturing) {
         // Grab reference to a newly created document
-        Mobify.Capture.initStreamingCapture(function(capture){
-        //Mobify.Capture.initCapture(function(capture){
+        Mobify.Capture.initCapture(function(capture){
             // optimize scripts
             var capturedDoc = capture.capturedDoc;
             //var scripts = capturedDoc.querySelectorAll('script');
@@ -28,7 +27,7 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
             var images = capturedDoc.querySelectorAll('img, picture');
             Mobify.ResizeImages.resize(images);
 
-            //capture.renderCapturedDoc();
+            capture.renderCapturedDoc();
         });
     }
 
