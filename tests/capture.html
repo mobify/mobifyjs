@@ -279,67 +279,6 @@
             $("#qunit-fixture").append($iframe);
         });
 
-        /**
-         * Ensure the complete document is captured.
-         */
-        asyncTest("streaming capture captures the complete document", 2, function() {
-            var opts = {
-                id: "capture-complete",
-                src: "/tests/fixtures/split-streaming.html",
-                width: 300
-            };
-            var $iframe = $("<iframe>", opts);
-            var el = $iframe[0];
-
-            // Begin capturing on message. Restoring sends "complete".
-            $(window).on("message", function onMessage(event) {
-                // We remove spaces and linebreaks when grabbing the html
-                // because spacing and line breaks are completely inconsistent
-                // between browsers
-                var expectedHtml = "<!DOCTYPEHTMLPUBLIC\"-//W3C//DTDHTML4.01Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\"><htmlclass=\"foo\"><head><basetarget=\"_parent\"><scriptsrc=\"/mobifyjs/build/mobify.js\"><\/script><script>varmain=function(){varcapturing=window.Mobify&&window.Mobify.capturing||false;if(capturing){Mobify.Capture.initStreamingCapture(function(capture){varcapturedDoc=capture.capturedDoc;Mobify.Utils.removeBySelector(\".first\",capturedDoc);if(capture.finished){}});}else{varscript=document.createElement(\"script\");script.type=\"text/javascript\";script.innerHTML=\"console.log('Inserted!')\";document.head.appendChild(script);}};main();<\/script><scripttype=\"text/javascript\">console.log('Inserted!')<\/script><style>body{margin:0;}img,div{position:relative;}.overflow{width:100%;}</style><titlecapture-moved=\"\">StreamingCapturingTestPage</title></head><body><h1>Start!</h1><div><div><divclass=\"second\"><imgsrc=\"http://cdn.mobify.com/mobifyjs/examples/assets/images/office-small.jpg\"><p>SecondchunkA</p><p>SecondchunkB</p></div><divclass=\"third\"><imgsrc=\"http://cdn.mobify.com/mobifyjs/examples/assets/images/leaves-small.jpg\"><p>Thirdchunk</p></div><pclass=\"overflow\">LoremIpsumissimplydummytextoftheprintingandtypesettingindustry.LoremIpsumhasbeentheindustry'sstandarddummytexteversincethe1500s.LoremIpsumissimplydummytextoftheprintingandtypesettingindustry.LoremIpsumhasbeentheindustry'sstandarddummytexteversincethe1500s.LoremIpsumissimplydummytextoftheprintingandtypesettingindustry.LoremIpsumhasbeentheindustry'sstandarddummytexteversincethe1500s.LoremIpsumissimplydummytextoftheprintingandtypesettingindustry.LoremIpsumhasbeentheindustry'sstandarddummytexteversincethe1500s.</p><pre>preeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</pre></div></div><h1id=\"complete\">Complete!</h1><scripttype=\"text/javascript\">/*<![CDATA[*/varfoo=\"bar\";/*]]>*/<\/script><scriptsrc=\"/mobifyjs/tests/resources/jquery-1.7.1.js\"><\/script><script>setTimeout(function(){window.parent.parent.postMessage(\"complete\",\"*\");},20);<\/script></body></html>"
-
-                // Grab outerHTML from the rendered page inside of our iframe
-                // (which, since we're using streaming capturing, is in an iframe!)
-                var destDoc = el.contentDocument.documentElement.querySelectorAll('iframe')[0].contentDocument;
-
-                // Test pre tag regression in iOS6/7 and Android 2.3
-                var $destDoc = $(destDoc);
-                var width = Utils.getPhysicalScreenSize().width/(window.devicePixelRatio || 1);
-
-                // PhantomJS has no physical screen width
-                if (width === 0) {
-                    ok(true, "I am PhantomJS, hear me roar.")
-                } else {
-                    ok($destDoc.find('p.overflow').outerWidth() <= width, "Regression test to ensure the pre tag doesn't cause the document to grow larger then it should (issue in iOS6/7 and Android 2.3)");
-                }
-
-                // Remove the style attribute we set because that will differ for each test run
-                // on saucelabs
-                destDoc.documentElement.removeAttribute('style');
-
-                // Remove elements/attributes because IE/FF
-                // display them in opposite order of Webkit based browsers
-                destDoc.documentElement.removeAttribute("webdriver");
-                Array.prototype.slice.call(destDoc.querySelectorAll('.mobify')).filter(function(el){
-                    el.removeAttribute('id');
-                    el.removeAttribute('class');
-                });
-                Utils.removeElements(destDoc.querySelectorAll('meta'));
-                var html = Utils.getDoctype(destDoc) + Utils.outerHTML(destDoc.documentElement);
-                event = event.originalEvent;
-                $(window).unbind("message", onMessage);
-                equal(html.replace(/(\r\n|\n|\r|\s)/gm,''), expectedHtml, "html in iframe should equal expected html");
-                start();
-            });
-
-            $("#qunit-fixture").append($iframe);
-        });
-
-        // TESTS TO WRITE FOR STREAMING CAPTURING:
-        // * Verify that scripts execute in the correct order using streaming capturing
-        // * Ensure navigation works correctly
-        // * Ensure that referer is being sent with requests made within the iframe
-
     });
 </script>
 </body>

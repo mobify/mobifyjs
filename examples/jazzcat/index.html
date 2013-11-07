@@ -11,32 +11,19 @@
 function() {
     var capturing = window.Mobify && window.Mobify.capturing || false;
     if (capturing) {
-        if (/streaming/.test(location.href)) {
-            // Initiate capture
-            Mobify.Capture.initStreamingCapture(function(capture){
-                // Grab reference to the captured document in progres
-                var capturedDoc = capture.capturedDoc;
-                
-                // Grab all scripts to be concatenated into one request
-                var scripts = capturedDoc.querySelectorAll('script');
-                Mobify.Jazzcat.optimizeScripts(scripts);
-            });
-        }
-        else {
-            // Initiate capture
-            Mobify.Capture.init(function(capture){
+        // Initiate capture
+        Mobify.Capture.init(function(capture){
 
-                // Grab reference to a newly created document
-                var capturedDoc = capture.capturedDoc;
+            // Grab reference to a newly created document
+            var capturedDoc = capture.capturedDoc;
 
-                // Grab all scripts to be concatenated into one request
-                var scripts = capturedDoc.querySelectorAll('script');
-                Mobify.Jazzcat.optimizeScripts(scripts);
+            // Grab all scripts to be concatenated into one request
+            var scripts = capturedDoc.querySelectorAll('script');
+            Mobify.Jazzcat.optimizeScripts(scripts);
 
-                // Render source DOM to document
-                capture.renderCapturedDoc();
-            });
-        }
+            // Render source DOM to document
+            capture.renderCapturedDoc();
+        });
     }
 });</script>
 
