@@ -238,9 +238,7 @@
         });
 
         test('get image url', function() {
-
-            var url = ResizeImages.getImageURL('http://test/image.jpg', 
-            {
+            var options = Utils.extend(ResizeImages.getDefaultOptions(), {
                 maxWidth: 320, 
                 maxHeight: 480, 
                 projectName: 'test1', 
@@ -248,7 +246,7 @@
                 format: 'png',
                 quality: '95',
             });
-
+            var url = ResizeImages.getImageURL('http://test/image.jpg', options);
             expectedUrl = '//ir0.mobify.com/project-test1/c8/png95/320/480/http://test/image.jpg';
 
             equal(url, expectedUrl);

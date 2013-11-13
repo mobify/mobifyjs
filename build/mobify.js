@@ -1251,11 +1251,10 @@ ResizeImages.supportsWebp = function(callback) {
  * Returns a URL suitable for use with the 'ir' service.
  */
 ResizeImages.getImageURL = function(url, options) {
-    var opts = Utils.clone(ResizeImages.defaults);
-    if (options) {
-        Utils.extend(opts, options);
+    var opts = options;
+    if (!opts) {
+        opts = ResizeImages.getDefaultOptions();
     }
-
     var bits = [opts.proto + opts.host];
 
     if (opts.projectName) {
@@ -1263,19 +1262,19 @@ ResizeImages.getImageURL = function(url, options) {
         bits.push(projectId);
     }
 
-    if (options.cacheHours) {
-        bits.push('c' + options.cacheHours);
+    if (opts.cacheHours) {
+        bits.push('c' + opts.cacheHours);
     }
 
     if (opts.format) {
-        bits.push(options.format + (options.quality || ''));
+        bits.push(opts.format + (opts.quality || ''));
     }
 
     if (opts.maxWidth) {
-        bits.push(options.maxWidth);
+        bits.push(opts.maxWidth);
 
         if (opts.maxHeight) {
-            bits.push(options.maxHeight);
+            bits.push(opts.maxHeight);
         }
     }
 
@@ -1382,12 +1381,9 @@ ResizeImages._getBinnedDimension = function(dim) {
 };
 
 /**
- * Searches the collection for image elements and modifies them to use
- * the Image Resize service. Pass `options` to modify how the images are 
- * resized.
+ * Gets the default options including width/height in device pixels
  */
-
-ResizeImages.resize = function(elements, options) {
+ResizeImages.getDefaultOptions = function(options) {
     var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
@@ -1420,6 +1416,17 @@ ResizeImages.resize = function(elements, options) {
         opts.format = "webp";
     }
 
+    return opts;
+}
+
+/**
+ * Searches the collection for image elements and modifies them to use
+ * the Image Resize service. Pass `options` to modify how the images are 
+ * resized.
+ */
+ResizeImages.resize = function(elements, options) {
+    var opts = ResizeImages.getDefaultOptions(options);
+
     for(var i=0; i < elements.length; i++) {
         var element = elements[i];
 
@@ -1438,6 +1445,15 @@ ResizeImages.resize = function(elements, options) {
     return elements;
 };
 
+ResizeImages.restoreOriginalSrc = function(event) {
+    var origSrc;
+    event.target.removeAttribute('onerror'); // remove ourselves
+    origSrc = event.target.getAttribute('data-orig-src')
+    if (origSrc) {
+        event.target.setAttribute('src', origSrc);
+    }
+};
+
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
 ResizeImages.defaults = {
@@ -1448,15 +1464,6 @@ ResizeImages.defaults = {
       targetAttribute: (capturing ? "x-src" : "src"),
       webp: ResizeImages.supportsWebp(),
       onerror: 'ResizeImages.restoreOriginalSrc(event);'
-};
-
-var restoreOriginalSrc = ResizeImages.restoreOriginalSrc = function(event) {
-    var origSrc;
-    event.target.removeAttribute('onerror'); // remove ourselves
-    origSrc = event.target.getAttribute('data-orig-src')
-    if (origSrc) {
-        event.target.setAttribute('src', origSrc);
-    }
 };
 
 return ResizeImages;
