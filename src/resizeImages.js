@@ -233,8 +233,11 @@ ResizeImages._getBinnedDimension = function(dim) {
 /**
  * Gets the default options including width/height in device pixels
  */
-ResizeImages.getDefaultOptions = function() {
+ResizeImages.getDefaultOptions = function(options) {
     var opts = Utils.clone(ResizeImages.defaults);
+    if (options) {
+        Utils.extend(opts, options);
+    }
 
     var dpr = opts.devicePixelRatio || window.devicePixelRatio;
 
@@ -272,10 +275,7 @@ ResizeImages.getDefaultOptions = function() {
  * resized.
  */
 ResizeImages.resize = function(elements, options) {
-    var opts = ResizeImages.getDefaultOptions();
-    if (options) {
-        Utils.extend(opts, options);
-    }
+    var opts = ResizeImages.getDefaultOptions(options);
 
     for(var i=0; i < elements.length; i++) {
         var element = elements[i];
