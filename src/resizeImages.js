@@ -231,9 +231,11 @@ ResizeImages._getBinnedDimension = function(dim) {
 };
 
 /**
- * Gets the default options including width/height in device pixels
+ * Processes options passed to `resize()`. Takes an options object that 
+ * potentially has height and width set in css pixels, returns an object where 
+ * they are expressed in device pixels, and other default options are set.
  */
-ResizeImages.getDefaultOptions = function(options) {
+ResizeImages.processOptions = function(options) {
     var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
@@ -256,7 +258,7 @@ ResizeImages.getDefaultOptions = function(options) {
         }
     }
 
-    // Doing rounding for non-integer device pixel ratios
+    // round up in case of non-integer device pixel ratios
     opts.maxWidth = Math.ceil(width);
     if (opts.maxHeight && height) {
         opts.maxHeight = Math.ceil(height);
@@ -267,7 +269,7 @@ ResizeImages.getDefaultOptions = function(options) {
     }
 
     return opts;
-}
+};
 
 /**
  * Searches the collection for image elements and modifies them to use
@@ -275,7 +277,7 @@ ResizeImages.getDefaultOptions = function(options) {
  * resized.
  */
 ResizeImages.resize = function(elements, options) {
-    var opts = ResizeImages.getDefaultOptions(options);
+    var opts = ResizeImages.processOptions(options);
 
     for(var i=0; i < elements.length; i++) {
         var element = elements[i];
