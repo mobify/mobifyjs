@@ -27,9 +27,11 @@
         <script>
         Mobify = { points: [+new Date], config: {}, conf: { data: {} } };
         </script>
+        <!--
         <script src="../vendor/zepto/src/zepto.js"></script>
-        <script src="../vendor/zepto/src/event.js"></script>
-
+        <script src="../vendor/zepto/src/event.js"></script> 
+        -->
+        <script src="../vendor/jquery/dist/jquery.js"></script>
         <script src="../api/noconflict.js"></script>
 
         <script src="../api/combo.js"></script>
@@ -231,12 +233,21 @@
                     return;
                 }
 
-                html += $('#fixtures').reduce(function(memo, el) {
-                        return memo + el.outerHTML + '\n';
-                    }, '');
-                html += $result.reduce(function(memo, el) {
-                        return memo + el.outerHTML + '\n';
-                }, '');
+                var i
+                  , len
+                  , $fixtures;
+
+                $fixtures = $('#fixtures')
+
+                $fixtures.each(function(index, el) {
+                    html += el.outerHTML + '\n';
+                });
+
+
+                $result.each(function(index, el) {
+                         html += el.outerHTML + '\n';
+                });
+                
                 html = '<html><body>' + html + '</body></html>';
 
                 var iframeEl = document.createElement('iframe');
@@ -267,13 +278,22 @@
             var $scripts = $($('#combineScripts-2').text())
               , $result = $scripts.combineScripts()
               , html = ''
+              , $fixtures = $('#fixtures');
 
-            html += $('#fixtures').reduce(function(memo, el) {
-                    return memo + el.outerHTML + '\n';
-                }, '')
-            html += $result.reduce(function(memo, el) {
-                    return memo + el.outerHTML + '\n';
-            }, '')
+            $fixtures.each(function(index, el) {
+                html += el.outerHTML + '\n';
+            });
+
+            $result.each(function(index, el) {
+                html += el.outerHTML + 'n';
+            });
+
+            // html += $('#fixtures').reduce(function(memo, el) {
+            //         return memo + el.outerHTML + '\n';
+            //     }, '')
+            // html += $result.reduce(function(memo, el) {
+            //         return memo + el.outerHTML + '\n';
+            // }, '')
             html = '<html><body>' + html + '</body></html>'
 
             var iframeEl = document.createElement('iframe');

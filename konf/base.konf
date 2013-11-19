@@ -3,7 +3,7 @@
 {#lib_export name="jquery"}
     window.Mobify = window.Mobify || {};
     {+jquery}
-        {>"/base/vendor/zepto/src/polyfill.js"/}
+    {!    {>"/base/vendor/zepto/src/polyfill.js"/}
         {>"/base/vendor/zepto/src/zepto.js"/}
         {>"/base/vendor/zepto/src/detect.js"/}
         {>"/base/vendor/zepto/src/event.js"/}
@@ -11,7 +11,9 @@
         {>"/base/vendor/zepto/src/ajax.js"/}
         {>"/base/vendor/zepto/src/form.js"/}
         {>"/base/vendor/zepto/src/selector.js"/}
-        {>"/base/vendor/zepto/src/stack.js"/}
+        {>"/base/vendor/zepto/src/stack.js"/}  !}
+        
+        {>"base/vendor/jquery/dist/jquery.min.js"/}
     {/jquery}
     {>"/base/api/noconflict.js"/}
 {/lib_export}
