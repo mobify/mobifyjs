@@ -754,17 +754,18 @@
             urlify = document.createElement("a");
             return function(url) {
                 urlify.href = url;
+                var addLeadingSlash = false;
                 // pave over IE's stripping of leading slahes in an anchor's 
                 // pathname property, this does not happen for real 
                 // window.location, so we should be covered 
                 if(urlify.pathname[0] !== '/') {
-                    urlify.pathname = '/' + urlify.pathname
+                    addLeadingSlash = true;
                 }
                 return {
                     host: urlify.host,
                     hostname: urlify.hostname,
                     href: urlify.href,
-                    pathname: urlify.pathname,
+                    pathname: (addLeadingSlash ? '/' : '' ) + urlify.pathname,
                     port: urlify.port,
                     protocol: urlify.protocol,
                     toString: function() {
