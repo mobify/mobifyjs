@@ -754,6 +754,12 @@
             urlify = document.createElement("a");
             return function(url) {
                 urlify.href = url;
+                // pave over IE's stripping of leading slahes in an anchor's 
+                // pathname property, this does not happen for real 
+                // window.location, so we should be covered 
+                if(urlify.pathname[0] !== '/') {
+                    urlify.pathname = '/' + urlify.pathname
+                }
                 return {
                     host: urlify.host,
                     hostname: urlify.hostname,
