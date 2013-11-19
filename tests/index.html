@@ -728,9 +728,9 @@
 
         test('Mobify.html.openTag', function() {
             var got = Mobify.html.openTag($("<div id=\"<>\" class='<>'></div>"))
-              , vow = "<div id=\"<>\" class=\"<>\">"
+              , vows = ["<div id=\"<>\" class=\"<>\">", "<div class=\"<>\" id=\"<>\""]
 
-            equal(got, vow);
+            ok(got === vows[0] || got === vows[1]);
         });
 
         test('Mobify.html.closeTag', function() {
