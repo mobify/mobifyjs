@@ -13,6 +13,7 @@
   - [Image API]({{ site.baseurl }}/v2/docs/image-resizer)
     - [`resize`]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesresizeimgelements-options)
     - [`getImageURL`]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesgetimageurlurl-options)
+    - [`getDefaultOptions`]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesgetdefaultoptions)
     - [WebP]({{ site.baseurl }}/v2/docs/image-resizer/#webp)
     - [Simplified Picture Element]({{ site.baseurl }}/v2/docs/image-resizer/#simplified-picture-element)
     - [ir0.mobify.com]({{ site.baseurl }}/v2/docs/image-resizer/#ir0mobifycom)

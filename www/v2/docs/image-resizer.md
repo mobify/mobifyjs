@@ -118,21 +118,54 @@ executed by `ResizeImages.resize` for each element. It can be overridden to use
 this API for a different image resizing service (such as 
 [src.sencha.io](http://www.sencha.com/learn/how-to-use-src-sencha-io/)).
 
+If you want to get a resized URL string (instead of resizing an img element),
+this is the method to use.
+
 **Options**
 
 The same as `ResizeImages.resize` options.
 
-**Usage/Example:**
+**Usage/Examples:**
 
     // Override getImageURL to use the src.sencha.io backend
     Mobify.ResizeImages.getImageURL = function(url, options) {
         return "http://src.sencha.io/" + options.maxWidth + "/" + url  
     };
 
+    // Get an optimized image URL from a URL string
+    Mobify.ResizeImages.getImageURL('http://www.foo.com/bar.png');
+
+    // Get an optimized image URL from a URL string with options overridden
+    var options = Utils.extend(ResizeImages.getDefaultOptions(), {
+        cacheHours: '8', 
+    });
+    Mobify.ResizeImages.getImageURL('http://www.foo.com/bar.png', options);
+
+
+## `ResizeImages.getDefaultOptions()`
+
+This method returns all of the default options.
+
+**Usage/Examples:**
+
+    Mobify.ResizeImages.getDefaultOptions()
+
+    // returns (for iPhone 5):
+    // {
+    //     proto: '//',
+    //     host: 'ir0.mobify.com',
+    //     projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
+    //     sourceAttribute: "x-src",
+    //     targetAttribute: (capturing ? "x-src" : "src"),
+    //     webp: ResizeImages.supportsWebp(),
+    //     onerror: 'ResizeImages.restoreOriginalSrc(event);'
+    //     maxWidth: 640
+    // }
+
+
 ## WebP
 
-[WebP](https://developers.google.com/speed/webp/) is a new image file format from Google, it offers significantly smaller file sizes than JPEG 
-compression with similar image quality.
+[WebP](https://developers.google.com/speed/webp/) is a new image file format from Google which offers significantly smaller file sizes than JPEG compression with similar image quality.
 
 Using the Image Resizer API with Mobify.js, image files referenced by your img 
 and picture elements will automatically be converted to WebP for browsers that
