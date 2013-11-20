@@ -103,7 +103,7 @@ ResizeImages.supportsWebp = function(callback) {
 ResizeImages.getImageURL = function(url, options) {
     var opts = options;
     if (!opts) {
-        opts = ResizeImages.getDefaultOptions();
+        opts = ResizeImages.processOptions();
     }
     var bits = [opts.proto + opts.host];
 

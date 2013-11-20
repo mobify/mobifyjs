@@ -1253,7 +1253,7 @@ ResizeImages.supportsWebp = function(callback) {
 ResizeImages.getImageURL = function(url, options) {
     var opts = options;
     if (!opts) {
-        opts = ResizeImages.getDefaultOptions();
+        opts = ResizeImages.processOptions();
     }
     var bits = [opts.proto + opts.host];
 
@@ -1381,10 +1381,15 @@ ResizeImages._getBinnedDimension = function(dim) {
 };
 
 /**
- * Gets the default options including width/height in device pixels
+ * Processes options passed to `resize()`. Takes an options object that 
+ * potentially has height and width set in css pixels, returns an object where 
+ * they are expressed in device pixels, and other default options are set.
  */
-ResizeImages.getDefaultOptions = function() {
+ResizeImages.processOptions = function(options) {
     var opts = Utils.clone(ResizeImages.defaults);
+    if (options) {
+        Utils.extend(opts, options);
+    }
 
     var dpr = opts.devicePixelRatio || window.devicePixelRatio;
 
@@ -1403,7 +1408,7 @@ ResizeImages.getDefaultOptions = function() {
         }
     }
 
-    // Doing rounding for non-integer device pixel ratios
+    // round up in case of non-integer device pixel ratios
     opts.maxWidth = Math.ceil(width);
     if (opts.maxHeight && height) {
         opts.maxHeight = Math.ceil(height);
@@ -1414,7 +1419,7 @@ ResizeImages.getDefaultOptions = function() {
     }
 
     return opts;
-}
+};
 
 /**
  * Searches the collection for image elements and modifies them to use
@@ -1422,10 +1427,7 @@ ResizeImages.getDefaultOptions = function() {
  * resized.
  */
 ResizeImages.resize = function(elements, options) {
-    var opts = ResizeImages.getDefaultOptions();
-    if (options) {
-        Utils.extend(opts, options);
-    }
+    var opts = ResizeImages.processOptions(options);
 
     for(var i=0; i < elements.length; i++) {
         var element = elements[i];
