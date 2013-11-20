@@ -14,7 +14,7 @@ or build the docs site manually in the instructions below.
 
 ### Building
 
-Mobify.js uses Grunt.js and Require.js to build the library, and manage all of the dependancies. First, you will need to install the grunt-cli globally:
+Mobify.js uses Grunt.js and Require.js to build the library, and manage all of the dependencies. First, you will need to install the grunt-cli globally:
 
     npm install -g grunt-cli
 
