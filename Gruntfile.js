@@ -1,6 +1,7 @@
 // http://stackoverflow.com/questions/13567312/working-project-structure-that-uses-grunt-js-to-combine-javascript-files-using-r
 var fs = require("fs");
 var path = require('path');
+var amdclean = require('amdclean');
 
 var LONG_CACHE_CONTROL = "public,max-age=31536000, s-maxage=900"; // one year
 var SHORT_CACHE_CONTROL = "public,max-age=300"; // five minutes
@@ -52,23 +53,35 @@ module.exports = function(grunt) {
             // Building full Mobify.js library
             full: {
                 options: {
-                    almond: true,
-                    mainConfigFile: "./src/config.js",
-                    optimize: "none",
+                    wrap: true,
+                    baseUrl: "src",
                     keepBuildDir: true,
+                    optimize: "none",
                     name: "mobify-library",
-                    out: "./build/mobify.js"
+                    out: "./build/mobify.js",
+                    paths: {   
+                        "mobifyjs": "."
+                    },
+                    onBuildWrite: function(name, path, contents) {
+                        return amdclean.clean(contents);
+                    }
                 }
             },
             // Building custom Mobify.js library (must copy mobify-custom.js.example -> mobify-custom.js)
             custom: {
                 options: {
-                    almond: true,
-                    mainConfigFile: "./src/config.js",
-                    optimize: "none",
+                    wrap: true,
+                    baseUrl: ".",
                     keepBuildDir: true,
-                    name: "../mobify-custom.js",
-                    out: "./build/custom/mobify.js"
+                    optimize: "none",
+                    name: "./mobify-custom.js",
+                    out: "./build/custom/mobify.js",
+                    paths: {   
+                        "mobifyjs": "src"
+                    },
+                    onBuildWrite: function(name, path, contents) {
+                        return amdclean.clean(contents);
+                    }
                 }
             }
         },
