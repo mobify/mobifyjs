@@ -5,10 +5,10 @@ title: Mobify.js Documentation
 
 # Image Resizer
 
-- Automatically resize `<img>` and `<picture>` elements to the maximum width
+- Automatically resize `<img>` and `<span data-picture>` elements to the maximum width
 of the screen.
 - Automatically determine support for `WEBP`, and convert images on the fly.
-- Manual resize of `<picture>` elements by specifying different widths
+- Manual resize of `<span data-picture>` elements by specifying different widths
 on each `<source>` element breakpoint.
 - Cache all images on Mobify's CDN.
 - Image resizing powered by the [Mobify Performance Suite](https://cloud.mobify.com){: target='_blank' }.
@@ -28,11 +28,11 @@ Please refer to the  [quickstart guide](/mobifyjs/v2/docs/) to get setup.
 
 ## `ResizeImages.resize(images, [options])`
 
-__images__ must be an array of `<img>` and/or `<picture>` elements.
+__images__ must be an array of `<img>` and/or `<span data-picture>` elements.
 
 __options__ are optional.
 
-Rewrites the `src` of every `<img>/<picture>` in the `images` array on the page based 
+Rewrites the `src` of every `<img>/<span data-picture>` in the `images` array on the page based 
 on the options passed. 
 
 - By default, images are requested through `ir0.mobify.com` (part of the [Mobify Performance Suite](https://cloud.mobify.com){: target='_blank' }).
@@ -81,7 +81,7 @@ Automatic image resizing (using Capturing):
     Mobify.Capture.init(function(capture){
         var capturedDoc = capture.capturedDoc;
         // Resize images using Mobify Image Resizer
-        var images = capturedDoc.querySelectorAll('img, picture');
+        var images = capturedDoc.querySelectorAll('img, span[data-picture]');
         Mobify.ResizeImages.resize( images, {
             cacheHours: "2",
         } );
@@ -177,31 +177,31 @@ current state of browser support for this format.
 
 ## Simplified Picture Element
 
-Mobify.js comes with a `<picture>` polyfill. In combination with the Image Resize
-API, you can have much simplier `<picture>` elements. You also no longer need
+Mobify.js comes with a `<span data-picture>` polyfill. In combination with the Image Resize
+API, you can have much simplier `<span data-picture>` elements. You also no longer need
 a &lt;noscript> fallback when using the Resize API (with Capturing).
 
-The problem with the `<picture>` element is that using it to specify the same
+The problem with the `<span data-picture>` element is that using it to specify the same
 image at different widths can be extremely tedious. Nobody wants to generate 4
 versions of every image at all of the possible resolutions, and constantly 
 update those versions in the markup. Scaling image widths can be automated
-(although the `<picture>` element is the best solution for art direction).
+(although the `<span data-picture>` element is the best solution for art direction).
 
-To solve this problem, Mobify.js allows for alternate `<picture>` markup that
+To solve this problem, Mobify.js allows for alternate `<span data-picture>` markup that
 allows you to specify widths as attributes on `<source>` elements, instead of
 specifying a different `src` attribute for each breakpoint. 
 
 For example, you could write your element like this:
 
-    <picture data-src="horse.png">
-        <source src="alt-horse.png" data-media="(max-width: 480px)">
-        <source media="(min-width: 480px)" data-width="200">
-        <source media="(min-width: 800px)" data-width="400">
-        <source media="(min-width: 1000px)">
+    <span data-picture data-src="horse.png">
+        <span src="alt-horse.png" data-media="(max-width: 480px)"></span>
+        <span media="(min-width: 480px)" data-width="200"></span>
+        <span media="(min-width: 800px)" data-width="400"></span>
+        <span media="(min-width: 1000px)"></span>
         <img src="horse-small.png">
-    </picture>
+    </span>
 
-Notice the use of the `data-src` attribute inside of the `<picture>` element. 
+Notice the use of the `data-src` attribute inside of the `<span data-picture>` element. 
 This gives us a basis that we can resize to produce an asset for other 
 breakpoints. 
 
@@ -222,13 +222,13 @@ Let's break down how this will actually work in the browser:
 
 The `resize` method will cause the above markup to transform into this (on an iPhone):
 
-    <picture data-src="horse.png">
-        <source src="ir0.mobify.com/320/http://site.com/alt-horse.png" data-media="(max-width: 480px)">
-        <source src="ir0.mobify.com/200/http://site.com/horse.png" media="(min-width: 480px)" data-width="200">
-        <source src="ir0.mobify.com/400/http://site.com/horse.png" media="(min-width: 800px)" data-width="400">
-        <source src="ir0.mobify.com/320/http://site.com/horse.png" media="(min-width: 1000px)">
+    <span data-picture data-src="horse.png">
+        <span src="ir0.mobify.com/320/http://site.com/alt-horse.png" data-media="(max-width: 480px)"></span>
+        <span src="ir0.mobify.com/200/http://site.com/horse.png" media="(min-width: 480px)" data-width="200"></span>
+        <span src="ir0.mobify.com/400/http://site.com/horse.png" media="(min-width: 800px)" data-width="400"></span>
+        <span src="ir0.mobify.com/320/http://site.com/horse.png" media="(min-width: 1000px)"></span>
         <img src="horse-small.png">
-    </picture>
+    </span>
 
 After `resize` changes the markup, the Picture polyfill will run and select the appropriate image based on running the media queries.
 

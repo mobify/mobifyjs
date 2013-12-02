@@ -4,7 +4,7 @@
 <script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=e,a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h="mobify",i=function(){var c=new Date;c.setTime(c.getTime()+3e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e)if("string"==typeof e){var c=b.createElement("script");c.onerror=i,g(c,"main-executable",h,mainUrl)}else a.Mobify.mainExecutable=e.toString(),e()},f.onerror=i,g(f,"mobify-js",h,d)})}(window,document,function(){a=/webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return!a||a[1]&&4>+a[2]||a[3]&&11>+a[4]||a[5]&&6>+a[6]?!1:!0},
 
 // path to mobify.js
-"/mobifyjs/build/mobify.min.js",
+"/mobifyjs/build/mobify.js",
 
 // calls to APIs go here (or path to a main.js)
 function() {
@@ -32,12 +32,12 @@ function() {
     <p>Credit to scottjehl for his <a href="http://scottjehl.github.com/picturefill/">picturefill example</a></p>
     <p>This example has been forked and replicated using capturing to avoid the need for a &lt;noscript&gt; tag (view source to see for yourself).</p>
     <p>Open up the network tab of your web inspector to see that the img element does not have it's asset downloaded.<p>
-    <picture>
-        <source src="/mobifyjs/examples/assets/images/small.jpg">
-        <source src="/mobifyjs/examples/assets/images/medium.jpg" media="(min-width: 450px)">
-        <source src="/mobifyjs/examples/assets/images/large.jpg" media="(min-width: 800px)">
-        <source src="/mobifyjs/examples/assets/images/extralarge.jpg" media="(min-width: 1000px)">
+    <span data-picture>
+        <span src="/mobifyjs/examples/assets/images/small.jpg"></span>
+        <span src="/mobifyjs/examples/assets/images/medium.jpg" data-media="(min-width: 450px)"></span>
+        <span src="/mobifyjs/examples/assets/images/large.jpg" data-media="(min-width: 800px)"></span>
+        <span src="/mobifyjs/examples/assets/images/extralarge.jpg" data-media="(min-width: 1000px)"></span>
         <img src="/mobifyjs/examples/assets/images/small.jpg">
-    </picture>
+    </span>
 </body>
 </html>
