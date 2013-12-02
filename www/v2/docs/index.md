@@ -46,7 +46,7 @@ any element that loads external resources!**):
         Mobify.Capture.init(function(capture){
           var capturedDoc = capture.capturedDoc;
 
-          var images = capturedDoc.querySelectorAll("img, picture");
+          var images = capturedDoc.querySelectorAll("img, span[data-picture]");
           Mobify.ResizeImages.resize(images);
             
           // Render source DOM to document
@@ -61,7 +61,7 @@ any element that loads external resources!**):
 If you want to use the [Image API](/mobifyjs/v2/docs/image-resizer/)
 without [Capturing](/mobifyjs/v2/docs/capturing/), you must change
 `src` to `x-src` (this is configurable) for every <code>&lt;img&gt;</code> and 
-<code>&lt;picture&gt;</code> element you have in your site (you
+<code>&lt;span data-picture&gt;</code> element you have in your site (you
 also may want to add <code>&lt;noscript&gt;</code> fallbacks if you're worried
 about browsers with JavaScript disabled/unavailable). This snippet will
 load mobify.js asynchronously in order to be able to start loading images before
@@ -74,7 +74,7 @@ Then, paste the following tag before <code>&lt;/head&gt;</code>, or top of
     <script>
         var intervalId = setInterval(function(){
             if (window.Mobify) {
-                var images = document.querySelectorAll('img[x-src], picture');
+                var images = document.querySelectorAll('img[x-src], span[data-picture]');
                 if (images.length > 0) {
                     Mobify.ResizeImages.resize(images);
                 }

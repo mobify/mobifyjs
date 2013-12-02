@@ -39,11 +39,11 @@ You can find the source code here:
 This example uses the [Image Resizer API](/mobifyjs/v2/docs/image-resizer/)
 in Mobify.js to resize picture elements to the width of the browser.
 
-The problem with the `picture` element is that using it to specify the same image at different widths can be extremely tedious. Nobody wants to generate 4 versions of every image at all of the possible resolutions, and constantly update those 
+The problem with the `span data-picture` element is that using it to specify the same image at different widths can be extremely tedious. Nobody wants to generate 4 versions of every image at all of the possible resolutions, and constantly update those 
 versions in the markup. Scaling image widths can be automated. (although the
-`picture` element is the best solution for art direction).
+`span data-picture` element is the best solution for art direction).
 
-To solve this problem, Mobify.js allows for alternate `picture` markup that
+To solve this problem, Mobify.js allows for alternate `span data-picture` markup that
 allows you to specify widths as attributes on `source` elements, instead of
 specifying a different image for each breakpoint. 
 
@@ -51,21 +51,21 @@ specifying a different image for each breakpoint.
 
 The following markup (URLs shortened for example):
 
-    <picture data-src="extralarge.jpg">
-        <source src="alternate_art.png" media="(min-width: 320px)" data-width="320">
-        <source media="(min-width: 800px)" data-width="400">
-        <source media="(min-width: 1000px)" data-width="500">
+    <span data-picture data-src="extralarge.jpg">
+        <span src="alternate_art.png" data-media="(min-width: 320px)" data-width="320"></span>
+        <span data-media="(min-width: 800px)" data-width="400"></span>
+        <span data-media="(min-width: 1000px)" data-width="500"></span>
         <img src="small.jpg">
-    </picture>
+    </span>
 
 is modified into this on the fly:
 
-    <picture data-src="extralarge.jpg">
-        <source src="//ir0.mobify.com/project-oss-localhost/webp/320/1418/http://localhost:3000/mobifyjs/examples/assets/images/alternate_art.png" media="(min-width: 320px)" data-width="320">
-        <source media="(min-width: 800px)" data-width="400" src="//ir0.mobify.com/project-oss-localhost/webp/400/1418/http://localhost:3000/mobifyjs/examples/assets/images/extralarge.jpg">
-        <source media="(min-width: 1000px)" data-width="500" src="//ir0.mobify.com/project-oss-localhost/webp/500/1418/http://localhost:3000/mobifyjs/examples/assets/images/extralarge.jpg">
+    <span data-picture data-src="extralarge.jpg">
+        <span src="//ir0.mobify.com/project-oss-localhost/webp/320/1418/http://localhost:3000/mobifyjs/examples/assets/images/alternate_art.png" media="(min-width: 320px)" data-width="320"></span>
+        <span media="(min-width: 800px)" data-width="400" src="//ir0.mobify.com/project-oss-localhost/webp/400/1418/http://localhost:3000/mobifyjs/examples/assets/images/extralarge.jpg"></span>
+        <span media="(min-width: 1000px)" data-width="500" src="//ir0.mobify.com/project-oss-localhost/webp/500/1418/http://localhost:3000/mobifyjs/examples/assets/images/extralarge.jpg"></span>
         <img data-orig-src="small.jpg">
-    </picture>
+    </span>
 
 You can find the source code here:
 
@@ -90,11 +90,11 @@ in web inspector to see which resources get downloaded:
 
 Here is the important chunk of code that is in the source of the example:
 
-    <picture>
-        <source src="/examples/assets/images/small.jpg">
-        <source src="/examples/assets/images/medium.jpg" media="(min-width: 450px)">
-        <source src="/examples/assets/images/large.jpg" media="(min-width: 800px)">
-        <source src="/examples/assets/images/extralarge.jpg" media="(min-width: 1000px)">
+    <span data-picture>
+        <span src="/examples/assets/images/small.jpg"></span>
+        <span src="/examples/assets/images/medium.jpg" media="(min-width: 450px)"></span>
+        <span src="/examples/assets/images/large.jpg" media="(min-width: 800px)"></span>
+        <span src="/examples/assets/images/extralarge.jpg" media="(min-width: 1000px)"></span>
         <img src="/examples/assets/images/small.jpg">
     </picture>
 

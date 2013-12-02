@@ -14,7 +14,7 @@ function() {
     Mobify.Capture.init(function(capture){
       var capturedDoc = capture.capturedDoc;
 
-      var images = capturedDoc.querySelectorAll("img, picture, span[data-picture]");
+      var images = capturedDoc.querySelectorAll("img, span[data-picture]");
       Mobify.ResizeImages.resize(images);
         
       // Render source DOM to document
