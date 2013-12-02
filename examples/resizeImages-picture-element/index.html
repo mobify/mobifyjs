@@ -45,16 +45,16 @@ picture {
 </head>
 <body class="foo">
 
-    <p>Picture polyfill is used here in a much simpler way. Equivalent images at different breakpoints do not need to be automatically generated, they only need to set width attributes for each `source` element.</p>
+    <p>Picture polyfill is used here in a much simpler way. Equivalent images at different breakpoints do not need to be automatically generated, they only need to set width attributes for each `source/span` element.</p>
     <p>View the source to have a look, and view the inspector to see what the `resize` method does to the picture element's markup.</p>
     <!-- http://upload.wikimedia.org/wikipedia/commons/6/68/President_Barack_Obama_Tours_Storm_Damage_in_New_Jersey_2.jpg -->
-    <picture class="example-photo" data-src="/mobifyjs/examples/assets/images/responsive-obama.jpg">
-        <source src="/mobifyjs/examples/assets/images/responsive-obama-mobile.png">
-        <source media="(min-width: 512px)">
-        <source media="(min-width: 1024px)" data-width="512">
-        <source media="(min-width: 2048px)" data-width="1024">
+    <span data-picture class="example-photo" data-src="/mobifyjs/examples/assets/images/responsive-obama.jpg">
+        <span src="/mobifyjs/examples/assets/images/responsive-obama-mobile.png"></span>
+        <span data-media="(min-width: 512px)"></span>
+        <span data-media="(min-width: 1024px)" data-width="512"></span>
+        <span data-media="(min-width: 2048px)" data-width="1024"></span>
         <img src="/mobifyjs/examples/assets/images/responsive-obama.jpg">
-    </picture>
+    </span>
 
     <h1>Excitingus Headlineus</h1>
 

@@ -178,7 +178,7 @@ ResizeImages._resizeSourceElement = function(element, opts, rootSrc) {
  * children
  */
 ResizeImages._crawlPictureElement = function(el, opts) {
-    var sources = el.getElementsByTagName('source');
+    var sources = el.getElementsByTagName('span') || el.getElementsByTagName('source');
     // If source elements are erased from the dom, leave the
     // picture element alone.
     if (sources.length === 0 || el.hasAttribute('mobify-optimized')) {
@@ -289,7 +289,7 @@ ResizeImages.resize = function(elements, options) {
         }
         // For a `picture`, (potentially) nuke src on `img`, and
         // pass all `source` elements into modifyImages recursively
-        else if (element.nodeName === 'PICTURE') {
+        else if (element.nodeName === 'SPAN' || element.nodeName === 'PICTURE') {
             ResizeImages._crawlPictureElement(element, opts);
         }
     }

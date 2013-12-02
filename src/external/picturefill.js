@@ -76,7 +76,7 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
                 }
 
                 picImg.src = matchedEl.getAttribute( "data-src" ) || matchedEl.getAttribute("src");
-                matchedEl.appendChild( picImg );
+                matchedEl.parentNode.appendChild( picImg );
                 picImg.removeAttribute("width");
                 picImg.removeAttribute("height");
             }
