@@ -380,9 +380,10 @@ Capture.prototype.createDocumentFragments = function() {
 };
 
 /**
- * Returns an escaped HTML representation of the captured DOM
+ * Returns an HTML representation of the captured DOM with resources enabled.
+ * (escapedHTMLString remains for backwards compatibility)
  */
-Capture.prototype.escapedHTMLString = function() {
+Capture.prototype.enabledHTMLString = Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
     var html = Capture.enable(Utils.outerHTML(doc.documentElement), this.prefix);
     var htmlWithDoctype = this.doctype + html;
@@ -393,11 +394,11 @@ Capture.prototype.escapedHTMLString = function() {
  * Rewrite the document with a new html string
  */
 Capture.prototype.render = function(htmlString) {
-    var escapedHTMLString;
+    var enabledHTMLString;
     if (!htmlString) {
-        escapedHTMLString = this.escapedHTMLString();
+        enabledHTMLString = this.enabledHTMLString();
     } else {
-        escapedHTMLString = Capture.enable(htmlString);
+        enabledHTMLString = Capture.enable(htmlString);
     }
 
     var doc = this.sourceDoc;
@@ -408,7 +409,7 @@ Capture.prototype.render = function(htmlString) {
     // Asynchronously render the new document
     setTimeout(function(){
         doc.open("text/html", "replace");
-        doc.write(escapedHTMLString);
+        doc.write(enabledHTMLString);
         doc.close();
     });
 };
