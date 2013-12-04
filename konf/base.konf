@@ -3,7 +3,15 @@
 {#lib_export name="jquery"}
     window.Mobify = window.Mobify || {};
     {+jquery}
-        {>"/base/vendor/jquery-2.0.3.js"/}
+        {>"/base/vendor/zepto/src/zepto.js"/}
+        {>"/base/vendor/zepto/src/event.js"/}
+        {>"/base/vendor/zepto/src/ajax.js"/}
+        {>"/base/vendor/zepto/src/form.js"/}
+        {>"/base/vendor/zepto/src/ie.js"/}
+        {>"/base/vendor/zepto/src/detect.js"/}
+        {>"/base/vendor/zepto/src/fx.js"/}
+        {>"/base/vendor/zepto/src/selector.js"/}
+        {>"/base/vendor/zepto/src/stack.js"/}
     {/jquery}
     {>"/base/api/noconflict.js"/}
 {/lib_export}
