@@ -288,12 +288,6 @@
                 html += el.outerHTML + 'n';
             });
 
-            // html += $('#fixtures').reduce(function(memo, el) {
-            //         return memo + el.outerHTML + '\n';
-            //     }, '')
-            // html += $result.reduce(function(memo, el) {
-            //         return memo + el.outerHTML + '\n';
-            // }, '')
             html = '<html><body>' + html + '</body></html>'
 
             var iframeEl = document.createElement('iframe');
