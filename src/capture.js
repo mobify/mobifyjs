@@ -464,7 +464,10 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     // must re-inject the script.
     var mobifyjsScript = Capture.getMobifyLibrary(sourceDoc);
 
-    var head = destDoc.head;
+    var head = destDoc.head || destDoc.getElementsByTagName('head')[0];
+    if (!head) {
+        return;
+    }
     // If main script exists, re-inject it.
     var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {

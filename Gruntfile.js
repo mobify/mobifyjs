@@ -27,7 +27,6 @@ module.exports = function(grunt) {
               options: {
                 timeout: 20000,
                 urls: [
-                  'http://localhost:3000/tests/mobify-library.html',
                   'http://localhost:3000/tests/capture.html',
                   'http://localhost:3000/tests/jazzcat.html',
                   'http://localhost:3000/tests/resizeImages.html',
@@ -97,7 +96,6 @@ module.exports = function(grunt) {
                     username: '<%= localConfig.saucelabs.username %>', // if not provided it'll default to ENV SAUCE_USERNAME (if applicable)
                     key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                     urls: [
-                        'http://localhost:3000/tests/mobify-library.html',
                         'http://localhost:3000/tests/capture.html',
                         'http://localhost:3000/tests/resizeImages.html',
                         'http://localhost:3000/tests/jazzcat.html',
