@@ -1,4 +1,4 @@
-require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
+require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify", "mobifyjs/firefox"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, Firefox) {
     var Mobify = window.Mobify = window.Mobify || {};
 
     // DECLARE LIBRARIES ATTACHED TO MOBIFY OBJECT HERE
@@ -29,6 +29,8 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
 
             capture.renderCapturedDoc();
         });
+    } else {
+        FF.patchAll();
     }
 
 }, undefined, true);
