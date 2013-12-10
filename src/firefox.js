@@ -46,7 +46,7 @@ define(["mobifyjs/utils"], function(Utils){
 
             if (!defaultPrevented) {
                 // Prevent the default action, which would cause a
-                // page relresh.
+                // page refresh.
                 e.preventDefault();
 
                 // But pretend that we didn't call it.
