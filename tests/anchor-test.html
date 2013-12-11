@@ -24,15 +24,15 @@
     QUnit.start();
 
     var skip = function() {
-        // Test harness does not work on Android 4.0.x because
+        // Test harness does not work on Android 4.0.x and less because
         // of an iframe scrolling bug. However, the functionality works
         // but needs to be manually tested.
-        return /android.*4\.0\./i.test(window.navigator.userAgent);
-    }
+        return /android.*(4\.0\.|(2|3)\.\d)/i.test(window.navigator.userAgent);
+    };
 
     var testSetup = function(id, ready) {
         var opts = {
-            id: "flood-test",
+            id: "anchor-test",
             src: "/tests/fixtures/anchor-test.html"
         };
         var $iframe = $("<iframe>", opts);
@@ -72,7 +72,7 @@
 
             setTimeout(function() {
                 if (skip()) {
-                    ok(true, "Test harness does not work on Android 4.0.x. Must be tested manually.");
+                    ok(true, "Test harness does not work on Android < 4.0. Must be tested manually.");
                     return start();
                 }
 

@@ -1,4 +1,4 @@
-define(["mobifyjs/utils"], function(Utils) {
+define(["mobifyjs/utils", "mobifyjs/firefox"], function(Utils, Firefox) {
 
 // ##
 // # Static Variables/Functions
@@ -468,6 +468,12 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     if (!head) {
         return;
     }
+
+    // inject post capture callback
+    var postCaptureScript = destDoc.createElement('script');
+    postCaptureScript.innerHTML = 'Mobify.Capture.postCapture();';
+    head.insertBefore(postCaptureScript, head.firstChild);
+
     // If main script exists, re-inject it.
     var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {
@@ -478,7 +484,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
-        head.insertBefore(mainClone, head.firstChild)
+        head.insertBefore(mainClone, head.firstChild);
     }
     // reinject mobify.js file
     var mobifyjsClone = destDoc.importNode(mobifyjsScript, false);
@@ -504,6 +510,17 @@ Capture.prototype.renderCapturedDoc = function(options) {
     }
 
     this.render();
+};
+
+/**
+ * Post Capture Callback
+ * 
+ * Called after the document is written, can be used to patch
+ * browser issues.
+ */
+Capture.postCapture = function() {
+    // Patch Firefox specific bugs.
+    Firefox.patchAll();
 };
 
 return Capture;

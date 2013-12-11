@@ -670,7 +670,123 @@ Utils.waitForReady = function(doc, callback) {
 return Utils;
 
 });
-define('mobifyjs/capture',["mobifyjs/utils"], function(Utils) {
+// Fixes specific to Firefox.
+
+define('mobifyjs/firefox',["mobifyjs/utils"], function(Utils){
+    var exports = {};
+
+    exports.isFirefox = function(ua) {
+        ua = window.navigator.userAgent;
+
+        return /firefox|fennec/i.test(ua)
+    }
+
+    exports._patchAnchorLinks = function(doc) {
+        // Anchor links in FF, after we do `document.open` cause a page
+        // navigation (a refresh) instead of just scrolling the
+        // element in to view.
+        //
+        // So, we prevent the default action on the element, and
+        // then manually scroll it in to view (unless some else already
+        // called prevent default).
+
+        var body = doc.body;
+
+        if (!(body && body.addEventListener)) {
+            // Body is not there or we can't bind as expected.
+            return;
+        }
+
+        var _handler = function(e) {
+            // Handler for all clicks on the page, but only triggers
+            // on proper anchor links.
+
+            var target = e.target;
+
+            var matches = function(el) {
+                return (el.nodeName == "A") && (/^#/.test(el.getAttribute('href')));
+            }
+
+            if (!matches(target)) {
+                return;
+            }
+            
+            // Newer browsers support `e.defaultPrevented`. FF 4.0 supports `e.getPreventDefault()`
+            var defaultPrevented = (typeof e.defaultPrevented !== "undefined") ?
+                e.defaultPrevented :
+                e.getPreventDefault && e.getPreventDefault();
+
+            if (!defaultPrevented) {
+                // Prevent the default action, which would cause a
+                // page refresh.
+                e.preventDefault();
+
+                // But pretend that we didn't call it.
+                e.defaultPrevented = false;
+
+                // We have to wait and see if anyone else calls
+                // `preventDefault`. If they do, we don't scroll.
+                var scroll = true;
+
+                // Override the `preventDefault` to stop  us from scrolling.
+                e.preventDefault = function() {
+                    e.defaultPrevented = true;
+                    scroll = false;
+                }
+
+                // If no other events call `preventDefault` we manually
+                // scroll to the element in question.
+                setTimeout(function() {
+                    if (scroll) {
+                        _scrollToAnchor(target.getAttribute('href'));
+                    }
+                }, 50);
+            }   
+        };
+
+
+        var _scrollToAnchor = function(anchor) {
+            // Scrolls to the element, if any, that matches
+            // the given anchor link (eg, "#foo").
+
+            var anchorRe = /^#([^\s]*)/;
+            var match = anchor.match(anchorRe);
+            var target;
+            
+            // Find the target, if any
+            if (match && match[1] === "") {
+                target = doc.body;
+            } else if (match && match[1]) {
+                var target = doc.getElementById(match[1]);
+            }
+
+            // Scroll to it, if it exists
+            if (target) {
+                target.scrollIntoView && target.scrollIntoView();
+            }
+        }
+
+        // We have to get the event through bubbling, otherwise
+        // events cancelled by a the return value of an onclick
+        // handler are not correctly handled.
+        body.addEventListener('click', _handler, false);
+    };
+
+    exports.patchAnchorLinks = function() {
+        Utils.waitForReady(document, this._patchAnchorLinks);
+    }
+
+    exports.patchAll = function() {
+        if (!exports.isFirefox()) {
+            return
+        }
+        this.patchAnchorLinks();
+    };
+
+    return exports;
+});
+
+define('mobifyjs/capture',["mobifyjs/utils", "mobifyjs/firefox"], function(Utils, Firefox) {
 
 // ##
 // # Static Variables/Functions
@@ -1140,6 +1256,12 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     if (!head) {
         return;
     }
+
+    // inject post capture callback
+    var postCaptureScript = destDoc.createElement('script');
+    postCaptureScript.innerHTML = 'Mobify.Capture.postCapture();';
+    head.insertBefore(postCaptureScript, head.firstChild);
+
     // If main script exists, re-inject it.
     var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {
@@ -1150,7 +1272,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
-        head.insertBefore(mainClone, head.firstChild)
+        head.insertBefore(mainClone, head.firstChild);
     }
     // reinject mobify.js file
     var mobifyjsClone = destDoc.importNode(mobifyjsScript, false);
@@ -1176,6 +1298,17 @@ Capture.prototype.renderCapturedDoc = function(options) {
     }
 
     this.render();
+};
+
+/**
+ * Post Capture Callback
+ * 
+ * Called after the document is written, can be used to patch
+ * browser issues.
+ */
+Capture.postCapture = function() {
+    // Patch Firefox specific bugs.
+    Firefox.patchAll();
 };
 
 return Capture;
@@ -2231,122 +2364,6 @@ var defaults = CssOptimize._defaults = {
 return CssOptimize;
 });
 
-// Fixes specific to Firefox.
-
-define('mobifyjs/firefox',["mobifyjs/utils"], function(Utils){
-    var exports = {};
-
-    exports.isFirefox = function(ua) {
-        ua = window.navigator.userAgent;
-
-        return /firefox|fennec/i.test(ua)
-    }
-
-    exports._patchAnchorLinks = function(doc) {
-        // Anchor links in FF, after we do `document.open` cause a page
-        // navigation (a refresh) instead of just scrolling the
-        // element in to view.
-        //
-        // So, we prevent the default action on the element, and
-        // then manually scroll it in to view (unless some else already
-        // called prevent default).
-
-        var body = doc.body;
-
-        if (!(body && body.addEventListener)) {
-            // Body is not there or we can't bind as expected.
-            return;
-        }
-
-        var _handler = function(e) {
-            // Handler for all clicks on the page, but only triggers
-            // on proper anchor links.
-
-            var target = e.target;
-
-            var matches = function(el) {
-                return (el.nodeName == "A") && (/^#/.test(el.getAttribute('href')));
-            }
-
-            if (!matches(target)) {
-                return;
-            }
-            
-            // Newer browsers support `e.defaultPrevented`. FF 4.0 supports `e.getPreventDefault()`
-            var defaultPrevented = (typeof e.defaultPrevented !== "undefined") ?
-                e.defaultPrevented :
-                e.getPreventDefault && e.getPreventDefault();
-
-            if (!defaultPrevented) {
-                // Prevent the default action, which would cause a
-                // page relresh.
-                e.preventDefault();
-
-                // But pretend that we didn't call it.
-                e.defaultPrevented = false;
-
-                // We have to wait and see if anyone else calls
-                // `preventDefault`. If they do, we don't scroll.
-                var scroll = true;
-
-                // Override the `preventDefault` to stop  us from scrolling.
-                e.preventDefault = function() {
-                    e.defaultPrevented = true;
-                    scroll = false;
-                }
-
-                // If no other events call `preventDefault` we manually
-                // scroll to the element in question.
-                setTimeout(function() {
-                    if (scroll) {
-                        _scrollToAnchor(target.getAttribute('href'));
-                    }
-                }, 50);
-            }   
-        };
-
-
-        var _scrollToAnchor = function(anchor) {
-            // Scrolls to the element, if any, that matches
-            // the given anchor link (eg, "#foo").
-
-            var anchorRe = /^#([^\s]*)/;
-            var match = anchor.match(anchorRe);
-            var target;
-            
-            // Find the target, if any
-            if (match && match[1] === "") {
-                target = doc.body;
-            } else if (match && match[1]) {
-                var target = doc.getElementById(match[1]);
-            }
-
-            // Scroll to it, if it exists
-            if (target) {
-                target.scrollIntoView && target.scrollIntoView();
-            }
-        }
-
-        // We have to get the event through bubbling, otherwise
-        // events cancelled by a the return value of an onclick
-        // handler are not correctly handled.
-        body.addEventListener('click', _handler, false);
-    };
-
-    exports.patchAnchorLinks = function() {
-        Utils.waitForReady(document, this._patchAnchorLinks);
-    }
-
-    exports.patchAll = function() {
-        if (!exports.isFirefox()) {
-            return
-        }
-        this.patchAnchorLinks();
-    };
-
-    return exports;
-});
-
 define('mobifyjs/external/picturefill',["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
@@ -2490,7 +2507,7 @@ return;
 
 });
 
-require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify", "mobifyjs/cssOptimize",  "mobifyjs/firefox", "mobifyjs/external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize, Firefox) {
+require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify", "mobifyjs/cssOptimize", "mobifyjs/external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize) {
     var Mobify = window.Mobify = window.Mobify || {};
     Mobify.Utils = Utils;
     Mobify.Capture = Capture;
@@ -2498,7 +2515,6 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
     Mobify.Jazzcat = Jazzcat;
     Mobify.CssOptimize = CssOptimize;
     Mobify.Unblockify = Unblockify;
-    Mobify.Firefox = Firefox;
     Mobify.api = "2.0"; // v6 tag backwards compatibility change
     return Mobify;
 
