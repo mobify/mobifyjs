@@ -325,6 +325,31 @@
             $("#qunit-fixture").append($iframe);
         });
 
+        /**
+         * Ensure that no meta tags get added to the document. This is a
+         * regression test to make sure meta tags within noscript tags
+         * do not get moved into the "head" in older browsers (Safari 4/5)
+         */
+        asyncTest("meta tags don't get moved into head", function() {
+            var opts = {
+                src: "/tests/fixtures/meta.html"
+            };
+            var $iframe = $("<iframe>", opts);
+            var el = $iframe[0];
+
+            window.addEventListener("message", function onMessage(event) {
+                if (event.source != el.contentWindow) return;
+                window.removeEventListener("message", onMessage, false);
+
+                // Make sure that there are no meta tags in the document at all
+                equal(el.contentDocument.getElementsByTagName('meta').length, 0, "Meta tags moved into the head are removed");
+                start();
+            }, false);
+
+            $("#qunit-fixture").append($iframe);
+        });
+
+
     });
 </script>
 </body>
