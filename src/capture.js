@@ -73,7 +73,6 @@ function escapeQuote(s) {
  */
 function extractHTMLStringFromElement(container) {
     if (!container) return '';
-
     return [].map.call(container.childNodes, function(el) {
         var tagName = nodeName(el);
         if (tagName == '#comment') return '<!--' + el.textContent + '-->';
@@ -360,8 +359,19 @@ Capture.prototype.createDocumentFragments = function() {
 
     // Set innerHTML of new source DOM body
     bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
-    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
 
+    // In Safari 4/5 and iOS 4.3, there are certain scenarios where elements
+    // in the body (ex "meta" in "noscripts" tags) get moved into the head,
+    // which can cause issues with certain websites (for example, if you have
+    // a meta refresh tag inside of a noscript tag)
+    var heads = doc.querySelectorAll('head');
+    if (heads.length > 1) {
+        while (heads[1].hasChildNodes()) {
+            heads[1].removeChild(heads[1].lastChild);
+        }
+    }
+
+    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
     // On FF4, and potentially other browsers, you cannot modify <head>
     // using innerHTML. In that case, do a manual copy of each element
     try {
@@ -371,10 +381,6 @@ Capture.prototype.createDocumentFragments = function() {
         title && headEl.removeChild(title);
         this.setElementContentFromString(headEl, disabledHeadContent);
     }
-
-    // Append head and body to the html element
-    htmlEl.appendChild(headEl);
-    htmlEl.appendChild(bodyEl);
 
     return docFrags;
 };
