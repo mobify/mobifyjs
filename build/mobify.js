@@ -1012,9 +1012,9 @@ Capture.prototype.createDocumentFragments = function() {
         }
     }
 
+    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
     // On FF4, and potentially other browsers, you cannot modify <head>
     // using innerHTML. In that case, do a manual copy of each element
-    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
     try {
         headEl.innerHTML = disabledHeadContent;
     } catch (e) {

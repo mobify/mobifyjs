@@ -216,6 +216,11 @@ module.exports = function(grunt) {
                         src: "build/mobify.js",
                         dest: "mobifyjs/build/mobify-<%= pkg.version %>.js",
                         rel: "build",
+                    },
+                    { // unminified dev build to latest
+                        src: "build/mobify.js",
+                        dest: "mobifyjs/build/mobify.js",
+                        rel: "build",
                     }
                 ]
             },
@@ -228,6 +233,11 @@ module.exports = function(grunt) {
                     { // minified production build
                         src: "build/mobify.min.js",
                         dest: "mobifyjs/build/mobify-<%= pkg.version %>.min.js",
+                        rel: "build",
+                    },
+                    { // minified production build to latest
+                        src: "build/mobify.min.js",
+                        dest: "mobifyjs/build/mobify.min.js",
                         rel: "build",
                     }
                 ]
