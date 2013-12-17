@@ -747,7 +747,7 @@ Capture.init = Capture.initCapture = function(callback, doc, prefix) {
 
     var createCapture = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
-        var capturedStringFragments = capture.createDocumentFragmentsStrings();
+        var capturedStringFragments = Capture.createDocumentFragmentsStrings(capture.sourceDoc);
         Utils.extend(capture, capturedStringFragments);
         var capturedDOMFragments = capture.createDocumentFragments();
         Utils.extend(capture, capturedDOMFragments);
@@ -878,11 +878,18 @@ Capture.openTag = function(element) {
 };
 
 /**
+ * Set the content of an element with html from a string
+ */
+Capture.setElementContentFromString = function(el, htmlString) {
+    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
+};
+
+/**
  * Returns an object containing the state of the original page. Caches the object
  * in `extractedHTML` for later use.
  */
- Capture.prototype.createDocumentFragmentsStrings = function() {
-    var doc = this.sourceDoc;
+ Capture.createDocumentFragmentsStrings = function(doc) {
+    doc = doc;
     var headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head');
     var bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body');
     var htmlEl = doc.getElementsByTagName('html')[0];
@@ -923,16 +930,26 @@ Capture.openTag = function(element) {
         // <!-- comment --> . Skip it.
         if (!match[1]) continue;
 
+        // Grab the contents of head
+        captured.headContent = rawHTML.slice(0, match.index);
+
+        // Parse the head content
+        var parsedHeadTag = /^\s*(<head[^>]*>)([\s\S]*)/gi.exec(captured.headContent);
+        if (parsedHeadTag) {
+            // if headContent contains an open head, then we know the tag was placed
+            // outside of the body
+            captured.headOpenTag = parsedHeadTag[1];
+            captured.headContent = parsedHeadTag[2];
+        }
+
+        // If there is a closing head tag
         if (match[1][1] == '/') {
             // Hit </head. Gather <head> innerHTML. Also, take trailing content,
             // just in case <body ... > is missing or malformed
-            captured.headContent = rawHTML.slice(0, match.index);
             captured.bodyContent = rawHTML.slice(match.index + match[1].length);
         } else {
             // Hit <body. Gather <body> innerHTML.
-
             // If we were missing a </head> before, now we can pick up everything before <body
-            captured.headContent = captured.head || rawHTML.slice(0, match.index);
             captured.bodyContent = match[0];
 
             // Find the end of <body ... >
@@ -976,13 +993,6 @@ Capture.prototype.restore = function() {
 };
 
 /**
- * Set the content of an element with html from a string
- */
-Capture.prototype.setElementContentFromString = function(el, htmlString) {
-    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
-};
-
-/**
  * Grab fragment strings and construct DOM fragments
  * returns htmlEl, headEl, bodyEl, doc
  */
@@ -1013,14 +1023,14 @@ Capture.prototype.createDocumentFragments = function() {
     }
 
     var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
-    // On FF4, and potentially other browsers, you cannot modify <head>
+    // On FF4, iOS 4.3, and potentially other browsers, you cannot modify <head>
     // using innerHTML. In that case, do a manual copy of each element
     try {
         headEl.innerHTML = disabledHeadContent;
     } catch (e) {
         var title = headEl.getElementsByTagName('title')[0];
         title && headEl.removeChild(title);
-        this.setElementContentFromString(headEl, disabledHeadContent);
+        Capture.setElementContentFromString(headEl, disabledHeadContent);
     }
 
     return docFrags;
