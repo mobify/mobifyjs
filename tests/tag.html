@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html class="foo">
+<head>
+  <meta charset="utf-8">
+  <title>Mobify.js Anchor Link Tests</title>
+  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
+
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+</head>
+<body>
+
+<div id="qunit"></div>
+
+<div id="qunit-fixture">
+</div>
+
+<script>
+    // http://api.qunitjs.com/QUnit.config/
+    QUnit.config.autostart = false;
+    QUnit.config.testTimeout = 30 * 1000;
+
+    QUnit.start();
+
+    var skip = function() {
+        return false;
+    }
+
+    var testSetup = function(src, ready) {
+        var opts = {
+            id: "tag-test.html",
+            src: src
+        };
+        var $iframe = $("<iframe>", opts);
+        var el = $iframe[0];
+
+        // Clear cookies
+        document.cookie = 'mobify=0' +
+            '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
+            '; path=/';
+
+        window.addEventListener("message", function onMessage(event) {
+            if (event.source != el.contentWindow) return;
+            window.removeEventListener("message", onMessage, false);
+            var win = el.contentWindow;
+            var doc = el.contentWindow.document;
+
+            setTimeout(function() {
+                if (skip()) {
+                    ok(true, "Test harness does not work. Must be tested manually.");
+                    return start();
+                }
+
+                // Call ready so we can fire assertions
+                ready(win, doc, event);
+            }, 100);
+        }, false);
+
+        $("#qunit-fixture").append($iframe);
+    };
+
+    asyncTest("There is a plaintext tag", function() {
+        testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
+            equal(event.data, "loaded", "Expected event was received.");
+            ok(doc.getElementsByTagName("plaintext")[0], "Plaintext element exists");
+            equal(win.mobifyjsFileName, "/tests/fixtures/tag/mobify.js", "Correct file was loaded.");
+            equal(doc.getElementById("content"), null, "#content should not exist");
+
+            start();
+        });
+    });
+
+    asyncTest("Unmobifies Correctly", function() {
+        testSetup("/tests/fixtures/tag/failed-load-tag.html", function(win, doc, event) {
+            equal(event.data, "error", "Expected error was received.")
+            equal(doc.getElementsByTagName("plaintext").length, 0, "Plaintext element does not exist");
+            notEqual(doc.getElementById("content"), null, "#content should exist");
+
+            start();
+        });
+    });
+
+</script>
+</body>
+</html>
