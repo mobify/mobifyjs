@@ -83,6 +83,14 @@
         });
     });
 
+    asyncTest("Mobify.tagVersion exists", function() {
+        testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
+            deepEqual(win.Mobify.tagVersion, [7, 0], "Mobify.tagVersion exists");
+
+            start();
+        });
+    });
+
     asyncTest("Mobify.userAgent exists", function() {
         testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
             equal(win.Mobify.userAgent, window.navigator.userAgent, "Mobify.userAgent exists");

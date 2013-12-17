@@ -2,6 +2,8 @@ var Mobify = {};
 
 Mobify.points = [Date.now()];
 
+Mobify.tagVersion = [7, 0];
+
 Mobify.userAgent = window.navigator.userAgent;
 
 Mobify.previewUrl = "https://preview.mobify.com/v7/";
