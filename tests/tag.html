@@ -27,7 +27,9 @@
         return false;
     }
 
-    var testSetup = function(src, ready) {
+    var testSetup = function(src, ready, beforeLoad) {
+        console.log("Test Setup");
+
         var opts = {
             id: "tag-test.html",
             src: src
@@ -37,6 +39,10 @@
 
         // Clear cookies
         document.cookie = 'mobify=0' +
+            '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
+            '; path=/';
+
+        document.cookie = 'mobify-mode=' +
             '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
             '; path=/';
 
@@ -57,8 +63,29 @@
             }, 100);
         }, false);
 
+        if (beforeLoad) { beforeLoad(el) };
+
         $("#qunit-fixture").append($iframe);
+
+        console.log("Attached");
     };
+
+    asyncTest("Mobify.points exists", function() {
+        testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
+            equal(win.Mobify.points.length, 1, "Mobify.points is an array");
+            equal(typeof win.Mobify.points[0], "number", "Mobify.point[0] is a number");
+
+            start();
+        });
+    });
+
+    asyncTest("Mobify.userAgent exists", function() {
+        testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
+            equal(win.Mobify.userAgent, window.navigator.userAgent, "Mobify.userAgent exists");
+
+            start();
+        });
+    });
 
     asyncTest("There is a plaintext tag", function() {
         testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
@@ -70,6 +97,8 @@
             start();
         });
     });
+
+
 
     asyncTest("Unmobifies Correctly", function() {
         testSetup("/tests/fixtures/tag/failed-load-tag.html", function(win, doc, event) {
@@ -91,6 +120,56 @@
             start();
         });
     });
+
+    asyncTest("Loads mobile correctly when forced via Mode cookie", function() {
+        testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
+            equal(event.data, "loaded", "Expected loaded event was received.")
+            equal(doc.getElementsByTagName("plaintext").length, 1, "Plaintext element does exist");
+            equal(win.mobifyjsFileName, "/tests/fixtures/tag/mobify.js", "Correct file was loaded.");
+            equal(doc.getElementById("content"), null, "#content should not exist");
+
+            start();
+        }, function (el) {
+            document.cookie = "mobify-mode=mobile; path=/";
+        });
+    });
+
+    asyncTest("Loads mobile correctly via correct userAgent", function() {
+        testSetup("/tests/fixtures/tag/useragent.html", function(win, doc, event) {
+            equal(event.data, "loaded", "Expected loaded event was received.")
+            equal(doc.getElementsByTagName("plaintext").length, 1, "Plaintext element does exist");
+            equal(win.mobifyjsFileName, "/tests/fixtures/tag/mobify.js", "Correct file was loaded.");
+            equal(doc.getElementById("content"), null, "#content should not exist");
+
+            start();
+        }, function (el) {
+            document.cookie = "mobify-mode=mobile; path=/";
+        });
+    });
+
+    asyncTest("Fires preload callback", function() {
+        testSetup("/tests/fixtures/tag/preload.html", function(win, doc, event) {
+            equal(win.preloadFired, true, "Preload fired.");
+
+            start();
+        }, function (el) {
+            document.cookie = "mobify-mode=mobile; path=/";
+        });
+    });
+
+    asyncTest("Fires postload callback", function() {
+        testSetup("/tests/fixtures/tag/postload.html", function(win, doc, event) {
+            equal(win.postloadFired, true, "Postload fired.");
+
+            start();
+        }, function (el) {
+            document.cookie = "mobify-mode=mobile; path=/";
+        });
+    });
+
+
+
+    
 
 </script>
 </body>

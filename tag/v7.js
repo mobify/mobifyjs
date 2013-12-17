@@ -1,5 +1,15 @@
 var Mobify = {};
 
+Mobify.points = [Date.now()];
+
+Mobify.userAgent = window.navigator.userAgent;
+
+Mobify.debug = function(line) {
+    if (console.log) {
+        console.log(line);
+    }
+};
+
 Mobify.loadScript = function(options) {
     var mobifyTagScript = document.getElementsByTagName('script')[0];
 
@@ -53,24 +63,45 @@ Mobify.disable = function() {
 
 Mobify.init = function(options) {
     var self = this;
+    self.debug("Init Called");
 
     if (self.isDisabled()) {
+        self.debug("Tag is disabled.")
         return;
     }
 
-    var mode = options.getMode(Mobify);
+    var mode = self.getCookie("mobify-mode") || options.getMode(Mobify);
     var opts = options[mode];
 
+    self.debug("Mode is: " + mode);
+
     if (typeof opts === "undefined") {
+        self.debug("No mode options found, acting disabled.")
         return;
+    }
+
+    var preloadCallback = function() {
+        if (opts.preload) {
+            opts.preload(self);
+        }
+    }
+
+    var postloadCallback = function() {
+        if (opts.postload) {
+            Mobify.debug("Post Load Callback Firing");
+            opts.postload(self);
+        }
     }
 
     var load = function() {
+        preloadCallback();
+
         self.loadScript({
             id: "mobify-js",
             src: opts.url,
             class: "mobify",
-            onerror: function() {self.disable()}
+            onerror: function() {self.disable()},
+            onload: postloadCallback
         });
     };
 

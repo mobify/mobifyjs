@@ -4,14 +4,13 @@
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
         <script>Mobify.init({
-            getMode: function() { return 'desktop' },
-            mobile: {
-                capture: true,
-                url: "/tests/fixtures/tag/mobify.js"
-            },
-            desktop: {
-                capture: false,
-                url: "/tests/fixtures/tag/desktop.js"
+                getMode: function() {
+                    return 'mobile';
+                },
+                mobile: {
+                    capture: true,
+                    url: "/tests/fixtures/tag/mobify.js",
+                    postload: function() { window.postloadCallback() }
             }
         });</script>
     </head>
