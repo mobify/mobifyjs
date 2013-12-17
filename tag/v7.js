@@ -116,7 +116,7 @@ Mobify.init = function(options) {
         self.loadScript({
             id: "mobify-js",
             src: opts.url,
-            class: "mobify",
+            'class': "mobify",
             onerror: function() {self.disable()},
             onload: postloadCallback
         });
@@ -128,32 +128,3 @@ Mobify.init = function(options) {
         load();
     }
 };
-
-// var options = {
-//     getMode: function(Mobify) {
-//         var override = Mobify.getCookie('mobify-mode');
-
-//         if (override) {
-//             return override;
-//         }
-
-//         if (/i/i.test(Mobify.userAgent)) {
-//             return 'mobile';
-//         } else if (/j/.test(Mobify.userAgent)) {
-//             return 'tablet';
-//         } else{
-//             return 'desktop';
-//         }
-//     },
-
-//     mobile: {
-//         capture: true,
-//         url: '',
-//     },
-
-//     tablet: {
-//         capture: true,
-//         url: '',
-//     }
-// };
-
