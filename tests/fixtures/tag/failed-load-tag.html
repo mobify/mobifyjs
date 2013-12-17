@@ -3,7 +3,13 @@
     <head>
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
-        <script>Mobify.init({url: "/tests/fixtures/tag/mobify-does-not-exist.js"});</script>
+        <script>Mobify.init({
+            getMode: function() { return 'mobile' },
+            mobile: {
+                capture: true,
+                url: "/tests/fixtures/tag/mobify-does-not-exist.js"
+            }
+        });</script>
     </head>
     <body>
         <h1>Mobify tag Tests</h1>

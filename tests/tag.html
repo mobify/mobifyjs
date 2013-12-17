@@ -81,6 +81,17 @@
         });
     });
 
+    asyncTest("Loads Desktop Correctly", function() {
+        testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
+            equal(event.data, "desktop", "Expected desktop event was received.")
+            equal(doc.getElementsByTagName("plaintext").length, 0, "Plaintext element does not exist");
+            equal(win.mobifyjsFileName, "/tests/fixtures/tag/desktop.js", "Correct file was loaded.");
+            notEqual(doc.getElementById("content"), null, "#content should exist");
+
+            start();
+        });
+    });
+
 </script>
 </body>
 </html>

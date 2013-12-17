@@ -26,6 +26,14 @@ Mobify.startCapture = function(callback) {
     }, 0);
 };
 
+Mobify.getCookie = function(name) {
+    var re = new RegExp("(^|; )" + name + "=([^;]*)");
+    var match = document.cookie.match(re);
+    if (match) {
+        return match[2];
+    }
+}
+
 Mobify.isDisabled = function() {
     return /mobify=0/.test(document.cookie);
 };
@@ -46,19 +54,58 @@ Mobify.disable = function() {
 Mobify.init = function(options) {
     var self = this;
 
-    var mobifyjsUrl = options.url;
-
     if (self.isDisabled()) {
         return;
     }
 
-    self.startCapture(function() {
+    var mode = options.getMode(Mobify);
+    var opts = options[mode];
+
+    if (typeof opts === "undefined") {
+        return;
+    }
+
+    var load = function() {
         self.loadScript({
             id: "mobify-js",
-            src: mobifyjsUrl,
+            src: opts.url,
             class: "mobify",
             onerror: function() {self.disable()}
         });
-    });
+    };
+
+    if (opts.capture) {
+        self.startCapture(load);
+    } else {
+        load();
+    }
 };
+
+// var options = {
+//     getMode: function(Mobify) {
+//         var override = Mobify.getCookie('mobify-mode');
+
+//         if (override) {
+//             return override;
+//         }
+
+//         if (/i/i.test(Mobify.userAgent)) {
+//             return 'mobile';
+//         } else if (/j/.test(Mobify.userAgent)) {
+//             return 'tablet';
+//         } else{
+//             return 'desktop';
+//         }
+//     },
+
+//     mobile: {
+//         capture: true,
+//         url: '',
+//     },
+
+//     tablet: {
+//         capture: true,
+//         url: '',
+//     }
+// };
 

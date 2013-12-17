@@ -4,16 +4,16 @@
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
         <script>Mobify.init({
-            getMode: function() { return 'mobile' },
-            mobile: {
-                capture: true,
-                url: "/tests/fixtures/tag/mobify.js"
+            getMode: function() { return 'desktop' },
+            desktop: {
+                capture: false,
+                url: "/tests/fixtures/tag/desktop.js"
             }
         });</script>
     </head>
     <body>
         <h1>Mobify tag Tests</h1>
 
-        <script>parent.postMessage("error", "*");</script>
+        <div id="content">Content</div>
     </body>
 </html>
