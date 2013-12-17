@@ -4,6 +4,8 @@ Mobify.points = [Date.now()];
 
 Mobify.userAgent = window.navigator.userAgent;
 
+Mobify.previewUrl = "https://preview.mobify.com/v7/";
+
 Mobify.debug = function(line) {
     if (console.log) {
         console.log(line);
@@ -42,10 +44,20 @@ Mobify.getCookie = function(name) {
     if (match) {
         return match[2];
     }
-}
+};
 
 Mobify.isDisabled = function() {
     return /mobify=0/.test(document.cookie);
+};
+
+Mobify.isPreview = function() {
+    return /mobify-preview/.test(window.location.hash + " " + document.cookie);
+};
+
+Mobify.loadPreview = function() {
+    this.loadScript({
+        src: this.previewUrl
+    });
 };
 
 Mobify.disable = function() {
@@ -66,7 +78,12 @@ Mobify.init = function(options) {
     self.debug("Init Called");
 
     if (self.isDisabled()) {
-        self.debug("Tag is disabled.")
+        self.debug("Tag is disabled.");
+        return;
+    }
+
+    if (self.isPreview()) {
+        self.startCapture(function(){self.loadPreview()});
         return;
     }
 

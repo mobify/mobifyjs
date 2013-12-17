@@ -46,6 +46,10 @@
             '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
             '; path=/';
 
+        document.cookie = 'mobify-preview=' +
+            '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
+            '; path=/';
+
         window.addEventListener("message", function onMessage(event) {
             if (event.source != el.contentWindow) return;
             window.removeEventListener("message", onMessage, false);
@@ -167,9 +171,43 @@
         });
     });
 
+    asyncTest("isPreview detects `mobify-preview` in hash.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html#mobify-preview&foo", function(win, doc, event) {
+            equal(win.Mobify.isPreview(), true, "Preview condition detected.");
 
+            start();
+        });
+    });
 
-    
+    asyncTest("isPreview detects `mobify-preview` in cookie.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+            equal(win.Mobify.isPreview(), true, "Preview condition detected.");
+
+            start();
+        }, function (el) {
+            document.cookie = "mobify-preview=true; path=/";
+        });
+    });
+
+    asyncTest("isPreview does not trigger without cookie or hash.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+            equal(win.Mobify.isPreview(), false, "Preview condition not detected.");
+
+            start();
+        });
+    });
+
+    asyncTest("Loads preview correctly", function() {
+        testSetup("/tests/fixtures/tag/preview.html#mobify-preview", function(win, doc, event) {
+            equal(win.Mobify.isPreview(), true, "Preview condition not detected.");
+
+            equal(event.data, "preview", "Expected preview event was received.")
+            equal(doc.getElementsByTagName("plaintext").length, 1, "Plaintext element does exist");
+            equal(doc.getElementById("content"), null, "#content should not exist");
+
+            start();
+        });
+    });     
 
 </script>
 </body>

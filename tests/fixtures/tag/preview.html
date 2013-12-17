@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+    <head>
+        <!-- Mobify Tag External -->
+        <script src="/tag/v7.js"></script>
+        <script>
+            Mobify.previewUrl = "/tests/fixtures/tag/preview.js";
+        </script>
+
+        <script>Mobify.init({
+            getMode: function() { return 'mobile' },
+            mobile: {
+                capture: true,
+                url: "/tests/fixtures/tag/mobify.js"
+            }
+        });</script>
+    <body>
+        <h1>Mobify tag Tests</h1>
+
+        <div id="content">Content</div>
+
+        <script>
+            parent.postMessage("error", "*");
+        </script>
+    </body>
+</html>
