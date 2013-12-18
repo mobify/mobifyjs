@@ -59,7 +59,9 @@ Mobify.isDisabled = function() {
 };
 
 Mobify.isPreview = function() {
-    return /mobify-preview/.test(window.location.hash + " " + document.cookie);
+    return !!(this.getSessionStorage("mobify-preview") ||
+            this.getCookie("mobify-preview") || 
+            /mobify-preview/.test(window.location.hash));
 };
 
 Mobify.loadPreview = function() {
@@ -83,6 +85,8 @@ Mobify.disable = function() {
 
 Mobify.init = function(options) {
     var self = this;
+    self.options = options;
+
     self.debug("Init Called");
 
     if (self.isDisabled()) {
@@ -95,7 +99,7 @@ Mobify.init = function(options) {
         return;
     }
 
-    var mode = self.getSessionStorage("mobify-mode") || self.getCookie("mobify-mode") || options.getMode(Mobify);
+    var mode = self.getCookie("mobify-mode") || options.getMode(Mobify);
     var opts = options[mode];
 
     self.debug("Mode is: " + mode);

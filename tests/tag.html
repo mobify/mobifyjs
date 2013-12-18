@@ -84,7 +84,7 @@
             '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
             '; path=/';
 
-        delete window.sessionStorage['mobify-mode'];
+        delete window.sessionStorage['mobify-preview'];
 
         window.addEventListener("message", function onMessage(event) {
             if (event.source != el.contentWindow || event.data !== "ready") return;
@@ -179,17 +179,6 @@
         });
     });
 
-    asyncTest("Loads mobile correctly when forced via `mode` sessionStorage", function() {
-        testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
-            assertCapturing();
-            assertLoaded("/tests/fixtures/tag/mobile.js");
-
-            start();
-        }, function (el) {
-            window.sessionStorage['mobify-mode'] = "mobile";
-        });
-    });
-
     asyncTest("Loads mobile correctly via correct userAgent", function() {
         testSetup("/tests/fixtures/tag/useragent.html", function(win, doc, event) {
             assertCapturing();
@@ -238,6 +227,16 @@
         });
     });
 
+    asyncTest("isPreview detects `mobify-preview` in sessionStorage.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+            equal(win.Mobify.isPreview(), true, "Preview condition detected.");
+
+            start();
+        }, function (el) {
+            window.sessionStorage['mobify-preview'] = "true";
+        });
+    }); 
+
     asyncTest("isPreview does not trigger without cookie or hash.", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.isPreview(), false, "Preview condition not detected.");
@@ -255,7 +254,7 @@
 
             start();
         });
-    });     
+    });    
 
 </script>
 </body>
