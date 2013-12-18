@@ -28,12 +28,19 @@
     };
 
     var assertHandler = function(event) {
-        if (typeof event.data !== "object" || event.data.assert !== true) {
+        if (!/^json:/.test(event.data)) {
             return;
         }
 
-        var method = event.data.method;
-        var args = event.data.args;
+        var jsonData = event.data.slice(5);
+        var data = JSON.parse(jsonData);
+
+        if (data.assert !== true) {
+            return;
+        }
+
+        var method = data.method;
+        var args = data.args;
 
         QUnit[method].apply(QUnit, args);
     };
@@ -191,11 +198,14 @@
     asyncTest("Fires postload callback", function() {
         testSetup("/tests/fixtures/tag/postload.html", function(win, doc, event) {
             // All assertions are fired in the iframe.
+
             expect(2);
 
             start();
         });
     });
+
+    module("Preview");
 
     asyncTest("isPreview detects `mobify-preview` in hash.", function() {
         testSetup("/tests/fixtures/tag/no-run.html#mobify-preview&foo", function(win, doc, event) {

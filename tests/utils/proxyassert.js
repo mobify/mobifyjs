@@ -1,10 +1,12 @@
 window.Assert = (function() {
     var sendMessage = function(method, args) {
-        parent.postMessage({
+        var message = {
             "assert": true,
             "method": method,
-            "args": [].slice.apply(args)
-        }, "*");
+            "args": [].slice.call(args)
+        };
+
+        parent.postMessage("json:" + JSON.stringify(message), "*");
     };
 
     var exports = {};
