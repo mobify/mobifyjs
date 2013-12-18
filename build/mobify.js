@@ -933,11 +933,9 @@ Capture.setElementContentFromString = function(el, htmlString) {
         // Grab the contents of head
         captured.headContent = rawHTML.slice(0, match.index);
         // Parse the head content
-        // (using match instead of exec, since the next few lines of code
-        // will run multiple times, and there is a bug in Android 2.3
-        // where the exec call improperly caches the .lastIndex property,
-        // causing parsedHeadTag to be null on the second iteration.
-        // http://stackoverflow.com/questions/20250019/javascript-regex-mysteriously-fails-to-match-in-android-2-3-stock-browser
+        // (using match instead of exec because even though we are creating
+        // RegExp objects using /foo/ notation, Android 2.3 seems to cache
+        // that object. Using match allows us to not worry about that bug)
         var parsedHeadTag = captured.headContent.match(/^\s*(<head[^>]*>)([\s\S]*)/i);
         if (parsedHeadTag) {
             // if headContent contains an open head, then we know the tag was placed
