@@ -283,8 +283,6 @@ Capture.setElementContentFromString = function(el, htmlString) {
     //Fallback for absence of </head> and <body>
     var rawHTML = captured.bodyContent = captured.headContent + captured.bodyContent;
     captured.headContent = '';
-    var parseHeadRe = /^\s*(<head[^>]*>)([\s\S]*)/i;
-    var parseBodyRe = /^((?:[^>'"]*|'[^']*?'|"[^"]*?")*>)([\s\S]*)$/;
 
     // Search rawHTML for the head/body split.
     for (var match; match = bodySnatcher.exec(rawHTML); match) {
@@ -294,12 +292,10 @@ Capture.setElementContentFromString = function(el, htmlString) {
         // Grab the contents of head
         captured.headContent = rawHTML.slice(0, match.index);
         // Parse the head content
-        // (using match instead of exec, since the next few lines of code
-        // will run multiple times, and there is a bug in Android 2.3
-        // where the exec call improperly caches the .lastIndex property,
-        // causing parsedHeadTag to be null on the second iteration.
-        // http://stackoverflow.com/questions/20250019/javascript-regex-mysteriously-fails-to-match-in-android-2-3-stock-browser
-        var parsedHeadTag = captured.headContent.match(parseHeadRe);
+        // (using match instead of exec because even though we are creating
+        // RegExp objects using /foo/ notation, Android 2.3 seems to cache
+        // that object. Using match allows us to not worry about that bug)
+        var parsedHeadTag = captured.headContent.match(/^\s*(<head[^>]*>)([\s\S]*)/i);
         if (parsedHeadTag) {
             // if headContent contains an open head, then we know the tag was placed
             // outside of the body
@@ -318,7 +314,7 @@ Capture.setElementContentFromString = function(el, htmlString) {
             captured.bodyContent = match[0];
 
             // Find the end of <body ... >
-            var parseBodyTag = parseBodyRe.exec(captured.bodyContent);
+            var parseBodyTag = /^((?:[^>'"]*|'[^']*?'|"[^"]*?")*>)([\s\S]*)$/.exec(captured.bodyContent);
 
             // Will skip this if <body was malformed (e.g. no closing > )
             if (parseBodyTag) {
