@@ -1,6 +1,14 @@
 <!doctype html>
 <html>
     <head>
+        <script src="/tests/utils/proxyassert.js"></script>
+
+        <script>
+            window.preloadCallback = function() {
+                Assert.notEqual(window.mobifyJSLoaded, true, "preloadCallback should be fired before mobile.js has loaded.");
+            };
+        </script>
+
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
         <script>Mobify.init({
@@ -9,8 +17,8 @@
             },
             mobile: {
                 capture: true,
-                url: "/tests/fixtures/tag/mobify.js",
-                preload: function() {window.preloadFired = true;}
+                url: "/tests/fixtures/tag/mobile.js",
+                preload: window.preloadCallback
             }
         });</script>
     </head>
@@ -18,5 +26,7 @@
         <h1>Mobify tag Tests</h1>
 
         <div id="content">Content</div>
+
+        <script>Assert.ok(false, "Capturing failed");</script>
     </body>
 </html>

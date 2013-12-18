@@ -1,6 +1,14 @@
 <!doctype html>
 <html>
     <head>
+        <script src="/tests/utils/proxyassert.js"></script>
+
+        <script>
+            window.postloadCallback = function() {
+                Assert.equal(window.mobifyJSLoaded, true, "postloadCallback should be fired after mobile.js has loaded.");
+            };
+        </script>
+
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
         <script>Mobify.init({
@@ -9,8 +17,8 @@
                 },
                 mobile: {
                     capture: true,
-                    url: "/tests/fixtures/tag/mobify.js",
-                    postload: function() { window.postloadCallback() }
+                    url: "/tests/fixtures/tag/mobile.js",
+                    postload: window.postloadCallback
             }
         });</script>
     </head>
@@ -18,5 +26,7 @@
         <h1>Mobify tag Tests</h1>
 
         <div id="content">Content</div>
+
+        <script>Assert.ok(false, "Capturing failed");</script>
     </body>
 </html>

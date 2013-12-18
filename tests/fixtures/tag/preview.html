@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
     <head>
+        <script src="/tests/utils/proxyassert.js"></script>
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
         <script>
@@ -11,7 +12,7 @@
             getMode: function() { return 'mobile' },
             mobile: {
                 capture: true,
-                url: "/tests/fixtures/tag/mobify.js"
+                url: "/tests/fixtures/tag/mobile.js"
             }
         });</script>
     <body>
@@ -20,7 +21,7 @@
         <div id="content">Content</div>
 
         <script>
-            parent.postMessage("error", "*");
+            Assert.ok(false, "Capturing failed.");
         </script>
     </body>
 </html>

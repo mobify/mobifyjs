@@ -1,13 +1,14 @@
 <!doctype html>
 <html>
     <head>
+        <script src="/tests/utils/proxyassert.js"></script>
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
         <script>Mobify.init({
-            getMode: function() { return 'mobile' },
-            mobile: {
+            getMode: function() { return 'failed' },
+            failed: {
                 capture: true,
-                url: "/tests/fixtures/tag/mobify-does-not-exist.js"
+                url: "/tests/fixtures/tag/should-not-exist.js"
             }
         });</script>
     </head>
@@ -16,6 +17,6 @@
 
         <div id="content">Content</div>
 
-        <script>parent.postMessage("error", "*");</script>
+        <script>Assert.ok(true, "Should Fail to load and get here.");</script>
     </body>
 </html>

@@ -1,13 +1,14 @@
 <!doctype html>
 <html>
     <head>
+        <script src="/tests/utils/proxyassert.js"></script>
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
         <script>Mobify.init({
             getMode: function() { return 'desktop' },
             mobile: {
                 capture: true,
-                url: "/tests/fixtures/tag/mobify.js"
+                url: "/tests/fixtures/tag/mobile.js"
             },
             desktop: {
                 capture: false,
@@ -19,5 +20,7 @@
         <h1>Mobify tag Tests</h1>
 
         <div id="content">Content</div>
+
+        <script>Assert.ok(true, "Capturing should not run.");</script>
     </body>
 </html>

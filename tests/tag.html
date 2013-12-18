@@ -2,7 +2,7 @@
 <html class="foo">
 <head>
   <meta charset="utf-8">
-  <title>Mobify.js Anchor Link Tests</title>
+  <title>Mobify.js Tag Tests</title>
   <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
   <script src="/tests/resources/qunit-1.10.0.js"></script>
   <script src="/tests/resources/jquery-1.7.1.js"></script>
@@ -25,6 +25,33 @@
 
     var skip = function() {
         return false;
+    };
+
+    var assertHandler = function(event) {
+        if (typeof event.data !== "object" || event.data.assert !== true) {
+            return;
+        }
+
+        var method = event.data.method;
+        var args = event.data.args;
+
+        QUnit[method].apply(QUnit, args);
+    };
+
+    var currentWin, currentDoc;
+
+    var assertCapturing = function() {
+        equal(currentDoc.getElementsByTagName("plaintext").length, 1, "Plaintext element should exist");
+        equal(currentDoc.getElementById("content"), null, "#content should not exist");
+    };
+
+    var assertNotCapturing = function() {
+        equal(currentDoc.getElementsByTagName("plaintext").length, 0, "Plaintext element should not exist");
+        notEqual(currentDoc.getElementById("content"), null, "#content should exist");
+    };
+
+    var assertLoaded = function(path) {
+        equal(currentWin.mobifyjsFileName, path, "Should load expected file.")
     }
 
     var testSetup = function(src, ready, beforeLoad) {
@@ -53,8 +80,8 @@
         window.addEventListener("message", function onMessage(event) {
             if (event.source != el.contentWindow) return;
             window.removeEventListener("message", onMessage, false);
-            var win = el.contentWindow;
-            var doc = el.contentWindow.document;
+            var win = currentWin = el.contentWindow;
+            var doc = currentDoc = el.contentWindow.document;
 
             setTimeout(function() {
                 if (skip()) {
@@ -67,6 +94,8 @@
             }, 100);
         }, false);
 
+        window.addEventListener("message", assertHandler, false);
+
         if (beforeLoad) { beforeLoad(el) };
 
         $("#qunit-fixture").append($iframe);
@@ -74,8 +103,11 @@
         console.log("Attached");
     };
 
+
+    module("Mobify Properties");
+
     asyncTest("Mobify.points exists", function() {
-        testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.points.length, 1, "Mobify.points is an array");
             equal(typeof win.Mobify.points[0], "number", "Mobify.point[0] is a number");
 
@@ -84,7 +116,7 @@
     });
 
     asyncTest("Mobify.tagVersion exists", function() {
-        testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             deepEqual(win.Mobify.tagVersion, [7, 0], "Mobify.tagVersion exists");
 
             start();
@@ -92,31 +124,27 @@
     });
 
     asyncTest("Mobify.userAgent exists", function() {
-        testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.userAgent, window.navigator.userAgent, "Mobify.userAgent exists");
 
             start();
         });
     });
 
-    asyncTest("There is a plaintext tag", function() {
-        testSetup("/tests/fixtures/tag/tag.html", function(win, doc, event) {
-            equal(event.data, "loaded", "Expected event was received.");
-            ok(doc.getElementsByTagName("plaintext")[0], "Plaintext element exists");
-            equal(win.mobifyjsFileName, "/tests/fixtures/tag/mobify.js", "Correct file was loaded.");
-            equal(doc.getElementById("content"), null, "#content should not exist");
+    module("Capturing");
+
+    asyncTest("Always-Run: Capturing Fires", function() {
+        testSetup("/tests/fixtures/tag/always-run.html", function(win, doc, event) {
+            assertCapturing();
+            assertLoaded("/tests/fixtures/tag/mobile.js");
 
             start();
         });
     });
 
-
-
     asyncTest("Unmobifies Correctly", function() {
         testSetup("/tests/fixtures/tag/failed-load-tag.html", function(win, doc, event) {
-            equal(event.data, "error", "Expected error was received.")
-            equal(doc.getElementsByTagName("plaintext").length, 0, "Plaintext element does not exist");
-            notEqual(doc.getElementById("content"), null, "#content should exist");
+            assertNotCapturing();
 
             start();
         });
@@ -124,21 +152,17 @@
 
     asyncTest("Loads Desktop Correctly", function() {
         testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
-            equal(event.data, "desktop", "Expected desktop event was received.")
-            equal(doc.getElementsByTagName("plaintext").length, 0, "Plaintext element does not exist");
-            equal(win.mobifyjsFileName, "/tests/fixtures/tag/desktop.js", "Correct file was loaded.");
-            notEqual(doc.getElementById("content"), null, "#content should exist");
+            assertNotCapturing();
+            assertLoaded("/tests/fixtures/tag/desktop.js");
 
             start();
         });
     });
 
-    asyncTest("Loads mobile correctly when forced via Mode cookie", function() {
+    asyncTest("Loads mobile correctly when forced via `mode` cookie", function() {
         testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
-            equal(event.data, "loaded", "Expected loaded event was received.")
-            equal(doc.getElementsByTagName("plaintext").length, 1, "Plaintext element does exist");
-            equal(win.mobifyjsFileName, "/tests/fixtures/tag/mobify.js", "Correct file was loaded.");
-            equal(doc.getElementById("content"), null, "#content should not exist");
+            assertCapturing();
+            assertLoaded("/tests/fixtures/tag/mobile.js");
 
             start();
         }, function (el) {
@@ -148,34 +172,28 @@
 
     asyncTest("Loads mobile correctly via correct userAgent", function() {
         testSetup("/tests/fixtures/tag/useragent.html", function(win, doc, event) {
-            equal(event.data, "loaded", "Expected loaded event was received.")
-            equal(doc.getElementsByTagName("plaintext").length, 1, "Plaintext element does exist");
-            equal(win.mobifyjsFileName, "/tests/fixtures/tag/mobify.js", "Correct file was loaded.");
-            equal(doc.getElementById("content"), null, "#content should not exist");
+            assertCapturing();
+            assertLoaded("/tests/fixtures/tag/mobile.js");
 
             start();
-        }, function (el) {
-            document.cookie = "mobify-mode=mobile; path=/";
         });
     });
 
     asyncTest("Fires preload callback", function() {
         testSetup("/tests/fixtures/tag/preload.html", function(win, doc, event) {
-            equal(win.preloadFired, true, "Preload fired.");
+            // All assertions are fired in the iframe.
+            expect(2);
 
             start();
-        }, function (el) {
-            document.cookie = "mobify-mode=mobile; path=/";
         });
     });
 
     asyncTest("Fires postload callback", function() {
         testSetup("/tests/fixtures/tag/postload.html", function(win, doc, event) {
-            equal(win.postloadFired, true, "Postload fired.");
+            // All assertions are fired in the iframe.
+            expect(2);
 
             start();
-        }, function (el) {
-            document.cookie = "mobify-mode=mobile; path=/";
         });
     });
 
@@ -207,11 +225,10 @@
 
     asyncTest("Loads preview correctly", function() {
         testSetup("/tests/fixtures/tag/preview.html#mobify-preview", function(win, doc, event) {
-            equal(win.Mobify.isPreview(), true, "Preview condition not detected.");
+            equal(win.Mobify.isPreview(), true, "Preview condition detected.");
 
-            equal(event.data, "preview", "Expected preview event was received.")
-            equal(doc.getElementsByTagName("plaintext").length, 1, "Plaintext element does exist");
-            equal(doc.getElementById("content"), null, "#content should not exist");
+            assertCapturing();
+            assertLoaded("/tests/fixtures/tag/preview.js");
 
             start();
         });

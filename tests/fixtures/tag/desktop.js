@@ -1,3 +1,4 @@
+window.mobifyJSLoaded = true;
 window.mobifyjsFileName = "/tests/fixtures/tag/desktop.js";
 
-parent.postMessage("desktop", "*");
+Assert.ok(true, "desktop.js was loaded.");
