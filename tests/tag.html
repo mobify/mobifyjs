@@ -78,7 +78,7 @@
             '; path=/';
 
         window.addEventListener("message", function onMessage(event) {
-            if (event.source != el.contentWindow) return;
+            if (event.source != el.contentWindow || event.data !== "ready") return;
             window.removeEventListener("message", onMessage, false);
             var win = currentWin = el.contentWindow;
             var doc = currentDoc = el.contentWindow.document;

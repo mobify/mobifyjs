@@ -4,8 +4,10 @@
         <script src="/tests/utils/proxyassert.js"></script>
 
         <script>
+            Assert.holdReady();
             window.postloadCallback = function() {
                 Assert.equal(window.mobifyJSLoaded, true, "postloadCallback should be fired after mobile.js has loaded.");
+                Assert.releaseReady();
             };
         </script>
 
