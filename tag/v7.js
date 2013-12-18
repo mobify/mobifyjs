@@ -48,6 +48,12 @@ Mobify.getCookie = function(name) {
     }
 };
 
+Mobify.getSessionStorage = function(name) {
+    if (window.sessionStorage) {
+        return window.sessionStorage[name];
+    }
+}
+
 Mobify.isDisabled = function() {
     return /mobify=0/.test(document.cookie);
 };
@@ -89,7 +95,7 @@ Mobify.init = function(options) {
         return;
     }
 
-    var mode = self.getCookie("mobify-mode") || options.getMode(Mobify);
+    var mode = self.getSessionStorage("mobify-mode") || self.getCookie("mobify-mode") || options.getMode(Mobify);
     var opts = options[mode];
 
     self.debug("Mode is: " + mode);

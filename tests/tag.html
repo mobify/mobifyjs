@@ -84,6 +84,8 @@
             '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
             '; path=/';
 
+        delete window.sessionStorage['mobify-mode'];
+
         window.addEventListener("message", function onMessage(event) {
             if (event.source != el.contentWindow || event.data !== "ready") return;
             window.removeEventListener("message", onMessage, false);
@@ -174,6 +176,17 @@
             start();
         }, function (el) {
             document.cookie = "mobify-mode=mobile; path=/";
+        });
+    });
+
+    asyncTest("Loads mobile correctly when forced via `mode` sessionStorage", function() {
+        testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
+            assertCapturing();
+            assertLoaded("/tests/fixtures/tag/mobile.js");
+
+            start();
+        }, function (el) {
+            window.sessionStorage['mobify-mode'] = "mobile";
         });
     });
 
