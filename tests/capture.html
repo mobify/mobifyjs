@@ -234,6 +234,45 @@
             $("#qunit-fixture").append(iframe);
         });
 
+        asyncTest("createDocumentFragmentsStrings - body in comment", function(){
+            var iframe = $("<iframe>", {id: "plaintext-example"});
+            iframe.attr("src", "/tests/fixtures/plaintext-above-head-example.html")
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
+                var capture = Capture.createDocumentFragmentsStrings(doc);
+                // We're not testing the all function here, let's remove it
+                delete capture.all;
+                deepEqual(capture, expectedCapture)
+                start();
+            });
+            $("#qunit-fixture").append(iframe);
+        });
+
+        asyncTest("createDocumentFragmentsStrings - malformed markup", function(){
+            var iframe = $("<iframe>", {id: "plaintext-example"});
+            iframe.attr("src", "/tests/fixtures/plaintext-malformed-markup-example.html")
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
+                var expectedCaptureClone = Utils.clone(expectedCapture);
+                expectedCaptureClone.bodyOpenTag = "<body foo=\"bar>\" bar='>baz'>";
+                expectedCaptureClone.headOpenTag = "<head foo=\"bar>\" bar='>baz'>";
+                var capture = Capture.createDocumentFragmentsStrings(doc);
+                // We're not testing the all function here, let's remove it
+                delete capture.all;
+                deepEqual(capture, expectedCaptureClone)
+                start();
+            });
+            $("#qunit-fixture").append(iframe);
+        });
+
         asyncTest("createDocumentFragmentsStrings - no end head tag", function(){
             var iframe = $("<iframe>", {id: "plaintext-example"});
             iframe.attr("src", "/tests/fixtures/plaintext-no-end-head-example.html")
