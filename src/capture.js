@@ -292,10 +292,9 @@ Capture.setElementContentFromString = function(el, htmlString) {
         // Grab the contents of head
         captured.headContent = rawHTML.slice(0, match.index);
         // Parse the head content
-        // (using match instead of exec because even though we are creating
-        // RegExp objects using /foo/ notation, Android 2.3 seems to cache
-        // that object. Using match allows us to not worry about that bug)
-        var parsedHeadTag = captured.headContent.match(/^\s*(<head[^>]*>)([\s\S]*)/i);
+        // (using a "new RegExp" here because in Android 2.3 when you use a global
+        // match using a RegExp literal, the state is incorrectly cached).
+        var parsedHeadTag = (new RegExp('^\\s*(<head[^>]*>)([\\s\\S]*)', 'gi')).exec(captured.headContent);
         if (parsedHeadTag) {
             // if headContent contains an open head, then we know the tag was placed
             // outside of the body
