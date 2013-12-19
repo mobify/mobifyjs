@@ -30,7 +30,7 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
             capture.renderCapturedDoc();
         });
     } else {
-        FF.patchAll();
+
     }
 
 }, undefined, true);
