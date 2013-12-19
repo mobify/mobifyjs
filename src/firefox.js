@@ -95,7 +95,7 @@ define(["mobifyjs/utils"], function(Utils){
         }
 
         // We have to get the event through bubbling, otherwise
-        // events cancelled by a the return value of an onclick
+        // events cancelled by the return value of an onclick
         // handler are not correctly handled.
         body.addEventListener('click', _handler, false);
     };
