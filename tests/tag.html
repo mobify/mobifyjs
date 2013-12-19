@@ -227,16 +227,6 @@
         });
     });
 
-    asyncTest("isPreview detects `mobify-preview` in sessionStorage.", function() {
-        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
-            equal(win.Mobify.isPreview(), true, "Preview condition detected.");
-
-            start();
-        }, function (el) {
-            window.sessionStorage['mobify-preview'] = "true";
-        });
-    }); 
-
     asyncTest("isPreview does not trigger without cookie or hash.", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.isPreview(), false, "Preview condition not detected.");
