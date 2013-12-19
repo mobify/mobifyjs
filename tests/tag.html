@@ -244,7 +244,36 @@
 
             start();
         });
-    });    
+    });
+
+    asyncTest("Skips preview if skipPreview is set.", function() {
+        testSetup("/tests/fixtures/tag/skip-preview.html#mobify-preview", function(win, doc, event) {
+            assertCapturing();
+            assertLoaded("/tests/fixtures/tag/mobile.js");
+
+            start();
+        });
+    });
+
+    module("Time Tracking");
+    asyncTest("Time tracking happens when capturing.", function() {
+        testSetup("/tests/fixtures/tag/always-run.html", function(win, doc, event) {
+            ok(win.Mobify.DOMContentLoadedTime > 0, "DOMContentLoaded Time is recorded.");
+            ok(win.Mobify.LoadTime > 0, "Load Time is recorded.");
+
+            start();
+        });
+    });
+
+    asyncTest("Time tracking happens when not capturing.", function() {
+        testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
+            ok(win.Mobify.DOMContentLoadedTime > 0, "DOMContentLoaded Time is recorded.");
+            ok(win.Mobify.LoadTime > 0, "Load Time is recorded.");
+
+            start();
+        });
+    });
+
 
 </script>
 </body>

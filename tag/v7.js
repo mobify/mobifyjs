@@ -14,7 +14,6 @@ Mobify.userAgent = window.navigator.userAgent;
 // Mobify.previewUrl is preview API endpoint.
 Mobify.previewUrl = "https://preview.mobify.com/v7/";
 
-
 // Mobify.debug is a wrapper for console.log
 // Ideally, this will be compiled out during a build step.
 Mobify.debug = function(line) {
@@ -97,11 +96,26 @@ Mobify.disable = function() {
     window.location = window.location.href;
 };
 
+// Mobify.collectTiming collects DOMContentLoaded time,
+// and Load time.
+Mobify.collectTiming = function() {
+    if (window.addEventListener) {
+        window.addEventListener('DOMContentLoaded', function() {
+            Mobify.DOMContentLoadedTime = Date.now();
+        }, false);
+        window.addEventListener('load', function() {
+            Mobify.LoadTime = Date.now();
+        }, false);
+    }
+};
 
 // Mobify.init initializes the tag with the `options`.
 //
 // Format of `options` object:
 // Mobify.init({
+//     // Whether we should allow load through preview.
+//     skipPreview: true 
+
 //     getMode: function(Mobify) {
 //         // Return mode based on device or other settings.
 //         // `mode` is a key in to the options object
@@ -122,7 +136,7 @@ Mobify.disable = function() {
 
 //         // Postload Callback (optional)
 //         // Called after the script's onload handler fires.
-//         postload: function() {}
+//         postload: function() {};
 //     }
 // });
 Mobify.init = function(options) {
@@ -136,7 +150,9 @@ Mobify.init = function(options) {
         return;
     }
 
-    if (self.isPreview()) {
+    self.collectTiming();
+
+    if (!options.skipPreview && self.isPreview()) {
         self.startCapture(function(){self.loadPreview()});
         return;
     }
