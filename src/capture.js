@@ -1,4 +1,4 @@
-define(["mobifyjs/utils", "mobifyjs/firefox"], function(Utils, Firefox) {
+define(["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
 
 // ##
 // # Static Variables/Functions
@@ -485,11 +485,6 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
         return;
     }
 
-    // inject post capture callback
-    var postCaptureScript = destDoc.createElement('script');
-    postCaptureScript.innerHTML = 'Mobify.Capture.postCapture();';
-    head.insertBefore(postCaptureScript, head.firstChild);
-
     // If main script exists, re-inject it.
     var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {
@@ -529,15 +524,14 @@ Capture.prototype.renderCapturedDoc = function(options) {
 };
 
 /**
- * Post Capture Callback
+ * patchAnchorLinks
+ *
+ * Anchor Links `<a href="#foo">Link</a>` are broken on Firefox.
+ * We provide a function that patches, but it does break
+ * actually changing the URL to show "#foo".
  * 
- * Called after the document is written, can be used to patch
- * browser issues.
  */
-Capture.postCapture = function() {
-    // Patch Firefox specific bugs.
-    Firefox.patchAll();
-};
+Capture.patchAnchorLinks = patchAnchorLinks;
 
 return Capture;
 

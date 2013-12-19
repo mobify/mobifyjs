@@ -9,6 +9,7 @@
     - [`render(htmlString)`]({{ site.baseurl }}/v2/docs/capturing/#renderhtmlstring)
     - [`renderCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#rendercaptureddoc)
     - [`restore()`]({{ site.baseurl }}/v2/docs/capturing/#restore)
+    - [`patchAnchorLinks()`]({{ site.baseurl }}/v2/docs/capturing/#patchanchorlinks)
     - [Browser Support]({{ site.baseurl }}/v2/docs/capturing/#browser-support)
   - [Image API]({{ site.baseurl }}/v2/docs/image-resizer)
     - [`resize`]({{ site.baseurl }}/v2/docs/image-resizer/#resizeimagesresizeimgelements-options)

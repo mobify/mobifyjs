@@ -1,15 +1,15 @@
-// Fixes specific to Firefox.
+// Fixes anchor links (on FF)
 
 define(["mobifyjs/utils"], function(Utils){
     var exports = {};
 
-    exports.isFirefox = function(ua) {
+    var isFirefox = function(ua) {
         ua = window.navigator.userAgent;
 
         return /firefox|fennec/i.test(ua)
-    }
+    };
 
-    exports._patchAnchorLinks = function(doc) {
+    var _patchAnchorLinks = function(doc) {
         // Anchor links in FF, after we do `document.open` cause a page
         // navigation (a refresh) instead of just scrolling the
         // element in to view.
@@ -92,7 +92,7 @@ define(["mobifyjs/utils"], function(Utils){
             if (target) {
                 target.scrollIntoView && target.scrollIntoView();
             }
-        }
+        };
 
         // We have to get the event through bubbling, otherwise
         // events cancelled by the return value of an onclick
@@ -100,16 +100,13 @@ define(["mobifyjs/utils"], function(Utils){
         body.addEventListener('click', _handler, false);
     };
 
-    exports.patchAnchorLinks = function() {
-        Utils.waitForReady(document, this._patchAnchorLinks);
-    }
-
-    exports.patchAll = function() {
-        if (!exports.isFirefox()) {
+    var patchAnchorLinks = function() {
+        if (!isFirefox()) {
             return
         }
-        this.patchAnchorLinks();
-    };
 
-    return exports;
+        Utils.waitForReady(document, _patchAnchorLinks);
+    }
+
+    return patchAnchorLinks;
 });

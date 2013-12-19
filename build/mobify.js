@@ -670,18 +670,18 @@ Utils.waitForReady = function(doc, callback) {
 return Utils;
 
 });
-// Fixes specific to Firefox.
+// Fixes anchor links (on FF)
 
-define('mobifyjs/firefox',["mobifyjs/utils"], function(Utils){
+define('mobifyjs/patchAnchorLinks',["mobifyjs/utils"], function(Utils){
     var exports = {};
 
-    exports.isFirefox = function(ua) {
+    var isFirefox = function(ua) {
         ua = window.navigator.userAgent;
 
         return /firefox|fennec/i.test(ua)
-    }
+    };
 
-    exports._patchAnchorLinks = function(doc) {
+    var _patchAnchorLinks = function(doc) {
         // Anchor links in FF, after we do `document.open` cause a page
         // navigation (a refresh) instead of just scrolling the
         // element in to view.
@@ -764,29 +764,26 @@ define('mobifyjs/firefox',["mobifyjs/utils"], function(Utils){
             if (target) {
                 target.scrollIntoView && target.scrollIntoView();
             }
-        }
+        };
 
         // We have to get the event through bubbling, otherwise
-        // events cancelled by a the return value of an onclick
+        // events cancelled by the return value of an onclick
         // handler are not correctly handled.
         body.addEventListener('click', _handler, false);
     };
 
-    exports.patchAnchorLinks = function() {
-        Utils.waitForReady(document, this._patchAnchorLinks);
-    }
-
-    exports.patchAll = function() {
-        if (!exports.isFirefox()) {
+    var patchAnchorLinks = function() {
+        if (!isFirefox()) {
             return
         }
-        this.patchAnchorLinks();
-    };
 
-    return exports;
+        Utils.waitForReady(document, _patchAnchorLinks);
+    }
+
+    return patchAnchorLinks;
 });
 
-define('mobifyjs/capture',["mobifyjs/utils", "mobifyjs/firefox"], function(Utils, Firefox) {
+define('mobifyjs/capture',["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
 
 // ##
 // # Static Variables/Functions
@@ -1317,15 +1314,14 @@ Capture.prototype.renderCapturedDoc = function(options) {
 };
 
 /**
- * Post Capture Callback
+ * patchAnchorLinks
+ *
+ * Anchor Links `<a href="#foo">Link</a>` are broken on Firefox.
+ * We provide a function that patches, but it does break
+ * actually changing the URL to show "#foo".
  * 
- * Called after the document is written, can be used to patch
- * browser issues.
  */
-Capture.postCapture = function() {
-    // Patch Firefox specific bugs.
-    Firefox.patchAll();
-};
+Capture.patchAnchorLinks = patchAnchorLinks;
 
 return Capture;
 
