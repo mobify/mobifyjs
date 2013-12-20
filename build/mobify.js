@@ -1270,11 +1270,6 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
         return;
     }
 
-    // inject post capture callback
-    var postCaptureScript = destDoc.createElement('script');
-    postCaptureScript.innerHTML = 'Mobify.Capture.postCapture();';
-    head.insertBefore(postCaptureScript, head.firstChild);
-
     // If main script exists, re-inject it.
     var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {

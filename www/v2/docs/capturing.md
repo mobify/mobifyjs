@@ -156,7 +156,7 @@ __Note: This method is async__
 ## `patchAnchorLinks()`
 
 On Firefox, links to anchors eg (`<a href="#foo">`) cause the browser 
-to navigate, because Firefox considers the re-written
+to navigate when using Capturing, because Firefox considers the re-written
 document to be a different location.
 
 If you have click handlers on such `a` tags, which do not call
@@ -172,6 +172,9 @@ logic based on `onhashchange` or based on the `hash` at load time.
 
 It should also be noted, that `history.pushState()` is broken on Firefox,
 when used with capturing and no fix exists currently.
+
+This patch is not executed by default - if you want to use it, follow the
+example below:
 
 **Usage/Example:**
 
