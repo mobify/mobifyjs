@@ -14,8 +14,12 @@ http.globalAgent.maxSockets = 100;
 /**
  * Inlines the V7 Tag on test fixtures.
  */
-var inlineTag = function(req, res) {
-    var page = fs.readFileSync(__dirname + req.path, 'utf8');
+var inlineTag = function(req, res, next) {
+    try {
+        var page = fs.readFileSync(__dirname + req.path, 'utf8');
+    } catch (e) {
+        return next();
+    }
     var tag = fs.readFileSync(__dirname + "/tag/v7.js", 'utf8');
 
     page = page.replace("<script src=\"/tag/v7.js\"></script>", "<script>" + tag + "</script>");
