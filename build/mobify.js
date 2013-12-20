@@ -594,7 +594,7 @@ Utils.matchMedia = function(doc) {
 Utils.domIsReady = function(doc) {
     var doc = doc || document;
     return doc.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading";
-}
+};
 
 Utils.getPhysicalScreenSize = function(devicePixelRatio) {
 
@@ -634,12 +634,156 @@ Utils.getPhysicalScreenSize = function(devicePixelRatio) {
     }
 
     return multiplyByPixelRatio(sizes);
-}
+};
+
+Utils.waitForReady = function(doc, callback) {
+    // Waits for `doc` to be ready, and then fires callback, passing
+    // `doc`.
+
+    // We may be in "loading" state by the time we get here, meaning we are
+    // not ready to capture. Next step after "loading" is "interactive",
+    // which is a valid state to start capturing on (except IE), and thus when ready
+    // state changes once, we know we are good to start capturing.
+    // Cannot rely on using DOMContentLoaded because this event prematurely fires
+    // for some IE10s.
+    var ready = false;
+    
+    var onReady = function() {
+        if (!ready) {
+            ready = true;
+            iid && clearInterval(iid);
+            callback(doc);
+        }
+    }
+
+    // Backup with polling incase readystatechange doesn't fire
+    // (happens with some Android 2.3 browsers)
+    var iid = setInterval(function(){
+        if (Utils.domIsReady(doc)) {
+            onReady();
+        }
+    }, 100);
+
+    doc.addEventListener("readystatechange", onReady, false);
+};
 
 return Utils;
 
 });
-define('mobifyjs/capture',["mobifyjs/utils"], function(Utils) {
+// Fixes anchor links (on FF)
+
+define('mobifyjs/patchAnchorLinks',["mobifyjs/utils"], function(Utils){
+    var exports = {};
+
+    var isFirefox = function(ua) {
+        ua = window.navigator.userAgent;
+
+        return /firefox|fennec/i.test(ua)
+    };
+
+    var _patchAnchorLinks = function(doc) {
+        // Anchor links in FF, after we do `document.open` cause a page
+        // navigation (a refresh) instead of just scrolling the
+        // element in to view.
+        //
+        // So, we prevent the default action on the element, and
+        // then manually scroll it in to view (unless some else already
+        // called prevent default).
+
+        var body = doc.body;
+
+        if (!(body && body.addEventListener)) {
+            // Body is not there or we can't bind as expected.
+            return;
+        }
+
+        var _handler = function(e) {
+            // Handler for all clicks on the page, but only triggers
+            // on proper anchor links.
+
+            var target = e.target;
+
+            var matches = function(el) {
+                return (el.nodeName == "A") && (/^#/.test(el.getAttribute('href')));
+            }
+
+            if (!matches(target)) {
+                return;
+            }
+            
+            // Newer browsers support `e.defaultPrevented`. FF 4.0 supports `e.getPreventDefault()`
+            var defaultPrevented = (typeof e.defaultPrevented !== "undefined") ?
+                e.defaultPrevented :
+                e.getPreventDefault && e.getPreventDefault();
+
+            if (!defaultPrevented) {
+                // Prevent the default action, which would cause a
+                // page refresh.
+                e.preventDefault();
+
+                // But pretend that we didn't call it.
+                e.defaultPrevented = false;
+
+                // We have to wait and see if anyone else calls
+                // `preventDefault`. If they do, we don't scroll.
+                var scroll = true;
+
+                // Override the `preventDefault` to stop  us from scrolling.
+                e.preventDefault = function() {
+                    e.defaultPrevented = true;
+                    scroll = false;
+                }
+
+                // If no other events call `preventDefault` we manually
+                // scroll to the element in question.
+                setTimeout(function() {
+                    if (scroll) {
+                        _scrollToAnchor(target.getAttribute('href'));
+                    }
+                }, 50);
+            }   
+        };
+
+
+        var _scrollToAnchor = function(anchor) {
+            // Scrolls to the element, if any, that matches
+            // the given anchor link (eg, "#foo").
+
+            var anchorRe = /^#([^\s]*)/;
+            var match = anchor.match(anchorRe);
+            var target;
+            
+            // Find the target, if any
+            if (match && match[1] === "") {
+                target = doc.body;
+            } else if (match && match[1]) {
+                var target = doc.getElementById(match[1]);
+            }
+
+            // Scroll to it, if it exists
+            if (target) {
+                target.scrollIntoView && target.scrollIntoView();
+            }
+        };
+
+        // We have to get the event through bubbling, otherwise
+        // events cancelled by the return value of an onclick
+        // handler are not correctly handled.
+        body.addEventListener('click', _handler, false);
+    };
+
+    var patchAnchorLinks = function() {
+        if (!isFirefox()) {
+            return
+        }
+
+        Utils.waitForReady(document, _patchAnchorLinks);
+    }
+
+    return patchAnchorLinks;
+});
+
+define('mobifyjs/capture',["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
 
 // ##
 // # Static Variables/Functions
@@ -1125,6 +1269,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     if (!head) {
         return;
     }
+
     // If main script exists, re-inject it.
     var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {
@@ -1135,7 +1280,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
-        head.insertBefore(mainClone, head.firstChild)
+        head.insertBefore(mainClone, head.firstChild);
     }
     // reinject mobify.js file
     var mobifyjsClone = destDoc.importNode(mobifyjsScript, false);
@@ -1162,6 +1307,16 @@ Capture.prototype.renderCapturedDoc = function(options) {
 
     this.render();
 };
+
+/**
+ * patchAnchorLinks
+ *
+ * Anchor Links `<a href="#foo">Link</a>` are broken on Firefox.
+ * We provide a function that patches, but it does break
+ * actually changing the URL to show "#foo".
+ * 
+ */
+Capture.patchAnchorLinks = patchAnchorLinks;
 
 return Capture;
 

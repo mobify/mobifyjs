@@ -1,4 +1,4 @@
-define(["mobifyjs/utils"], function(Utils) {
+define(["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
 
 // ##
 // # Static Variables/Functions
@@ -484,6 +484,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     if (!head) {
         return;
     }
+
     // If main script exists, re-inject it.
     var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {
@@ -494,7 +495,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
-        head.insertBefore(mainClone, head.firstChild)
+        head.insertBefore(mainClone, head.firstChild);
     }
     // reinject mobify.js file
     var mobifyjsClone = destDoc.importNode(mobifyjsScript, false);
@@ -521,6 +522,16 @@ Capture.prototype.renderCapturedDoc = function(options) {
 
     this.render();
 };
+
+/**
+ * patchAnchorLinks
+ *
+ * Anchor Links `<a href="#foo">Link</a>` are broken on Firefox.
+ * We provide a function that patches, but it does break
+ * actually changing the URL to show "#foo".
+ * 
+ */
+Capture.patchAnchorLinks = patchAnchorLinks;
 
 return Capture;
 

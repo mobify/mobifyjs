@@ -180,7 +180,7 @@ Utils.matchMedia = function(doc) {
 Utils.domIsReady = function(doc) {
     var doc = doc || document;
     return doc.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading";
-}
+};
 
 Utils.getPhysicalScreenSize = function(devicePixelRatio) {
 
@@ -220,7 +220,38 @@ Utils.getPhysicalScreenSize = function(devicePixelRatio) {
     }
 
     return multiplyByPixelRatio(sizes);
-}
+};
+
+Utils.waitForReady = function(doc, callback) {
+    // Waits for `doc` to be ready, and then fires callback, passing
+    // `doc`.
+
+    // We may be in "loading" state by the time we get here, meaning we are
+    // not ready to capture. Next step after "loading" is "interactive",
+    // which is a valid state to start capturing on (except IE), and thus when ready
+    // state changes once, we know we are good to start capturing.
+    // Cannot rely on using DOMContentLoaded because this event prematurely fires
+    // for some IE10s.
+    var ready = false;
+    
+    var onReady = function() {
+        if (!ready) {
+            ready = true;
+            iid && clearInterval(iid);
+            callback(doc);
+        }
+    }
+
+    // Backup with polling incase readystatechange doesn't fire
+    // (happens with some Android 2.3 browsers)
+    var iid = setInterval(function(){
+        if (Utils.domIsReady(doc)) {
+            onReady();
+        }
+    }, 100);
+
+    doc.addEventListener("readystatechange", onReady, false);
+};
 
 return Utils;
 
