@@ -594,7 +594,7 @@ Utils.matchMedia = function(doc) {
 Utils.domIsReady = function(doc) {
     var doc = doc || document;
     return doc.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading";
-}
+};
 
 Utils.getPhysicalScreenSize = function(devicePixelRatio) {
 
@@ -634,12 +634,156 @@ Utils.getPhysicalScreenSize = function(devicePixelRatio) {
     }
 
     return multiplyByPixelRatio(sizes);
-}
+};
+
+Utils.waitForReady = function(doc, callback) {
+    // Waits for `doc` to be ready, and then fires callback, passing
+    // `doc`.
+
+    // We may be in "loading" state by the time we get here, meaning we are
+    // not ready to capture. Next step after "loading" is "interactive",
+    // which is a valid state to start capturing on (except IE), and thus when ready
+    // state changes once, we know we are good to start capturing.
+    // Cannot rely on using DOMContentLoaded because this event prematurely fires
+    // for some IE10s.
+    var ready = false;
+    
+    var onReady = function() {
+        if (!ready) {
+            ready = true;
+            iid && clearInterval(iid);
+            callback(doc);
+        }
+    }
+
+    // Backup with polling incase readystatechange doesn't fire
+    // (happens with some Android 2.3 browsers)
+    var iid = setInterval(function(){
+        if (Utils.domIsReady(doc)) {
+            onReady();
+        }
+    }, 100);
+
+    doc.addEventListener("readystatechange", onReady, false);
+};
 
 return Utils;
 
 });
-define('mobifyjs/capture',["mobifyjs/utils"], function(Utils) {
+// Fixes anchor links (on FF)
+
+define('mobifyjs/patchAnchorLinks',["mobifyjs/utils"], function(Utils){
+    var exports = {};
+
+    var isFirefox = function(ua) {
+        ua = window.navigator.userAgent;
+
+        return /firefox|fennec/i.test(ua)
+    };
+
+    var _patchAnchorLinks = function(doc) {
+        // Anchor links in FF, after we do `document.open` cause a page
+        // navigation (a refresh) instead of just scrolling the
+        // element in to view.
+        //
+        // So, we prevent the default action on the element, and
+        // then manually scroll it in to view (unless some else already
+        // called prevent default).
+
+        var body = doc.body;
+
+        if (!(body && body.addEventListener)) {
+            // Body is not there or we can't bind as expected.
+            return;
+        }
+
+        var _handler = function(e) {
+            // Handler for all clicks on the page, but only triggers
+            // on proper anchor links.
+
+            var target = e.target;
+
+            var matches = function(el) {
+                return (el.nodeName == "A") && (/^#/.test(el.getAttribute('href')));
+            }
+
+            if (!matches(target)) {
+                return;
+            }
+            
+            // Newer browsers support `e.defaultPrevented`. FF 4.0 supports `e.getPreventDefault()`
+            var defaultPrevented = (typeof e.defaultPrevented !== "undefined") ?
+                e.defaultPrevented :
+                e.getPreventDefault && e.getPreventDefault();
+
+            if (!defaultPrevented) {
+                // Prevent the default action, which would cause a
+                // page refresh.
+                e.preventDefault();
+
+                // But pretend that we didn't call it.
+                e.defaultPrevented = false;
+
+                // We have to wait and see if anyone else calls
+                // `preventDefault`. If they do, we don't scroll.
+                var scroll = true;
+
+                // Override the `preventDefault` to stop  us from scrolling.
+                e.preventDefault = function() {
+                    e.defaultPrevented = true;
+                    scroll = false;
+                }
+
+                // If no other events call `preventDefault` we manually
+                // scroll to the element in question.
+                setTimeout(function() {
+                    if (scroll) {
+                        _scrollToAnchor(target.getAttribute('href'));
+                    }
+                }, 50);
+            }   
+        };
+
+
+        var _scrollToAnchor = function(anchor) {
+            // Scrolls to the element, if any, that matches
+            // the given anchor link (eg, "#foo").
+
+            var anchorRe = /^#([^\s]*)/;
+            var match = anchor.match(anchorRe);
+            var target;
+            
+            // Find the target, if any
+            if (match && match[1] === "") {
+                target = doc.body;
+            } else if (match && match[1]) {
+                var target = doc.getElementById(match[1]);
+            }
+
+            // Scroll to it, if it exists
+            if (target) {
+                target.scrollIntoView && target.scrollIntoView();
+            }
+        };
+
+        // We have to get the event through bubbling, otherwise
+        // events cancelled by the return value of an onclick
+        // handler are not correctly handled.
+        body.addEventListener('click', _handler, false);
+    };
+
+    var patchAnchorLinks = function() {
+        if (!isFirefox()) {
+            return
+        }
+
+        Utils.waitForReady(document, _patchAnchorLinks);
+    }
+
+    return patchAnchorLinks;
+});
+
+define('mobifyjs/capture',["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
 
 // ##
 // # Static Variables/Functions
@@ -714,7 +858,6 @@ function escapeQuote(s) {
  */
 function extractHTMLStringFromElement(container) {
     if (!container) return '';
-
     return [].map.call(container.childNodes, function(el) {
         var tagName = nodeName(el);
         if (tagName == '#comment') return '<!--' + el.textContent + '-->';
@@ -748,7 +891,7 @@ Capture.init = Capture.initCapture = function(callback, doc, prefix) {
 
     var createCapture = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
-        var capturedStringFragments = capture.createDocumentFragmentsStrings();
+        var capturedStringFragments = Capture.createDocumentFragmentsStrings(capture.sourceDoc);
         Utils.extend(capture, capturedStringFragments);
         var capturedDOMFragments = capture.createDocumentFragments();
         Utils.extend(capture, capturedDOMFragments);
@@ -879,11 +1022,17 @@ Capture.openTag = function(element) {
 };
 
 /**
+ * Set the content of an element with html from a string
+ */
+Capture.setElementContentFromString = function(el, htmlString) {
+    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
+};
+
+/**
  * Returns an object containing the state of the original page. Caches the object
  * in `extractedHTML` for later use.
  */
- Capture.prototype.createDocumentFragmentsStrings = function() {
-    var doc = this.sourceDoc;
+ Capture.createDocumentFragmentsStrings = function(doc) {
     var headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head');
     var bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body');
     var htmlEl = doc.getElementsByTagName('html')[0];
@@ -924,16 +1073,27 @@ Capture.openTag = function(element) {
         // <!-- comment --> . Skip it.
         if (!match[1]) continue;
 
+        // Grab the contents of head
+        captured.headContent = rawHTML.slice(0, match.index);
+        // Parse the head content
+        // (using a "new RegExp" here because in Android 2.3 when you use a global
+        // match using a RegExp literal, the state is incorrectly cached).
+        var parsedHeadTag = (new RegExp('^\\s*(<head(?:[^>\'"]*|\'[^\']*?\'|"[^"]*?")*>)([\\s\\S]*)$')).exec(captured.headContent);
+        if (parsedHeadTag) {
+            // if headContent contains an open head, then we know the tag was placed
+            // outside of the body
+            captured.headOpenTag = parsedHeadTag[1];
+            captured.headContent = parsedHeadTag[2];
+        }
+
+        // If there is a closing head tag
         if (match[1][1] == '/') {
             // Hit </head. Gather <head> innerHTML. Also, take trailing content,
             // just in case <body ... > is missing or malformed
-            captured.headContent = rawHTML.slice(0, match.index);
             captured.bodyContent = rawHTML.slice(match.index + match[1].length);
         } else {
             // Hit <body. Gather <body> innerHTML.
-
             // If we were missing a </head> before, now we can pick up everything before <body
-            captured.headContent = captured.head || rawHTML.slice(0, match.index);
             captured.bodyContent = match[0];
 
             // Find the end of <body ... >
@@ -977,13 +1137,6 @@ Capture.prototype.restore = function() {
 };
 
 /**
- * Set the content of an element with html from a string
- */
-Capture.prototype.setElementContentFromString = function(el, htmlString) {
-    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
-};
-
-/**
  * Grab fragment strings and construct DOM fragments
  * returns htmlEl, headEl, bodyEl, doc
  */
@@ -1001,21 +1154,28 @@ Capture.prototype.createDocumentFragments = function() {
 
     // Set innerHTML of new source DOM body
     bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
-    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
 
-    // On FF4, and potentially other browsers, you cannot modify <head>
+    // In Safari 4/5 and iOS 4.3, there are certain scenarios where elements
+    // in the body (ex "meta" in "noscripts" tags) get moved into the head,
+    // which can cause issues with certain websites (for example, if you have
+    // a meta refresh tag inside of a noscript tag)
+    var heads = doc.querySelectorAll('head');
+    if (heads.length > 1) {
+        while (heads[1].hasChildNodes()) {
+            heads[1].removeChild(heads[1].lastChild);
+        }
+    }
+
+    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
+    // On FF4, iOS 4.3, and potentially other browsers, you cannot modify <head>
     // using innerHTML. In that case, do a manual copy of each element
     try {
         headEl.innerHTML = disabledHeadContent;
     } catch (e) {
         var title = headEl.getElementsByTagName('title')[0];
         title && headEl.removeChild(title);
-        this.setElementContentFromString(headEl, disabledHeadContent);
+        Capture.setElementContentFromString(headEl, disabledHeadContent);
     }
-
-    // Append head and body to the html element
-    htmlEl.appendChild(headEl);
-    htmlEl.appendChild(bodyEl);
 
     return docFrags;
 };
@@ -1109,6 +1269,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     if (!head) {
         return;
     }
+
     // If main script exists, re-inject it.
     var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {
@@ -1119,7 +1280,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
-        head.insertBefore(mainClone, head.firstChild)
+        head.insertBefore(mainClone, head.firstChild);
     }
     // reinject mobify.js file
     var mobifyjsClone = destDoc.importNode(mobifyjsScript, false);
@@ -1146,6 +1307,16 @@ Capture.prototype.renderCapturedDoc = function(options) {
 
     this.render();
 };
+
+/**
+ * patchAnchorLinks
+ *
+ * Anchor Links `<a href="#foo">Link</a>` are broken on Firefox.
+ * We provide a function that patches, but it does break
+ * actually changing the URL to show "#foo".
+ * 
+ */
+Capture.patchAnchorLinks = patchAnchorLinks;
 
 return Capture;
 

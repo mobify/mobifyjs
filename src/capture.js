@@ -1,4 +1,4 @@
-define(["mobifyjs/utils"], function(Utils) {
+define(["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
 
 // ##
 // # Static Variables/Functions
@@ -73,7 +73,6 @@ function escapeQuote(s) {
  */
 function extractHTMLStringFromElement(container) {
     if (!container) return '';
-
     return [].map.call(container.childNodes, function(el) {
         var tagName = nodeName(el);
         if (tagName == '#comment') return '<!--' + el.textContent + '-->';
@@ -107,7 +106,7 @@ Capture.init = Capture.initCapture = function(callback, doc, prefix) {
 
     var createCapture = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
-        var capturedStringFragments = capture.createDocumentFragmentsStrings();
+        var capturedStringFragments = Capture.createDocumentFragmentsStrings(capture.sourceDoc);
         Utils.extend(capture, capturedStringFragments);
         var capturedDOMFragments = capture.createDocumentFragments();
         Utils.extend(capture, capturedDOMFragments);
@@ -238,11 +237,17 @@ Capture.openTag = function(element) {
 };
 
 /**
+ * Set the content of an element with html from a string
+ */
+Capture.setElementContentFromString = function(el, htmlString) {
+    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
+};
+
+/**
  * Returns an object containing the state of the original page. Caches the object
  * in `extractedHTML` for later use.
  */
- Capture.prototype.createDocumentFragmentsStrings = function() {
-    var doc = this.sourceDoc;
+ Capture.createDocumentFragmentsStrings = function(doc) {
     var headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head');
     var bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body');
     var htmlEl = doc.getElementsByTagName('html')[0];
@@ -283,16 +288,27 @@ Capture.openTag = function(element) {
         // <!-- comment --> . Skip it.
         if (!match[1]) continue;
 
+        // Grab the contents of head
+        captured.headContent = rawHTML.slice(0, match.index);
+        // Parse the head content
+        // (using a "new RegExp" here because in Android 2.3 when you use a global
+        // match using a RegExp literal, the state is incorrectly cached).
+        var parsedHeadTag = (new RegExp('^\\s*(<head(?:[^>\'"]*|\'[^\']*?\'|"[^"]*?")*>)([\\s\\S]*)$')).exec(captured.headContent);
+        if (parsedHeadTag) {
+            // if headContent contains an open head, then we know the tag was placed
+            // outside of the body
+            captured.headOpenTag = parsedHeadTag[1];
+            captured.headContent = parsedHeadTag[2];
+        }
+
+        // If there is a closing head tag
         if (match[1][1] == '/') {
             // Hit </head. Gather <head> innerHTML. Also, take trailing content,
             // just in case <body ... > is missing or malformed
-            captured.headContent = rawHTML.slice(0, match.index);
             captured.bodyContent = rawHTML.slice(match.index + match[1].length);
         } else {
             // Hit <body. Gather <body> innerHTML.
-
             // If we were missing a </head> before, now we can pick up everything before <body
-            captured.headContent = captured.head || rawHTML.slice(0, match.index);
             captured.bodyContent = match[0];
 
             // Find the end of <body ... >
@@ -336,13 +352,6 @@ Capture.prototype.restore = function() {
 };
 
 /**
- * Set the content of an element with html from a string
- */
-Capture.prototype.setElementContentFromString = function(el, htmlString) {
-    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
-};
-
-/**
  * Grab fragment strings and construct DOM fragments
  * returns htmlEl, headEl, bodyEl, doc
  */
@@ -360,21 +369,28 @@ Capture.prototype.createDocumentFragments = function() {
 
     // Set innerHTML of new source DOM body
     bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
-    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
 
-    // On FF4, and potentially other browsers, you cannot modify <head>
+    // In Safari 4/5 and iOS 4.3, there are certain scenarios where elements
+    // in the body (ex "meta" in "noscripts" tags) get moved into the head,
+    // which can cause issues with certain websites (for example, if you have
+    // a meta refresh tag inside of a noscript tag)
+    var heads = doc.querySelectorAll('head');
+    if (heads.length > 1) {
+        while (heads[1].hasChildNodes()) {
+            heads[1].removeChild(heads[1].lastChild);
+        }
+    }
+
+    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
+    // On FF4, iOS 4.3, and potentially other browsers, you cannot modify <head>
     // using innerHTML. In that case, do a manual copy of each element
     try {
         headEl.innerHTML = disabledHeadContent;
     } catch (e) {
         var title = headEl.getElementsByTagName('title')[0];
         title && headEl.removeChild(title);
-        this.setElementContentFromString(headEl, disabledHeadContent);
+        Capture.setElementContentFromString(headEl, disabledHeadContent);
     }
-
-    // Append head and body to the html element
-    htmlEl.appendChild(headEl);
-    htmlEl.appendChild(bodyEl);
 
     return docFrags;
 };
@@ -468,6 +484,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     if (!head) {
         return;
     }
+
     // If main script exists, re-inject it.
     var mainScript = Capture.getMain(sourceDoc);
     if (mainScript) {
@@ -478,7 +495,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
-        head.insertBefore(mainClone, head.firstChild)
+        head.insertBefore(mainClone, head.firstChild);
     }
     // reinject mobify.js file
     var mobifyjsClone = destDoc.importNode(mobifyjsScript, false);
@@ -505,6 +522,16 @@ Capture.prototype.renderCapturedDoc = function(options) {
 
     this.render();
 };
+
+/**
+ * patchAnchorLinks
+ *
+ * Anchor Links `<a href="#foo">Link</a>` are broken on Firefox.
+ * We provide a function that patches, but it does break
+ * actually changing the URL to show "#foo".
+ * 
+ */
+Capture.patchAnchorLinks = patchAnchorLinks;
 
 return Capture;
 

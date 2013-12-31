@@ -47,6 +47,10 @@
     QUnit.config.autostart = false;
     QUnit.config.testTimeout = 30 * 1000;
 
+    var removeNewlines = function(str) {
+        return str.replace(/(\r\n|\n|\r)/gm,'');
+    };
+
     require.config({
         "baseUrl": "../src/",
         "paths": {
@@ -151,7 +155,7 @@
             ok(!detector("Mozilla/5.0 (Windows; U; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)"), "IE 6 (not supported)");
             ok(!detector("Opera/9.80 (Windows NT 6.1; U; pl) Presto/2.6.31 Version/10.70"), "Opera 10 (not supported)");
 
-        })
+        });
 
         asyncTest("createDocumentFromSource", function(){
             var iframe = $("<iframe>", {id: "plaintext-example"});
@@ -165,11 +169,11 @@
                 Capture.init(function(capture) {
                     var capturedDoc = capture.capturedDoc;
 
-                    var expectedHtml = "<!DOCTYPE HTML><html class=\"testclass\"><head>\
+                    var expectedHtml = "<!DOCTYPE HTML><html class=\"testclass\"><head foo=\"bar\">\
 \n    \
 \n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\
 \n\
-\n</head><body>\
+\n</head><body bar=\"baz\">\
 \n    <p>Plaintext example page!</p>\
 \n    <script src=\"/path/to/script.js\"><\/script>\
 \n\
@@ -180,6 +184,110 @@
                     equal(html, expectedHtml, "Passed!");
                     start();
                 }, doc);
+            });
+            $("#qunit-fixture").append(iframe);
+        });
+
+        // Shared expected output for the next two tests
+        var expectedCapture = {
+            doctype: "<!DOCTYPE HTML>",
+            htmlOpenTag: "<html class=\"testclass\">",
+            headOpenTag: "<head foo=\"bar\">",
+            bodyOpenTag: "<body bar=\"baz\">",
+            headContent: "\n    \n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\n</head>\n",
+            bodyContent: "\n    <p>Plaintext example page!</p>\n    <script src=\"/path/to/script.js\"><\/script>\n</body>\n</html>\n\n"
+        }
+
+        asyncTest("createDocumentFragmentsStrings - below head tag", function(){
+            var iframe = $("<iframe>", {id: "plaintext-example"});
+            iframe.attr("src", "/tests/fixtures/plaintext-example.html")
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
+                var capture = Capture.createDocumentFragmentsStrings(doc);
+                // We're not testing the all function here, let's remove it
+                delete capture.all;
+                deepEqual(capture, expectedCapture)
+                start();
+            });
+            $("#qunit-fixture").append(iframe);
+        });
+
+        asyncTest("createDocumentFragmentsStrings - above head tag", function(){
+            var iframe = $("<iframe>", {id: "plaintext-example"});
+            iframe.attr("src", "/tests/fixtures/plaintext-above-head-example.html")
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
+                var capture = Capture.createDocumentFragmentsStrings(doc);
+                // We're not testing the all function here, let's remove it
+                delete capture.all;
+                deepEqual(capture, expectedCapture)
+                start();
+            });
+            $("#qunit-fixture").append(iframe);
+        });
+
+        asyncTest("createDocumentFragmentsStrings - body in comment", function(){
+            var iframe = $("<iframe>", {id: "plaintext-example"});
+            iframe.attr("src", "/tests/fixtures/plaintext-above-head-example.html")
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
+                var capture = Capture.createDocumentFragmentsStrings(doc);
+                // We're not testing the all function here, let's remove it
+                delete capture.all;
+                deepEqual(capture, expectedCapture)
+                start();
+            });
+            $("#qunit-fixture").append(iframe);
+        });
+
+        asyncTest("createDocumentFragmentsStrings - malformed markup", function(){
+            var iframe = $("<iframe>", {id: "plaintext-example"});
+            iframe.attr("src", "/tests/fixtures/plaintext-malformed-markup-example.html")
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
+                var expectedCaptureClone = Utils.clone(expectedCapture);
+                expectedCaptureClone.bodyOpenTag = "<body foo=\"bar>\" bar='>baz'>";
+                expectedCaptureClone.headOpenTag = "<head foo=\"bar>\" bar='>baz'>";
+                var capture = Capture.createDocumentFragmentsStrings(doc);
+                // We're not testing the all function here, let's remove it
+                delete capture.all;
+                deepEqual(capture, expectedCaptureClone)
+                start();
+            });
+            $("#qunit-fixture").append(iframe);
+        });
+
+        asyncTest("createDocumentFragmentsStrings - no end head tag", function(){
+            var iframe = $("<iframe>", {id: "plaintext-example"});
+            iframe.attr("src", "/tests/fixtures/plaintext-no-end-head-example.html")
+            iframe.load(function(){
+                var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+                var expectedCaptureClone = Utils.clone(expectedCapture);
+                expectedCaptureClone.headContent = "\n    \n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\n"
+                var capture = Capture.createDocumentFragmentsStrings(doc);
+                // We're not testing the all function here, let's remove it
+                delete capture.all;
+                deepEqual(capture, expectedCaptureClone)
+                start();
             });
             $("#qunit-fixture").append(iframe);
         });
@@ -324,6 +432,31 @@
 
             $("#qunit-fixture").append($iframe);
         });
+
+        /**
+         * Ensure that no meta tags get added to the document. This is a
+         * regression test to make sure meta tags within noscript tags
+         * do not get moved into the "head" in older browsers (Safari 4/5)
+         */
+        asyncTest("meta tags don't get moved into head", function() {
+            var opts = {
+                src: "/tests/fixtures/meta.html"
+            };
+            var $iframe = $("<iframe>", opts);
+            var el = $iframe[0];
+
+            window.addEventListener("message", function onMessage(event) {
+                if (event.source != el.contentWindow) return;
+                window.removeEventListener("message", onMessage, false);
+
+                // Make sure that there are no meta tags in the document at all
+                equal(el.contentDocument.getElementsByTagName('meta').length, 0, "Meta tags moved into the head are removed");
+                start();
+            }, false);
+
+            $("#qunit-fixture").append($iframe);
+        });
+
 
     });
 </script>

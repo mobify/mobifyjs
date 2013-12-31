@@ -32,7 +32,8 @@ module.exports = function(grunt) {
                   'http://localhost:3000/tests/resizeImages.html',
                   'http://localhost:3000/tests/unblockify.html',
                   'http://localhost:3000/tests/cssOptimize.html',
-                  'http://localhost:3000/tests/tag.html'
+                  'http://localhost:3000/tests/tag.html',
+                  'http://localhost:3000/tests/anchor-test.html'
                 ]
               }
             }
@@ -102,7 +103,8 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/jazzcat.html',
                         'http://localhost:3000/tests/unblockify.html',
                         'http://localhost:3000/tests/cssOptimize.html',
-                        'http://localhost:3000/tests/tag.html'
+                        'http://localhost:3000/tests/tag.html',
+                        'http://localhost:3000/tests/anchor-test.html'
                     ],
                     concurrency: 16,
                     tunneled: true,
@@ -218,6 +220,11 @@ module.exports = function(grunt) {
                         src: "build/mobify.js",
                         dest: "mobifyjs/build/mobify-<%= pkg.version %>.js",
                         rel: "build",
+                    },
+                    { // unminified dev build to latest
+                        src: "build/mobify.js",
+                        dest: "mobifyjs/build/mobify.js",
+                        rel: "build",
                     }
                 ]
             },
@@ -230,6 +237,11 @@ module.exports = function(grunt) {
                     { // minified production build
                         src: "build/mobify.min.js",
                         dest: "mobifyjs/build/mobify-<%= pkg.version %>.min.js",
+                        rel: "build",
+                    },
+                    { // minified production build to latest
+                        src: "build/mobify.min.js",
+                        dest: "mobifyjs/build/mobify.min.js",
                         rel: "build",
                     }
                 ]
