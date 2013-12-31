@@ -14,24 +14,24 @@ Mobify.init({
         match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
         var desktop = "desktop";
         if (!match) {
-            return desktop;
+            return false;
         }
         // match[1] == Firefox
         if (match[1] && +match[2] < 4) {
-            return desktop;
+            return false;
         }
         // match[3] == Opera
         if (match[3] && +match[4] < 11) {
-            return desktop;
+            return false;
         }
         // match[5] == IE
         if (match[5] && +match[6] < 6) {
-            return desktop;
+            return false;
         }
 
-        return "mobile";
+        return "all";
     },
-    mobile: {
+    all: {
         capture: true,
         url: "/mobifyjs/build/mobify.js",
         postload: function() {
