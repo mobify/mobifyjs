@@ -1,4 +1,6 @@
-var Mobify = {};
+window.Mobify = window.Mobify || {};
+
+(function(window, document, Mobify) {
 
 // Mobify.points records timing information. We record
 // time-to-first byte in the tag.
@@ -176,20 +178,27 @@ Mobify.init = function(options) {
     var postloadCallback = function() {
         if (opts.postload) {
             Mobify.debug("Post Load Callback Firing");
+            Mobify.postload = opts.postload.toString();
             opts.postload(self);
         }
     }
 
-    var load = function() {
+    var load = function(async) {
         preloadCallback();
 
-        self.loadScript({
+        var options = {
             id: "mobify-js",
             src: opts.url,
             'class': "mobify",
             onerror: function() {self.disable()},
             onload: postloadCallback
-        });
+        }
+
+        if (async) {
+            options.async = true;
+        }
+
+        self.loadScript(options);
     };
 
     if (opts.capture) {
@@ -198,3 +207,5 @@ Mobify.init = function(options) {
         load();
     }
 };
+
+})(window, document, window.Mobify);

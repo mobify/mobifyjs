@@ -1,35 +1,64 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=e,a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h="mobify",i=function(){var c=new Date;c.setTime(c.getTime()+3e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e)if("string"==typeof e){var c=b.createElement("script");c.onerror=i,g(c,"main-executable",h,mainUrl)}else a.Mobify.mainExecutable=e.toString(),e()},f.onerror=i,g(f,"mobify-js",h,d)})}(window,document,function(){a=/webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return!a||a[1]&&4>+a[2]||a[3]&&11>+a[4]||a[5]&&6>+a[6]?!1:!0},
+<script>window.Mobify=window.Mobify||{};(function(e,t,n){n.points=[Date.now()];n.tagVersion=[7,0];n.userAgent=e.navigator.userAgent;n.previewUrl="https://preview.mobify.com/v7/";n.debug=function(e){if(console.log){console.log(e)}};n.loadScript=function(e){var n=t.getElementsByTagName("script")[0];var r=t.createElement("script");for(prop in e){if(/onerror|onload|src|id/.test(prop)){r[prop]=e[prop]}else{r.setAttribute(prop,e[prop])}}n.parentNode.insertBefore(r,n)};n.startCapture=function(e){var r=this;t.write('<plaintext style="display:none">');setTimeout(function(){n.capturing=true;e.call(r)},0)};n.getCookie=function(e){var n=new RegExp("(^|; )"+e+"=([^;]*)");var r=t.cookie.match(n);if(r){return r[2]}};n.isDisabled=function(){return/mobify=0/.test(t.cookie)};n.isPreview=function(){return!!(this.getCookie("mobify-preview")||/mobify-preview/.test(e.location.hash))};n.loadPreview=function(){this.loadScript({src:this.previewUrl})};n.disable=function(){var n=new Date;n.setTime(n.getTime()+5*60*1e3);t.cookie="mobify=0"+"; expires="+n.toGMTString()+"; path=/";e.location=e.location.href};n.collectTiming=function(){if(e.addEventListener){e.addEventListener("DOMContentLoaded",function(){n.DOMContentLoadedTime=Date.now()},false);e.addEventListener("load",function(){n.LoadTime=Date.now()},false)}};n.init=function(e){var t=this;t.options=e;t.debug("Init Called");if(t.isDisabled()){t.debug("Tag is disabled.");return}t.collectTiming();if(!e.skipPreview&&t.isPreview()){t.startCapture(function(){t.loadPreview()});return}var r=t.getCookie("mobify-mode")||e.getMode(n);var i=e[r];t.debug("Mode is: "+r);if(typeof i==="undefined"){t.debug("No mode options found, acting disabled.");return}var s=function(){if(i.preload){i.preload(t)}};var o=function(){if(i.postload){n.debug("Post Load Callback Firing");n.postload=i.postload.toString();i.postload(t)}};var u=function(e){s();var n={id:"mobify-js",src:i.url,"class":"mobify",onerror:function(){t.disable()},onload:o};if(e){n.async=true}t.loadScript(n)};if(i.capture){t.startCapture(u)}else{u()}}})(window,document,window.Mobify);
 
-// path to mobify.js
-"/mobifyjs/build/mobify.js",
+Mobify.init({
+    getMode: function() {
+        // We're enabled for:
+        // - WebKit based browsers
+        // - IE 10+
+        // - FireFox 4+
+        // - Opera 11+
+        // - 3DS
+        match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
+        var desktop = "desktop";
+        if (!match) {
+            return desktop;
+        }
+        // match[1] == Firefox
+        if (match[1] && +match[2] < 4) {
+            return desktop;
+        }
+        // match[3] == Opera
+        if (match[3] && +match[4] < 11) {
+            return desktop;
+        }
+        // match[5] == IE
+        if (match[5] && +match[6] < 6) {
+            return desktop;
+        }
 
-// calls to APIs go here (or path to a main.js)
-function() {
-    var capturing = window.Mobify && window.Mobify.capturing || false;
-    if (capturing) {
-        // Grab reference to a newly created document
-        Mobify.Capture.init(function(capture){
-            // Grab reference to the captured document in progres
-            var capturedDoc = capture.capturedDoc;
-            var grumpyUrl = "/mobifyjs/examples/assets/images/grumpycat.jpg"
+        return "mobile";
+    },
+    mobile: {
+        capture: true,
+        url: "/mobifyjs/build/mobify.js",
+        postload: function() {
+            var capturing = window.Mobify && window.Mobify.capturing || false;
+            if (capturing) {
+                // Grab reference to a newly created document
+                Mobify.Capture.init(function(capture){
+                    // Grab reference to the captured document in progres
+                    var capturedDoc = capture.capturedDoc;
+                    var grumpyUrl = "/mobifyjs/examples/assets/images/grumpycat.jpg"
 
-            var imgs = capturedDoc.getElementsByTagName("img");
-            for(var i = 0; i < imgs.length; i++) {
-                var img = imgs[i];
-                var ogImage = img.getAttribute("x-src");
-                img.setAttribute("x-src", grumpyUrl);
-                img.setAttribute("old-src", ogImage);
+                    var imgs = capturedDoc.getElementsByTagName("img");
+                    for(var i = 0; i < imgs.length; i++) {
+                        var img = imgs[i];
+                        var ogImage = img.getAttribute("x-src");
+                        img.setAttribute("x-src", grumpyUrl);
+                        img.setAttribute("old-src", ogImage);
+                    }
+
+                    // Render source DOM to document
+                    capture.renderCapturedDoc();
+                });
             }
-
-            // Render source DOM to document
-            capture.renderCapturedDoc();
-        });
-    }
-    else {
-        console.log('Executing post-capture!');
+            else {
+                console.log('Executing post-capture!');
+            }
+        }
     }
 });</script>
 <!-- END MOBIFY TAG -->
