@@ -111,6 +111,34 @@ Mobify.collectTiming = function() {
     }
 };
 
+// Mobify.supportedBrowser will return whether or not we are on a device
+Mobify.supportedBrowser = function() {
+    // We're enabled for:
+    // - WebKit based browsers
+    // - IE 10+
+    // - FireFox 4+
+    // - Opera 11+
+    // - 3DS
+    match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
+    if (!match) {
+        return false;
+    }
+    // match[1] == Firefox
+    if (match[1] && +match[2] < 4) {
+        return false;
+    }
+    // match[3] == Opera
+    if (match[3] && +match[4] < 11) {
+        return false;
+    }
+    // match[5] == IE
+    if (match[5] && +match[6] < 6) {
+        return false;
+    }
+
+    return true;
+}
+
 
 
 Mobify.getOptions = function(){
@@ -120,12 +148,18 @@ Mobify.getOptions = function(){
         return;
     }
 
+    // if the "options" objects has a mode, grab the mode and return the options
+    // set for that mode
     if ('getMode' in options) {
         var mode = self.getCookie("mobify-mode") || options.getMode(Mobify);
         return options[mode];
+    // if there is no mode set, return the options object if the browser is
+    // supported, or if we're not capturing
+    } else if (options.capture === false || Mobify.supportedBrowser()){
+        return options
     }
 
-    return options;
+    return undefined;
 }
 
 // Mobify.init initializes the tag with the `options`.
@@ -211,10 +245,11 @@ Mobify.init = function(options) {
         self.loadScript(options);
     };
 
-    if (opts.capture) {
-        self.startCapture(load);
-    } else {
+    // default capture to true
+    if (opts.capture === false) {
         load();
+    } else {
+        self.startCapture(load);
     }
 };
 
