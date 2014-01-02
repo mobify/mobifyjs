@@ -139,8 +139,9 @@ Mobify.supportedBrowser = function() {
     return true;
 }
 
-
-
+// Mobify.getOptions will return the options based on what mode specified
+// in the getMode method, or if getMode is not specified, just the options
+// passed into `init`
 Mobify.getOptions = function(){
     var self = this;
     var options = self.options;
