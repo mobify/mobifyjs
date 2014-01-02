@@ -1242,7 +1242,7 @@ Capture.getPostload = function(doc) {
     var doc = doc || document;
     var postloadScript = undefined;
     // mainExecutable is used for backwards compatibility purposes
-    var postload = window.Mobify && (window.Mobify.postload || window.Mobify.mainExecutable);
+    var postload = window.Mobify && (window.Mobify.getOptions && window.Mobify.getOptions().postload.toString() || window.Mobify.mainExecutable);
     if (postload) {
         // Checks for main executable string on Mobify object and creates a script
         // out of it

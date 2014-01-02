@@ -111,6 +111,23 @@ Mobify.collectTiming = function() {
     }
 };
 
+
+
+Mobify.getOptions = function(){
+    var self = this;
+    var options = self.options;
+    if (!options) {
+        return;
+    }
+
+    if ('getMode' in options) {
+        var mode = self.getCookie("mobify-mode") || options.getMode(Mobify);
+        return options[mode];
+    }
+
+    return options;
+}
+
 // Mobify.init initializes the tag with the `options`.
 //
 // Format of `options` object:
@@ -159,10 +176,7 @@ Mobify.init = function(options) {
         return;
     }
 
-    var mode = self.getCookie("mobify-mode") || options.getMode(Mobify);
-    var opts = options[mode];
-
-    self.debug("Mode is: " + mode);
+    var opts = Mobify.getOptions();
 
     if (typeof opts === "undefined") {
         self.debug("No mode options found, acting disabled.")
@@ -173,17 +187,17 @@ Mobify.init = function(options) {
         if (opts.preload) {
             opts.preload(self);
         }
-    }
+    };
 
     var postloadCallback = function() {
         if (opts.postload) {
             Mobify.debug("Post Load Callback Firing");
-            Mobify.postload = opts.postload.toString();
+            Mobify.postload = opts.postload;
             opts.postload(self);
         }
-    }
+    };
 
-    var load = function(async) {
+    var load = function() {
         preloadCallback();
 
         var options = {
@@ -192,10 +206,6 @@ Mobify.init = function(options) {
             'class': "mobify",
             onerror: function() {self.disable()},
             onload: postloadCallback
-        }
-
-        if (async) {
-            options.async = true;
         }
 
         self.loadScript(options);
