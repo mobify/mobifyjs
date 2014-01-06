@@ -343,6 +343,16 @@
         });
     });
 
+    asyncTest("Projects 2.0", function() {
+        testSetup("/tests/fixtures/tag/project2-0.html", function(win, doc, event) {
+            expect(2);
+
+            ok(win.elseClauseHit, "Else clause was run.");
+
+            start();
+        });
+    });
+
 
 </script>
 </body>

@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Title of Page</title>
+        <script src="/tests/utils/proxyassert.js"></script>
+        <!-- Mobify Tag External -->
+        <script src="/tag/v7.js"></script>
+        <script>
+        Mobify.Tag.init({
+            getMode: function() { return 'mobile' },
+            mobile: {
+                capture: true,
+                url: "/tests/fixtures/tag/project2-0/mobify.js"
+            }
+        });</script>
+    </head>
+    <body>
+        <h1>Mobify tag Tests</h1>
+
+        <div id="content">Content</div>
+
+        <script class="assert">Assert.ok(false, "This assertion should be changed to true."); Assert.ready();</script>
+    </body>
+</html>
