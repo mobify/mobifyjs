@@ -126,7 +126,7 @@
 
     asyncTest("Mobify.tagVersion exists", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
-            deepEqual(win.Mobify.tagVersion, [7, 0], "Mobify.tagVersion exists");
+            deepEqual(win.Mobify.Tag.version, [7, 0], "Mobify.tagVersion exists");
 
             start();
         });
@@ -134,7 +134,7 @@
 
     asyncTest("Mobify.userAgent exists", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
-            equal(win.Mobify.userAgent, window.navigator.userAgent, "Mobify.userAgent exists");
+            equal(win.Mobify.Tag.userAgent, window.navigator.userAgent, "Mobify.userAgent exists");
 
             start();
         });
@@ -211,7 +211,7 @@
 
     asyncTest("isPreview detects `mobify-preview` in hash.", function() {
         testSetup("/tests/fixtures/tag/no-run.html#mobify-preview&foo", function(win, doc, event) {
-            equal(win.Mobify.isPreview(), true, "Preview condition detected.");
+            equal(win.Mobify.Tag.isPreview(), true, "Preview condition detected.");
 
             start();
         });
@@ -219,7 +219,7 @@
 
     asyncTest("isPreview detects `mobify-preview` in cookie.", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
-            equal(win.Mobify.isPreview(), true, "Preview condition detected.");
+            equal(win.Mobify.Tag.isPreview(), true, "Preview condition detected.");
 
             start();
         }, function (el) {
@@ -229,7 +229,7 @@
 
     asyncTest("isPreview does not trigger without cookie or hash.", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
-            equal(win.Mobify.isPreview(), false, "Preview condition not detected.");
+            equal(win.Mobify.Tag.isPreview(), false, "Preview condition not detected.");
 
             start();
         });
@@ -237,7 +237,7 @@
 
     asyncTest("Loads preview correctly", function() {
         testSetup("/tests/fixtures/tag/preview.html#mobify-preview", function(win, doc, event) {
-            equal(win.Mobify.isPreview(), true, "Preview condition detected.");
+            equal(win.Mobify.Tag.isPreview(), true, "Preview condition detected.");
 
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/preview.js");
@@ -258,8 +258,8 @@
     module("Time Tracking");
     asyncTest("Time tracking happens when capturing.", function() {
         testSetup("/tests/fixtures/tag/always-run.html", function(win, doc, event) {
-            ok(win.Mobify.DOMContentLoadedTime > 0, "DOMContentLoaded Time is recorded.");
-            ok(win.Mobify.LoadTime > 0, "Load Time is recorded.");
+            ok(win.Mobify.Tag.DOMContentLoadedTime > 0, "DOMContentLoaded Time is recorded.");
+            ok(win.Mobify.Tag.LoadTime > 0, "Load Time is recorded.");
 
             start();
         });
@@ -267,8 +267,8 @@
 
     asyncTest("Time tracking happens when not capturing.", function() {
         testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
-            ok(win.Mobify.DOMContentLoadedTime > 0, "DOMContentLoaded Time is recorded.");
-            ok(win.Mobify.LoadTime > 0, "Load Time is recorded.");
+            ok(win.Mobify.Tag.DOMContentLoadedTime > 0, "DOMContentLoaded Time is recorded.");
+            ok(win.Mobify.Tag.LoadTime > 0, "Load Time is recorded.");
 
             start();
         });

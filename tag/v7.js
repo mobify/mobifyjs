@@ -1,33 +1,34 @@
 window.Mobify = window.Mobify || {};
+window.Mobify.Tag = window.Mobify.Tag || {};
 
-(function(window, document, Mobify) {
+(function(window, document, Mobify, Tag) {
 
-// Mobify.points records timing information. We record
-// time-to-first byte in the tag.
-Mobify.points = [Date.now()];
-
-// Mobify.tagVersion is the current tag version.
-Mobify.tagVersion = [7, 0];
-
-// Mobify.userAgent is the current user agent.
-// We store it here so it can easily be override for testing purporses.
-Mobify.userAgent = window.navigator.userAgent;
-
-// Mobify.previewUrl is preview API endpoint.
-Mobify.previewUrl = "https://preview.mobify.com/v7/";
-
-// Mobify.debug is a wrapper for console.log
+// Tag.debug is a wrapper for console.log
 // Ideally, this will be compiled out during a build step.
-Mobify.debug = function(line) {
+Tag.debug = function(line) {
     if (console.log) {
         console.log(line);
     }
 };
 
-// Mobify.loadScript loads a script with attributes in `options`
+// Mobify.points records timing information. We record
+// time-to-first byte in the tag.
+Mobify.points = [Date.now()];
+
+// Tag.tagVersion is the current tag version.
+Tag.version = [7, 0];
+
+// Tag.userAgent is the current user agent.
+// We store it here so it can easily be override for testing purporses.
+Tag.userAgent = window.navigator.userAgent;
+
+// previewUrl is preview API endpoint.
+Tag.previewUrl = "https://preview.mobify.com/v7/";
+
+// Tag.loadScript loads a script with attributes in `options`
 // asynchronously. The script is inserted in the DOM before the Mobify
 // tag.
-Mobify.loadScript = function(options) {
+Tag.loadScript = function(options) {
     var mobifyTagScript = document.getElementsByTagName('script')[0];
 
     var script = document.createElement('script');
@@ -41,9 +42,9 @@ Mobify.loadScript = function(options) {
     mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
 };
 
-// Mobify.startCapture begins the capturing process, and at the end
+// Tag.startCapture begins the capturing process, and at the end
 // calls the callback.
-Mobify.startCapture = function(callback) {
+Tag.startCapture = function(callback) {
     var self = this;
 
     document.write('<plaintext style="display:none">');
@@ -55,8 +56,8 @@ Mobify.startCapture = function(callback) {
     }, 0);
 };
 
-// Mobify.getCookie fetches the values of a cookie by the given `name`
-Mobify.getCookie = function(name) {
+// Tag.getCookie fetches the values of a cookie by the given `name`
+Tag.getCookie = function(name) {
     var re = new RegExp("(^|; )" + name + "=([^;]*)");
     var match = document.cookie.match(re);
     if (match) {
@@ -64,28 +65,28 @@ Mobify.getCookie = function(name) {
     }
 };
 
-// Mobify.isDisabled checks if we are *completely* disabled.
+// Tag.isDisabled checks if we are *completely* disabled.
 // If so, we don't capture nor load any scripts.
-Mobify.isDisabled = function() {
+Tag.isDisabled = function() {
     return /mobify=0/.test(document.cookie);
 };
 
-// Mobify.isPreview checks to see if we need to load the preview API.
-Mobify.isPreview = function() {
+// Tag.isPreview checks to see if we need to load the preview API.
+Tag.isPreview = function() {
     return !!(this.getCookie("mobify-preview") || 
             /mobify-preview/.test(window.location.hash));
 };
 
-// Mobify.loadPreview loads the preview API.
-Mobify.loadPreview = function() {
+// Tag.loadPreview loads the preview API.
+Tag.loadPreview = function() {
     this.loadScript({
         src: this.previewUrl
     });
 };
 
 
-// Mobify.disable temporarily disables the tag for 5 minutes.
-Mobify.disable = function() {
+// Tag.disable temporarily disables the tag for 5 minutes.
+Tag.disable = function() {
     var now = new Date();
     // Set now to 5 minutes ahead
     now.setTime(now.getTime() + 5*60*1000);
@@ -98,28 +99,30 @@ Mobify.disable = function() {
     window.location = window.location.href;
 };
 
-// Mobify.collectTiming collects DOMContentLoaded time,
+// Tag.collectTiming collects DOMContentLoaded time,
 // and Load time.
-Mobify.collectTiming = function() {
+Tag.collectTiming = function() {
     if (window.addEventListener) {
         window.addEventListener('DOMContentLoaded', function() {
-            Mobify.DOMContentLoadedTime = Date.now();
+            Tag.DOMContentLoadedTime = Date.now();
         }, false);
         window.addEventListener('load', function() {
-            Mobify.LoadTime = Date.now();
+            Tag.LoadTime = Date.now();
         }, false);
     }
 };
 
-// Mobify.supportedBrowser will return whether or not we are on a device
-Mobify.supportedBrowser = function() {
+// Tag.supportedBrowser will return whether or not we are on a device
+Tag.supportedBrowser = function() {
+    var self = this;
+
     // We're enabled for:
     // - WebKit based browsers
     // - IE 10+
     // - FireFox 4+
     // - Opera 11+
     // - 3DS
-    match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(navigator.userAgent);
+    match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(this.userAgent);
     if (!match) {
         return false;
     }
@@ -141,7 +144,7 @@ Mobify.supportedBrowser = function() {
 
 
 
-Mobify.getOptions = function(){
+Tag.getOptions = function(){
     var self = this;
     var options = self.options;
     if (!options) {
@@ -155,17 +158,17 @@ Mobify.getOptions = function(){
         return options[mode];
     // if there is no mode set, return the options object if the browser is
     // supported, or if we're not capturing
-    } else if (options.capture === false || Mobify.supportedBrowser()){
+    } else if (options.capture === false || self.supportedBrowser()){
         return options
     }
 
     return undefined;
 }
 
-// Mobify.init initializes the tag with the `options`.
+// Mobify.Tag.init initializes the tag with the `options`.
 //
 // Format of `options` object:
-// Mobify.init({
+// Mobify.Tag.init({
 //     // Whether we should allow load through preview.
 //     skipPreview: true 
 
@@ -192,7 +195,7 @@ Mobify.getOptions = function(){
 //         postload: function() {};
 //     }
 // });
-Mobify.init = function(options) {
+Tag.init = function(options) {
     var self = this;
     self.options = options;
 
@@ -210,10 +213,10 @@ Mobify.init = function(options) {
         return;
     }
 
-    var opts = Mobify.getOptions();
+    var opts = self.getOptions();
 
     if (typeof opts === "undefined") {
-        self.debug("No mode options found, acting disabled.")
+        self.debug("No mode options found, acting disabled.");
         return;
     }
 
@@ -225,8 +228,7 @@ Mobify.init = function(options) {
 
     var postloadCallback = function() {
         if (opts.postload) {
-            Mobify.debug("Post Load Callback Firing");
-            Mobify.postload = opts.postload;
+            self.debug("Post Load Callback Firing");
             opts.postload(self);
         }
     };
@@ -253,4 +255,4 @@ Mobify.init = function(options) {
     }
 };
 
-})(window, document, window.Mobify);
+})(window, document, window.Mobify, window.Mobify.Tag);
