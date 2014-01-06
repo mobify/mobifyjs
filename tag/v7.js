@@ -248,7 +248,7 @@ Tag.init = function(options) {
         self.loadScript(options);
     };
 
-    // default capture to true
+    // Default capture to true
     if (opts.capture === false) {
         load();
     } else {

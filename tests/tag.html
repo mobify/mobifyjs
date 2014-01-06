@@ -188,6 +188,15 @@
         });
     });
 
+    asyncTest("Single-mode loads", function() {
+        testSetup("/tests/fixtures/tag/single-mode.html", function(win, doc, event) {
+            assertCapturing();
+            assertLoaded("/tests/fixtures/tag/mobile.js");
+
+            start();
+        });
+    });
+
     asyncTest("Fires preload callback", function() {
         testSetup("/tests/fixtures/tag/preload.html", function(win, doc, event) {
             // All assertions are fired in the iframe.
