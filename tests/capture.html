@@ -112,51 +112,6 @@
             ok((openTag === "<div id=\"foo-element\" foo=\"bar\">") || openTag === "<div foo=\"bar\" id=\"foo-element\">")
         });
 
-        test("detector", function(){
-            var detector = function (userAgent){
-                // We're enabled for:
-                // - WebKit based browsers
-                // - IE 10+
-                // - FireFox 4+
-                // - Opera 11+
-                // - 3DS
-                match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(userAgent);
-
-                if (!match) {
-                    return false;
-                }
-
-                // match[1] == Firefox
-                if (match[1] && +match[2] < 4) {
-                    return false;
-                }
-                // match[3] == Opera
-                if (match[3] && +match[4] < 11) {
-                    return false;
-                }
-                // match[5] == IE
-                if (match[5] && +match[6] < 6) {
-                    return false;
-                }
-
-                return true;
-            };
-
-            ok(detector("Mozilla/5.0 (X11; U; Linux i686; ru; rv:1.9.1.3) Gecko/20091020 Ubuntu/10.04 (lucid) Firefox/4.0.1"), "Firefox 4.0");
-            ok(detector("Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1"), "Firefox 16");
-            ok(detector("Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15"), "Chrome");
-            ok(detector("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)"), "IE 10");
-            ok(detector("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"), "IE 11");
-            ok(detector("Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02"), "Opera 12");
-            ok(detector("Opera/9.80 (X11; Linux x86_64; U; Ubuntu/10.10 (maverick); pl) Presto/2.7.62 Version/11.01"), "Opera 11");
-            ok(detector("Mozilla/5.0 (Nintendo 3DS; U; ; en) Version/1.7498.US"), "Nintendo 3DS");
-            ok(!detector("Mozilla/5.0 (X11; U; Linux i686; pl-PL; rv:1.9.0.2) Gecko/20121223 Ubuntu/9.25 (jaunty) Firefox/3.8"), "Firefox 3.8 (not supported)");
-            ok(!detector("Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US))"), "IE 9 (not supported)");
-            ok(!detector("Mozilla/5.0 (Windows; U; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)"), "IE 6 (not supported)");
-            ok(!detector("Opera/9.80 (Windows NT 6.1; U; pl) Presto/2.6.31 Version/10.70"), "Opera 10 (not supported)");
-
-        });
-
         asyncTest("createDocumentFromSource", function(){
             var iframe = $("<iframe>", {id: "plaintext-example"});
             iframe.attr("src", "/tests/fixtures/plaintext-example.html")
