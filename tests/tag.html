@@ -62,8 +62,6 @@
     }
 
     var testSetup = function(src, ready, beforeLoad) {
-        console.log("Test Setup");
-
         var opts = {
             id: "tag-test.html",
             src: src
@@ -108,8 +106,6 @@
         if (beforeLoad) { beforeLoad(el) };
 
         $("#qunit-fixture").append($iframe);
-
-        console.log("Attached");
     };
 
 
