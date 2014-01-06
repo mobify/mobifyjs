@@ -451,23 +451,26 @@ Capture.getMobifyLibrary = function(doc) {
 };
 
 /**
- * Grabs the main function/src/script if it exists
+ * Grabs the postload function/src/script if it exists
  */
-Capture.getMain = function(doc) {
+Capture.getPostload = function(doc) {
     var doc = doc || document;
-    var mainScript = undefined;
-    if (window.Mobify && window.Mobify.mainExecutable) {
+    var postloadScript = undefined;
+    // mainExecutable is used for backwards compatibility purposes
+    var tagOptions = window.Mobify.Tag && window.Mobify.Tag.getOptions && window.Mobify.Tag.getOptions() || {};
+    var postload = (tagOptions.postload && tagOptions.postload.toString()) || window.Mobify.mainExecutable;
+    if (postload) {
         // Checks for main executable string on Mobify object and creates a script
         // out of it
-        mainScript = document.createElement('script');
-        mainScript.innerHTML = "var main = " + window.Mobify.mainExecutable.toString() + "; main();";
-        mainScript.id = 'main-executable';
-        mainScript.setAttribute("class", "mobify");
+        postloadScript = document.createElement('script');
+        postloadScript.innerHTML = "var postload = " + postload + "; postload();";
+        postloadScript.id = 'postload';
+        postloadScript.setAttribute("class", "mobify");
     } else {
         // Older tags used to insert the main executable by themselves. 
-        mainScript = doc.getElementById("main-executable");
+        postloadScript = doc.getElementById("main-executable");
     }
-    return mainScript;
+    return postloadScript;
 }
 
 /**
@@ -486,7 +489,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     }
 
     // If main script exists, re-inject it.
-    var mainScript = Capture.getMain(sourceDoc);
+    var mainScript = Capture.getPostload(sourceDoc);
     if (mainScript) {
         // Since you can't move nodes from one document to another,
         // we must clone it first using importNode:

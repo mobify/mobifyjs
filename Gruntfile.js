@@ -32,7 +32,8 @@ module.exports = function(grunt) {
                   'http://localhost:3000/tests/resizeImages.html',
                   'http://localhost:3000/tests/unblockify.html',
                   'http://localhost:3000/tests/cssOptimize.html',
-                  'http://localhost:3000/tests/anchor-test.html',
+                  'http://localhost:3000/tests/tag.html',
+                  'http://localhost:3000/tests/anchor-test.html'
                 ]
               }
             }
@@ -102,6 +103,7 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/jazzcat.html',
                         'http://localhost:3000/tests/unblockify.html',
                         'http://localhost:3000/tests/cssOptimize.html',
+                        'http://localhost:3000/tests/tag.html',
                         'http://localhost:3000/tests/anchor-test.html'
                     ],
                     concurrency: 16,

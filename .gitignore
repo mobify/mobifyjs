@@ -8,3 +8,4 @@ node_modules
 *.gz
 build/mobify-experimental*
 report.xml
+localConfig.json
