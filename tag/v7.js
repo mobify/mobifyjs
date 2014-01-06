@@ -113,7 +113,7 @@ Tag.collectTiming = function() {
 };
 
 // Tag.supportedBrowser will return whether or not we are on a device
-Tag.supportedBrowser = function() {
+Tag.supportedBrowser = function(ua) {
     var self = this;
 
     // We're enabled for:
@@ -122,7 +122,7 @@ Tag.supportedBrowser = function() {
     // - FireFox 4+
     // - Opera 11+
     // - 3DS
-    match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(this.userAgent);
+    match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(ua);
     if (!match) {
         return false;
     }
@@ -143,7 +143,8 @@ Tag.supportedBrowser = function() {
 }
 
 
-
+// Tag.getOptions returns the current options, accounting for the current
+// mode if necessary.
 Tag.getOptions = function(){
     var self = this;
     var options = self.options;
@@ -151,18 +152,18 @@ Tag.getOptions = function(){
         return;
     }
 
-    // if the "options" objects has a mode, grab the mode and return the options
-    // set for that mode
     if ('getMode' in options) {
+        // If the "options" objects has a mode, grab the mode and
+        // return the options set for that mode
         var mode = self.getCookie("mobify-mode") || options.getMode(Mobify);
         return options[mode];
-    // if there is no mode set, return the options object if the browser is
-    // supported, or if we're not capturing
-    } else if (options.capture === false || self.supportedBrowser()){
+    } else if (self.supportedBrowser(self.userAgent)) {
+        // If there is no mode set, return the options object if the browser is
+        // supported.
         return options
     }
 
-    return undefined;
+    return;
 }
 
 // Mobify.Tag.init initializes the tag with the `options`.

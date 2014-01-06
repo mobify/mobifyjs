@@ -274,6 +274,31 @@
         });
     });
 
+    module("Misc")
+    asyncTest("Tag.supportedBrowser", function() {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+            var ua = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)"
+            equal(win.Mobify.Tag.supportedBrowser(ua), true, "Correctly detects browser support for IE10");
+
+            var ua = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 7.1; Trident/5.0)"
+            equal(win.Mobify.Tag.supportedBrowser(ua), false, "Correctly detects browser support for IE9");
+
+            var ua = "Mozilla/45.0 (compatible; MSIE 6.0; Windows NT 5.1)"
+            equal(win.Mobify.Tag.supportedBrowser(ua), false, "Correctly detects browser support for IE6");
+
+            var ua = "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.9) Gecko/20100915 Gentoo Firefox/3.6.9"
+            equal(win.Mobify.Tag.supportedBrowser(ua), false, "Correctly detects browser support for FF3.6");
+
+            var ua = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0"
+            equal(win.Mobify.Tag.supportedBrowser(ua), true, "Correctly detects browser support for FF25");
+
+            var ua = "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7"
+            equal(win.Mobify.Tag.supportedBrowser(ua), true, "Correctly detects browser support for iPhone");
+
+            start();
+        });
+    });
+
 
 </script>
 </body>
