@@ -122,7 +122,7 @@
 
     asyncTest("Mobify.tagVersion exists", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
-            deepEqual(win.Mobify.Tag.version, [7, 0], "Mobify.tagVersion exists");
+            deepEqual(win.Mobify.tagVersion, [7, 0], "Mobify.tagVersion exists");
 
             start();
         });

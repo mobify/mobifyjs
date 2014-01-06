@@ -13,10 +13,13 @@ Tag.debug = function(line) {
 
 // Mobify.points records timing information. We record
 // time-to-first byte in the tag.
+//
+// This property is required by Mobify.js
 Mobify.points = [Date.now()];
 
 // Tag.tagVersion is the current tag version.
-Tag.version = [7, 0];
+// This property is required by Mobify.js
+Mobify.tagVersion = [7, 0];
 
 // Tag.userAgent is the current user agent.
 // We store it here so it can easily be override for testing purporses.
