@@ -121,8 +121,7 @@ Tag.supportedBrowser = function(ua) {
     // - IE 10+
     // - FireFox 4+
     // - Opera 11+
-    // - 3DS
-    match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(ua);
+    match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)/i.exec(ua);
     if (!match) {
         return false;
     }
