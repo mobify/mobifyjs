@@ -330,6 +330,20 @@
     });
 
     module("Compatiblity")
+    asyncTest("Projects 1.0", function() {
+        testSetup("/tests/fixtures/tag/project1-0.html", function(win, doc, event) {
+            var query = doc.querySelectorAll('p.extract');
+            var titleEl = query[0];
+            var pEl = query[1];
+
+            equal(titleEl.innerHTML, "Title of Page");
+            equal(pEl.innerHTML, "First Paragraph");
+
+            start();
+        });
+    });
+
+
     asyncTest("Projects 1.1", function() {
         testSetup("/tests/fixtures/tag/project1-1.html", function(win, doc, event) {
             var query = doc.querySelectorAll('p.extract');
