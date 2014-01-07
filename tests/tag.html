@@ -27,6 +27,32 @@
         return false;
     };
 
+    var supportedBrowser = function() {
+        // We're enabled for:
+        // - WebKit based browsers
+        // - IE 10+
+        // - FireFox 4+
+        // - Opera 11+
+        match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)/i.exec(window.navigator.userAgent);
+        if (!match) {
+            return false;
+        }
+        // match[1] == Firefox
+        if (match[1] && +match[2] < 4) {
+            return false;
+        }
+        // match[3] == Opera
+        if (match[3] && +match[4] < 11) {
+            return false;
+        }
+        // match[5] == IE
+        if (match[5] && +match[6] < 6) {
+            return false;
+        }
+
+        return true;
+    }
+
     var assertHandler = function(event) {
         if (!/^json:/.test(event.data)) {
             return;
@@ -331,6 +357,13 @@
 
     module("Compatiblity")
     asyncTest("Projects 1.0", function() {
+        // This test only runs on supported browsers, but not Opera or IE for 1.0.
+        if (!supportedBrowser() || /trident|opera/i.test(window.navigator.userAgent)) {
+            ok("Browser is not supported for this feature. Test skipped.");
+            return start();
+        }
+
+
         testSetup("/tests/fixtures/tag/project1-0.html", function(win, doc, event) {
             var query = doc.querySelectorAll('p.extract');
             var titleEl = query[0];
@@ -345,13 +378,19 @@
 
 
     asyncTest("Projects 1.1", function() {
+        // This test only runs on supported browsers, but not Opera or IE for 1.1.
+        if (!supportedBrowser() || /trident|opera/i.test(window.navigator.userAgent)) {
+            ok(true, "Browser is not supported for this feature. Test skipped.");
+            return start();
+        }
+
         testSetup("/tests/fixtures/tag/project1-1.html", function(win, doc, event) {
             var query = doc.querySelectorAll('p.extract');
             var titleEl = query[0];
             var pEl = query[1];
 
-            equal(titleEl.innerHTML, "Title of Page");
-            equal(pEl.innerHTML, "First Paragraph");
+            equal(titleEl.textContent || titleEl.innerHTML, "Title of Page", "Title Found");
+            equal(pEl.textContent || pEl.innerHTML, "First Paragraph", "First P Found");
 
             start();
         });

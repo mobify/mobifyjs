@@ -6,7 +6,7 @@ window.Mobify.Tag = window.Mobify.Tag || {};
 // Tag.debug is a wrapper for console.log
 // Ideally, this will be compiled out during a build step.
 Tag.debug = function(line) {
-    if (console.log) {
+    if (window.console && window.console.log) {
         console.log(line);
     }
 };
@@ -15,7 +15,7 @@ Tag.debug = function(line) {
 // time-to-first byte in the tag.
 //
 // This property is required by Mobify.js
-Mobify.points = [Date.now()];
+Mobify.points = [+(new Date())];
 
 // Tag.tagVersion is the current tag version.
 // This property is required by Mobify.js

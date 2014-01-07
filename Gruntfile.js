@@ -33,7 +33,8 @@ module.exports = function(grunt) {
                   'http://localhost:3000/tests/unblockify.html',
                   'http://localhost:3000/tests/cssOptimize.html',
                   'http://localhost:3000/tests/tag.html',
-                  'http://localhost:3000/tests/anchor-test.html'
+                  'http://localhost:3000/tests/anchor-test.html',
+                  'http://localhost:3000/tests/tag-old-browser.html'
                 ]
               }
             }
@@ -185,6 +186,58 @@ module.exports = function(grunt) {
                             browserName: 'android',
                             platform: 'Linux',
                             version: '4'
+                        }
+                    ], // https://saucelabs.com/docs/browsers
+                    onTestComplete: function(){
+                        // Called after a qunit unit is done, per page, per browser
+                        // Return true or false, passes or fails the test
+                        // Returning undefined does not alter the test result
+
+                        // For async return, call
+                        var done = this.async();
+                        setTimeout(function(){
+                            // Return to this test after 1000 milliseconds
+                            done(/*true or false changes the test result, undefined does not alter the result*/);
+                        }, 1000);
+                    }
+                }
+            },
+
+            oldbrowsers: {
+                options: {
+                    username: '<%= localConfig.saucelabs.username %>', // if not provided it'll default to ENV SAUCE_USERNAME (if applicable)
+                    key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
+                    urls: [
+                        'http://localhost:3000/tests/tag-old-browser.html',
+                    ],
+                    concurrency: 16,
+                    tunneled: true,
+                    detailedError: true,
+                    browsers: [ //https://saucelabs.com/docs/platforms
+                        {
+                            browserName: 'internet explorer',
+                            platform: 'Windows XP',
+                            version: '6'
+                        },
+                        {
+                            browserName: 'internet explorer',
+                            platform: 'Windows XP',
+                            version: '7'
+                        },
+                        {
+                            browserName: 'internet explorer',
+                            platform: 'Windows XP',
+                            version: '8'
+                        },
+                        {
+                            browserName: 'firefox',
+                            platform: 'Windows XP',
+                            version: '3.6'
+                        },
+                        {
+                            browserName: 'opera',
+                            platform: 'Windows XP',
+                            version: '11'
                         }
                     ], // https://saucelabs.com/docs/browsers
                     onTestComplete: function(){
