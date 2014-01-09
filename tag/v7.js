@@ -60,24 +60,27 @@ Tag.startCapture = function(callback) {
 };
 
 // Tag.getCookie fetches the values of a cookie by the given `name`
+// Returns `undefined` if no cookie matches.
 Tag.getCookie = function(name) {
-    var re = new RegExp("(^|; )" + name + "=([^;]*)");
+    // Internet Explorer treats empty cookies differently, it does
+    // not include the '=', so our regex has to be extra complicated.
+    var re = new RegExp("(^|; )" + name + "((=([^;]*))|()(;|$))");
     var match = document.cookie.match(re);
     if (match) {
-        return match[2];
+        return (typeof match[4] === 'string' ? match[4] : match[5]);
     }
 };
 
 // Tag.isDisabled checks if we are *completely* disabled.
 // If so, we don't capture nor load any scripts.
 Tag.isDisabled = function() {
-    return /mobify=0/.test(document.cookie);
+    return this.getCookie('mobify-path') === '';
 };
 
 // Tag.isPreview checks to see if we need to load the preview API.
 Tag.isPreview = function() {
-    return !!(this.getCookie("mobify-preview") || 
-            /mobify-preview/.test(window.location.hash));
+    return !!((this.getCookie("mobify-path") === 'true') || 
+            /mobify-path=true/.test(window.location.hash));
 };
 
 // Tag.loadPreview loads the preview API.
@@ -94,7 +97,7 @@ Tag.disable = function() {
     // Set now to 5 minutes ahead
     now.setTime(now.getTime() + 5*60*1000);
     
-    document.cookie = 'mobify=0' +
+    document.cookie = 'mobify-path=' +
             '; expires=' + now.toGMTString() +
             '; path=/';
 

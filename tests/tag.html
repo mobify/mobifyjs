@@ -96,19 +96,13 @@
         var el = $iframe[0];
 
         // Clear cookies
-        document.cookie = 'mobify=0' +
+        document.cookie = 'mobify-path=' +
             '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
             '; path=/';
 
         document.cookie = 'mobify-mode=' +
             '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
             '; path=/';
-
-        document.cookie = 'mobify-preview=' +
-            '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
-            '; path=/';
-
-        delete window.sessionStorage['mobify-preview'];
 
         window.addEventListener("message", function onMessage(event) {
             if (event.source != el.contentWindow || event.data !== "ready") return;
@@ -238,23 +232,44 @@
         });
     });
 
-    module("Preview");
+    
+    module("Disable");
+    asyncTest("isDisabled detects `mobify-path=` in cookie.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+            equal(win.Mobify.Tag.isDisabled(), true, "Disabled condition detected.");
 
-    asyncTest("isPreview detects `mobify-preview` in hash.", function() {
-        testSetup("/tests/fixtures/tag/no-run.html#mobify-preview&foo", function(win, doc, event) {
+            start();
+        }, function (el) {
+            document.cookie = "mobify-path=; path=/";
+        });
+    });
+
+    asyncTest("Capturing does not fire if disabled.", function() {
+        testSetup("/tests/fixtures/tag/disabled.html", function(win, doc, event) {
+            assertNotCapturing();
+
+            start();
+        }, function (el) {
+            document.cookie = "mobify-path=; path=/";
+        });
+    });
+
+    module("Preview");
+    asyncTest("isPreview detects `mobify-path=true` in hash.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html#mobify-path=true&foo", function(win, doc, event) {
             equal(win.Mobify.Tag.isPreview(), true, "Preview condition detected.");
 
             start();
         });
     });
 
-    asyncTest("isPreview detects `mobify-preview` in cookie.", function() {
+    asyncTest("isPreview detects `mobify-path=true` in cookie.", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.Tag.isPreview(), true, "Preview condition detected.");
 
             start();
         }, function (el) {
-            document.cookie = "mobify-preview=true; path=/";
+            document.cookie = "mobify-path=true; path=/";
         });
     });
 
@@ -267,7 +282,7 @@
     });
 
     asyncTest("Loads preview correctly", function() {
-        testSetup("/tests/fixtures/tag/preview.html#mobify-preview", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/preview.html#mobify-path=true", function(win, doc, event) {
             equal(win.Mobify.Tag.isPreview(), true, "Preview condition detected.");
 
             assertCapturing();
@@ -278,7 +293,7 @@
     });
 
     asyncTest("Skips preview if skipPreview is set.", function() {
-        testSetup("/tests/fixtures/tag/skip-preview.html#mobify-preview", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/skip-preview.html#mobify-path=true", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/mobile.js");
 
@@ -358,7 +373,7 @@
     module("Compatiblity")
     asyncTest("Projects 1.0", function() {
         // This test only runs on supported browsers, but not Opera or IE for 1.0.
-        if (!supportedBrowser() || /trident|opera/i.test(window.navigator.userAgent)) {
+        if (!supportedBrowser() || /trident|opera|firefox/i.test(window.navigator.userAgent)) {
             ok("Browser is not supported for this feature. Test skipped.");
             return start();
         }
