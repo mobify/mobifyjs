@@ -355,7 +355,10 @@ var $ = Mobify.$
                 }
             }
 
-            Mobify.combo._docWrite.call(document, '<script ' + out + '<\/script>');
+            // Uglify will strip out the escape here, so we need to split up
+            // '<' and '/' to prevent browsers (Firefox in this case) 
+            // from barfing when attempting to document.write this out.
+            Mobify.combo._docWrite.call(document, '<script ' + out + '<' + '/script>');
         }
 
         /**
