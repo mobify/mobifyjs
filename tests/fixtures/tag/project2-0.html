@@ -9,7 +9,25 @@
             getMode: function() { return 'mobile' },
             mobile: {
                 capture: true,
-                url: "/tests/fixtures/tag/project2-0/mobify.js"
+                url: "/build/mobify.js",
+                postload: function() {
+                    var capturing = window.Mobify && window.Mobify.capturing || false;
+                    if (capturing) {
+                        // Grab reference to a newly created document
+                        Mobify.Capture.initCapture(function(capture){
+                            var capturedDoc = capture.capturedDoc;
+
+                            var script = capturedDoc.querySelector('.assert');
+
+                            // Replace test failures with successess!
+                            script.innerHTML = script.innerHTML.replace("false", "true");
+
+                            capture.renderCapturedDoc();
+                        });
+                    } else {
+                        window.elseClauseHit = true;
+                    }
+                }
             }
         });</script>
 
