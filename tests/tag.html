@@ -347,7 +347,7 @@
     module("Compatiblity")
     asyncTest("Projects 1.0", function() {
         // This test only runs on supported browsers, but not Opera or IE for 1.0.
-        if (!/trident|opera|firefox/i.test(window.navigator.userAgent)) {
+        if (/trident|opera|firefox/i.test(window.navigator.userAgent)) {
             ok("Browser is not supported for this feature. Test skipped.");
             return start();
         }
@@ -368,7 +368,7 @@
 
     asyncTest("Projects 1.1", function() {
         // This test only runs on supported browsers, but not Opera or IE for 1.1.
-        if (!/trident|opera/i.test(window.navigator.userAgent)) {
+        if (/trident|opera/i.test(window.navigator.userAgent)) {
             ok(true, "Browser is not supported for this feature. Test skipped.");
             return start();
         }
