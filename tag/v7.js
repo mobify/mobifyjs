@@ -64,10 +64,10 @@ Tag.startCapture = function(callback) {
 Tag.getCookie = function(name) {
     // Internet Explorer treats empty cookies differently, it does
     // not include the '=', so our regex has to be extra complicated.
-    var re = new RegExp("(^|; )" + name + "((=([^;]*))|()(;|$))");
+    var re = new RegExp("(^|; )" + name + "((=([^;]*))|(; |$))");
     var match = document.cookie.match(re);
     if (match) {
-        return (typeof match[4] === 'string' ? match[4] : match[5]);
+        return match[4] || '';
     }
 };
 
@@ -89,7 +89,6 @@ Tag.loadPreview = function() {
         src: this.previewUrl
     });
 };
-
 
 // Tag.disable temporarily disables the tag for 5 minutes.
 Tag.disable = function() {
@@ -145,7 +144,7 @@ Tag.supportedBrowser = function(ua) {
     }
 
     return true;
-}
+};
 
 // Tag.getOptions returns the current options, accounting for the current
 // mode if necessary.
