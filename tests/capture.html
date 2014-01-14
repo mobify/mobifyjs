@@ -261,9 +261,9 @@
             var html = '<html><head></head>\
                         <body>\
                         <script>var verify=[1];<\/script>\
-                        <script src="/tests/resources/bigscript.js"><\/script>\
+                        <script x-src="/tests/resources/bigscript.js"><\/script>\
                         <script>verify.push(3);<\/script>\
-                        <script src="/tests/resources/smallscript.js"><\/script>\
+                        <script x-src="/tests/resources/smallscript.js"><\/script>\
                         <script>verify.push(5);<\/script>\
                         <script>parent.postMessage(verify.join(), "*");<\/script>\
                         </body></html>';
