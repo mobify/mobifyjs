@@ -1198,7 +1198,7 @@ Capture.prototype.render = function(htmlString) {
     if (!htmlString) {
         escapedHTMLString = this.escapedHTMLString();
     } else {
-        escapedHTMLString = Capture.enable(htmlString);
+        escapedHTMLString = Capture.enable(htmlString, this.prefix);
     }
 
     var doc = this.sourceDoc;
