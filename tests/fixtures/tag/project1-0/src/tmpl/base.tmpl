@@ -1,0 +1,86 @@
+{! 
+  Template syntax legend:
+
+  ! Comment !       - Template comment. Text surrounded by ! will not be rendered.
+  {foo}             - Renders the value of key 'foo'.
+  {foo|bar}         - Renders the value of key 'foo' through the filter bar.
+                        Normally, text variables are escaped by dust, so <p> appears as <p> on user
+                        screen instead of creating a paragraph. |s filter overrides that.
+                        openTag, closeTag and innerHTML tags allow showing parts of HTML elements.
+
+  {#foo}..{/foo}    - iterate or descend into the key foo. 
+                      Example:  {#header}
+                                    {logo} 
+                                    {nav} 
+                                {/header}
+  {>foo/}           - Include the template 'foo' inside the current template
+                      (also known as a "partial")
+  {+bar}...{/bar}   - Block placeholder. Defined blocks which can be overridden 
+                      in other templates that include this one.
+  {<bar}...{/bar}   - Block override. Overrides the content in the bar block placeholder.
+  {?foo}...{/foo}   - Conditional.
+                      Example:  {?user}
+                                    Welcome {user} 
+                                    Please login. 
+                                {/user}
+  {%script}{/script} - Special script pragma to prevent removal of whitespace when building. 
+
+  $html,$head,$body  - Special keys which are the html, head, and body elements 
+                       from the desktop site.
+  {#lib_imports/}    - The Mobify object gets blown away when we write the rendered template to the document.
+                       This function allows us to reload these libraries after templates have been rendered.
+                       For example, because of this, you can use Mobify.$ to access Zepto, instead of having
+                       to include a script tag for your own selector engine.
+
+Below is your base template file, which is extended by home.tmpl:
+
+!}
+
+{doctype|s}
+{$html|openTag|s}
+{$head|openTag|s}
+    {+baseScripts}
+        {#lib_import/}
+        {%script}
+            Mobify.enhance();
+            // Scroll the page past URL bar if user did not scroll manually, and hash is absent.
+            Mobify.$(this).bind('load', function() {
+                location.hash || setTimeout(function() {
+                    pageYOffset || scrollTo(0, 1);
+                }, 250);
+            });
+        {/script}
+        {%script}
+            Mobify.$('html').addClass("{#content.templateName}x-{.}{~s}{/content.templateName}");
+        {/script}    
+    {/baseScripts}
+    {+head}
+        {$head|innerHTML|s}
+        <link rel="stylesheet" href="{config.configDir}style.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    {/head}
+</head>
+{$body|openTag|s}
+    {!  Here, we have set up a few blocks that would help you override content from page-specific
+        templates. For example, if you would like to create a splash page without headers or footers, 
+        you could write {<body}<p>Splash page content</p>{/body} in a page template.
+
+        If you override block contents, you can bring back old content with a {_SUPER_} reference.
+        For instance, if a certain page needs to be wrapped in an extra div, its template could add
+        {<body}<div class="outerWrap">{_SUPER_}</div>{/body}.
+
+        Blocks are independent from names of data objects used within. For example, above in {+head}
+        you can see how content object is being accessed within head block. Reuse of names is merely
+        a matter of convention.
+    !}
+    {+body}
+        {>_header/}
+        {+content}
+            {$body|innerHTML|s}
+        {/content}
+        {>_footer/}
+    {/body}
+    {+scripts}
+    {/scripts}
+</body>
+</html>

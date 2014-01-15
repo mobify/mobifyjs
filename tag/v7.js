@@ -6,17 +6,20 @@ window.Mobify.Tag = window.Mobify.Tag || {};
 // Tag.debug is a wrapper for console.log
 // Ideally, this will be compiled out during a build step.
 Tag.debug = function(line) {
-    if (console.log) {
+    if (window.console && window.console.log) {
         console.log(line);
     }
 };
 
 // Mobify.points records timing information. We record
 // time-to-first byte in the tag.
-Mobify.points = [Date.now()];
+//
+// This property is required by Mobify.js
+Mobify.points = [+(new Date())];
 
 // Tag.tagVersion is the current tag version.
-Tag.version = [7, 0];
+// This property is required by Mobify.js
+Mobify.tagVersion = [7, 0];
 
 // Tag.userAgent is the current user agent.
 // We store it here so it can easily be override for testing purporses.
@@ -57,24 +60,27 @@ Tag.startCapture = function(callback) {
 };
 
 // Tag.getCookie fetches the values of a cookie by the given `name`
+// Returns `undefined` if no cookie matches.
 Tag.getCookie = function(name) {
-    var re = new RegExp("(^|; )" + name + "=([^;]*)");
+    // Internet Explorer treats empty cookies differently, it does
+    // not include the '=', so our regex has to be extra complicated.
+    var re = new RegExp("(^|; )" + name + "((=([^;]*))|(; |$))");
     var match = document.cookie.match(re);
     if (match) {
-        return match[2];
+        return match[4] || '';
     }
 };
 
 // Tag.isDisabled checks if we are *completely* disabled.
 // If so, we don't capture nor load any scripts.
 Tag.isDisabled = function() {
-    return /mobify=0/.test(document.cookie);
+    return this.getCookie('mobify-path') === '';
 };
 
 // Tag.isPreview checks to see if we need to load the preview API.
 Tag.isPreview = function() {
-    return !!(this.getCookie("mobify-preview") || 
-            /mobify-preview/.test(window.location.hash));
+    return !!((this.getCookie("mobify-path") === 'true') || 
+            /mobify-path=true/.test(window.location.hash));
 };
 
 // Tag.loadPreview loads the preview API.
@@ -84,14 +90,13 @@ Tag.loadPreview = function() {
     });
 };
 
-
 // Tag.disable temporarily disables the tag for 5 minutes.
 Tag.disable = function() {
     var now = new Date();
     // Set now to 5 minutes ahead
     now.setTime(now.getTime() + 5*60*1000);
     
-    document.cookie = 'mobify=0' +
+    document.cookie = 'mobify-path=' +
             '; expires=' + now.toGMTString() +
             '; path=/';
 
@@ -139,7 +144,7 @@ Tag.supportedBrowser = function(ua) {
     }
 
     return true;
-}
+};
 
 // Tag.getOptions returns the current options, accounting for the current
 // mode if necessary.

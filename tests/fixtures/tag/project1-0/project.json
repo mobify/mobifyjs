@@ -1,0 +1,10 @@
+{
+    "name": "project1-0",
+    "api": "1.0",
+    "source_directory": "src",
+    "build_directory": "bld",
+    "plugins": [],
+    "exclude": [
+        "*.tmpl"
+    ]
+}

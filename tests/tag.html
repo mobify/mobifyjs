@@ -62,8 +62,6 @@
     }
 
     var testSetup = function(src, ready, beforeLoad) {
-        console.log("Test Setup");
-
         var opts = {
             id: "tag-test.html",
             src: src
@@ -72,19 +70,13 @@
         var el = $iframe[0];
 
         // Clear cookies
-        document.cookie = 'mobify=0' +
+        document.cookie = 'mobify-path=' +
             '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
             '; path=/';
 
         document.cookie = 'mobify-mode=' +
             '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
             '; path=/';
-
-        document.cookie = 'mobify-preview=' +
-            '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
-            '; path=/';
-
-        delete window.sessionStorage['mobify-preview'];
 
         window.addEventListener("message", function onMessage(event) {
             if (event.source != el.contentWindow || event.data !== "ready") return;
@@ -108,8 +100,6 @@
         if (beforeLoad) { beforeLoad(el) };
 
         $("#qunit-fixture").append($iframe);
-
-        console.log("Attached");
     };
 
 
@@ -126,7 +116,7 @@
 
     asyncTest("Mobify.tagVersion exists", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
-            deepEqual(win.Mobify.Tag.version, [7, 0], "Mobify.tagVersion exists");
+            deepEqual(win.Mobify.tagVersion, [7, 0], "Mobify.tagVersion exists");
 
             start();
         });
@@ -216,23 +206,44 @@
         });
     });
 
-    module("Preview");
+    
+    module("Disable");
+    asyncTest("isDisabled detects `mobify-path=` in cookie.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+            equal(win.Mobify.Tag.isDisabled(), true, "Disabled condition detected.");
 
-    asyncTest("isPreview detects `mobify-preview` in hash.", function() {
-        testSetup("/tests/fixtures/tag/no-run.html#mobify-preview&foo", function(win, doc, event) {
+            start();
+        }, function (el) {
+            document.cookie = "mobify-path=; path=/";
+        });
+    });
+
+    asyncTest("Capturing does not fire if disabled.", function() {
+        testSetup("/tests/fixtures/tag/disabled.html", function(win, doc, event) {
+            assertNotCapturing();
+
+            start();
+        }, function (el) {
+            document.cookie = "mobify-path=; path=/";
+        });
+    });
+
+    module("Preview");
+    asyncTest("isPreview detects `mobify-path=true` in hash.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html#mobify-path=true&foo", function(win, doc, event) {
             equal(win.Mobify.Tag.isPreview(), true, "Preview condition detected.");
 
             start();
         });
     });
 
-    asyncTest("isPreview detects `mobify-preview` in cookie.", function() {
+    asyncTest("isPreview detects `mobify-path=true` in cookie.", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.Tag.isPreview(), true, "Preview condition detected.");
 
             start();
         }, function (el) {
-            document.cookie = "mobify-preview=true; path=/";
+            document.cookie = "mobify-path=true; path=/";
         });
     });
 
@@ -245,7 +256,7 @@
     });
 
     asyncTest("Loads preview correctly", function() {
-        testSetup("/tests/fixtures/tag/preview.html#mobify-preview", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/preview.html#mobify-path=true", function(win, doc, event) {
             equal(win.Mobify.Tag.isPreview(), true, "Preview condition detected.");
 
             assertCapturing();
@@ -256,7 +267,7 @@
     });
 
     asyncTest("Skips preview if skipPreview is set.", function() {
-        testSetup("/tests/fixtures/tag/skip-preview.html#mobify-preview", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/skip-preview.html#mobify-path=true", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/mobile.js");
 
@@ -329,6 +340,57 @@
 
             var ua = "Opera/9.80 (Windows NT 6.1; U; pl) Presto/2.6.31 Version/10.70";
             equal(win.Mobify.Tag.supportedBrowser(ua), false, "Correctly detects browser support for Opera 10");
+            start();
+        });
+    });
+
+    module("Compatiblity")
+    asyncTest("Projects 1.0", function() {
+        // This test only runs on supported browsers, but not Opera or IE for 1.0.
+        if (/trident|opera|firefox/i.test(window.navigator.userAgent)) {
+            ok("Browser is not supported for this feature. Test skipped.");
+            return start();
+        }
+
+
+        testSetup("/tests/fixtures/tag/project1-0.html", function(win, doc, event) {
+            var query = doc.querySelectorAll('p.extract');
+            var titleEl = query[0];
+            var pEl = query[1];
+
+            equal(titleEl.innerHTML, "Title of Page");
+            equal(pEl.innerHTML, "First Paragraph");
+
+            start();
+        });
+    });
+
+
+    asyncTest("Projects 1.1", function() {
+        // This test only runs on supported browsers, but not Opera or IE for 1.1.
+        if (/trident|opera/i.test(window.navigator.userAgent)) {
+            ok(true, "Browser is not supported for this feature. Test skipped.");
+            return start();
+        }
+
+        testSetup("/tests/fixtures/tag/project1-1.html", function(win, doc, event) {
+            var query = doc.querySelectorAll('p.extract');
+            var titleEl = query[0];
+            var pEl = query[1];
+
+            equal(titleEl.textContent || titleEl.innerHTML, "Title of Page", "Title Found");
+            equal(pEl.textContent || pEl.innerHTML, "First Paragraph", "First P Found");
+
+            start();
+        });
+    });
+
+    asyncTest("Projects 2.0", function() {
+        testSetup("/tests/fixtures/tag/project2-0.html", function(win, doc, event) {
+            expect(2);
+
+            ok(win.elseClauseHit, "Else clause was run.");
+
             start();
         });
     });
