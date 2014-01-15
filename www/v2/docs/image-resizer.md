@@ -136,19 +136,19 @@ The same as `ResizeImages.resize` options.
     Mobify.ResizeImages.getImageURL('http://www.foo.com/bar.png');
 
     // Get an optimized image URL from a URL string with options overridden
-    var options = Utils.extend(ResizeImages.getDefaultOptions(), {
+    var options = Utils.extend(ResizeImages.processOptions(), {
         cacheHours: '8', 
     });
     Mobify.ResizeImages.getImageURL('http://www.foo.com/bar.png', options);
 
 
-## `ResizeImages.getDefaultOptions()`
+## `ResizeImages.processOptions()`
 
 This method returns all of the default options.
 
 **Usage/Examples:**
 
-    Mobify.ResizeImages.getDefaultOptions()
+    Mobify.ResizeImages.processOptions()
 
     // returns (for iPhone 5):
     // {
