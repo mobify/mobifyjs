@@ -1,0 +1,2 @@
+2.0.6 - Fixed issue where we were not passing in the prefix when 
+        using `render` with an HTML string, causing assets to not get enabled.
