@@ -37,7 +37,7 @@
         ok(Mobify.Tag.init, "Mobify.Tag.init should exist.");
 
         Mobify.Tag.init({
-            getMode: function() {return 'desktop'},
+            mode: function() {return 'desktop'},
             desktop: {
                 capture: false,
                 url: "/tests/fixtures/tag/desktop.js"

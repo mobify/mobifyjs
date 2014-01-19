@@ -46,8 +46,8 @@ EXPOSE && (Tag['Private'] = Private);
     @typedef {{
         capture: ?boolean, 
         url: string,
-        postload: ?function(),
-        preload: ?function()
+        post: ?function(),
+        pre: ?function()
     }}
 */
 Tag.singleOptionsType;
@@ -284,13 +284,13 @@ Private['supportedBrowser'] = supportedBrowser;
     @type {Tag.singleOptionsType|null}
 */
 var getOptions = function(options){
-    if (options['getMode']) {
+    if (options['mode']) {
         // If the "options" objects has a mode, grab the mode and
         // return the options set for that mode
         var mode = getCookie("mobify-mode");
 
         if (!mode || !options[mode]) {
-            mode = options['getMode'](Mobify);
+            mode = options['mode'](Mobify);
         }
         
         return options[mode];
@@ -313,7 +313,7 @@ Tag['getOptions'] = getOptions;
         // Whether we should allow load through preview.
         skipPreview: true 
 
-        getMode: function(Mobify) {
+        mode: function(Mobify) {
             // Return mode based on device or other settings.
             // `mode` is a key in to the options object
             // that selects our device-specific options.
@@ -329,7 +329,7 @@ Tag['getOptions'] = getOptions;
 
             // Prelab Callback (optional)
             // Called immediately before we insert the script.
-            preload: function() {};
+            pre: function() {};
 
             // Postload Callback (optional)
             // Called after the script's onload handler fires.
@@ -367,14 +367,14 @@ Tag['init'] = function(options) {
     }
 
     var preloadCallback = function() {
-        if (opts['preload']) {
-            opts['preload']();
+        if (opts['pre']) {
+            opts['pre']();
         }
     };
 
     var postloadCallback = function() {
-        if (opts['postload']) {
-            opts['postload']();
+        if (opts['post']) {
+            opts['post']();
         }
     };
 
