@@ -20,7 +20,16 @@ var inlineTag = function(req, res, next) {
     } catch (e) {
         return next();
     }
-    var tag = fs.readFileSync(__dirname + "/tag/v7.js", 'utf8');
+
+    var tagSource = '/tag/v7.min.js';
+    
+    if (req.query['full-tag']) {
+        tagSource = '/tag/v7.exposed.min.js';
+    }
+
+    var tag = fs.readFileSync(__dirname + tagSource, 'utf8');
+
+    tag = tag.replace("https://preview.mobify.com/v7/", "/tests/fixtures/tag/preview.js");
 
     page = page.replace("<script src=\"/tag/v7.js\"></script>", "<script>" + tag + "</script>");
 
