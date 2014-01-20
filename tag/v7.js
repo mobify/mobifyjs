@@ -13,7 +13,15 @@
         code, are assigned to `Private`, but when `EXPOSED` is defined to
         `false`, these end up being dead-code and are removed.
 
-    To Compile:
+    To Compile For Unit Tests:
+        java -jar <path to compiler.jar> \
+        --accept_const_keyword \
+        --compilation_level ADVANCED_OPTIMIZATIONS \
+        --js tag/v7.js \
+        --use_types_for_optimization > tag/v7.exposed.min.js
+
+
+    To Compile For Production:
         java -jar <path to compiler.jar> \
         --accept_const_keyword \
         --compilation_level ADVANCED_OPTIMIZATIONS \
@@ -21,6 +29,9 @@
         --js tag/v7.js \
         --use_types_for_optimization > tag/v7.min.js
 */
+
+/** @define {boolean} */
+var ALLOW_SKIP_PREVIEW = true;
 
 /** @define {boolean} */
 var SINGLE_MODE = true;
@@ -272,7 +283,7 @@ Private['supportedBrowser'] = supportedBrowser;
     @type {!Object}
 */
 var getOptions = function(options){
-    if (options['mode']) {
+    if (!SINGLE_MODE || options['mode']) {
         // If the "options" objects has a mode, grab the mode and
         // return the options set for that mode
         var mode = getCookie("mobify-mode");
@@ -342,7 +353,7 @@ Tag['init'] = function(options) {
 
     collectTiming();
 
-    if (!options['skipPreview'] && isPreview()) {
+    if (!(ALLOW_SKIP_PREVIEW && options['skipPreview']) && isPreview()) {
         startCapture(loadPreview);
         return;
     }
