@@ -1,15 +1,25 @@
-// ==ClosureCompiler==
-// @output_file_name v7.min.js
-// @compilation_level ADVANCED_OPTIMIZATIONS
-// ==/ClosureCompiler==
+/**
+    Mobify Tag Version 7.0  
+    
+    Notes on Compiling:
+        - We rely on Google's Closure Compiler to make the tag small.
+        - We have to annotate our code carefully, and further, write
+        it in a way that gives us the most gains from the Closure compiler.
+            - All properties that will be public must be assigned
+            using [] dictionary/bracket syntax.
+            - Everything should have correct JSDoc annotations.
+            - See https://developers.google.com/closure/compiler/docs/js-for-compiler
+        - Functions that need to be unit tested, but not public in final
+        code, are assigned to `Private`, but when `EXPOSED` is defined to
+        `false`, these end up being dead-code and are removed.
 
-/* To Compile:
-    java -jar <path to compiler.jar> \
-    --accept_const_keyword \
-    --compilation_level ADVANCED_OPTIMIZATIONS \
-    --define EXPOSE=false \
-    --js tag/v7.js \
-    --use_types_for_optimization > tag/v7.min.js
+    To Compile:
+        java -jar <path to compiler.jar> \
+        --accept_const_keyword \
+        --compilation_level ADVANCED_OPTIMIZATIONS \
+        --define EXPOSE=false \
+        --js tag/v7.js \
+        --use_types_for_optimization > tag/v7.min.js
 */
 
 /** @define {boolean} */
@@ -39,18 +49,6 @@ var Tag = Mobify['Tag'] = {};
 
 var Private = {};
 EXPOSE && (Tag['Private'] = Private);
-
-
-/** Single Options Type
-    
-    @typedef {{
-        capture: ?boolean, 
-        url: string,
-        post: ?function(),
-        pre: ?function()
-    }}
-*/
-Tag.singleOptionsType;
 
 /** 
     Mobify.points records timing information. We record
@@ -94,11 +92,9 @@ Private['previewUrl'] = previewUrl;
     asynchronously. The script is inserted in the DOM before the Mobify
     tag.
 
-    TODO: Write type for options?
-
     @private
-    @param {!Object} options properties to assign to script
-    @param {string=} klass class attribute to assign to element
+    @param {!Object} options Properties to assign to script
+    @param {string=} klass Class attribute to assign to element
     @type {null}
 */
 var loadScript = function(options, klass) {
@@ -121,7 +117,7 @@ Private['loadScript'] = loadScript;
     calls the callback.
 
     @private
-    @param {function()} callback callback to call after capturing has begun
+    @param {function()} callback Callback to call after capturing has begun
     @type {null}
 */
 var startCapture = function(callback) {
@@ -134,7 +130,6 @@ var startCapture = function(callback) {
         callback();
     }, 0);
 };
-
 Private['startCapture'] = startCapture;
 
 /**
@@ -142,7 +137,7 @@ Private['startCapture'] = startCapture;
     Returns `undefined` if no cookie matches.
 
     @private
-    @param {string} name name of cookie to fetch.
+    @param {string} name Name of cookie to fetch.
     @type {string|null}
 */
 var getCookie = function(name) {
@@ -154,7 +149,6 @@ var getCookie = function(name) {
         return match[4] || '';
     }
 };
-
 Private['getCookie'] = getCookie;
 
 /** 
@@ -169,7 +163,6 @@ var isDisabled = function() {
     // undefined it means there was no cookie.
     return getCookie('mobify-path') === '';
 };
-
 Private['isDisabled'] = isDisabled;
 
 /**
@@ -181,7 +174,6 @@ var isPreview = function() {
     return (getCookie("mobify-path") == 'true' || 
             /mobify-path=true/.test(window.location.hash));
 };
-
 Private['isPreview'] = isPreview;
 
 /**
@@ -197,7 +189,6 @@ var loadPreview = function() {
 };
 
 Private['loadPreview'] = loadPreview;
-
 /**
     disableTag temporarily disables the tag for 5 minutes.
 
@@ -216,7 +207,6 @@ var disableTag = function() {
     // Reload the page (location.reload has problems in FF)
     window.location = window.location.href;
 };
-
 Private['disableTag'] = disableTag;
 
 /** 
@@ -239,7 +229,6 @@ var collectTiming = function() {
         bindEvent('load');
     }
 };
-
 Private['collectTiming'] = collectTiming;
 
 /** 
@@ -274,14 +263,13 @@ var supportedBrowser = function(ua) {
 
     return true;
 };
-
 Private['supportedBrowser'] = supportedBrowser;
 
 /**
     Tag.getOptions returns the current options, accounting for the current
     mode if necessary.
 
-    @type {Tag.singleOptionsType|null}
+    @type {!Object}
 */
 var getOptions = function(options){
     if (options['mode']) {
@@ -297,12 +285,11 @@ var getOptions = function(options){
     } else if (SINGLE_MODE && supportedBrowser(Tag.userAgent)) {
         // If there is no mode set, return the options object if the browser is
         // supported.
-        return options
+        return options;
     }
 
     return;
-}
-
+};
 Tag['getOptions'] = getOptions;
 
 /*
@@ -340,7 +327,7 @@ Tag['getOptions'] = getOptions;
 
 
 
-/** Mobify.init
+/** Mobify.Tag.init
 
     @expose
     @param {!Object} options Options to load with
