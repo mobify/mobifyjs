@@ -289,7 +289,7 @@ var getOptions = function(options){
         var mode = getCookie("mobify-mode");
 
         if (!mode || !options[mode]) {
-            mode = options['mode'](Mobify);
+            mode = options['mode'](Tag['ua']);
         }
         
         return options[mode];
