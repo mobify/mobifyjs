@@ -81,13 +81,13 @@ Mobify['points'] = [+(new Date())];
 Mobify['tagVersion'] = [7, 0];
 
 /** 
-    Tag.userAgent is the current user agent.
+    Tag.ua is the current user agent.
     We store it here so it can easily be override for testing purporses.
 
     @expose
     @type {string}
 */
-Tag['userAgent'] = window.navigator.userAgent;
+Tag['ua'] = window.navigator.userAgent;
 
 /** 
     previewUrl is preview API endpoint.
@@ -293,7 +293,7 @@ var getOptions = function(options){
         }
         
         return options[mode];
-    } else if (SINGLE_MODE && supportedBrowser(Tag.userAgent)) {
+    } else if (SINGLE_MODE && supportedBrowser(Tag['ua'])) {
         // If there is no mode set, return the options object if the browser is
         // supported.
         return options;
@@ -380,7 +380,7 @@ Tag['init'] = function(options) {
         preloadCallback();
 
         var options = {
-            id: "mobifyify-js",
+            id: "mobify-js",
             src: opts['url'],
             onerror: disableTag,
             onload: postloadCallback

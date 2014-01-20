@@ -124,7 +124,7 @@
 
     asyncTest("Mobify.userAgent exists", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
-            equal(win.Mobify.Tag.userAgent, window.navigator.userAgent, "Mobify.userAgent exists");
+            equal(win.Mobify.Tag.ua, window.navigator.userAgent, "Mobify.userAgent exists");
 
             start();
         });
