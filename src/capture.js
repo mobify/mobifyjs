@@ -1,4 +1,5 @@
-define(["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
+var Utils = require('./utils');
+var patchAnchorLinks = require('./patchAnchorLinks');
 
 // ##
 // # Static Variables/Functions
@@ -536,6 +537,4 @@ Capture.prototype.renderCapturedDoc = function(options) {
  */
 Capture.patchAnchorLinks = patchAnchorLinks;
 
-return Capture;
-
-});
+module.exports = Capture;

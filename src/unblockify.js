@@ -1,4 +1,6 @@
-define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+var Utils = require('./utils');
+var Capture = require('./capture');
+
 
 var Unblockify = {}
 
@@ -28,6 +30,4 @@ Unblockify.unblock = function(scripts) {
     };
 };
 
-return Unblockify;
-
-});
+module.exports = Unblockify;

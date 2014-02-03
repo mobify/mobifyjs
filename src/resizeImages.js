@@ -1,7 +1,6 @@
-define(["mobifyjs/utils"], function(Utils) {
+var Utils = require('./utils');
 
 var ResizeImages = window.ResizeImages = {};
-
 var localStorageWebpKey = 'Mobify-Webp-Support-v2';
 
 function persistWebpSupport(supported) {
@@ -318,6 +317,4 @@ ResizeImages.defaults = {
       onerror: 'ResizeImages.restoreOriginalSrc(event);'
 };
 
-return ResizeImages;
-
-});
+module.exports = ResizeImages;

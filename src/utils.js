@@ -1,9 +1,3 @@
-define([], function() {
-
-// ##
-// # Utility methods
-// ##
-
 var Utils = {};
 
 Utils.extend = function(target){
@@ -253,6 +247,4 @@ Utils.waitForReady = function(doc, callback) {
     doc.addEventListener("readystatechange", onReady, false);
 };
 
-return Utils;
-
-});
+module.exports =  Utils;
