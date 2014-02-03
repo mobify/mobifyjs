@@ -2,7 +2,7 @@
  * cssOptimize - Client code to a css optimization service
  */
 
-define(["mobifyjs/utils"], function(Utils) {
+var Utils = require('./utils');
 
 var CssOptimize = window.cssOptimize = {};
 
@@ -85,5 +85,4 @@ var defaults = CssOptimize._defaults = {
     onerror: 'Mobify.CssOptimize.restoreOriginalHref(event);'
 };
 
-return CssOptimize;
-});
+module.exports = CssOptimize;
