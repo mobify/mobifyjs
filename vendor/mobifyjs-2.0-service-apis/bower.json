@@ -2,6 +2,6 @@
   "name": "mps-zazzle",
   "version": "1.0.0",
   "dependencies": {
-    "mobifyjs": "2.0.5"
+    "mobifyjs": "v2.0-backwards-compat-fixes"
   }
 }

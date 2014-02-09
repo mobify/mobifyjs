@@ -1,5 +1,0 @@
-test:
-    pre:
-        - make install
-    override:
-        - make test

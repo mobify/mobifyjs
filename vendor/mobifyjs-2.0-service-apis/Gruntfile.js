@@ -33,17 +33,10 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "main",
-                    out: "./build/mobifyjs-2.0-service-apis.js",
+                    out: "../../api/mobify-services.js",
                     onBuildWrite: function(name, path, contents) {
                         return amdclean.clean(contents);
                     }
-                }
-            },
-        },
-        uglify: {
-            main: {
-                files: {
-                    'build/mobifyjs-2.0-service-apis.min.js': ['build/mobifyjs-2.0-service-apis.js']
                 }
             },
         },
@@ -58,9 +51,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-connect');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
 
-    grunt.registerTask('build', ['requirejs:main', 'uglify:main']);
+    grunt.registerTask('build', ['requirejs:main']);
     grunt.registerTask('preview', ['build', 'connect', 'watch']);
     grunt.registerTask('serve', 'preview');
 };
