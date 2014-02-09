@@ -7,6 +7,7 @@
     "connect": "2.3.4",
     "grunt": "~0.4.0",
     "grunt-requirejs": "0.4.0",
+    "grunt-contrib-requirejs": "0.4.1",
     "grunt-contrib-watch": "~0.2.x",
     "grunt-contrib-connect": "~0.1.0",
     "grunt-contrib-uglify": "~0.2.0",

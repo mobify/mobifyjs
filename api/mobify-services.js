@@ -541,6 +541,9 @@ var mobifyjs_jazzcat = function (Utils) {
             var insertLoader = function (script, urls) {
                 if (script) {
                     var loader = Jazzcat.getLoaderScript(urls, options);
+                    if (script.parentNode === null) {
+                        return;
+                    }
                     script.parentNode.insertBefore(loader, script);
                 }
             };
@@ -571,10 +574,12 @@ var mobifyjs_jazzcat = function (Utils) {
                 if (jsonp && !Jazzcat.cacheLoaderInserted) {
                     httpCache.load(httpCache.options);
                     var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-                    script.parentNode.insertBefore(httpLoaderScript, script);
-                    Jazzcat.cacheLoaderInserted = true;
+                    if (script.parentNode !== null) {
+                        script.parentNode.insertBefore(httpLoaderScript, script);
+                        Jazzcat.cacheLoaderInserted = true;
+                    }
                 }
-                var parent = script.parentNode.nodeName === 'HEAD' ? 'head' : 'body';
+                var parent = script.parentNode !== null && script.parentNode.nodeName === 'HEAD' ? 'head' : 'body';
                 if (jsonp) {
                     if (!httpCache.get(url)) {
                         if (!concat) {
@@ -657,7 +662,7 @@ var mobifyjs_jazzcat = function (Utils) {
                 out = 'data-orig-src="' + url + '"';
                 out += '>' + resource.body.replace(scriptSplitRe, '$1\\$2') + onload;
             }
-            Jazzcat.write.call(document, '<script ' + out + '</script>');
+            Jazzcat.write.call(document, '<script ' + out + '<' + '/script>');
         };
         Jazzcat.load = function (resources) {
             var resource;
@@ -750,6 +755,32 @@ var mobifyjs_cssOptimize = function (Utils) {
     Mobify.ResizeImages = ResizeImages;
     Mobify.Jazzcat = Jazzcat;
     Mobify.CssOptimize = CssOptimize;
+    var $ = Mobify && Mobify.$;
+    if (!$) {
+        return;
+    }
+    Mobify.combo = Jazzcat;
+    $.fn.combineScripts = function (opts) {
+        return Mobify.Jazzcat.optimizeScripts.call(window, this, opts);
+    };
+    Mobify.Jazzcat.defaults.projectName = Mobify && Mobify.config && Mobify.config.projectName || '';
+    $.fn.combineScripts.defaults = Mobify.Jazzcat.defaults;
+    Mobify.cssURL = function (obj) {
+        return '//jazzcat.mobify.com/css/' + encodeURIComponent(JSON.stringify(obj));
+    };
+    $.fn.resizeImages = function (opts) {
+        var imgs = this.find('img').toArray();
+        return Mobify.ResizeImages.resize.call(window, imgs, opts);
+    };
+    Mobify.ResizeImages.defaults.projectName = Mobify.config.projectName || '';
+    $.fn.resizeImages.defaults = Mobify.ResizeImages.defaults;
+    Mobify.getImageURL = function (url, options) {
+        var opts = ResizeImages.processOptions();
+        if (options) {
+            Utils.extend(opts, options);
+        }
+        return Mobify.ResizeImages.getImageURL(url, opts);
+    };
 }(mobifyjs_utils, mobifyjs_resizeImages, mobifyjs_jazzcat, mobifyjs_cssOptimize));
 define("main", function(){});
 }());

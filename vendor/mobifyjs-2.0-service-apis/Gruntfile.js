@@ -29,9 +29,12 @@ module.exports = function(grunt) {
             // Building Custom Mobify.js 2.0 build
             main: {
                 options: {
-                    mainConfigFile: "./config.js",
+                    wrap: true,
+                    baseUrl: ".",
+                    paths: {   
+                        mobifyjs: "bower_components/mobifyjs/src",
+                    },
                     optimize: "none",
-                    keepBuildDir: true,
                     name: "main",
                     out: "../../api/mobify-services.js",
                     onBuildWrite: function(name, path, contents) {
