@@ -1,0 +1,7 @@
+{
+  "name": "mps-zazzle",
+  "version": "1.0.0",
+  "dependencies": {
+    "mobifyjs": "v2.0-backwards-compat-fixes"
+  }
+}
