@@ -21,10 +21,12 @@ var inlineTag = function(req, res, next) {
         return next();
     }
 
-    var tagSource = '/tag/v7.min.js';
+    var tagSource = '/tag/v7.exposed.min.js';
     
-    if (req.query['full-tag']) {
-        tagSource = '/tag/v7.exposed.min.js';
+    if (req.query['tag'] == "min") {
+        tagSource = '/tag/v7.min.js';
+    } else if (req.query['tag'] == "opensource") {
+        tagSource = '/tag/v7.open.min.js';
     }
 
     var tag = fs.readFileSync(__dirname + tagSource, 'utf8');

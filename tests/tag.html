@@ -105,7 +105,7 @@
     module("Disable");
     
     asyncTest("isDisabled detects `mobify-path=` in cookie.", function() {
-        testSetup("/tests/fixtures/tag/no-run.html?full-tag=true", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.Tag.Private.isDisabled(), true, "Disabled condition detected.");
 
             start();
@@ -116,7 +116,7 @@
 
     module("Preview");
     asyncTest("isPreview detects `mobify-path=true` in hash.", function() {
-        testSetup("/tests/fixtures/tag/no-run.html?full-tag=true#mobify-path=true&foo", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html#mobify-path=true&foo", function(win, doc, event) {
             equal(win.Mobify.Tag.Private.isPreview(), true, "Preview condition detected.");
 
             start();
@@ -124,7 +124,7 @@
     });
 
     asyncTest("isPreview detects `mobify-path=true` in cookie.", function() {
-        testSetup("/tests/fixtures/tag/no-run.html?full-tag=true", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.Tag.Private.isPreview(), true, "Preview condition detected.");
 
             start();
@@ -134,7 +134,7 @@
     });
 
     asyncTest("isPreview does not trigger without cookie or hash.", function() {
-        testSetup("/tests/fixtures/tag/no-run.html?full-tag=true", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.Tag.Private.isPreview(), false, "Preview condition not detected.");
 
             start();
@@ -143,7 +143,7 @@
 
     module("Misc")
     asyncTest("Tag.Private.supportedBrowser", function() {
-        testSetup("/tests/fixtures/tag/no-run.html?full-tag=true", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             // IE browsers
             var ua = "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko";
             equal(win.Mobify.Tag.Private.supportedBrowser(ua), true, "Correctly detects browser support for IE11");

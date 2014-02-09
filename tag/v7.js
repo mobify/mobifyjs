@@ -26,8 +26,19 @@
         --accept_const_keyword \
         --compilation_level ADVANCED_OPTIMIZATIONS \
         --define EXPOSE=false \
+        --define SINGLE_MODE=false \
+        --define ALLOW_SKIP_PREVIEW=false \
         --js tag/v7.js \
         --use_types_for_optimization > tag/v7.min.js
+
+
+    To Compile Open Source Tag:
+        java -jar <path to compiler.jar> \
+        --accept_const_keyword \
+        --compilation_level ADVANCED_OPTIMIZATIONS \
+        --js tag/v7.js \
+        --define EXPOSE=false \
+        --use_types_for_optimization > tag/v7.open.min.js
 */
 
 /** @define {boolean} */

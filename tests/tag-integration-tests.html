@@ -106,7 +106,7 @@
     module("Mobify Properties");
 
     asyncTest("Mobify.points exists", function() {
-        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html?tag=min", function(win, doc, event) {
             equal(win.Mobify.points.length, 1, "Mobify.points is an array");
             equal(typeof win.Mobify.points[0], "number", "Mobify.point[0] is a number");
 
@@ -115,7 +115,7 @@
     });
 
     asyncTest("Mobify.tagVersion exists", function() {
-        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html?tag=min", function(win, doc, event) {
             deepEqual(win.Mobify.tagVersion, [7, 0], "Mobify.tagVersion exists");
 
             start();
@@ -123,7 +123,7 @@
     });
 
     asyncTest("Mobify.userAgent exists", function() {
-        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/no-run.html?tag=min", function(win, doc, event) {
             equal(win.Mobify.Tag.ua, window.navigator.userAgent, "Mobify.userAgent exists");
 
             start();
@@ -141,7 +141,7 @@
     module("Capturing");
 
     asyncTest("Always-Run: Capturing Fires", function() {
-        testSetup("/tests/fixtures/tag/always-run.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/always-run.html?tag=min", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/mobile.js");
 
@@ -150,7 +150,7 @@
     });
 
     asyncTest("Always-Run: Mobify.Tag.options exists", function() {
-        testSetup("/tests/fixtures/tag/always-run.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/always-run.html?tag=min", function(win, doc, event) {
             equal(typeof win.Mobify.Tag.options.mobile, "object", "Mobify.Tag.options exists")
 
             start();
@@ -158,7 +158,7 @@
     });
 
     asyncTest("Unmobifies Correctly", function() {
-        testSetup("/tests/fixtures/tag/failed-load-tag.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/failed-load-tag.html?tag=min", function(win, doc, event) {
             assertNotCapturing();
 
             start();
@@ -166,7 +166,7 @@
     });
 
     asyncTest("Loads Desktop Correctly", function() {
-        testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/desktop.html?tag=min", function(win, doc, event) {
             assertNotCapturing();
             assertLoaded("/tests/fixtures/tag/desktop.js");
 
@@ -175,7 +175,7 @@
     });
 
     asyncTest("Loads mobile correctly when forced via `mode` cookie", function() {
-        testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/desktop.html?tag=min", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/mobile.js");
 
@@ -186,7 +186,7 @@
     });
 
     asyncTest("Loads mobile correctly via correct userAgent", function() {
-        testSetup("/tests/fixtures/tag/useragent.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/useragent.html?tag=min", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/mobile.js");
 
@@ -195,7 +195,7 @@
     });
 
     asyncTest("Single-mode loads", function() {
-        testSetup("/tests/fixtures/tag/single-mode.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/single-mode.html?tag=opensource", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/mobile.js");
 
@@ -204,7 +204,7 @@
     });
 
     asyncTest("Fires preload callback", function() {
-        testSetup("/tests/fixtures/tag/preload.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/preload.html?tag=min", function(win, doc, event) {
             // All assertions are fired in the iframe.
             expect(2);
 
@@ -213,7 +213,7 @@
     });
 
     asyncTest("Fires postload callback", function() {
-        testSetup("/tests/fixtures/tag/postload.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/postload.html?tag=min", function(win, doc, event) {
             // All assertions are fired in the iframe.
 
             expect(2);
@@ -226,7 +226,7 @@
     module("Disable");
 
     asyncTest("Capturing does not fire if disabled.", function() {
-        testSetup("/tests/fixtures/tag/disabled.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/disabled.html?tag=min", function(win, doc, event) {
             assertNotCapturing();
 
             start();
@@ -238,7 +238,7 @@
     module("Preview");
 
     asyncTest("Loads preview correctly", function() {
-        testSetup("/tests/fixtures/tag/preview.html#mobify-path=true", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/preview.html?tag=min#mobify-path=true", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/preview.js");
 
@@ -247,7 +247,8 @@
     });
 
     asyncTest("Skips preview if skipPreview is set.", function() {
-        testSetup("/tests/fixtures/tag/skip-preview.html#mobify-path=true", function(win, doc, event) {
+        // Test on Open Source
+        testSetup("/tests/fixtures/tag/skip-preview.html?tag=opensource#mobify-path=true", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/mobile.js");
 
@@ -257,7 +258,7 @@
 
     module("Time Tracking");
     asyncTest("Time tracking happens when capturing.", function() {
-        testSetup("/tests/fixtures/tag/always-run.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/always-run.html?tag=min", function(win, doc, event) {
             ok(win.Mobify.Tag.DOMContentLoaded > 0, "DOMContentLoaded Time is recorded.");
             ok(win.Mobify.Tag.load > 0, "Load Time is recorded.");
 
@@ -266,7 +267,7 @@
     });
 
     asyncTest("Time tracking happens when not capturing.", function() {
-        testSetup("/tests/fixtures/tag/desktop.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/desktop.html?tag=min", function(win, doc, event) {
             ok(win.Mobify.Tag.DOMContentLoaded > 0, "DOMContentLoaded Time is recorded.");
             ok(win.Mobify.Tag.load > 0, "Load Time is recorded.");
 
@@ -283,7 +284,7 @@
         }
 
 
-        testSetup("/tests/fixtures/tag/project1-0.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/project1-0.html?tag=min", function(win, doc, event) {
             var query = doc.querySelectorAll('p.extract');
             var titleEl = query[0];
             var pEl = query[1];
@@ -303,7 +304,7 @@
             return start();
         }
 
-        testSetup("/tests/fixtures/tag/project1-1.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/project1-1.html?tag=min", function(win, doc, event) {
             var query = doc.querySelectorAll('p.extract');
             var titleEl = query[0];
             var pEl = query[1];
@@ -316,7 +317,7 @@
     });
 
     asyncTest("Projects 2.0", function() {
-        testSetup("/tests/fixtures/tag/project2-0.html", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/project2-0.html?tag=min", function(win, doc, event) {
             expect(2);
 
             ok(win.elseClauseHit, "Else clause was run.");
