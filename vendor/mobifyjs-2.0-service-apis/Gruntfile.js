@@ -33,7 +33,7 @@ module.exports = function(grunt) {
                     optimize: "none",
                     keepBuildDir: true,
                     name: "main",
-                    out: "./build/mobifyjs-2.0-services.js",
+                    out: "./build/mobifyjs-2.0-service-apis.js",
                     onBuildWrite: function(name, path, contents) {
                         return amdclean.clean(contents);
                     }
@@ -43,7 +43,7 @@ module.exports = function(grunt) {
         uglify: {
             main: {
                 files: {
-                    'build/mobifyjs-2.0-services.min.js': ['build/mobifyjs-2.0-services.js']
+                    'build/mobifyjs-2.0-service-apis.min.js': ['build/mobifyjs-2.0-service-apis.js']
                 }
             },
         },
