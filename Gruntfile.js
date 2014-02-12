@@ -32,8 +32,10 @@ module.exports = function(grunt) {
                   'http://localhost:3000/tests/resizeImages.html',
                   'http://localhost:3000/tests/unblockify.html',
                   'http://localhost:3000/tests/cssOptimize.html',
-                  'http://localhost:3000/tests/tag.html',
                   'http://localhost:3000/tests/anchor-test.html',
+                  'http://localhost:3000/tests/supported-browser.html',
+                  'http://localhost:3000/tests/tag.html',
+                  'http://localhost:3000/tests/tag-integration-tests.html',
                   'http://localhost:3000/tests/tag-old-browser.html'
                 ]
               }
@@ -104,8 +106,10 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/jazzcat.html',
                         'http://localhost:3000/tests/unblockify.html',
                         'http://localhost:3000/tests/cssOptimize.html',
+                        'http://localhost:3000/tests/anchor-test.html',
+                        'http://localhost:3000/tests/supported-browser.html',
                         'http://localhost:3000/tests/tag.html',
-                        'http://localhost:3000/tests/anchor-test.html'
+                        'http://localhost:3000/tests/tag-integration-tests.html'
                     ],
                     concurrency: 16,
                     tunneled: true,
@@ -209,6 +213,7 @@ module.exports = function(grunt) {
                     key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                     urls: [
                         'http://localhost:3000/tests/tag-old-browser.html',
+                        'http://localhost:3000/tests/supported-browser.html'
                     ],
                     concurrency: 16,
                     tunneled: true,

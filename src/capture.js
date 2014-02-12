@@ -456,9 +456,10 @@ Capture.getMobifyLibrary = function(doc) {
 Capture.getPostload = function(doc) {
     var doc = doc || document;
     var postloadScript = undefined;
+
     // mainExecutable is used for backwards compatibility purposes
-    var tagOptions = window.Mobify.Tag && window.Mobify.Tag.getOptions && window.Mobify.Tag.getOptions() || {};
-    var postload = (tagOptions.postload && tagOptions.postload.toString()) || window.Mobify.mainExecutable;
+    var tagOptions = window.Mobify.Tag && window.Mobify.Tag.options && window.Mobify.Tag.getOptions(Mobify.Tag.options) || {};
+    var postload = (tagOptions.post && tagOptions.post.toString()) || window.Mobify.mainExecutable;
     if (postload) {
         // Checks for main executable string on Mobify object and creates a script
         // out of it

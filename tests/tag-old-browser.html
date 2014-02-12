@@ -17,7 +17,7 @@
 </div>
 
 
-<script src="/tag/v7.js"></script>
+<script src="/tag/v7.exposed.min.js"></script>
 
 <script>
     var Assert = window.Assert = {}
@@ -37,7 +37,7 @@
         ok(Mobify.Tag.init, "Mobify.Tag.init should exist.");
 
         Mobify.Tag.init({
-            getMode: function() {return 'desktop'},
+            mode: function() {return 'desktop'},
             desktop: {
                 capture: false,
                 url: "/tests/fixtures/tag/desktop.js"
@@ -48,22 +48,14 @@
     asyncTest("Ensures single-mode does not blow up", function() {
         expect(1);
 
-        var id = setTimeout(function() {
-            // We wait 2 seconds to make sure nothing loaded.
-            ok(true, "Nothing Loaded.");
-            start();
-        }, 2000);
-
         Assert._waitingCb = function() {
-            clearTimeout(id);
             start();
         };
 
-        // This should not load anything.
-        Mobify.Tag.userAgent = "Mozilla/5.0 (Windows; U; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)"
+        // This should always load
         Mobify.Tag.init({
             capture: false,
-            url: "/tests/fixtures/tag/dont-load.js"
+            url: "/tests/fixtures/tag/desktop.js"
         });
     });
 </script>
