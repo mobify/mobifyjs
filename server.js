@@ -25,8 +25,6 @@ var inlineTag = function(req, res, next) {
     
     if (req.query['tag'] == "min") {
         tagSource = '/tag/v7.min.js';
-    } else if (req.query['tag'] == "opensource") {
-        tagSource = '/tag/v7.open.min.js';
     }
 
     var tag = fs.readFileSync(__dirname + tagSource, 'utf8');

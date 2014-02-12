@@ -26,26 +26,10 @@
         --accept_const_keyword \
         --compilation_level ADVANCED_OPTIMIZATIONS \
         --define EXPOSE=false \
-        --define SINGLE_MODE=false \
-        --define ALLOW_SKIP_PREVIEW=false \
         --js tag/v7.js \
         --use_types_for_optimization > tag/v7.min.js
 
-
-    To Compile Open Source Tag:
-        java -jar <path to compiler.jar> \
-        --accept_const_keyword \
-        --compilation_level ADVANCED_OPTIMIZATIONS \
-        --js tag/v7.js \
-        --define EXPOSE=false \
-        --use_types_for_optimization > tag/v7.open.min.js
 */
-
-/** @define {boolean} */
-var ALLOW_SKIP_PREVIEW = true;
-
-/** @define {boolean} */
-var SINGLE_MODE = true;
 
 /** @define {boolean} */
 var EXPOSE = true;
@@ -260,7 +244,7 @@ Private['collectTiming'] = collectTiming;
     @type {!Object}
 */
 var getOptions = function(options){
-    if (!SINGLE_MODE || options['mode']) {
+    if (options['mode']) {
         // If the "options" objects has a mode, grab the mode and
         // return the options set for that mode
         var mode = getCookie("mobify-mode");
@@ -326,7 +310,7 @@ Tag['init'] = function(options) {
 
     collectTiming();
 
-    if (!(ALLOW_SKIP_PREVIEW && options['skipPreview']) && isPreview()) {
+    if (!options['skipPreview'] && isPreview()) {
         startCapture(loadPreview);
         return;
     }

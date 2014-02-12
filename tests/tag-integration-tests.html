@@ -195,7 +195,7 @@
     });
 
     asyncTest("Single-mode loads", function() {
-        testSetup("/tests/fixtures/tag/single-mode.html?tag=opensource", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/single-mode.html?tag=min", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/mobile.js");
 
@@ -248,7 +248,7 @@
 
     asyncTest("Skips preview if skipPreview is set.", function() {
         // Test on Open Source
-        testSetup("/tests/fixtures/tag/skip-preview.html?tag=opensource#mobify-path=true", function(win, doc, event) {
+        testSetup("/tests/fixtures/tag/skip-preview.html?tag=min#mobify-path=true", function(win, doc, event) {
             assertCapturing();
             assertLoaded("/tests/fixtures/tag/mobile.js");
 
