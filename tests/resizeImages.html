@@ -53,6 +53,10 @@
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
+    <div id="resizeImages-set-quality-no-format">
+        <img x-src="http://www.mobify.com/static/img/team/dave@2x.png"
+    </div>
+
     <div id="resizeImages-adds-onerror">
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
@@ -160,6 +164,18 @@
             for(var i = 0, len = resized.length; i < len; i++) {
                 equal(resized[i].getAttribute('data-orig-src'), originalSrcs[i]);
             }
+        });
+
+        test('resize images - set quality but not format', function() {
+            var images = document.querySelectorAll("#resizeImages-set-quality-no-format img");
+
+            var resized = ResizeImages.resize(images, {
+                quality: 30
+            });
+
+            expectedSrc = "//ir0.mobify.com/project-oss-localhost/q30/320/http://www.mobify.com/static/img/team/dave@2x.png"
+
+            equal(resized[0].getAttribute("src"), expectedSrc)
         });
 
         test('resize images - adds an onerror handler', function() {
