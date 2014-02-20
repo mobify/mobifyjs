@@ -79,8 +79,6 @@
         QUnit.start();
         module("processOptions");
         test('processOptions - adds a default project name', function() {
-            var origDpr = window.devicePixelRatio;
-            window.devicePixelRatio = 1;
             expectedProjectName = "oss-localhost";
             var opts = ResizeImages.processOptions({});
 
@@ -321,7 +319,8 @@
                 projectName: 'test1',
                 maxWidth: 320,
                 maxHeight: 480,
-                webp: false
+                webp: false,
+                devicePixelRatio: 1
             });
 
             var src = $('#resizeImages img').attr('src');
@@ -344,6 +343,9 @@
 
             window.onerr = function() {
                 ok(true);
+
+                // cleanup
+                delete window.onerr;
                 start();
             }
 
@@ -358,7 +360,8 @@
                 maxWidth: 1280,
                 maxHeight: 480,
                 webp: false,
-                sourceAttribute: 'src'
+                sourceAttribute: 'src',
+                devicePixelRatio: 1
             });
 
             var sources = images[0].getElementsByTagName('source');
