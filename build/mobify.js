@@ -1,789 +1,18 @@
-(function () {
-/**
- * almond 0.2.6 Copyright (c) 2011-2012, The Dojo Foundation All Rights Reserved.
- * Available via the MIT or new BSD license.
- * see: http://github.com/jrburke/almond for details
- */
-//Going sloppy to avoid 'use strict' string cost, but strict practices should
-//be followed.
-/*jslint sloppy: true */
-/*global setTimeout: false */
-
-var requirejs, require, define;
-(function (undef) {
-    var main, req, makeMap, handlers,
-        defined = {},
-        waiting = {},
-        config = {},
-        defining = {},
-        hasOwn = Object.prototype.hasOwnProperty,
-        aps = [].slice;
-
-    function hasProp(obj, prop) {
-        return hasOwn.call(obj, prop);
-    }
-
-    /**
-     * Given a relative module name, like ./something, normalize it to
-     * a real name that can be mapped to a path.
-     * @param {String} name the relative name
-     * @param {String} baseName a real name that the name arg is relative
-     * to.
-     * @returns {String} normalized name
-     */
-    function normalize(name, baseName) {
-        var nameParts, nameSegment, mapValue, foundMap,
-            foundI, foundStarMap, starI, i, j, part,
-            baseParts = baseName && baseName.split("/"),
-            map = config.map,
-            starMap = (map && map['*']) || {};
-
-        //Adjust any relative paths.
-        if (name && name.charAt(0) === ".") {
-            //If have a base name, try to normalize against it,
-            //otherwise, assume it is a top-level require that will
-            //be relative to baseUrl in the end.
-            if (baseName) {
-                //Convert baseName to array, and lop off the last part,
-                //so that . matches that "directory" and not name of the baseName's
-                //module. For instance, baseName of "one/two/three", maps to
-                //"one/two/three.js", but we want the directory, "one/two" for
-                //this normalization.
-                baseParts = baseParts.slice(0, baseParts.length - 1);
-
-                name = baseParts.concat(name.split("/"));
-
-                //start trimDots
-                for (i = 0; i < name.length; i += 1) {
-                    part = name[i];
-                    if (part === ".") {
-                        name.splice(i, 1);
-                        i -= 1;
-                    } else if (part === "..") {
-                        if (i === 1 && (name[2] === '..' || name[0] === '..')) {
-                            //End of the line. Keep at least one non-dot
-                            //path segment at the front so it can be mapped
-                            //correctly to disk. Otherwise, there is likely
-                            //no path mapping for a path starting with '..'.
-                            //This can still fail, but catches the most reasonable
-                            //uses of ..
-                            break;
-                        } else if (i > 0) {
-                            name.splice(i - 1, 2);
-                            i -= 2;
-                        }
-                    }
-                }
-                //end trimDots
-
-                name = name.join("/");
-            } else if (name.indexOf('./') === 0) {
-                // No baseName, so this is ID is resolved relative
-                // to baseUrl, pull off the leading dot.
-                name = name.substring(2);
-            }
-        }
-
-        //Apply map config if available.
-        if ((baseParts || starMap) && map) {
-            nameParts = name.split('/');
-
-            for (i = nameParts.length; i > 0; i -= 1) {
-                nameSegment = nameParts.slice(0, i).join("/");
-
-                if (baseParts) {
-                    //Find the longest baseName segment match in the config.
-                    //So, do joins on the biggest to smallest lengths of baseParts.
-                    for (j = baseParts.length; j > 0; j -= 1) {
-                        mapValue = map[baseParts.slice(0, j).join('/')];
-
-                        //baseName segment has  config, find if it has one for
-                        //this name.
-                        if (mapValue) {
-                            mapValue = mapValue[nameSegment];
-                            if (mapValue) {
-                                //Match, update name to the new value.
-                                foundMap = mapValue;
-                                foundI = i;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (foundMap) {
-                    break;
-                }
-
-                //Check for a star map match, but just hold on to it,
-                //if there is a shorter segment match later in a matching
-                //config, then favor over this star map.
-                if (!foundStarMap && starMap && starMap[nameSegment]) {
-                    foundStarMap = starMap[nameSegment];
-                    starI = i;
-                }
-            }
-
-            if (!foundMap && foundStarMap) {
-                foundMap = foundStarMap;
-                foundI = starI;
-            }
-
-            if (foundMap) {
-                nameParts.splice(0, foundI, foundMap);
-                name = nameParts.join('/');
-            }
-        }
-
-        return name;
-    }
-
-    function makeRequire(relName, forceSync) {
-        return function () {
-            //A version of a require function that passes a moduleName
-            //value for items that may need to
-            //look up paths relative to the moduleName
-            return req.apply(undef, aps.call(arguments, 0).concat([relName, forceSync]));
-        };
-    }
-
-    function makeNormalize(relName) {
-        return function (name) {
-            return normalize(name, relName);
-        };
-    }
-
-    function makeLoad(depName) {
-        return function (value) {
-            defined[depName] = value;
-        };
-    }
-
-    function callDep(name) {
-        if (hasProp(waiting, name)) {
-            var args = waiting[name];
-            delete waiting[name];
-            defining[name] = true;
-            main.apply(undef, args);
-        }
-
-        if (!hasProp(defined, name) && !hasProp(defining, name)) {
-            throw new Error('No ' + name);
-        }
-        return defined[name];
-    }
-
-    //Turns a plugin!resource to [plugin, resource]
-    //with the plugin being undefined if the name
-    //did not have a plugin prefix.
-    function splitPrefix(name) {
-        var prefix,
-            index = name ? name.indexOf('!') : -1;
-        if (index > -1) {
-            prefix = name.substring(0, index);
-            name = name.substring(index + 1, name.length);
-        }
-        return [prefix, name];
-    }
-
-    /**
-     * Makes a name map, normalizing the name, and using a plugin
-     * for normalization if necessary. Grabs a ref to plugin
-     * too, as an optimization.
-     */
-    makeMap = function (name, relName) {
-        var plugin,
-            parts = splitPrefix(name),
-            prefix = parts[0];
-
-        name = parts[1];
-
-        if (prefix) {
-            prefix = normalize(prefix, relName);
-            plugin = callDep(prefix);
-        }
-
-        //Normalize according
-        if (prefix) {
-            if (plugin && plugin.normalize) {
-                name = plugin.normalize(name, makeNormalize(relName));
-            } else {
-                name = normalize(name, relName);
-            }
-        } else {
-            name = normalize(name, relName);
-            parts = splitPrefix(name);
-            prefix = parts[0];
-            name = parts[1];
-            if (prefix) {
-                plugin = callDep(prefix);
-            }
-        }
-
-        //Using ridiculous property names for space reasons
-        return {
-            f: prefix ? prefix + '!' + name : name, //fullName
-            n: name,
-            pr: prefix,
-            p: plugin
-        };
-    };
-
-    function makeConfig(name) {
-        return function () {
-            return (config && config.config && config.config[name]) || {};
-        };
-    }
-
-    handlers = {
-        require: function (name) {
-            return makeRequire(name);
-        },
-        exports: function (name) {
-            var e = defined[name];
-            if (typeof e !== 'undefined') {
-                return e;
-            } else {
-                return (defined[name] = {});
-            }
-        },
-        module: function (name) {
-            return {
-                id: name,
-                uri: '',
-                exports: defined[name],
-                config: makeConfig(name)
-            };
-        }
-    };
-
-    main = function (name, deps, callback, relName) {
-        var cjsModule, depName, ret, map, i,
-            args = [],
-            usingExports;
-
-        //Use name if no relName
-        relName = relName || name;
-
-        //Call the callback to define the module, if necessary.
-        if (typeof callback === 'function') {
-
-            //Pull out the defined dependencies and pass the ordered
-            //values to the callback.
-            //Default to [require, exports, module] if no deps
-            deps = !deps.length && callback.length ? ['require', 'exports', 'module'] : deps;
-            for (i = 0; i < deps.length; i += 1) {
-                map = makeMap(deps[i], relName);
-                depName = map.f;
-
-                //Fast path CommonJS standard dependencies.
-                if (depName === "require") {
-                    args[i] = handlers.require(name);
-                } else if (depName === "exports") {
-                    //CommonJS module spec 1.1
-                    args[i] = handlers.exports(name);
-                    usingExports = true;
-                } else if (depName === "module") {
-                    //CommonJS module spec 1.1
-                    cjsModule = args[i] = handlers.module(name);
-                } else if (hasProp(defined, depName) ||
-                           hasProp(waiting, depName) ||
-                           hasProp(defining, depName)) {
-                    args[i] = callDep(depName);
-                } else if (map.p) {
-                    map.p.load(map.n, makeRequire(relName, true), makeLoad(depName), {});
-                    args[i] = defined[depName];
-                } else {
-                    throw new Error(name + ' missing ' + depName);
-                }
-            }
-
-            ret = callback.apply(defined[name], args);
-
-            if (name) {
-                //If setting exports via "module" is in play,
-                //favor that over return value and exports. After that,
-                //favor a non-undefined return value over exports use.
-                if (cjsModule && cjsModule.exports !== undef &&
-                        cjsModule.exports !== defined[name]) {
-                    defined[name] = cjsModule.exports;
-                } else if (ret !== undef || !usingExports) {
-                    //Use the return value from the function.
-                    defined[name] = ret;
-                }
-            }
-        } else if (name) {
-            //May just be an object definition for the module. Only
-            //worry about defining if have a module name.
-            defined[name] = callback;
-        }
-    };
-
-    requirejs = require = req = function (deps, callback, relName, forceSync, alt) {
-        if (typeof deps === "string") {
-            if (handlers[deps]) {
-                //callback in this case is really relName
-                return handlers[deps](callback);
-            }
-            //Just return the module wanted. In this scenario, the
-            //deps arg is the module name, and second arg (if passed)
-            //is just the relName.
-            //Normalize module name, if it contains . or ..
-            return callDep(makeMap(deps, callback).f);
-        } else if (!deps.splice) {
-            //deps is a config object, not an array.
-            config = deps;
-            if (callback.splice) {
-                //callback is an array, which means it is a dependency list.
-                //Adjust args if there are dependencies
-                deps = callback;
-                callback = relName;
-                relName = null;
-            } else {
-                deps = undef;
-            }
-        }
-
-        //Support require(['a'])
-        callback = callback || function () {};
-
-        //If relName is a function, it is an errback handler,
-        //so remove it.
-        if (typeof relName === 'function') {
-            relName = forceSync;
-            forceSync = alt;
-        }
-
-        //Simulate async callback;
-        if (forceSync) {
-            main(undef, deps, callback, relName);
-        } else {
-            //Using a non-zero value because of concern for what old browsers
-            //do, and latest browsers "upgrade" to 4 if lower value is used:
-            //http://www.whatwg.org/specs/web-apps/current-work/multipage/timers.html#dom-windowtimers-settimeout:
-            //If want a value immediately, use require('id') instead -- something
-            //that works in almond on the global level, but not guaranteed and
-            //unlikely to work in other AMD implementations.
-            setTimeout(function () {
-                main(undef, deps, callback, relName);
-            }, 4);
-        }
-
-        return req;
-    };
-
-    /**
-     * Just drops the config on the floor, but returns req in case
-     * the config return value is used.
-     */
-    req.config = function (cfg) {
-        config = cfg;
-        if (config.deps) {
-            req(config.deps, config.callback);
-        }
-        return req;
-    };
-
-    /**
-     * Expose module registry for debugging and tooling
-     */
-    requirejs._defined = defined;
-
-    define = function (name, deps, callback) {
-
-        //This module may not have dependencies
-        if (!deps.splice) {
-            //deps is not an array, so probably means
-            //an object literal or factory function for
-            //the value. Adjust args.
-            callback = deps;
-            deps = [];
-        }
-
-        if (!hasProp(defined, name) && !hasProp(waiting, name)) {
-            waiting[name] = [name, deps, callback];
-        }
-    };
-
-    define.amd = {
-        jQuery: true
-    };
-}());
-
-define("almond", function(){});
-
-define('mobifyjs/utils',[], function() {
-
-// ##
-// # Utility methods
-// ##
-
-var Utils = {};
-
-Utils.extend = function(target){
-    [].slice.call(arguments, 1).forEach(function(source) {
-        for (var key in source)
-            if (source[key] !== undefined)
-                target[key] = source[key];
-    });
-    return target;
-};
-
-Utils.keys = function(obj) {
-    var result = [];
-    for (var key in obj) {
-        if (obj.hasOwnProperty(key))
-            result.push(key);
-    }
-    return result;
-};
-
-Utils.values = function(obj) {
-    var result = [];
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key))
-          result.push(obj[key]);
-    }
-    return result;
-};
-
-Utils.clone = function(obj) {
-    var target = {};
-    for (var i in obj) {
-        if (obj.hasOwnProperty(i)) {
-          target[i] = obj[i];
-        }
-    }
-    return target;
-};
-
-// Some url helpers
-/**
- * Takes a url, relative or absolute, and absolutizes it relative to the current 
- * document's location/base, with the assistance of an a element.
- */
-var _absolutifyAnchor = document.createElement("a");
-Utils.absolutify = function(url) {
-    _absolutifyAnchor.href = url;
-    return _absolutifyAnchor.href;
-};
-
-/**
- * Takes an absolute url, returns true if it is an http/s url, false otherwise 
- * (e.g. mailto:, gopher://, data:, etc.)
- */
-var _httpUrlRE = /^https?/;
-Utils.httpUrl = function(url) {
-    return _httpUrlRE.test(url);
-};
-
-/**
- * outerHTML polyfill - https://gist.github.com/889005
- */
-Utils.outerHTML = function(el){
-    if (el.outerHTML) {
-        return el.outerHTML;
-    }
-    else {
-        var div = document.createElement('div');
-        div.appendChild(el.cloneNode(true));
-        var contents = div.innerHTML;
-        div = null;
-        return contents;
-    }
-};
-
-/**
- * Return a string for the doctype of the current document.
- */
-Utils.getDoctype = function(doc) {
-    doc = doc || document;
-    var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
-            return el.nodeType == Node.DOCUMENT_TYPE_NODE
-        })[0];
-
-    if (!doctypeEl) return '';
-
-    return '<!DOCTYPE HTML'
-        + (doctypeEl.publicId ? ' PUBLIC "' + doctypeEl.publicId + '"' : '')
-        + (doctypeEl.systemId ? ' "' + doctypeEl.systemId + '"' : '')
-        + '>';
-};
-
-Utils.removeBySelector = function(selector, doc) {
-    doc = doc || document;
-
-    var els = doc.querySelectorAll(selector);
-    return Utils.removeElements(els, doc);
-};
-
-Utils.removeElements = function(elements, doc) {
-    doc = doc || document;
-
-    for (var i=0,ii=elements.length; i<ii; i++) {
-        var el = elements[i];
-        el.parentNode.removeChild(el);
-    }
-    return elements;
-};
-
-// localStorage detection as seen in such great libraries as Modernizr
-// https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
-// Exposing on Jazzcat for use in qunit tests
-var cachedLocalStorageSupport;
-Utils.supportsLocalStorage = function() {
-    if (cachedLocalStorageSupport !== undefined) {
-        return cachedLocalStorageSupport;
-    }
-    var mod = 'modernizr';
-    try {
-        localStorage.setItem(mod, mod);
-        localStorage.removeItem(mod);
-        cachedLocalStorageSupport = true;
-    } catch(e) {
-        cachedLocalStorageSupport = false
-    }
-    return cachedLocalStorageSupport;
-};
-
-// matchMedia polyfill generator
-// (allows you to specify which document to run polyfill on)
-Utils.matchMedia = function(doc) {
-    
-
-    var bool,
-        docElem = doc.documentElement,
-        refNode = docElem.firstElementChild || docElem.firstChild,
-        // fakeBody required for <FF4 when executed in <head>
-        fakeBody = doc.createElement("body"),
-        div = doc.createElement("div");
-
-    div.id = "mq-test-1";
-    div.style.cssText = "position:absolute;top:-100em";
-    fakeBody.style.background = "none";
-    fakeBody.appendChild(div);
-
-    return function(q){
-        div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
-
-        docElem.insertBefore(fakeBody, refNode);
-        bool = div.offsetWidth === 42;
-        docElem.removeChild(fakeBody);
-
-        return {
-           matches: bool,
-           media: q
-        };
-    };
-};
-
-// readyState: loading --> interactive --> complete
-//                      |               |
-//                      |               |
-//                      v               v
-// Event:        DOMContentLoaded    onload
-//
-// iOS 4.3 and some Android 2.X.X have a non-typical "loaded" readyState,
-// which is an acceptable readyState to start capturing on, because
-// the data is fully loaded from the server at that state.
-// For some IE (IE10 on Lumia 920 for example), interactive is not 
-// indicative of the DOM being ready, therefore "complete" is the only acceptable
-// readyState for IE10
-// Credit to https://github.com/jquery/jquery/commit/0f553ed0ca0c50c5f66377e9f2c6314f822e8f25
-// for the IE10 fix
-Utils.domIsReady = function(doc) {
-    var doc = doc || document;
-    return doc.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading";
-};
-
-Utils.getPhysicalScreenSize = function(devicePixelRatio) {
-
-    function multiplyByPixelRatio(sizes) {
-        var dpr = devicePixelRatio || window.devicePixelRatio || 1;
-
-        sizes.width = Math.round(sizes.width * dpr);
-        sizes.height = Math.round(sizes.height * dpr);
-
-        return sizes;
-    }
-
-    var iOS = navigator.userAgent.match(/ip(hone|od|ad)/i);
-    var androidVersion = (navigator.userAgent.match(/android (\d)/i) || {})[1];
-
-    var sizes = {
-        width: window.outerWidth
-      , height: window.outerHeight
-    };
-
-    // Old Android and BB10 use physical pixels in outerWidth/Height, which is what we need
-    // New Android (4.0 and above) use CSS pixels, requiring devicePixelRatio multiplication
-    // iOS lies about outerWidth/Height when zooming, but does expose CSS pixels in screen.width/height
-
-    if (!iOS) {
-        if (androidVersion > 3) return multiplyByPixelRatio(sizes);
-        return sizes;
-    }
-
-    var isLandscape = window.orientation % 180;
-    if (isLandscape) {
-        sizes.height = screen.width;
-        sizes.width = screen.height;
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['mobifyjs/utils', 'mobifyjs/patchAnchorLinks'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('./utils.js'), require('./patchAnchorLinks.js'));
     } else {
-        sizes.width = screen.width;
-        sizes.height = screen.height;
+        // Browser globals (root is window)
+        root.Capture = factory(root.Utils, root.patchAnchorLinks);
     }
-
-    return multiplyByPixelRatio(sizes);
-};
-
-Utils.waitForReady = function(doc, callback) {
-    // Waits for `doc` to be ready, and then fires callback, passing
-    // `doc`.
-
-    // We may be in "loading" state by the time we get here, meaning we are
-    // not ready to capture. Next step after "loading" is "interactive",
-    // which is a valid state to start capturing on (except IE), and thus when ready
-    // state changes once, we know we are good to start capturing.
-    // Cannot rely on using DOMContentLoaded because this event prematurely fires
-    // for some IE10s.
-    var ready = false;
-    
-    var onReady = function() {
-        if (!ready) {
-            ready = true;
-            iid && clearInterval(iid);
-            callback(doc);
-        }
-    }
-
-    // Backup with polling incase readystatechange doesn't fire
-    // (happens with some Android 2.3 browsers)
-    var iid = setInterval(function(){
-        if (Utils.domIsReady(doc)) {
-            onReady();
-        }
-    }, 100);
-
-    doc.addEventListener("readystatechange", onReady, false);
-};
-
-return Utils;
-
-});
-// Fixes anchor links (on FF)
-
-define('mobifyjs/patchAnchorLinks',["mobifyjs/utils"], function(Utils){
-    var exports = {};
-
-    var isFirefox = function(ua) {
-        ua = window.navigator.userAgent;
-
-        return /firefox|fennec/i.test(ua)
-    };
-
-    var _patchAnchorLinks = function(doc) {
-        // Anchor links in FF, after we do `document.open` cause a page
-        // navigation (a refresh) instead of just scrolling the
-        // element in to view.
-        //
-        // So, we prevent the default action on the element, and
-        // then manually scroll it in to view (unless some else already
-        // called prevent default).
-
-        var body = doc.body;
-
-        if (!(body && body.addEventListener)) {
-            // Body is not there or we can't bind as expected.
-            return;
-        }
-
-        var _handler = function(e) {
-            // Handler for all clicks on the page, but only triggers
-            // on proper anchor links.
-
-            var target = e.target;
-
-            var matches = function(el) {
-                return (el.nodeName == "A") && (/^#/.test(el.getAttribute('href')));
-            }
-
-            if (!matches(target)) {
-                return;
-            }
-            
-            // Newer browsers support `e.defaultPrevented`. FF 4.0 supports `e.getPreventDefault()`
-            var defaultPrevented = (typeof e.defaultPrevented !== "undefined") ?
-                e.defaultPrevented :
-                e.getPreventDefault && e.getPreventDefault();
-
-            if (!defaultPrevented) {
-                // Prevent the default action, which would cause a
-                // page refresh.
-                e.preventDefault();
-
-                // But pretend that we didn't call it.
-                e.defaultPrevented = false;
-
-                // We have to wait and see if anyone else calls
-                // `preventDefault`. If they do, we don't scroll.
-                var scroll = true;
-
-                // Override the `preventDefault` to stop  us from scrolling.
-                e.preventDefault = function() {
-                    e.defaultPrevented = true;
-                    scroll = false;
-                }
-
-                // If no other events call `preventDefault` we manually
-                // scroll to the element in question.
-                setTimeout(function() {
-                    if (scroll) {
-                        _scrollToAnchor(target.getAttribute('href'));
-                    }
-                }, 50);
-            }   
-        };
-
-
-        var _scrollToAnchor = function(anchor) {
-            // Scrolls to the element, if any, that matches
-            // the given anchor link (eg, "#foo").
-
-            var anchorRe = /^#([^\s]*)/;
-            var match = anchor.match(anchorRe);
-            var target;
-            
-            // Find the target, if any
-            if (match && match[1] === "") {
-                target = doc.body;
-            } else if (match && match[1]) {
-                var target = doc.getElementById(match[1]);
-            }
-
-            // Scroll to it, if it exists
-            if (target) {
-                target.scrollIntoView && target.scrollIntoView();
-            }
-        };
-
-        // We have to get the event through bubbling, otherwise
-        // events cancelled by the return value of an onclick
-        // handler are not correctly handled.
-        body.addEventListener('click', _handler, false);
-    };
-
-    var patchAnchorLinks = function() {
-        if (!isFirefox()) {
-            return
-        }
-
-        Utils.waitForReady(document, _patchAnchorLinks);
-    }
-
-    return patchAnchorLinks;
-});
-
-define('mobifyjs/capture',["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
+}(this, function (Utils, patchAnchorLinks) {
 
 // ##
 // # Static Variables/Functions
@@ -1324,332 +553,114 @@ Capture.patchAnchorLinks = patchAnchorLinks;
 
 return Capture;
 
-});
+}));
 
-define('mobifyjs/resizeImages',["mobifyjs/utils"], function(Utils) {
-
-var ResizeImages = window.ResizeImages = {};
-
-var localStorageWebpKey = 'Mobify-Webp-Support-v2';
-
-function persistWebpSupport(supported) {
-    if (Utils.supportsLocalStorage()) {
-        var webpSupport = {
-            supported: supported,
-            date: Date.now()
-        };
-        localStorage.setItem(localStorageWebpKey, JSON.stringify(webpSupport));
+},{"./patchAnchorLinks.js":5,"./utils.js":8}],2:[function(require,module,exports){
+/**
+ * cssOptimize - Client code to a css optimization service
+ */
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['mobifyjs/utils'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        var Utils = require('./utils.js');
+        module.exports = factory(Utils);
+    } else {
+        // Browser globals (root is window)
+        root.CssOptimize = factory(root.Utils);
     }
-}
+}(this, function (Utils) {
+
+var CssOptimize = window.cssOptimize = {};
 
 /**
- * Synchronous WEBP detection using regular expressions
- * Credit to Ilya Grigorik for WEBP regex matching
- * https://github.com/igrigorik/webp-detect/blob/master/pagespeed.cc
- * Modified to exclude Android native browser on Android 4
+ * Takes an original, absolute url of a stylesheet, returns a url for that
+ * stylesheet going through the css service.
  */
-ResizeImages.userAgentWebpDetect = function(userAgent){
-    var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
-    var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3|(4(?!.*Chrome)))\\.)|(Chrome\\/[0-8]\\.)' +
-                                '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
-                                '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' +
-                                '|(Opera.*(Version/|Opera\\s)(10|11)\\.)', 'i');
 
-    // Return false if browser is not supported
-    if (!supportedRe.test(userAgent)) {
-        return false;
-    }
-
-    // Return false if a specific browser version is not supported
-    if (unsupportedVersionsRe.test(userAgent)) {
-        return false;
-    }
-    return true;
-};
-
-/**
- * Asychronous WEB detection using a data uri.
- * Credit to Modernizer:
- * https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
- */
-ResizeImages.dataUriWebpDetect = function(callback) {
-    var image = new Image();
-    image.onload = function() {
-        var support = (image.width === 1) ? true : false;
-        persistWebpSupport(support);
-        if (callback) callback(support);
-        };
-    // this webp generated with Mobify image resizer from 
-    // http://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png passed 
-    // through the Mobify Image resizer: 
-    // http://ir0.mobify.com/webp/http://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png
-    image.src = 'data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQABgBwlpAADcAD+/gbQAA==';
-}
-
-/**
- * Detect WEBP support sync and async. Do our best to determine support
- * with regex, and use data-uri method for future proofing.
- * (note: async test will not complete before first run of `resize`,
- * since onload of detector image won't fire until document is complete)
- * Also caches results for WEBP support in localStorage.
- */
-ResizeImages.supportsWebp = function(callback) {
-
-    // Return early if we have persisted WEBP support
-    if (Utils.supportsLocalStorage()) {
-        
-        // Check if WEBP support has already been detected
-        var webpSupport;
-        var storedSupport = localStorage.getItem(localStorageWebpKey);
-
-        // Only JSON.parse if storedSupport is not null, or else things
-        // will break on Android 2.3
-        storedSupport && (webpSupport = JSON.parse(storedSupport));
-        
-        // Grab previously cached support value in localStorage.
-        if (webpSupport && (Date.now() - webpSupport.date < 604800000)) {
-            return webpSupport.supported;
-        }
-    }
-
-    // Run async WEBP detection for future proofing
-    // This test may not finish running before the first call of `resize`
-    ResizeImages.dataUriWebpDetect(callback);
-
-    // Run regex based synchronous WEBP detection
-    var support = ResizeImages.userAgentWebpDetect(navigator.userAgent);
-
-    persistWebpSupport(support);
-
-    return support;
-
-};
-
-/**
- * Returns a URL suitable for use with the 'ir' service.
- */
-ResizeImages.getImageURL = function(url, options) {
-    var opts = options;
-    if (!opts) {
-        opts = ResizeImages.processOptions();
-    }
-    var bits = [opts.proto + opts.host];
+CssOptimize.getCssUrl = function(url, options) {
+    var opts = Utils.extend({}, defaults, options);
+    var bits = [opts.protoAndHost];
 
     if (opts.projectName) {
-        var projectId = "project-" + opts.projectName;
-        bits.push(projectId);
+        bits.push('project-' + opts.projectName);
     }
 
-    if (opts.cacheHours) {
-        bits.push('c' + opts.cacheHours);
-    }
-
-    if (opts.format) {
-        bits.push(opts.format + (opts.quality || ''));
-    }
-
-    if (opts.maxWidth) {
-        bits.push(opts.maxWidth);
-
-        if (opts.maxHeight) {
-            bits.push(opts.maxHeight);
-        }
-    }
-
+    bits.push(opts.endpoint);
     bits.push(url);
+
     return bits.join('/');
 };
 
 /**
- * Replaces src attr of passed element with value of running `getImageUrl` on it
- * Allows overriding of img.getAttribute(x-src) with srcVal
+ * Rewrite the href of a stylesheet referencing `<link>` element to go through 
+ * our service.
  */
-
-ResizeImages._rewriteSrcAttribute = function(element, opts, srcVal){
-    srcVal = element.getAttribute(opts.sourceAttribute) || srcVal;
-    if (srcVal) {
-        var url = Utils.absolutify(srcVal);
+CssOptimize._rewriteHref = function(element, options) {
+    var attributeVal = element.getAttribute(options.targetAttribute);
+    var url;
+    if (attributeVal) {
+        url = Utils.absolutify(attributeVal);
         if (Utils.httpUrl(url)) {
-            if (opts.onerror) {
-                element.setAttribute('onerror', opts.onerror);
-            }
-            element.setAttribute(opts.targetAttribute, ResizeImages.getImageURL(url, opts));
-            element.setAttribute('data-orig-src', srcVal);
-            // if using resize when not capturing, remove the sourceAttribute
-            // as long as it's not "src", which is the target attribute used
-            // when not capturing.
-            if (!capturing && opts.sourceAttribute != opts.targetAttribute) {
-                element.removeAttribute(opts.sourceAttribute);
+            element.setAttribute('data-orig-href', attributeVal);
+            element.setAttribute(options.targetAttribute,
+                                 CssOptimize.getCssUrl(url, options));
+            if (options.onerror) {
+                element.setAttribute('onerror', options.onerror);
             }
         }
     }
 };
 
 /**
- * Modifies src of `<source />` children of a `<picture>` element to use image 
- * resizer
+ * Takes an array-like object of `<link>` elements
  */
-ResizeImages._resizeSourceElement = function(element, opts, rootSrc) {
-    // Grab optional width override
-    var width = element.getAttribute('data-width');
-    var localOpts = opts;
-    if (width) {
-        localOpts = Utils.clone(opts);
-        localOpts.maxWidth = width;
-    }
-    // pass along rootSrc if defined on `picture` element
-    ResizeImages._rewriteSrcAttribute(element, localOpts, rootSrc);
-};
+CssOptimize.optimize = function(elements, options) {
+    var opts = Utils.extend({}, defaults, options);
+    var element;
 
-/**
- * Takes a picture element and calls _resizeSourceElement on its `<source />` 
- * children
- */
-ResizeImages._crawlPictureElement = function(el, opts) {
-    var sources = el.getElementsByTagName('source');
-    // If source elements are erased from the dom, leave the
-    // picture element alone.
-    if (sources.length === 0 || el.hasAttribute('mobify-optimized')) {
-        return;
-    }
-    el.setAttribute('mobify-optimized', '');
-
-    // Grab optional `data-src` attribute on `picture`.
-    // Used for preventing writing the same src multiple times for
-    // different `source` elements.
-    var rootSrc = el.getAttribute('data-src');
-
-    // resize the sources
-    for(var i =  0, len = sources.length; i < len; i++) {
-        ResizeImages._resizeSourceElement(sources[i], opts, rootSrc);
-    }
-};
-
-/**
- * Searches a list of target dimensions for the smallest one that is greater than 
- * the passed value and return it, or return the greatst value if none are 
- * greater.
- *
- * Popular device resolutions: 
- * iPhone 3Gs - 320x480
- * iPhone 4 - 640x960
- * iPhone 5 - 650x1156
- * 
- * Galaxy SIII/Nexus 4/Nexus 7 - 720x1280
- * Galaxy SIV/Nexus 5 - 1080x1920
- * 
- * iPad (non-retina) - 1024x768
- * iPad (retina) - 2048x1536
- *
- * A larger list of target dimensions would include 720px, 800px, 1024px, 1280px 
- * and 1920px but they have been omitted due tot heir proximity to other, larger 
- * values
- */
-var targetDims = [320, 640, 768, 1080, 1536, 2048, 4000];
-ResizeImages._getBinnedDimension = function(dim) {
-    var resultDim = 0;
-
-    for (var i = 0, len = targetDims.length; i < len; i++) {
-        resultDim = targetDims[i];
-        if (resultDim >= dim) {
-            break;
-        }
-    }
-    return resultDim;
-};
-
-/**
- * Processes options passed to `resize()`. Takes an options object that 
- * potentially has height and width set in css pixels, returns an object where 
- * they are expressed in device pixels, and other default options are set.
- */
-ResizeImages.processOptions = function(options) {
-    var opts = Utils.clone(ResizeImages.defaults);
-    if (options) {
-        Utils.extend(opts, options);
-    }
-
-    var dpr = opts.devicePixelRatio || window.devicePixelRatio;
-
-    var screenSize = Utils.getPhysicalScreenSize(dpr);
-
-    // If maxHeight/maxWidth are not specified, use screen dimensions
-    // in device pixels
-    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
-    var height = opts.maxHeight || undefined;
-
-    // Otherwise, compute device pixels
-    if (dpr && opts.maxWidth) {
-        width = width * dpr;
-        if (opts.maxHeight) {
-            height = height * dpr;
-        }
-    }
-
-    // round up in case of non-integer device pixel ratios
-    opts.maxWidth = Math.ceil(width);
-    if (opts.maxHeight && height) {
-        opts.maxHeight = Math.ceil(height);
-    }
-
-    if (!opts.format && opts.webp) {
-        opts.format = "webp";
-    }
-
-    return opts;
-};
-
-/**
- * Searches the collection for image elements and modifies them to use
- * the Image Resize service. Pass `options` to modify how the images are 
- * resized.
- */
-ResizeImages.resize = function(elements, options) {
-    var opts = ResizeImages.processOptions(options);
-
-    for(var i=0; i < elements.length; i++) {
-        var element = elements[i];
-
-        // For an `img`, simply modify the src attribute
-        if (element.nodeName === 'IMG' && !element.hasAttribute('mobify-optimized')) {
+    for(var i = 0, len = elements.length; i < len; i++) {
+        element = elements[i];
+        if (element.nodeName === 'LINK' &&
+            element.getAttribute('rel') === 'stylesheet' &&
+            element.getAttribute(opts.targetAttribute) &&
+            !element.hasAttribute('mobify-optimized')) {
             element.setAttribute('mobify-optimized', '');
-            ResizeImages._rewriteSrcAttribute(element, opts);
-        }
-        // For a `picture`, (potentially) nuke src on `img`, and
-        // pass all `source` elements into modifyImages recursively
-        else if (element.nodeName === 'PICTURE') {
-            ResizeImages._crawlPictureElement(element, opts);
+            CssOptimize._rewriteHref(element, opts);
         }
     }
-
-    return elements;
 };
 
-ResizeImages.restoreOriginalSrc = function(event) {
-    var origSrc;
-    event.target.removeAttribute('onerror'); // remove ourselves
-    origSrc = event.target.getAttribute('data-orig-src')
-    if (origSrc) {
-        event.target.setAttribute('src', origSrc);
+/**
+ * An 'error' event handler designed to be set using an "onerror" attribute that
+ * will set the target elements "href" attribute to the value of its 
+ * "data-orig-href" attribute, if one exists.
+ */
+var restoreOriginalHref = CssOptimize.restoreOriginalHref = function(event) {
+    var origHref;
+    event.target.removeAttribute('onerror'); //remove error handler
+    if(origHref = event.target.getAttribute('data-orig-href')) {
+        event.target.setAttribute('href', origHref);
     }
 };
 
-var capturing = window.Mobify && window.Mobify.capturing || false;
-
-ResizeImages.defaults = {
-      proto: '//',
-      host: 'ir0.mobify.com',
-      projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
-      sourceAttribute: "x-src",
-      targetAttribute: (capturing ? "x-src" : "src"),
-      webp: ResizeImages.supportsWebp(),
-      onerror: 'ResizeImages.restoreOriginalSrc(event);'
+var defaults = CssOptimize._defaults = {
+    protoAndHost: '//jazzcat.mobify.com',
+    endpoint: 'cssoptimizer',
+    projectName: 'oss-' + location.hostname.replace(/[^\w]/g, '-'),
+    targetAttribute: 'x-href',
+    onerror: 'Mobify.CssOptimize.restoreOriginalHref(event);'
 };
 
-return ResizeImages;
+return CssOptimize;
 
-});
+}));
 
+},{"./utils.js":8}],3:[function(require,module,exports){
 /**
  * The Jazzcat client is a library for loading JavaScript from the Jazzcat
  * webservice. Jazzcat provides a JSONP HTTP endpoint for fetching multiple HTTP
@@ -1673,7 +684,21 @@ return ResizeImages;
  * into the cache using a bootloader request to Jazzcat. Scripts are then
  * executed directly from the cache.
  */
-define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(["mobifyjs/utils"], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        var Utils = require('./utils.js');
+        module.exports = factory(Utils);
+    } else {
+        // Browser globals (root is window)
+        root.Jazzcat = factory(root.Utils);
+    }
+}(this, function (Utils) {
     /**
      * An HTTP 1.1 compliant localStorage backed cache.
      */
@@ -2249,9 +1274,508 @@ define('mobifyjs/jazzcat',["mobifyjs/utils", "mobifyjs/capture"], function(Utils
     };
 
     return Jazzcat;
-});
+}));
 
-define('mobifyjs/unblockify',["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+},{"./utils.js":8}],4:[function(require,module,exports){
+var Utils = require('./utils');
+var Capture = require('./capture');
+var ResizeImages = require('./resizeImages');
+var Jazzcat = require('./jazzcat');
+var CssOptimize = require('./cssOptimize');
+var Unblockify = require('./unblockify');
+
+var Mobify = window.Mobify = window.Mobify || {};
+Mobify.Utils = Utils;
+Mobify.Capture = Capture;
+Mobify.ResizeImages = ResizeImages;
+Mobify.Jazzcat = Jazzcat;
+Mobify.CssOptimize = CssOptimize;
+Mobify.Unblockify = Unblockify;
+Mobify.api = "2.0"; // v6 tag backwards compatibility change
+
+module.exports = Mobify;
+},{"./capture":1,"./cssOptimize":2,"./jazzcat":3,"./resizeImages":6,"./unblockify":7,"./utils":8}],5:[function(require,module,exports){
+// Fixes anchor links (on FF)
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(["mobifyjs/utils"], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        var Utils = require('./utils.js');
+        module.exports = factory(Utils);
+    } else {
+        // Browser globals (root is window)
+        root.Jazzcat = factory(root.Utils);
+    }
+}(this, function (Utils) {
+    var exports = {};
+
+    var isFirefox = function(ua) {
+        ua = window.navigator.userAgent;
+
+        return /firefox|fennec/i.test(ua)
+    };
+
+    var _patchAnchorLinks = function(doc) {
+        // Anchor links in FF, after we do `document.open` cause a page
+        // navigation (a refresh) instead of just scrolling the
+        // element in to view.
+        //
+        // So, we prevent the default action on the element, and
+        // then manually scroll it in to view (unless some else already
+        // called prevent default).
+
+        var body = doc.body;
+
+        if (!(body && body.addEventListener)) {
+            // Body is not there or we can't bind as expected.
+            return;
+        }
+
+        var _handler = function(e) {
+            // Handler for all clicks on the page, but only triggers
+            // on proper anchor links.
+
+            var target = e.target;
+
+            var matches = function(el) {
+                return (el.nodeName == "A") && (/^#/.test(el.getAttribute('href')));
+            }
+
+            if (!matches(target)) {
+                return;
+            }
+            
+            // Newer browsers support `e.defaultPrevented`. FF 4.0 supports `e.getPreventDefault()`
+            var defaultPrevented = (typeof e.defaultPrevented !== "undefined") ?
+                e.defaultPrevented :
+                e.getPreventDefault && e.getPreventDefault();
+
+            if (!defaultPrevented) {
+                // Prevent the default action, which would cause a
+                // page refresh.
+                e.preventDefault();
+
+                // But pretend that we didn't call it.
+                e.defaultPrevented = false;
+
+                // We have to wait and see if anyone else calls
+                // `preventDefault`. If they do, we don't scroll.
+                var scroll = true;
+
+                // Override the `preventDefault` to stop  us from scrolling.
+                e.preventDefault = function() {
+                    e.defaultPrevented = true;
+                    scroll = false;
+                }
+
+                // If no other events call `preventDefault` we manually
+                // scroll to the element in question.
+                setTimeout(function() {
+                    if (scroll) {
+                        _scrollToAnchor(target.getAttribute('href'));
+                    }
+                }, 50);
+            }   
+        };
+
+
+        var _scrollToAnchor = function(anchor) {
+            // Scrolls to the element, if any, that matches
+            // the given anchor link (eg, "#foo").
+
+            var anchorRe = /^#([^\s]*)/;
+            var match = anchor.match(anchorRe);
+            var target;
+            
+            // Find the target, if any
+            if (match && match[1] === "") {
+                target = doc.body;
+            } else if (match && match[1]) {
+                var target = doc.getElementById(match[1]);
+            }
+
+            // Scroll to it, if it exists
+            if (target) {
+                target.scrollIntoView && target.scrollIntoView();
+            }
+        };
+
+        // We have to get the event through bubbling, otherwise
+        // events cancelled by the return value of an onclick
+        // handler are not correctly handled.
+        body.addEventListener('click', _handler, false);
+    };
+
+    var patchAnchorLinks = function() {
+        if (!isFirefox()) {
+            return
+        }
+
+        Utils.waitForReady(document, _patchAnchorLinks);
+    }
+
+    return patchAnchorLinks;
+}));
+
+},{"./utils.js":8}],6:[function(require,module,exports){
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['mobifyjs/utils'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('./utils.js'));
+    } else {
+        // Browser globals (root is window)
+        root.ResizeImages = factory(root.Utils);
+    }
+}(this, function (Utils) {
+
+var ResizeImages = window.ResizeImages = {};
+
+var localStorageWebpKey = 'Mobify-Webp-Support-v2';
+
+function persistWebpSupport(supported) {
+    if (Utils.supportsLocalStorage()) {
+        var webpSupport = {
+            supported: supported,
+            date: Date.now()
+        };
+        localStorage.setItem(localStorageWebpKey, JSON.stringify(webpSupport));
+    }
+}
+
+/**
+ * Synchronous WEBP detection using regular expressions
+ * Credit to Ilya Grigorik for WEBP regex matching
+ * https://github.com/igrigorik/webp-detect/blob/master/pagespeed.cc
+ * Modified to exclude Android native browser on Android 4
+ */
+ResizeImages.userAgentWebpDetect = function(userAgent){
+    var supportedRe = /(Android\s|Chrome\/|Opera9.8*Version\/..\.|Opera..\.)/i;
+    var unsupportedVersionsRe = new RegExp('(Android\\s(0|1|2|3|(4(?!.*Chrome)))\\.)|(Chrome\\/[0-8]\\.)' +
+                                '|(Chrome\\/9\\.0\\.)|(Chrome\\/1[4-6]\\.)|(Android\\sChrome\\/1.\\.)' +
+                                '|(Android\\sChrome\\/20\\.)|(Chrome\\/(1.|20|21|22)\\.)' +
+                                '|(Opera.*(Version/|Opera\\s)(10|11)\\.)', 'i');
+
+    // Return false if browser is not supported
+    if (!supportedRe.test(userAgent)) {
+        return false;
+    }
+
+    // Return false if a specific browser version is not supported
+    if (unsupportedVersionsRe.test(userAgent)) {
+        return false;
+    }
+    return true;
+};
+
+/**
+ * Asychronous WEB detection using a data uri.
+ * Credit to Modernizer:
+ * https://github.com/Modernizr/Modernizr/blob/fb76d75fbf97f715e666b55b8aa04e43ef809f5e/feature-detects/img-webp.js
+ */
+ResizeImages.dataUriWebpDetect = function(callback) {
+    var image = new Image();
+    image.onload = function() {
+        var support = (image.width === 1) ? true : false;
+        persistWebpSupport(support);
+        if (callback) callback(support);
+        };
+    // this webp generated with Mobify image resizer from 
+    // http://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png passed 
+    // through the Mobify Image resizer: 
+    // http://ir0.mobify.com/webp/http://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png
+    image.src = 'data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQABgBwlpAADcAD+/gbQAA==';
+}
+
+/**
+ * Detect WEBP support sync and async. Do our best to determine support
+ * with regex, and use data-uri method for future proofing.
+ * (note: async test will not complete before first run of `resize`,
+ * since onload of detector image won't fire until document is complete)
+ * Also caches results for WEBP support in localStorage.
+ */
+ResizeImages.supportsWebp = function(callback) {
+
+    // Return early if we have persisted WEBP support
+    if (Utils.supportsLocalStorage()) {
+        
+        // Check if WEBP support has already been detected
+        var webpSupport;
+        var storedSupport = localStorage.getItem(localStorageWebpKey);
+
+        // Only JSON.parse if storedSupport is not null, or else things
+        // will break on Android 2.3
+        storedSupport && (webpSupport = JSON.parse(storedSupport));
+        
+        // Grab previously cached support value in localStorage.
+        if (webpSupport && (Date.now() - webpSupport.date < 604800000)) {
+            return webpSupport.supported;
+        }
+    }
+
+    // Run async WEBP detection for future proofing
+    // This test may not finish running before the first call of `resize`
+    ResizeImages.dataUriWebpDetect(callback);
+
+    // Run regex based synchronous WEBP detection
+    var support = ResizeImages.userAgentWebpDetect(navigator.userAgent);
+
+    persistWebpSupport(support);
+
+    return support;
+
+};
+
+/**
+ * Returns a URL suitable for use with the 'ir' service.
+ */
+ResizeImages.getImageURL = function(url, options) {
+    var opts = options;
+    if (!opts) {
+        opts = ResizeImages.processOptions();
+    }
+    var bits = [opts.proto + opts.host];
+
+    if (opts.projectName) {
+        var projectId = "project-" + opts.projectName;
+        bits.push(projectId);
+    }
+
+    if (opts.cacheHours) {
+        bits.push('c' + opts.cacheHours);
+    }
+
+    if (opts.format) {
+        bits.push(opts.format + (opts.quality || ''));
+    }
+
+    if (opts.maxWidth) {
+        bits.push(opts.maxWidth);
+
+        if (opts.maxHeight) {
+            bits.push(opts.maxHeight);
+        }
+    }
+
+    bits.push(url);
+    return bits.join('/');
+};
+
+/**
+ * Replaces src attr of passed element with value of running `getImageUrl` on it
+ * Allows overriding of img.getAttribute(x-src) with srcVal
+ */
+
+ResizeImages._rewriteSrcAttribute = function(element, opts, srcVal){
+    srcVal = element.getAttribute(opts.sourceAttribute) || srcVal;
+    if (srcVal) {
+        var url = Utils.absolutify(srcVal);
+        if (Utils.httpUrl(url)) {
+            if (opts.onerror) {
+                element.setAttribute('onerror', opts.onerror);
+            }
+            element.setAttribute(opts.targetAttribute, ResizeImages.getImageURL(url, opts));
+            element.setAttribute('data-orig-src', srcVal);
+            // if using resize when not capturing, remove the sourceAttribute
+            // as long as it's not "src", which is the target attribute used
+            // when not capturing.
+            if (!capturing && opts.sourceAttribute != opts.targetAttribute) {
+                element.removeAttribute(opts.sourceAttribute);
+            }
+        }
+    }
+};
+
+/**
+ * Modifies src of `<source />` children of a `<picture>` element to use image 
+ * resizer
+ */
+ResizeImages._resizeSourceElement = function(element, opts, rootSrc) {
+    // Grab optional width override
+    var width = element.getAttribute('data-width');
+    var localOpts = opts;
+    if (width) {
+        localOpts = Utils.clone(opts);
+        localOpts.maxWidth = width;
+    }
+    // pass along rootSrc if defined on `picture` element
+    ResizeImages._rewriteSrcAttribute(element, localOpts, rootSrc);
+};
+
+/**
+ * Takes a picture element and calls _resizeSourceElement on its `<source />` 
+ * children
+ */
+ResizeImages._crawlPictureElement = function(el, opts) {
+    var sources = el.getElementsByTagName('source');
+    // If source elements are erased from the dom, leave the
+    // picture element alone.
+    if (sources.length === 0 || el.hasAttribute('mobify-optimized')) {
+        return;
+    }
+    el.setAttribute('mobify-optimized', '');
+
+    // Grab optional `data-src` attribute on `picture`.
+    // Used for preventing writing the same src multiple times for
+    // different `source` elements.
+    var rootSrc = el.getAttribute('data-src');
+
+    // resize the sources
+    for(var i =  0, len = sources.length; i < len; i++) {
+        ResizeImages._resizeSourceElement(sources[i], opts, rootSrc);
+    }
+};
+
+/**
+ * Searches a list of target dimensions for the smallest one that is greater than 
+ * the passed value and return it, or return the greatst value if none are 
+ * greater.
+ *
+ * Popular device resolutions: 
+ * iPhone 3Gs - 320x480
+ * iPhone 4 - 640x960
+ * iPhone 5 - 650x1156
+ * 
+ * Galaxy SIII/Nexus 4/Nexus 7 - 720x1280
+ * Galaxy SIV/Nexus 5 - 1080x1920
+ * 
+ * iPad (non-retina) - 1024x768
+ * iPad (retina) - 2048x1536
+ *
+ * A larger list of target dimensions would include 720px, 800px, 1024px, 1280px 
+ * and 1920px but they have been omitted due tot heir proximity to other, larger 
+ * values
+ */
+var targetDims = [320, 640, 768, 1080, 1536, 2048, 4000];
+ResizeImages._getBinnedDimension = function(dim) {
+    var resultDim = 0;
+
+    for (var i = 0, len = targetDims.length; i < len; i++) {
+        resultDim = targetDims[i];
+        if (resultDim >= dim) {
+            break;
+        }
+    }
+    return resultDim;
+};
+
+/**
+ * Processes options passed to `resize()`. Takes an options object that 
+ * potentially has height and width set in css pixels, returns an object where 
+ * they are expressed in device pixels, and other default options are set.
+ */
+ResizeImages.processOptions = function(options) {
+    var opts = Utils.clone(ResizeImages.defaults);
+    if (options) {
+        Utils.extend(opts, options);
+    }
+
+    var dpr = opts.devicePixelRatio || window.devicePixelRatio;
+
+    var screenSize = Utils.getPhysicalScreenSize(dpr);
+
+    // If maxHeight/maxWidth are not specified, use screen dimensions
+    // in device pixels
+    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
+    var height = opts.maxHeight || undefined;
+
+    // Otherwise, compute device pixels
+    if (dpr && opts.maxWidth) {
+        width = width * dpr;
+        if (opts.maxHeight) {
+            height = height * dpr;
+        }
+    }
+
+    // round up in case of non-integer device pixel ratios
+    opts.maxWidth = Math.ceil(width);
+    if (opts.maxHeight && height) {
+        opts.maxHeight = Math.ceil(height);
+    }
+
+    if (!opts.format && opts.webp) {
+        opts.format = "webp";
+    }
+
+    return opts;
+};
+
+/**
+ * Searches the collection for image elements and modifies them to use
+ * the Image Resize service. Pass `options` to modify how the images are 
+ * resized.
+ */
+ResizeImages.resize = function(elements, options) {
+    var opts = ResizeImages.processOptions(options);
+
+    for(var i=0; i < elements.length; i++) {
+        var element = elements[i];
+
+        // For an `img`, simply modify the src attribute
+        if (element.nodeName === 'IMG' && !element.hasAttribute('mobify-optimized')) {
+            element.setAttribute('mobify-optimized', '');
+            ResizeImages._rewriteSrcAttribute(element, opts);
+        }
+        // For a `picture`, (potentially) nuke src on `img`, and
+        // pass all `source` elements into modifyImages recursively
+        else if (element.nodeName === 'PICTURE') {
+            ResizeImages._crawlPictureElement(element, opts);
+        }
+    }
+
+    return elements;
+};
+
+ResizeImages.restoreOriginalSrc = function(event) {
+    var origSrc;
+    event.target.removeAttribute('onerror'); // remove ourselves
+    origSrc = event.target.getAttribute('data-orig-src')
+    if (origSrc) {
+        event.target.setAttribute('src', origSrc);
+    }
+};
+
+var capturing = window.Mobify && window.Mobify.capturing || false;
+
+ResizeImages.defaults = {
+      proto: '//',
+      host: 'ir0.mobify.com',
+      projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
+      sourceAttribute: "x-src",
+      targetAttribute: (capturing ? "x-src" : "src"),
+      webp: ResizeImages.supportsWebp(),
+      onerror: 'ResizeImages.restoreOriginalSrc(event);'
+};
+
+return ResizeImages;
+
+}));
+
+},{"./utils.js":8}],7:[function(require,module,exports){
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['mobifyjs/utils', 'mobifyjs/capture'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        var Utils = require('./utils.js');
+        var Capture = require('./capture.js');
+        module.exports = factory(Utils, Capture);
+    } else {
+        // Browser globals (root is window)
+        root.Unblockify = factory(root.Utils, root.Capture);
+    }
+}(this, function (Utils, Capture) {
 
 var Unblockify = {}
 
@@ -2283,254 +1807,278 @@ Unblockify.unblock = function(scripts) {
 
 return Unblockify;
 
-});
+}));
 
-/**
- * cssOptimize - Client code to a css optimization service
- */
-
-define('mobifyjs/cssOptimize',["mobifyjs/utils"], function(Utils) {
-
-var CssOptimize = window.cssOptimize = {};
-
-/**
- * Takes an original, absolute url of a stylesheet, returns a url for that
- * stylesheet going through the css service.
- */
-
-CssOptimize.getCssUrl = function(url, options) {
-    var opts = Utils.extend({}, defaults, options);
-    var bits = [opts.protoAndHost];
-
-    if (opts.projectName) {
-        bits.push('project-' + opts.projectName);
+},{"./capture.js":1,"./utils.js":8}],8:[function(require,module,exports){
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    } else {
+        // Browser globals (root is window)
+        root.Utils = factory();
     }
+}(this, function () {
 
-    bits.push(opts.endpoint);
-    bits.push(url);
+// ##
+// # Utility methods
+// ##
 
-    return bits.join('/');
+var Utils = {};
+
+Utils.extend = function(target){
+    [].slice.call(arguments, 1).forEach(function(source) {
+        for (var key in source)
+            if (source[key] !== undefined)
+                target[key] = source[key];
+    });
+    return target;
 };
 
-/**
- * Rewrite the href of a stylesheet referencing `<link>` element to go through 
- * our service.
- */
-CssOptimize._rewriteHref = function(element, options) {
-    var attributeVal = element.getAttribute(options.targetAttribute);
-    var url;
-    if (attributeVal) {
-        url = Utils.absolutify(attributeVal);
-        if (Utils.httpUrl(url)) {
-            element.setAttribute('data-orig-href', attributeVal);
-            element.setAttribute(options.targetAttribute,
-                                 CssOptimize.getCssUrl(url, options));
-            if (options.onerror) {
-                element.setAttribute('onerror', options.onerror);
-            }
+Utils.keys = function(obj) {
+    var result = [];
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key))
+            result.push(key);
+    }
+    return result;
+};
+
+Utils.values = function(obj) {
+    var result = [];
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key))
+          result.push(obj[key]);
+    }
+    return result;
+};
+
+Utils.clone = function(obj) {
+    var target = {};
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i)) {
+          target[i] = obj[i];
         }
     }
+    return target;
+};
+
+// Some url helpers
+/**
+ * Takes a url, relative or absolute, and absolutizes it relative to the current 
+ * document's location/base, with the assistance of an a element.
+ */
+var _absolutifyAnchor = document.createElement("a");
+Utils.absolutify = function(url) {
+    _absolutifyAnchor.href = url;
+    return _absolutifyAnchor.href;
 };
 
 /**
- * Takes an array-like object of `<link>` elements
+ * Takes an absolute url, returns true if it is an http/s url, false otherwise 
+ * (e.g. mailto:, gopher://, data:, etc.)
  */
-CssOptimize.optimize = function(elements, options) {
-    var opts = Utils.extend({}, defaults, options);
-    var element;
+var _httpUrlRE = /^https?/;
+Utils.httpUrl = function(url) {
+    return _httpUrlRE.test(url);
+};
 
-    for(var i = 0, len = elements.length; i < len; i++) {
-        element = elements[i];
-        if (element.nodeName === 'LINK' &&
-            element.getAttribute('rel') === 'stylesheet' &&
-            element.getAttribute(opts.targetAttribute) &&
-            !element.hasAttribute('mobify-optimized')) {
-            element.setAttribute('mobify-optimized', '');
-            CssOptimize._rewriteHref(element, opts);
-        }
+/**
+ * outerHTML polyfill - https://gist.github.com/889005
+ */
+Utils.outerHTML = function(el){
+    if (el.outerHTML) {
+        return el.outerHTML;
+    }
+    else {
+        var div = document.createElement('div');
+        div.appendChild(el.cloneNode(true));
+        var contents = div.innerHTML;
+        div = null;
+        return contents;
     }
 };
 
 /**
- * An 'error' event handler designed to be set using an "onerror" attribute that
- * will set the target elements "href" attribute to the value of its 
- * "data-orig-href" attribute, if one exists.
+ * Return a string for the doctype of the current document.
  */
-var restoreOriginalHref = CssOptimize.restoreOriginalHref = function(event) {
-    var origHref;
-    event.target.removeAttribute('onerror'); //remove error handler
-    if(origHref = event.target.getAttribute('data-orig-href')) {
-        event.target.setAttribute('href', origHref);
-    }
+Utils.getDoctype = function(doc) {
+    doc = doc || document;
+    var doctypeEl = doc.doctype || [].filter.call(doc.childNodes, function(el) {
+            return el.nodeType == Node.DOCUMENT_TYPE_NODE
+        })[0];
+
+    if (!doctypeEl) return '';
+
+    return '<!DOCTYPE HTML'
+        + (doctypeEl.publicId ? ' PUBLIC "' + doctypeEl.publicId + '"' : '')
+        + (doctypeEl.systemId ? ' "' + doctypeEl.systemId + '"' : '')
+        + '>';
 };
 
-var defaults = CssOptimize._defaults = {
-    protoAndHost: '//jazzcat.mobify.com',
-    endpoint: 'cssoptimizer',
-    projectName: 'oss-' + location.hostname.replace(/[^\w]/g, '-'),
-    targetAttribute: 'x-href',
-    onerror: 'Mobify.CssOptimize.restoreOriginalHref(event);'
+Utils.removeBySelector = function(selector, doc) {
+    doc = doc || document;
+
+    var els = doc.querySelectorAll(selector);
+    return Utils.removeElements(els, doc);
 };
 
-return CssOptimize;
-});
+Utils.removeElements = function(elements, doc) {
+    doc = doc || document;
 
-define('mobifyjs/external/picturefill',["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+    for (var i=0,ii=elements.length; i<ii; i++) {
+        var el = elements[i];
+        el.parentNode.removeChild(el);
+    }
+    return elements;
+};
 
-var capturing = window.Mobify && window.Mobify.capturing || false;
+// localStorage detection as seen in such great libraries as Modernizr
+// https://github.com/Modernizr/Modernizr/blob/master/feature-detects/storage/localstorage.js
+// Exposing on Jazzcat for use in qunit tests
+var cachedLocalStorageSupport;
+Utils.supportsLocalStorage = function() {
+    if (cachedLocalStorageSupport !== undefined) {
+        return cachedLocalStorageSupport;
+    }
+    var mod = 'modernizr';
+    try {
+        localStorage.setItem(mod, mod);
+        localStorage.removeItem(mod);
+        cachedLocalStorageSupport = true;
+    } catch(e) {
+        cachedLocalStorageSupport = false
+    }
+    return cachedLocalStorageSupport;
+};
 
-if (capturing) {
-    // Override renderCapturedDoc to disable img elements in picture elements
-    var oldRenderCapturedDoc = Capture.prototype.renderCapturedDoc;
-    Capture.prototype.renderCapturedDoc = function(options) {
-        // Change attribute of any img element inside a picture element
-        // so it does not load post-flood
-        var imgsInPicture = this.capturedDoc.querySelectorAll('picture img');
-        for (var i = 0, len = imgsInPicture.length; i < len; i++) {
-            var disableImg = imgsInPicture[i];
-            var srcAttr = window.Mobify && window.Mobify.prefix + 'src';
-            disableImg.setAttribute('data-orig-src', disableImg.getAttribute(srcAttr));
-            disableImg.removeAttribute(srcAttr);
-        }
-        oldRenderCapturedDoc.apply(this, arguments);
+// matchMedia polyfill generator
+// (allows you to specify which document to run polyfill on)
+Utils.matchMedia = function(doc) {
+    "use strict";
+
+    var bool,
+        docElem = doc.documentElement,
+        refNode = docElem.firstElementChild || docElem.firstChild,
+        // fakeBody required for <FF4 when executed in <head>
+        fakeBody = doc.createElement("body"),
+        div = doc.createElement("div");
+
+    div.id = "mq-test-1";
+    div.style.cssText = "position:absolute;top:-100em";
+    fakeBody.style.background = "none";
+    fakeBody.appendChild(div);
+
+    return function(q){
+        div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
+
+        docElem.insertBefore(fakeBody, refNode);
+        bool = div.offsetWidth === 42;
+        docElem.removeChild(fakeBody);
+
+        return {
+           matches: bool,
+           media: q
+        };
+    };
+};
+
+// readyState: loading --> interactive --> complete
+//                      |               |
+//                      |               |
+//                      v               v
+// Event:        DOMContentLoaded    onload
+//
+// iOS 4.3 and some Android 2.X.X have a non-typical "loaded" readyState,
+// which is an acceptable readyState to start capturing on, because
+// the data is fully loaded from the server at that state.
+// For some IE (IE10 on Lumia 920 for example), interactive is not 
+// indicative of the DOM being ready, therefore "complete" is the only acceptable
+// readyState for IE10
+// Credit to https://github.com/jquery/jquery/commit/0f553ed0ca0c50c5f66377e9f2c6314f822e8f25
+// for the IE10 fix
+Utils.domIsReady = function(doc) {
+    var doc = doc || document;
+    return doc.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading";
+};
+
+Utils.getPhysicalScreenSize = function(devicePixelRatio) {
+
+    function multiplyByPixelRatio(sizes) {
+        var dpr = devicePixelRatio || window.devicePixelRatio || 1;
+
+        sizes.width = Math.round(sizes.width * dpr);
+        sizes.height = Math.round(sizes.height * dpr);
+
+        return sizes;
     }
 
-    return;
-}
+    var iOS = navigator.userAgent.match(/ip(hone|od|ad)/i);
+    var androidVersion = (navigator.userAgent.match(/android (\d)/i) || {})[1];
 
-window.matchMedia = window.matchMedia || Utils.matchMedia(document);
-
-/* https://github.com/Wilto/picturefill-proposal */
-/*! Picturefill - Author: Scott Jehl, 2012 | License: MIT/GPLv2 */ 
-/*
-    Picturefill: A polyfill for proposed behavior of the picture element, which does not yet exist, but should. :)
-    * Notes: 
-        * For active discussion of the picture element, see http://www.w3.org/community/respimg/
-        * While this code does work, it is intended to be used only for example purposes until either:
-            A) A W3C Candidate Recommendation for <picture> is released
-            B) A major browser implements <picture>
-*/ 
-(function( w ){
-    // Enable strict mode
-    
-
-    // User preference for HD content when available
-    var prefHD = false || w.localStorage && w.localStorage[ "picturefill-prefHD" ] === "true",
-        hasHD;
-
-    // Test if `<picture>` is supported natively, if so, exit - no polyfill needed.
-    if ( !!( w.document.createElement( "picture" ) && w.document.createElement( "source" ) && w.HTMLPictureElement ) ){
-        return;
-    }
-
-    w.picturefill = function() {
-        var ps = w.document.getElementsByTagName( "picture" );
-
-        // Loop the pictures
-        for( var i = 0, il = ps.length; i < il; i++ ){
-            var sources = ps[ i ].getElementsByTagName( "source" ),
-                picImg = null,
-                matches = [];
-
-            // If no sources are found, they're likely erased from the DOM. Try finding them inside comments.
-            if( !sources.length ){
-                var picText =  ps[ i ].innerHTML,
-                    frag = w.document.createElement( "div" ),
-                    // For IE9, convert the source elements to divs
-                    srcs = picText.replace( /(<)source([^>]+>)/gmi, "$1div$2" ).match( /<div[^>]+>/gmi );
-
-                frag.innerHTML = srcs.join( "" );
-                sources = frag.getElementsByTagName( "div" );
-            }
-
-            // See which sources match
-            for( var j = 0, jl = sources.length; j < jl; j++ ){
-                var media = sources[ j ].getAttribute( "media" );
-                // if there's no media specified, OR w.matchMedia is supported 
-                if( !media || ( w.matchMedia && w.matchMedia( media ).matches ) ){
-                    matches.push( sources[ j ] );
-                }
-            }
-
-            // Find any existing img element in the picture element
-            picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
-
-            if( matches.length ){
-                // Grab the most appropriate (last) match.
-                var match = matches.pop(),
-                    srcset = match.getAttribute( "srcset" );
-
-                if( !picImg ){
-                    picImg = w.document.createElement( "img" );
-                    picImg.alt = ps[ i ].getAttribute( "alt" );
-                    ps[ i ].appendChild( picImg );
-                }
-
-                if( srcset ) {
-                        var screenRes = ( prefHD && w.devicePixelRatio ) || 1, // Is it worth looping through reasonable matchMedia values here?
-                            sources = srcset.split(","); // Split comma-separated `srcset` sources into an array.
-
-                        hasHD = w.devicePixelRatio > 1;
-
-                        for( var res = sources.length, r = res - 1; r >= 0; r-- ) { // Loop through each source/resolution in `srcset`.
-                            var source = sources[ r ].replace(/^\s*/, '').replace(/\s*$/, '').split(" "), // Remove any leading whitespace, then split on spaces.
-                                resMatch = parseFloat( source[1], 10 ); // Parse out the resolution for each source in `srcset`.
-
-                            if( screenRes >= resMatch ) {
-                                if( picImg.getAttribute( "src" ) !== source[0] ) {
-                                    var newImg = document.createElement("img");
-
-                                    newImg.src = source[0];
-                                    // When the image is loaded, set a width equal to that of the original’s intrinsic width divided by the screen resolution:
-                                    newImg.onload = function() {
-                                        // Clone the original image into memory so the width is unaffected by page styles:
-                                        this.width = ( this.cloneNode( true ).width / resMatch );
-                                    }
-                                    picImg.parentNode.replaceChild( newImg, picImg );
-                                }
-                                break; // We’ve matched, so bail out of the loop here.
-                            }
-                        }
-                } else {
-                    // No `srcset` in play, so just use the `src` value:
-                    picImg.src = match.getAttribute( "src" );
-                }
-            }
-        }
+    var sizes = {
+        width: window.outerWidth
+      , height: window.outerHeight
     };
 
-    // Run on resize and domready (w.load as a fallback)
-    if( w.addEventListener ){
-        w.addEventListener( "resize", w.picturefill, false );
-        w.addEventListener( "DOMContentLoaded", function(){
-            w.picturefill();
-            // Run once only
-            w.removeEventListener( "load", w.picturefill, false );
-        }, false );
-        w.addEventListener( "load", w.picturefill, false );
+    // Old Android and BB10 use physical pixels in outerWidth/Height, which is what we need
+    // New Android (4.0 and above) use CSS pixels, requiring devicePixelRatio multiplication
+    // iOS lies about outerWidth/Height when zooming, but does expose CSS pixels in screen.width/height
+
+    if (!iOS) {
+        if (androidVersion > 3) return multiplyByPixelRatio(sizes);
+        return sizes;
     }
-    else if( w.attachEvent ){
-        w.attachEvent( "onload", w.picturefill );
+
+    var isLandscape = window.orientation % 180;
+    if (isLandscape) {
+        sizes.height = screen.width;
+        sizes.width = screen.height;
+    } else {
+        sizes.width = screen.width;
+        sizes.height = screen.height;
     }
-})( this );
 
-return;
+    return multiplyByPixelRatio(sizes);
+};
 
-});
+Utils.waitForReady = function(doc, callback) {
+    // Waits for `doc` to be ready, and then fires callback, passing
+    // `doc`.
 
-require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify", "mobifyjs/cssOptimize", "mobifyjs/external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize) {
-    var Mobify = window.Mobify = window.Mobify || {};
-    Mobify.Utils = Utils;
-    Mobify.Capture = Capture;
-    Mobify.ResizeImages = ResizeImages;
-    Mobify.Jazzcat = Jazzcat;
-    Mobify.CssOptimize = CssOptimize;
-    Mobify.Unblockify = Unblockify;
-    Mobify.api = "2.0"; // v6 tag backwards compatibility change
-    return Mobify;
+    // We may be in "loading" state by the time we get here, meaning we are
+    // not ready to capture. Next step after "loading" is "interactive",
+    // which is a valid state to start capturing on (except IE), and thus when ready
+    // state changes once, we know we are good to start capturing.
+    // Cannot rely on using DOMContentLoaded because this event prematurely fires
+    // for some IE10s.
+    var ready = false;
+    
+    var onReady = function() {
+        if (!ready) {
+            ready = true;
+            iid && clearInterval(iid);
+            callback(doc);
+        }
+    }
 
-}, undefined, true);
-// relPath, forceSync
-;
-define("mobify-library", function(){});
-}());
+    // Backup with polling incase readystatechange doesn't fire
+    // (happens with some Android 2.3 browsers)
+    var iid = setInterval(function(){
+        if (Utils.domIsReady(doc)) {
+            onReady();
+        }
+    }, 100);
+
+    doc.addEventListener("readystatechange", onReady, false);
+};
+
+return Utils;
+
+}));
+},{}]},{},[4])

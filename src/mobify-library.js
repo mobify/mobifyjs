@@ -1,13 +1,17 @@
-require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify", "mobifyjs/cssOptimize", "mobifyjs/external/picturefill"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, CssOptimize) {
-    var Mobify = window.Mobify = window.Mobify || {};
-    Mobify.Utils = Utils;
-    Mobify.Capture = Capture;
-    Mobify.ResizeImages = ResizeImages;
-    Mobify.Jazzcat = Jazzcat;
-    Mobify.CssOptimize = CssOptimize;
-    Mobify.Unblockify = Unblockify;
-    Mobify.api = "2.0"; // v6 tag backwards compatibility change
-    return Mobify;
+var Utils = require('./utils');
+var Capture = require('./capture');
+var ResizeImages = require('./resizeImages');
+var Jazzcat = require('./jazzcat');
+var CssOptimize = require('./cssOptimize');
+var Unblockify = require('./unblockify');
 
-}, undefined, true);
-// relPath, forceSync
+var Mobify = window.Mobify = window.Mobify || {};
+Mobify.Utils = Utils;
+Mobify.Capture = Capture;
+Mobify.ResizeImages = ResizeImages;
+Mobify.Jazzcat = Jazzcat;
+Mobify.CssOptimize = CssOptimize;
+Mobify.Unblockify = Unblockify;
+Mobify.api = "2.0"; // v6 tag backwards compatibility change
+
+module.exports = Mobify;

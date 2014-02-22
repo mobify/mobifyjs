@@ -52,28 +52,14 @@ module.exports = function(grunt) {
                 }
             }
         },
-        requirejs: {
-            // Building full Mobify.js library
+        browserify: {
             full: {
-                options: {
-                    almond: true,
-                    mainConfigFile: "./src/config.js",
-                    optimize: "none",
-                    keepBuildDir: true,
-                    name: "mobify-library",
-                    out: "./build/mobify.js"
-                }
+                src: ['src/mobify-library.js'],
+                dest: 'build/mobify.js'
             },
-            // Building custom Mobify.js library (must copy mobify-custom.js.example -> mobify-custom.js)
             custom: {
-                options: {
-                    almond: true,
-                    mainConfigFile: "./src/config.js",
-                    optimize: "none",
-                    keepBuildDir: true,
-                    name: "../mobify-custom.js",
-                    out: "./build/custom/mobify.js"
-                }
+                src: ['mobify-custom.js'],
+                dest: 'build/custom/mobify.js'
             }
         },
         uglify: {
@@ -396,7 +382,6 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-saucelabs');
@@ -405,15 +390,16 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-jekyll');
     grunt.loadNpmTasks('grunt-express');
     grunt.loadNpmTasks('grunt-release');
+    grunt.loadNpmTasks('grunt-browserify');
 
     grunt.registerTask('test', ['express', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present
     grunt.registerTask('build', function() {
         // Then build mobify.js library
-        grunt.task.run("requirejs:full", "uglify:full");
+        grunt.task.run("browserify:full", "uglify:full");
         // Build custom library if it exists
         if (grunt.file.exists("mobify-custom.js")) {
-            grunt.task.run("requirejs:custom", "uglify:custom");
+            grunt.task.run("browserify:custom", "uglify:custom");
         }
     });
     grunt.registerTask('default', 'build');
