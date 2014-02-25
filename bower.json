@@ -3,7 +3,9 @@
   "version": "2.0.6",
   "main": "build/mobify.min.js",
   "dependencies": {
-    "jazzcat-client": "git@github.com:mobify/jazzcat-client.git#2.0.6"
+    "mobifyjs-utils": "git@github.com:mobify/mobifyjs-utils.git#2.0.6",
+    "jazzcat-client": "git@github.com:mobify/jazzcat-client.git#2.0.6",
+    "imageresize-client": "git@github.com:mobify/imageresize-client.git#2.0.6"
   },
   "devDependencies": {
 
