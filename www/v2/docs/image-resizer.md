@@ -70,8 +70,9 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
   Only usable when maxWidth is specified.
 - `devicePixelRatio`: Override the default devicePixelRatio. Defaults to 
   `window.devicePixelRatio.`
-- `passthrough`: A boolean that when set serves images through the image resizer
-  backend but doesn't resize them.
+- `passthrough`: A boolean that controls whether to resize the image(s). When
+  set, the image(s) are served through the image resizer backend but are not
+  resized.
 
 **Example**
 
