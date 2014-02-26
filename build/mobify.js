@@ -1583,8 +1583,8 @@ ResizeImages.processOptions = function(options) {
         opts.format = "webp";
     }
 
-    // With `passthrough` the image is served through IR without resizing it,
-    // when set ensure that we clear any options pertaining to resizing
+    // With `passthrough` images are served through IR without resizing,
+    // when set ensure that any options pertaining to resizing are cleared
     if (opts.passthrough) {
         opts.maxWidth = opts.maxHeight = opts.devicePixelRatio = null;
     }
