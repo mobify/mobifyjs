@@ -1,6 +1,5 @@
-(function () {
-/**
- * almond 0.2.6 Copyright (c) 2011-2012, The Dojo Foundation All Rights Reserved.
+(function () {/**
+ * @license almond 0.2.9 Copyright (c) 2011-2014, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/almond for details
  */
@@ -17,7 +16,8 @@ var requirejs, require, define;
         config = {},
         defining = {},
         hasOwn = Object.prototype.hasOwnProperty,
-        aps = [].slice;
+        aps = [].slice,
+        jsSuffixRegExp = /\.js$/;
 
     function hasProp(obj, prop) {
         return hasOwn.call(obj, prop);
@@ -32,7 +32,7 @@ var requirejs, require, define;
      * @returns {String} normalized name
      */
     function normalize(name, baseName) {
-        var nameParts, nameSegment, mapValue, foundMap,
+        var nameParts, nameSegment, mapValue, foundMap, lastIndex,
             foundI, foundStarMap, starI, i, j, part,
             baseParts = baseName && baseName.split("/"),
             map = config.map,
@@ -50,8 +50,15 @@ var requirejs, require, define;
                 //"one/two/three.js", but we want the directory, "one/two" for
                 //this normalization.
                 baseParts = baseParts.slice(0, baseParts.length - 1);
+                name = name.split('/');
+                lastIndex = name.length - 1;
 
-                name = baseParts.concat(name.split("/"));
+                // Node .js allowance:
+                if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
+                    name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
+                }
+
+                name = baseParts.concat(name);
 
                 //start trimDots
                 for (i = 0; i < name.length; i += 1) {
@@ -260,14 +267,14 @@ var requirejs, require, define;
     main = function (name, deps, callback, relName) {
         var cjsModule, depName, ret, map, i,
             args = [],
+            callbackType = typeof callback,
             usingExports;
 
         //Use name if no relName
         relName = relName || name;
 
         //Call the callback to define the module, if necessary.
-        if (typeof callback === 'function') {
-
+        if (callbackType === 'undefined' || callbackType === 'function') {
             //Pull out the defined dependencies and pass the ordered
             //values to the callback.
             //Default to [require, exports, module] if no deps
@@ -298,7 +305,7 @@ var requirejs, require, define;
                 }
             }
 
-            ret = callback.apply(defined[name], args);
+            ret = callback ? callback.apply(defined[name], args) : undefined;
 
             if (name) {
                 //If setting exports via "module" is in play,
@@ -333,6 +340,13 @@ var requirejs, require, define;
         } else if (!deps.splice) {
             //deps is a config object, not an array.
             config = deps;
+            if (config.deps) {
+                req(config.deps, config.callback);
+            }
+            if (!callback) {
+                return;
+            }
+
             if (callback.splice) {
                 //callback is an array, which means it is a dependency list.
                 //Adjust args if there are dependencies
@@ -377,11 +391,7 @@ var requirejs, require, define;
      * the config return value is used.
      */
     req.config = function (cfg) {
-        config = cfg;
-        if (config.deps) {
-            req(config.deps, config.callback);
-        }
-        return req;
+        return req(cfg);
     };
 
     /**
@@ -1568,32 +1578,39 @@ ResizeImages.processOptions = function(options) {
     if (options) {
         Utils.extend(opts, options);
     }
-
-    var dpr = opts.devicePixelRatio || window.devicePixelRatio;
-
-    var screenSize = Utils.getPhysicalScreenSize(dpr);
-
-    // If maxHeight/maxWidth are not specified, use screen dimensions
-    // in device pixels
-    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
-    var height = opts.maxHeight || undefined;
-
-    // Otherwise, compute device pixels
-    if (dpr && opts.maxWidth) {
-        width = width * dpr;
-        if (opts.maxHeight) {
-            height = height * dpr;
-        }
-    }
-
-    // round up in case of non-integer device pixel ratios
-    opts.maxWidth = Math.ceil(width);
-    if (opts.maxHeight && height) {
-        opts.maxHeight = Math.ceil(height);
-    }
-
+    
     if (!opts.format && opts.webp) {
         opts.format = "webp";
+    }
+
+    // With `passthrough` the image is served through IR without resizing it,
+    // when set ensure that we clear any options pertaining to resizing
+    if (opts.passthrough) {
+        opts.maxWidth = opts.maxHeight = opts.devicePixelRatio = null;
+    }
+    else {
+        var dpr = opts.devicePixelRatio || window.devicePixelRatio;
+
+        var screenSize = Utils.getPhysicalScreenSize(dpr);
+
+        // If maxHeight/maxWidth are not specified, use screen dimensions
+        // in device pixels
+        var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
+        var height = opts.maxHeight || undefined;
+
+        // Otherwise, compute device pixels
+        if (dpr && opts.maxWidth) {
+            width = width * dpr;
+            if (opts.maxHeight) {
+                height = height * dpr;
+            }
+        }
+
+        // round up in case of non-integer device pixel ratios
+        opts.maxWidth = Math.ceil(width);
+        if (opts.maxHeight && height) {
+            opts.maxHeight = Math.ceil(height);
+        }
     }
 
     return opts;
@@ -2533,4 +2550,5 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
 // relPath, forceSync
 ;
 define("mobify-library", function(){});
+
 }());

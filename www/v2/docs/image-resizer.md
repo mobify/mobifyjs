@@ -64,12 +64,14 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
   format, except non-animated gifs, which are converted to png.
 - `quality`: An integer from 1-100 used as a quality parameter when encoding 
   jpg and webp images, can only be set along with the `format` parameter.
-- `maxWidth`: Maximum width of the image(s) being resized (in CSS pixes). 
+- `maxWidth`: Maximum width of the image(s) being resized (in CSS pixels). 
   Defaults to automatically determine width of device.
 - `maxHeight`: Maximum height of the image(s) being resized (in CSS pixels). 
   Only usable when maxWidth is specified.
 - `devicePixelRatio`: Override the default devicePixelRatio. Defaults to 
   `window.devicePixelRatio.`
+- `passthrough`: A boolean that when set serves images through the image resizer
+  backend but doesn't resize them.
 
 **Example**
 

@@ -240,32 +240,39 @@ ResizeImages.processOptions = function(options) {
     if (options) {
         Utils.extend(opts, options);
     }
-
-    var dpr = opts.devicePixelRatio || window.devicePixelRatio;
-
-    var screenSize = Utils.getPhysicalScreenSize(dpr);
-
-    // If maxHeight/maxWidth are not specified, use screen dimensions
-    // in device pixels
-    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
-    var height = opts.maxHeight || undefined;
-
-    // Otherwise, compute device pixels
-    if (dpr && opts.maxWidth) {
-        width = width * dpr;
-        if (opts.maxHeight) {
-            height = height * dpr;
-        }
-    }
-
-    // round up in case of non-integer device pixel ratios
-    opts.maxWidth = Math.ceil(width);
-    if (opts.maxHeight && height) {
-        opts.maxHeight = Math.ceil(height);
-    }
-
+    
     if (!opts.format && opts.webp) {
         opts.format = "webp";
+    }
+
+    // With `passthrough` images are served through IR without resizing,
+    // when set ensure that any options pertaining to resizing are cleared
+    if (opts.passthrough) {
+        opts.maxWidth = opts.maxHeight = opts.devicePixelRatio = null;
+    }
+    else {
+        var dpr = opts.devicePixelRatio || window.devicePixelRatio;
+
+        var screenSize = Utils.getPhysicalScreenSize(dpr);
+
+        // If maxHeight/maxWidth are not specified, use screen dimensions
+        // in device pixels
+        var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
+        var height = opts.maxHeight || undefined;
+
+        // Otherwise, compute device pixels
+        if (dpr && opts.maxWidth) {
+            width = width * dpr;
+            if (opts.maxHeight) {
+                height = height * dpr;
+            }
+        }
+
+        // round up in case of non-integer device pixel ratios
+        opts.maxWidth = Math.ceil(width);
+        if (opts.maxHeight && height) {
+            opts.maxHeight = Math.ceil(height);
+        }
     }
 
     return opts;

@@ -35,6 +35,10 @@
         <img data-src="http://www.mobify.com/i/phone-tablet.png"/>
     </div>
 
+    <div id="resizeImages-passthrough">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
 
     <div id="resizeImages-picture-element">
         <picture data-src="http://www.mobify.com/i/phone-tablet.png">
@@ -149,6 +153,23 @@
 
             equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
 
+        });
+
+        test('resize images - passthrough', function() {
+            var images = document.querySelectorAll('#resizeImages-passthrough img');
+
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                passthrough: true,
+                // With `passthrough` set, the following options should be ignored:
+                maxWidth: 320,
+                maxHeight: 480,
+                devicePixelRatio: 2
+            });
+
+            var src = $('#resizeImages-passthrough img').attr('src');
+
+            equal(src, '//ir0.mobify.com/project-test1/http://www.mobify.com/i/phone-tablet.png', 'passthrough img should not resize');
         });
 
         test('resize images - adds an original src data attribute', function() {
