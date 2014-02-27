@@ -96,6 +96,44 @@ Utils.getDoctype = function(doc) {
         + '>';
 };
 
+/**
+ * Returns an object that represents the parsed content attribute of the
+ * viewport meta tag. Returns false if no viewport meta tag is present.
+ */
+Utils.getMetaViewportProperties = function(doc) {
+    // Regex to split comma-delimited viewport meta tag properties
+    var SPLIT_PROPERTIES_REGEX = /,\s?/;
+
+    doc = doc || document;
+    var parsedProperties = {}
+
+    // Get the viewport meta tag
+    var viewport = doc.querySelectorAll('meta[name="viewport"]');
+    if (viewport.length == 0) {
+        return false;
+    }
+
+    // Split its properties
+    var content = viewport[0].getAttribute('content');
+    if (content == null) {
+        return false;
+    }
+    var properties = content.split(SPLIT_PROPERTIES_REGEX);
+
+    // Parse the properties into an object
+    for (var i = 0; i < properties.length; i++) {
+        var property = properties[i].split('=')
+
+        if (property.length >= 2) {
+            var key = property[0];
+            var value = property[1];
+            parsedProperties[key] = value;
+        }
+    }
+
+    return parsedProperties;
+}
+
 Utils.removeBySelector = function(selector, doc) {
     doc = doc || document;
 

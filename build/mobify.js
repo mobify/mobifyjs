@@ -520,6 +520,44 @@ Utils.getDoctype = function(doc) {
         + '>';
 };
 
+/**
+ * Returns an object that represents the parsed content attribute of the
+ * viewport meta tag. Returns false if no viewport meta tag is present.
+ */
+Utils.getMetaViewportProperties = function(doc) {
+    // Regex to split comma-delimited viewport meta tag properties
+    var SPLIT_PROPERTIES_REGEX = /,\s?/;
+
+    doc = doc || document;
+    var parsedProperties = {}
+
+    // Get the viewport meta tag
+    var viewport = doc.querySelectorAll('meta[name="viewport"]');
+    if (viewport.length == 0) {
+        return false;
+    }
+
+    // Split its properties
+    var content = viewport[0].getAttribute('content');
+    if (content == null) {
+        return false;
+    }
+    var properties = content.split(SPLIT_PROPERTIES_REGEX);
+
+    // Parse the properties into an object
+    for (var i = 0; i < properties.length; i++) {
+        var property = properties[i].split('=')
+
+        if (property.length >= 2) {
+            var key = property[0];
+            var value = property[1];
+            parsedProperties[key] = value;
+        }
+    }
+
+    return parsedProperties;
+}
+
 Utils.removeBySelector = function(selector, doc) {
     doc = doc || document;
 
@@ -1569,23 +1607,45 @@ ResizeImages._getBinnedDimension = function(dim) {
 };
 
 /**
+ * Returns a boolean that indicates whether images should be resized.
+ * Looks for the meta viewport tag and parses it to determine whether the
+ * website is responsive (the viewport is set to the device's width). This
+ * ensures that images that are part of a larger viewport are not scaled.
+ */
+ResizeImages._shouldResizeImages = function(document) {
+    var metaViewport = Utils.getMetaViewportProperties(document);
+    if (!metaViewport) {
+        return false;
+    }
+
+    return metaViewport['width'] == 'device-width';
+};
+
+/**
  * Processes options passed to `resize()`. Takes an options object that 
  * potentially has height and width set in css pixels, returns an object where 
  * they are expressed in device pixels, and other default options are set.
  */
-ResizeImages.processOptions = function(options) {
+ResizeImages.processOptions = function(options) {    
     var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
     }
-    
+
+    // A null value for `resize` (as is the default) triggers the auto detect
+    // functionality. This uses the document to determine whether images should
+    // be resized and sets a new default.
+    if (opts.resize == null && options.document) {
+        var resize = ResizeImages._shouldResizeImages(options.document);
+        ResizeImages.defaults.resize = opts.resize = resize;
+    }
+
     if (!opts.format && opts.webp) {
         opts.format = "webp";
     }
 
-    // With `passthrough` images are served through IR without resizing,
-    // when set ensure that any options pertaining to resizing are cleared
-    if (opts.passthrough) {
+    // Without `resize` images are served through IR without changing their dimensions
+    if (!opts.resize) {
         opts.maxWidth = opts.maxHeight = opts.devicePixelRatio = null;
     }
     else {
@@ -1622,6 +1682,15 @@ ResizeImages.processOptions = function(options) {
  * resized.
  */
 ResizeImages.resize = function(elements, options) {
+    // Return early if elements is empty
+    if (!elements.length) {
+        return;
+    }
+
+    // Supplement `options` with the document from the first element
+    if (options && !options.document) {
+        options.document = elements[0].ownerDocument;
+    }
     var opts = ResizeImages.processOptions(options);
 
     for(var i=0; i < elements.length; i++) {
@@ -1660,6 +1729,7 @@ ResizeImages.defaults = {
       sourceAttribute: "x-src",
       targetAttribute: (capturing ? "x-src" : "src"),
       webp: ResizeImages.supportsWebp(),
+      resize: null, // null triggers the auto detect functionality
       onerror: 'ResizeImages.restoreOriginalSrc(event);'
 };
 

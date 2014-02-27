@@ -2,7 +2,10 @@
 <html class="foo">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+
   <title>resizeImages.js Tests</title>
+
   <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
   <script src="/tests/resources/qunit-1.10.0.js"></script>
   <script src="/tests/resources/require.js" id="requirejs"></script>
@@ -14,6 +17,10 @@
 
 
 <div id="qunit-fixture">
+
+    <div id="resizeImages-detect">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
 
     <div id="resizeImages">
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
@@ -35,7 +42,11 @@
         <img data-src="http://www.mobify.com/i/phone-tablet.png"/>
     </div>
 
-    <div id="resizeImages-passthrough">
+    <div id="resizeImages-resize-option-false">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
+    <div id="resizeImages-resize-option-true">
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
@@ -77,6 +88,30 @@
     });
     require(["mobifyjs/utils", "mobifyjs/resizeImages"], function(Utils, ResizeImages) {
         QUnit.start();
+
+        var mockDocument = function(body) {
+          var doc = document.implementation.createHTMLDocument("");
+          doc.body.innerHTML = body;
+          return doc
+        };
+
+        test('resize images - auto detects resize from meta tag', function() {
+            var images = document.querySelectorAll('#resizeImages-detect img');
+
+            // Remove the viewport meta tag, shouldn't resize
+            var metaTag = $('meta[name="viewport"]').detach();
+            ResizeImages.resize(images, {});
+            equal(ResizeImages.defaults.resize, false, 'auto detect should not resize');
+
+            ResizeImages.defaults.resize = null; // reset
+
+            // Add the viewport meta tag back in, should resize
+            $('head').prepend(metaTag);
+            ResizeImages.resize(images, {});
+            equal(ResizeImages.defaults.resize, true, 'auto detect should resize');
+
+        });
+
         test('resize images - no projectName', function() {
             var images = document.querySelectorAll('#resizeImages-no-projectName img');
 
@@ -155,21 +190,38 @@
 
         });
 
-        test('resize images - passthrough', function() {
-            var images = document.querySelectorAll('#resizeImages-passthrough img');
+        test('resize images - resize option false', function() {
+            var images = document.querySelectorAll('#resizeImages-resize-option-false img');
 
             ResizeImages.resize(images, {
                 projectName: 'test1',
-                passthrough: true,
-                // With `passthrough` set, the following options should be ignored:
+                resize: false,
+                webp: false,
+                // With `resize` false, the following options should be ignored:
                 maxWidth: 320,
                 maxHeight: 480,
                 devicePixelRatio: 2
             });
 
-            var src = $('#resizeImages-passthrough img').attr('src');
+            var src = $('#resizeImages-resize-option-false img').attr('src');
 
-            equal(src, '//ir0.mobify.com/project-test1/http://www.mobify.com/i/phone-tablet.png', 'passthrough img should not resize');
+            equal(src, '//ir0.mobify.com/project-test1/http://www.mobify.com/i/phone-tablet.png', 'resize false img should not resize');
+        });
+
+        test('resize images - resize option true', function() {
+            var images = document.querySelectorAll('#resizeImages-resize-option-true img');
+
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                resize: true,
+                webp: false,
+                maxWidth: 320,
+                maxHeight: 480
+            });
+
+            var src = $('#resizeImages-resize-option-true img').attr('src');
+
+            equal(src, '//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png', 'resize true img should resize');
         });
 
         test('resize images - adds an original src data attribute', function() {
@@ -365,6 +417,26 @@
             strictEqual(gbd(2048), 2048);
             strictEqual(gbd(2049), 4000);
             strictEqual(gbd(4001), 4000);
+        });
+
+        test('_shouldResize', function() {
+            var tests = [
+                ['<meta name="viewport" content="initial-scale=1">', true],
+                ['<meta name="viewport" content="width=device-width">', true],
+                ['<meta name="viewport" content="initial-scale=2,width=device-width">', true],
+
+                ['<meta name="viewport" content="initial-scale=2">', false],
+                ['<meta name="viewport" content="width=480">', false],
+                ['<meta name="viewport" content="width=device-width,initial-scale=0.5>', false]
+            ];
+
+            for (var i = 0; i < tests.length; i++) {
+                var body = tests[i][0];
+                var expected = tests[i][1];
+
+                var doc = mockDocument(body);
+                equal(ResizeImages._shouldResize(doc), expected);
+            }
         });
 
         test('resize', function() {
