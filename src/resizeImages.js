@@ -232,7 +232,7 @@ ResizeImages._getBinnedDimension = function(dim) {
 
 /**
  * Returns a boolean that indicates whether images should be resized.
- * Looks for the meta viewport tag and parses it to determine whether the
+ * Looks for the viewport meta tag and parses it to determine whether the
  * website is responsive (the viewport is set to the device's width). This
  * ensures that images that are part of a larger viewport are not scaled.
  */

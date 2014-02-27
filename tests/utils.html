@@ -36,12 +36,12 @@
           deepEqual(actual, expected, message);
         }
         
-        test("getMetaViewportProperties - no meta viewport tag", function() {
+        test("getMetaViewportProperties - no viewport meta tag", function() {
           metaPropertiesEqual('<html><head></head></html>', false,
             "Should return false with no viewport tag");
         });
 
-        test("getMetaViewportProperties - with a meta viewport tag", function() {
+        test("getMetaViewportProperties - with a viewport meta tag", function() {
           metaPropertiesEqual('<meta name="viewport" content="">', {},
             "Should return an empty object");
         });
