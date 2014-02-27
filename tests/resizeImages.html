@@ -53,6 +53,10 @@
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
+    <div id="resizeImages-set-quality-no-format">
+        <img x-src="http://www.mobify.com/static/img/team/dave@2x.png"
+    </div>
+
     <div id="resizeImages-adds-onerror">
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
@@ -73,54 +77,24 @@
     });
     require(["mobifyjs/utils", "mobifyjs/resizeImages"], function(Utils, ResizeImages) {
         QUnit.start();
-        test('resize images - no projectName', function() {
-            var images = document.querySelectorAll('#resizeImages-no-projectName img');
+        module("processOptions");
+        test('processOptions - adds a default project name', function() {
+            expectedProjectName = "oss-localhost";
+            var opts = ResizeImages.processOptions({});
 
-            ResizeImages.resize(images, {
-                maxWidth: 320,
-                maxHeight: 480,
-                webp: false
-            });
-
-            var src = $('#resizeImages-no-projectName img').attr('src');
-
-            equal(src, "//ir0.mobify.com/project-oss-localhost/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
-
+            deepEqual(opts["projectName"], expectedProjectName, 
+                "projectName is " + opts["projectName"]);
         });
 
-        test('resize images', function() {
-            var images = document.querySelectorAll('#resizeImages img');
-
-            ResizeImages.resize(images, {
+        test('processOptions - high dpr', function() {
+            expectedOpts = Utils.extend({}, ResizeImages.defaults, {
                 projectName: 'test1',
-                maxWidth: 320,
-                maxHeight: 480,
-                webp: false
+                maxWidth: 640,
+                maxHeight: 960,
+                webp: false,
+                devicePixelRatio: 2,
             });
-
-            var src = $('#resizeImages img').attr('src');
-
-            equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
-        });
-
-        test('resize images - non-http', function() {
-            var images = document.querySelectorAll('#resizeImages-non-http img');
-            ResizeImages.resize(images, {
-                projectName: 'test1',
-                maxWidth: 320,
-                maxHeight: 480,
-            });   
-            var xSrc = $('#resizeImages-non-http img').attr('x-src');
-            var src = $('#resizeImages-non-http img').attr('src');
-
-            equal(xSrc, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
-            equal(src, undefined, "non-http img should not resize");
-        });
-
-        test('resize images - high dpr', function() {
-            var images = document.querySelectorAll('#resizeImages-high-dpr img');
-
-            ResizeImages.resize(images, {
+            opts = ResizeImages.processOptions({
                 projectName: 'test1',
                 maxWidth: 320,
                 maxHeight: 480,
@@ -128,116 +102,12 @@
                 devicePixelRatio: 2,
             });
 
-            var src = $('#resizeImages-high-dpr img').attr('src');
-
-            equal(src, "//ir0.mobify.com/project-test1/640/960/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+            deepEqual(opts, expectedOpts, "applies dpr multiplier option");
 
         });
 
-        test('resize images - different attribute', function() {
-            var images = document.querySelectorAll('#resizeImages-different-attribute img');
-            
-            ResizeImages.resize(images, {
-                projectName: 'test1',
-                maxWidth: 320,
-                maxHeight: 480,
-                sourceAttribute: "data-src",
-                webp: false
-            });
-
-            var src = $('#resizeImages-different-attribute img').attr('src');
-
-            equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
-
-        });
-
-        test('resize images - adds an original src data attribute', function() {
-            var images = document.querySelectorAll("#resizeImages-adds-data-orig-src img");
-            var originalSrcs = [].map.call(images, function(img) {
-                return img.getAttribute("x-src");
-            });
-            var resized = ResizeImages.resize(images);
-            for(var i = 0, len = resized.length; i < len; i++) {
-                equal(resized[i].getAttribute('data-orig-src'), originalSrcs[i]);
-            }
-        });
-
-        test('resize images - adds an onerror handler', function() {
-            var images = document.querySelectorAll("#resizeImages-adds-onerror img");
-            var resized = ResizeImages.resize(images);
-            for(var i = 0, len = resized.length; i < len; i++) {
-                ok(resized[i].getAttribute('onerror'));
-            }
-        });
-
-        test('resize images - onerror handler restores src', function () {
-            var img = new Image()
-            img.setAttribute("src", "foo");
-            img.setAttribute("data-orig-src", "bar");
-            ResizeImages.restoreOriginalSrc({target: img});
-
-            equal(img.getAttribute("src"), "bar");
-        });
-
-        asyncTest('resize images - onerror handler gets triggered', function () {
-            var img = new Image()
-            img.setAttribute("x-src", "http://www.mobify.com/fake/path.png");
-
-            window.onerr = function() {
-                ok(true);
-                start();
-            }
-
-            ResizeImages.resize([img], {onerror: "onerr()" });
-        });
-
-        test('resizeImages - does not modify data URI', function() {
-            var images = document.querySelectorAll("#resizeImages-dataURI img");
-            imageXSrc = images[0].getAttribute('x-src');
-
-            var resized = ResizeImages.resize(images, {
-                projectName: 'test',
-                maxWidth: 320
-            });
-            strictEqual(resized.length, 1, "still just the one image");
-            strictEqual(resized[0].getAttribute('x-src'), imageXSrc,
-              "x-src is unmodified");
-        });
-
-        test('resize images - picture element', function() {
-            var images = document.querySelectorAll('#resizeImages-picture-element picture');
-
-            ResizeImages.resize(images, {
-                projectName: 'test1',
-                maxWidth: 1280,
-                maxHeight: 480,
-                webp: false,
-                sourceAttribute: 'src'
-            });
-
-            var sources = images[0].getElementsByTagName('source');
-            if (sources.length === 0) {
-                ok(images[0].getElementsByTagName("img")[0].getAttribute("src"), 
-                    "http://www.mobify.com/i/phone-tablet-small.png",
-                    "if source not properly parsed (iOS 4.3), src for img element inside of a picture element should remain");
-                return;
-            }
-
-            equal(images[0].querySelectorAll("#width-and-src")[0].getAttribute("src"),
-                  "//ir0.mobify.com/project-test1/300/480/http://www.mobify.com/i/phone-tablet-small.png",
-                  "source in picture has width overridden, and uses own src");
-
-            equal(images[0].querySelectorAll("#width-and-no-src")[0].getAttribute("src"),
-                  "//ir0.mobify.com/project-test1/400/480/http://www.mobify.com/i/phone-tablet.png",
-                  "source in picture has width overridden, and uses data-src in picture");
-
-            equal(images[0].querySelectorAll("#no-width-and-no-src")[0].getAttribute("src"),
-                  "//ir0.mobify.com/project-test1/1280/480/http://www.mobify.com/i/phone-tablet.png",
-                  "source in picture has no width overide, and uses data-src in picture");
-
-        });
-
-        test('get image url', function() {
+        module("getImageURL");
+        test('getImageUrl - lots of options', function() {
             var options = Utils.extend(ResizeImages.processOptions(), {
                 maxWidth: 320, 
                 maxHeight: 480, 
@@ -252,6 +122,100 @@
             equal(url, expectedUrl);
         });
 
+        test('getImageURL - set quality but not format', function() {
+            var image = document.querySelectorAll("#resizeImages-set-quality-no-format img")[0];
+
+            var src = image.getAttribute('x-src');
+
+            var result = ResizeImages.getImageURL(src, 
+              Utils.extend({}, ResizeImages.defaults, {
+                quality: 30,
+                maxWidth: 320,
+                webp: false
+            }));
+
+            expectedSrc = "//ir0.mobify.com/project-oss-localhost/q30/320/http://www.mobify.com/static/img/team/dave@2x.png"
+
+            equal(result, expectedSrc)
+        });
+
+        module("_rewriteSrcAttribute");
+        test('_rewriteSrcAttribute - non-http', function() {
+            var image = document.querySelectorAll('#resizeImages-non-http img')[0];
+            ResizeImages._rewriteSrcAttribute(image, {
+                projectName: 'test1',
+                maxWidth: 320,
+                maxHeight: 480,
+                webp: false
+            });   
+            var xSrc = $('#resizeImages-non-http img').attr('x-src');
+            var src = $('#resizeImages-non-http img').attr('src');
+
+            equal(xSrc, "gopher://archie.ftp.mailto/somanyprotocols", "non-http img should not resize");
+            equal(src, undefined, "non-http src should not be rewritten");
+        });
+
+        test('_rewriteSrcAttribute - different attribute', function() {
+            var image = document.querySelectorAll('#resizeImages-different-attribute img')[0];
+            
+            ResizeImages._rewriteSrcAttribute(image, 
+              Utils.extend({}, ResizeImages.defaults, {
+                projectName: 'test1',
+                maxWidth: 320,
+                maxHeight: 480,
+                sourceAttribute: "data-src",
+                webp: false
+            }));
+
+            var src = image.getAttribute('src');
+
+            equal(src, 
+                  "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png",
+                  "src from data-src attribute");
+
+        });
+
+        test('_rewirteSrcAttribute - adds an original src data attribute', function() {
+            var images = document.querySelectorAll("#resizeImages-adds-data-orig-src img");
+            
+            var originalSrcs = [].map.call(images, function(img) {
+                return img.getAttribute("x-src");
+            });
+            
+            options = ResizeImages.processOptions();
+
+            var resized = [].map.call(images, function(img) {
+                ResizeImages._rewriteSrcAttribute(img, options);
+                return img;
+            });
+            
+            for(var i = 0, len = resized.length; i < len; i++) {
+                equal(resized[i].getAttribute('data-orig-src'), originalSrcs[i]);
+            }
+        });
+
+        test('_rewriteSrcAttribute - adds an onerror handler', function() {
+            var image = document.querySelectorAll("#resizeImages-adds-onerror img")[0];
+
+            ResizeImages._rewriteSrcAttribute(image, ResizeImages.processOptions());
+
+            ok(image.getAttribute('onerror'));
+        });
+
+        test('_rewriteSrcAttribute - does not modify data URI', function() {
+            var image = document.querySelectorAll("#resizeImages-dataURI img")[0];
+            imageXSrc = image.getAttribute('x-src');
+
+            ResizeImages._rewriteSrcAttribute(image, 
+              Utils.extend({}, ResizeImages.defaults, {
+                projectName: 'test',
+                maxWidth: 320
+            }));
+            strictEqual(image.getAttribute('x-src'), imageXSrc,
+              "x-src is unmodified");
+        });
+
+        module("webp");
         test('userAgentWebpDetect', function() {
             /*
              * Supported WEBP devices
@@ -336,6 +300,7 @@
 
         });
 
+        module("_getBinnedDimensions");
         test('_getBinnedDimension', function() {
             var gbd = ResizeImages._getBinnedDimension;
             strictEqual(gbd(1), 320);
@@ -344,6 +309,81 @@
             strictEqual(gbd(2048), 2048);
             strictEqual(gbd(2049), 4000);
             strictEqual(gbd(4001), 4000);
+        });
+
+        module("resize");
+        test('resize images', function() {
+            var images = document.querySelectorAll('#resizeImages img');
+
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                maxWidth: 320,
+                maxHeight: 480,
+                webp: false,
+                devicePixelRatio: 1
+            });
+
+            var src = $('#resizeImages img').attr('src');
+
+            equal(src, "//ir0.mobify.com/project-test1/320/480/http://www.mobify.com/i/phone-tablet.png", "http img should resize");
+        });
+
+        test('resize images - onerror handler restores src', function () {
+            var img = new Image()
+            img.setAttribute("src", "foo");
+            img.setAttribute("data-orig-src", "bar");
+            ResizeImages.restoreOriginalSrc({target: img});
+
+            equal(img.getAttribute("src"), "bar");
+        });
+
+        asyncTest('resize images - onerror handler gets triggered', function () {
+            var img = new Image()
+            img.setAttribute("x-src", "http://www.mobify.com/fake/path.png");
+
+            window.onerr = function() {
+                ok(true);
+
+                // cleanup
+                delete window.onerr;
+                start();
+            }
+
+            ResizeImages.resize([img], {onerror: "onerr()" });
+        });
+
+        test('resize images - picture element', function() {
+            var images = document.querySelectorAll('#resizeImages-picture-element picture');
+
+            ResizeImages.resize(images, {
+                projectName: 'test1',
+                maxWidth: 1280,
+                maxHeight: 480,
+                webp: false,
+                sourceAttribute: 'src',
+                devicePixelRatio: 1
+            });
+
+            var sources = images[0].getElementsByTagName('source');
+            if (sources.length === 0) {
+                ok(images[0].getElementsByTagName("img")[0].getAttribute("src"), 
+                    "http://www.mobify.com/i/phone-tablet-small.png",
+                    "if source not properly parsed (iOS 4.3), src for img element inside of a picture element should remain");
+                return;
+            }
+
+            equal(images[0].querySelectorAll("#width-and-src")[0].getAttribute("src"),
+                  "//ir0.mobify.com/project-test1/300/480/http://www.mobify.com/i/phone-tablet-small.png",
+                  "source in picture has width overridden, and uses own src");
+
+            equal(images[0].querySelectorAll("#width-and-no-src")[0].getAttribute("src"),
+                  "//ir0.mobify.com/project-test1/400/480/http://www.mobify.com/i/phone-tablet.png",
+                  "source in picture has width overridden, and uses data-src in picture");
+
+            equal(images[0].querySelectorAll("#no-width-and-no-src")[0].getAttribute("src"),
+                  "//ir0.mobify.com/project-test1/1280/480/http://www.mobify.com/i/phone-tablet.png",
+                  "source in picture has no width overide, and uses data-src in picture");
+
         });
 
         test('resize', function() {
