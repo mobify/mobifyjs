@@ -1555,6 +1555,8 @@ ResizeImages.getImageURL = function(url, options) {
 
     if (opts.format) {
         bits.push(opts.format + (opts.quality || ''));
+    } else if (opts.quality) {
+        bits.push('q' + opts.quality);
     }
 
     if (opts.maxWidth) {
