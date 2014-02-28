@@ -118,6 +118,8 @@ ResizeImages.getImageURL = function(url, options) {
 
     if (opts.format) {
         bits.push(opts.format + (opts.quality || ''));
+    } else if (opts.quality) {
+        bits.push('q' + opts.quality);
     }
 
     if (opts.maxWidth) {
@@ -281,9 +283,9 @@ ResizeImages.processOptions = function(options) {
         Utils.extend(opts, options);
     }
 
-    // A null value for `resize` (as is the default) triggers the auto detect
-    // functionality. This uses the document to determine whether images should
-    // be resized and sets a new default.
+    // A null value for `resize` triggers the auto detect functionality. This
+    // uses the document to determine whether images should be resized and sets
+    // it as the new default.
     if (opts.resize == null && options.document) {
         var resize = ResizeImages._shouldResize(options.document);
         ResizeImages.defaults.resize = opts.resize = resize;
@@ -378,7 +380,7 @@ ResizeImages.defaults = {
       sourceAttribute: "x-src",
       targetAttribute: (capturing ? "x-src" : "src"),
       webp: ResizeImages.supportsWebp(),
-      resize: null, // null triggers the auto detect functionality
+      resize: true,
       onerror: 'ResizeImages.restoreOriginalSrc(event);'
 };
 

@@ -72,8 +72,8 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
   `window.devicePixelRatio.`
 - `resize`: A boolean that controls whether to scale the image(s). When
   false, the image(s) are served through the image resizer backend but are not
-  resized. The default is null which auto detects whether to resize images from
-  the document's viewport meta tag.
+  resized. A value of null auto detects whether to resize images from the
+  document's viewport meta tag. The default is true.
 
 **Example**
 
