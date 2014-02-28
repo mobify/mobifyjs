@@ -1,6 +1,5 @@
-(function () {
-/**
- * almond 0.2.6 Copyright (c) 2011-2012, The Dojo Foundation All Rights Reserved.
+(function () {/**
+ * @license almond 0.2.9 Copyright (c) 2011-2014, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/almond for details
  */
@@ -17,7 +16,8 @@ var requirejs, require, define;
         config = {},
         defining = {},
         hasOwn = Object.prototype.hasOwnProperty,
-        aps = [].slice;
+        aps = [].slice,
+        jsSuffixRegExp = /\.js$/;
 
     function hasProp(obj, prop) {
         return hasOwn.call(obj, prop);
@@ -32,7 +32,7 @@ var requirejs, require, define;
      * @returns {String} normalized name
      */
     function normalize(name, baseName) {
-        var nameParts, nameSegment, mapValue, foundMap,
+        var nameParts, nameSegment, mapValue, foundMap, lastIndex,
             foundI, foundStarMap, starI, i, j, part,
             baseParts = baseName && baseName.split("/"),
             map = config.map,
@@ -50,8 +50,15 @@ var requirejs, require, define;
                 //"one/two/three.js", but we want the directory, "one/two" for
                 //this normalization.
                 baseParts = baseParts.slice(0, baseParts.length - 1);
+                name = name.split('/');
+                lastIndex = name.length - 1;
 
-                name = baseParts.concat(name.split("/"));
+                // Node .js allowance:
+                if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
+                    name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
+                }
+
+                name = baseParts.concat(name);
 
                 //start trimDots
                 for (i = 0; i < name.length; i += 1) {
@@ -260,14 +267,14 @@ var requirejs, require, define;
     main = function (name, deps, callback, relName) {
         var cjsModule, depName, ret, map, i,
             args = [],
+            callbackType = typeof callback,
             usingExports;
 
         //Use name if no relName
         relName = relName || name;
 
         //Call the callback to define the module, if necessary.
-        if (typeof callback === 'function') {
-
+        if (callbackType === 'undefined' || callbackType === 'function') {
             //Pull out the defined dependencies and pass the ordered
             //values to the callback.
             //Default to [require, exports, module] if no deps
@@ -298,7 +305,7 @@ var requirejs, require, define;
                 }
             }
 
-            ret = callback.apply(defined[name], args);
+            ret = callback ? callback.apply(defined[name], args) : undefined;
 
             if (name) {
                 //If setting exports via "module" is in play,
@@ -333,6 +340,13 @@ var requirejs, require, define;
         } else if (!deps.splice) {
             //deps is a config object, not an array.
             config = deps;
+            if (config.deps) {
+                req(config.deps, config.callback);
+            }
+            if (!callback) {
+                return;
+            }
+
             if (callback.splice) {
                 //callback is an array, which means it is a dependency list.
                 //Adjust args if there are dependencies
@@ -377,11 +391,7 @@ var requirejs, require, define;
      * the config return value is used.
      */
     req.config = function (cfg) {
-        config = cfg;
-        if (config.deps) {
-            req(config.deps, config.callback);
-        }
-        return req;
+        return req(cfg);
     };
 
     /**
@@ -509,6 +519,44 @@ Utils.getDoctype = function(doc) {
         + (doctypeEl.systemId ? ' "' + doctypeEl.systemId + '"' : '')
         + '>';
 };
+
+/**
+ * Returns an object that represents the parsed content attribute of the
+ * viewport meta tag. Returns false if no viewport meta tag is present.
+ */
+Utils.getMetaViewportProperties = function(doc) {
+    // Regex to split comma-delimited viewport meta tag properties
+    var SPLIT_PROPERTIES_REGEX = /,\s?/;
+
+    doc = doc || document;
+    var parsedProperties = {}
+
+    // Get the viewport meta tag
+    var viewport = doc.querySelectorAll('meta[name="viewport"]');
+    if (viewport.length == 0) {
+        return false;
+    }
+
+    // Split its properties
+    var content = viewport[0].getAttribute('content');
+    if (content == null) {
+        return false;
+    }
+    var properties = content.split(SPLIT_PROPERTIES_REGEX);
+
+    // Parse the properties into an object
+    for (var i = 0; i < properties.length; i++) {
+        var property = properties[i].split('=')
+
+        if (property.length >= 2) {
+            var key = property[0];
+            var value = property[1];
+            parsedProperties[key] = value;
+        }
+    }
+
+    return parsedProperties;
+}
 
 Utils.removeBySelector = function(selector, doc) {
     doc = doc || document;
@@ -1561,41 +1609,95 @@ ResizeImages._getBinnedDimension = function(dim) {
 };
 
 /**
+ * Returns a boolean that indicates whether images should be resized.
+ * Looks for the viewport meta tag and parses it to determine whether the
+ * website is responsive (the viewport is set to the device's width). This
+ * ensures that images that are part of a larger viewport are not scaled.
+ */
+ResizeImages._shouldResize = function(document) {
+    var metaViewport = Utils.getMetaViewportProperties(document);
+    if (!metaViewport) {
+        return false;
+    }
+
+    // It's complicated, but what we want to know is whether the viewport
+    // matches the 'ideal viewport'. If either `initial-scale` is 1 or `width`
+    // is device-width or both, then the viewport will match the 'ideal
+    // viewport'. There are a few other special circumstances under which the
+    // viewport could be ideal, but we can't test for them.
+    //
+    // See: http://www.quirksmode.org/mobile/metaviewport/
+
+    // Ideal viewport when width=device-width
+    if (!metaViewport['initial-scale'] && metaViewport['width']) {
+        return metaViewport['width'] == 'device-width';
+    }
+
+    // Ideal viewport when initial-scale=1
+    if (!metaViewport['width'] && metaViewport['initial-scale']) {
+        return metaViewport['initial-scale'] == '1';
+    }
+
+    // Ideal viewport when width=device-width and the intial-scale is 1 or more
+    // (in that case it's just zoomed)
+    if (metaViewport['width'] && metaViewport['initial-scale']) {
+        initialScale = parseInt(metaViewport['initial-scale']);
+        return initialScale >= 1 && metaViewport['width'] == 'device-width';
+    }
+
+    return false
+};
+
+/**
  * Processes options passed to `resize()`. Takes an options object that 
  * potentially has height and width set in css pixels, returns an object where 
  * they are expressed in device pixels, and other default options are set.
  */
-ResizeImages.processOptions = function(options) {
+ResizeImages.processOptions = function(options) {    
     var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
     }
 
-    var dpr = opts.devicePixelRatio || window.devicePixelRatio;
-
-    var screenSize = Utils.getPhysicalScreenSize(dpr);
-
-    // If maxHeight/maxWidth are not specified, use screen dimensions
-    // in device pixels
-    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
-    var height = opts.maxHeight || undefined;
-
-    // Otherwise, compute device pixels
-    if (dpr && opts.maxWidth) {
-        width = width * dpr;
-        if (opts.maxHeight) {
-            height = height * dpr;
-        }
-    }
-
-    // round up in case of non-integer device pixel ratios
-    opts.maxWidth = Math.ceil(width);
-    if (opts.maxHeight && height) {
-        opts.maxHeight = Math.ceil(height);
+    // A null value for `resize` triggers the auto detect functionality. This
+    // uses the document to determine whether images should be resized and sets
+    // it as the new default.
+    if (opts.resize == null && options.document) {
+        var resize = ResizeImages._shouldResize(options.document);
+        ResizeImages.defaults.resize = opts.resize = resize;
     }
 
     if (!opts.format && opts.webp) {
         opts.format = "webp";
+    }
+
+    // Without `resize` images are served through IR without changing their dimensions
+    if (!opts.resize) {
+        opts.maxWidth = opts.maxHeight = opts.devicePixelRatio = null;
+    }
+    else {
+        var dpr = opts.devicePixelRatio || window.devicePixelRatio;
+
+        var screenSize = Utils.getPhysicalScreenSize(dpr);
+
+        // If maxHeight/maxWidth are not specified, use screen dimensions
+        // in device pixels
+        var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
+        var height = opts.maxHeight || undefined;
+
+        // Otherwise, compute device pixels
+        if (dpr && opts.maxWidth) {
+            width = width * dpr;
+            if (opts.maxHeight) {
+                height = height * dpr;
+            }
+        }
+
+        // round up in case of non-integer device pixel ratios
+        opts.maxWidth = Math.ceil(width);
+        if (opts.maxHeight && height) {
+            opts.maxHeight = Math.ceil(height);
+        }
     }
 
     return opts;
@@ -1607,6 +1709,15 @@ ResizeImages.processOptions = function(options) {
  * resized.
  */
 ResizeImages.resize = function(elements, options) {
+    // Return early if elements is empty
+    if (!elements.length) {
+        return;
+    }
+
+    // Supplement `options` with the document from the first element
+    if (options && !options.document) {
+        options.document = elements[0].ownerDocument;
+    }
     var opts = ResizeImages.processOptions(options);
 
     for(var i=0; i < elements.length; i++) {
@@ -1645,6 +1756,7 @@ ResizeImages.defaults = {
       sourceAttribute: "x-src",
       targetAttribute: (capturing ? "x-src" : "src"),
       webp: ResizeImages.supportsWebp(),
+      resize: true,
       onerror: 'ResizeImages.restoreOriginalSrc(event);'
 };
 
@@ -2535,4 +2647,5 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
 // relPath, forceSync
 ;
 define("mobify-library", function(){});
+
 }());

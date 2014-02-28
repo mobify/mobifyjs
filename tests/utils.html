@@ -11,21 +11,7 @@
 <body>
 
 <div id="qunit"></div>
-
-<div id="qunit-fixture">
-
-<div class="removeElementsFilter">
-
-<script id="scriptsrc" src="fake1.js"></script>
-<script id="scriptinline">
-    console.log("fake2");
-</script>
-<img src="fake.png">
-
-</div>
-
-</div>
-
+<div id="qunit-fixture"></div>
 
 <script>
     QUnit.config.autostart = false;
@@ -37,8 +23,53 @@
     });
     require(["../src/utils.js"], function(Utils) {
         QUnit.start();
-        
 
+        var mockDocument = function(body) {
+          var doc = document.implementation.createHTMLDocument("");
+          doc.body.innerHTML = body;
+          return doc
+        };
+
+        var metaPropertiesEqual = function(body, expected, message) {
+          var doc = mockDocument(body);
+          var actual = Utils.getMetaViewportProperties(doc);
+          deepEqual(actual, expected, message);
+        }
+        
+        test("getMetaViewportProperties - no viewport meta tag", function() {
+          metaPropertiesEqual('<html><head></head></html>', false,
+            "Should return false with no viewport tag");
+        });
+
+        test("getMetaViewportProperties - with a viewport meta tag", function() {
+          metaPropertiesEqual('<meta name="viewport" content="">', {},
+            "Should return an empty object");
+        });
+
+        test("getMetaViewportProperties - with improperly formatted content", function() {
+          var doc = mockDocument('<meta name="viewport" content="===, = ,,,=something=hey">');
+          var properties = Utils.getMetaViewportProperties(doc);
+          ok(properties, "Should not blow up");
+
+          metaPropertiesEqual('<meta name="viewport">', false,
+            "Should return false with no content attribute");
+        });
+
+        test("getMetaViewportProperties - with properly formatted content", function() {
+          metaPropertiesEqual(
+            '<meta name="viewport" content="width=device-width,initial-scale=1">',
+            {width: 'device-width', 'initial-scale': '1'},
+            "Should return an object representation of the content attribute");
+
+          metaPropertiesEqual(
+            '<meta name="viewport" content="width=device-width">',
+            {width: 'device-width'},
+            "Should return an object representation of the content attribute");
+
+          metaPropertiesEqual(
+            '<meta name="viewport" content="">', {},
+            "Should return an object representation of the content attribute")
+        });
     });
 </script>
 </body>
