@@ -24,7 +24,7 @@
   "engine": ">= 0.10.1",
   "repository": {
     "type": "git",
-    "url": "git@github.com:mobify/mobify-js.git"
+    "url": "git@github.com:mobify/mobifyjs.git"
   },
   "private": true
 }
