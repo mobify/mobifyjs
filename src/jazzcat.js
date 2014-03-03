@@ -21,7 +21,7 @@
  * into the cache using a bootloader request to Jazzcat. Scripts are then
  * executed directly from the cache.
  */
-define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+define(["mobifyjs/utils"], function(Utils) {
     /**
      * An HTTP 1.1 compliant localStorage backed cache.
      */
@@ -344,6 +344,9 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
             if (script) {
                 var loader = Jazzcat.getLoaderScript(urls, options);
                 // insert the loader directly before the script
+                if (script.parentNode === null) {
+                    return;
+                }
                 script.parentNode.insertBefore(loader, script);
             }
         };
@@ -386,12 +389,14 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
             if (jsonp && !Jazzcat.cacheLoaderInserted) {
                 httpCache.load(httpCache.options);
                 var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-                script.parentNode.insertBefore(httpLoaderScript, script);
-                // ensure this doesn't happen again for this page load
-                Jazzcat.cacheLoaderInserted = true;
+                if (script.parentNode !== null) {
+                    script.parentNode.insertBefore(httpLoaderScript, script);
+                    // ensure this doesn't happen again for this page load
+                    Jazzcat.cacheLoaderInserted = true;
+                }
             }
 
-            var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
+            var parent = (script.parentNode !== null && script.parentNode.nodeName === "HEAD" ? "head" : "body");
 
             if (jsonp) {
                 // if: the script is not in the cache (or not jsonp), add a loader
@@ -554,7 +559,10 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         // http://hsivonen.iki.fi/script-execution/
         // http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
         // This call seems to do nothing in Opera 11/12
-        Jazzcat.write.call(document, '<script ' + out +'<\/script>');
+        // Also, Uglify will strip out the escape here, so we need to split up
+        // '<' and '/' to prevent browsers (Firefox in this case) 
+        // from barfing when attempting to document.write this out.
+        Jazzcat.write.call(document, '<script ' + out +'<' + '/script>');
     };
 
     /**
