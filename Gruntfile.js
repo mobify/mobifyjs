@@ -62,6 +62,28 @@ module.exports = function(grunt) {
                 dest: 'build/custom/mobify.js'
             }
         },
+        requirejs: {
+            full: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: true,
+                    name: "mobify-library",
+                    out: "./build/mobify.js"
+                }
+            },
+            custom: {
+                options: {
+                    almond: true,
+                    mainConfigFile: "./src/config.js",
+                    optimize: "none",
+                    keepBuildDir: true,
+                    name: "../mobify-custom.js",
+                    out: "./build/custom/mobify.js"
+                }
+            }
+        },
         uglify: {
             full: {
                 files: {
@@ -381,7 +403,8 @@ module.exports = function(grunt) {
             },
         }
     });
-
+    
+    grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-saucelabs');
