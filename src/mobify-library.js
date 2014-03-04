@@ -18,6 +18,8 @@
         var Jazzcat = require('./jazzcat');
         var CssOptimize = require('./cssOptimize');
         var Unblockify = require('./unblockify');
+        require('./external/picturefill');
+
         module.exports = factory(Utils, Capture, ResizeImages, Jazzcat,
                                  Unblockify, CssOptimize);
     }
