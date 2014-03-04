@@ -36,7 +36,8 @@ module.exports = function(grunt) {
                   'http://localhost:3000/tests/supported-browser.html',
                   'http://localhost:3000/tests/tag.html',
                   'http://localhost:3000/tests/tag-integration-tests.html',
-                  'http://localhost:3000/tests/tag-old-browser.html'
+                  'http://localhost:3000/tests/tag-old-browser.html',
+                  'http://localhost:3000/tests/utils.html'
                 ]
               }
             }
@@ -117,7 +118,8 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/anchor-test.html',
                         'http://localhost:3000/tests/supported-browser.html',
                         'http://localhost:3000/tests/tag.html',
-                        'http://localhost:3000/tests/tag-integration-tests.html'
+                        'http://localhost:3000/tests/tag-integration-tests.html',
+                        'http://localhost:3000/tests/utils.html'
                     ],
                     concurrency: 16,
                     tunneled: true,

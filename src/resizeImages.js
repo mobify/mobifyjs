@@ -246,41 +246,95 @@ ResizeImages._getBinnedDimension = function(dim) {
 };
 
 /**
+ * Returns a boolean that indicates whether images should be resized.
+ * Looks for the viewport meta tag and parses it to determine whether the
+ * website is responsive (the viewport is set to the device's width). This
+ * ensures that images that are part of a larger viewport are not scaled.
+ */
+ResizeImages._shouldResize = function(document) {
+    var metaViewport = Utils.getMetaViewportProperties(document);
+    if (!metaViewport) {
+        return false;
+    }
+
+    // It's complicated, but what we want to know is whether the viewport
+    // matches the 'ideal viewport'. If either `initial-scale` is 1 or `width`
+    // is device-width or both, then the viewport will match the 'ideal
+    // viewport'. There are a few other special circumstances under which the
+    // viewport could be ideal, but we can't test for them.
+    //
+    // See: http://www.quirksmode.org/mobile/metaviewport/
+
+    // Ideal viewport when width=device-width
+    if (!metaViewport['initial-scale'] && metaViewport['width']) {
+        return metaViewport['width'] == 'device-width';
+    }
+
+    // Ideal viewport when initial-scale=1
+    if (!metaViewport['width'] && metaViewport['initial-scale']) {
+        return metaViewport['initial-scale'] == '1';
+    }
+
+    // Ideal viewport when width=device-width and the intial-scale is 1 or more
+    // (in that case it's just zoomed)
+    if (metaViewport['width'] && metaViewport['initial-scale']) {
+        initialScale = parseInt(metaViewport['initial-scale']);
+        return initialScale >= 1 && metaViewport['width'] == 'device-width';
+    }
+
+    return false
+};
+
+/**
  * Processes options passed to `resize()`. Takes an options object that 
  * potentially has height and width set in css pixels, returns an object where 
  * they are expressed in device pixels, and other default options are set.
  */
-ResizeImages.processOptions = function(options) {
+ResizeImages.processOptions = function(options) {    
     var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
     }
 
-    var dpr = opts.devicePixelRatio || window.devicePixelRatio;
-
-    var screenSize = Utils.getPhysicalScreenSize(dpr);
-
-    // If maxHeight/maxWidth are not specified, use screen dimensions
-    // in device pixels
-    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
-    var height = opts.maxHeight || undefined;
-
-    // Otherwise, compute device pixels
-    if (dpr && opts.maxWidth) {
-        width = width * dpr;
-        if (opts.maxHeight) {
-            height = height * dpr;
-        }
-    }
-
-    // round up in case of non-integer device pixel ratios
-    opts.maxWidth = Math.ceil(width);
-    if (opts.maxHeight && height) {
-        opts.maxHeight = Math.ceil(height);
+    // A null value for `resize` triggers the auto detect functionality. This
+    // uses the document to determine whether images should be resized and sets
+    // it as the new default.
+    if (opts.resize == null && options.document) {
+        var resize = ResizeImages._shouldResize(options.document);
+        ResizeImages.defaults.resize = opts.resize = resize;
     }
 
     if (!opts.format && opts.webp) {
         opts.format = "webp";
+    }
+
+    // Without `resize` images are served through IR without changing their dimensions
+    if (!opts.resize) {
+        opts.maxWidth = opts.maxHeight = opts.devicePixelRatio = null;
+    }
+    else {
+        var dpr = opts.devicePixelRatio || window.devicePixelRatio;
+
+        var screenSize = Utils.getPhysicalScreenSize(dpr);
+
+        // If maxHeight/maxWidth are not specified, use screen dimensions
+        // in device pixels
+        var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
+        var height = opts.maxHeight || undefined;
+
+        // Otherwise, compute device pixels
+        if (dpr && opts.maxWidth) {
+            width = width * dpr;
+            if (opts.maxHeight) {
+                height = height * dpr;
+            }
+        }
+
+        // round up in case of non-integer device pixel ratios
+        opts.maxWidth = Math.ceil(width);
+        if (opts.maxHeight && height) {
+            opts.maxHeight = Math.ceil(height);
+        }
     }
 
     return opts;
@@ -292,6 +346,15 @@ ResizeImages.processOptions = function(options) {
  * resized.
  */
 ResizeImages.resize = function(elements, options) {
+    // Return early if elements is empty
+    if (!elements.length) {
+        return;
+    }
+
+    // Supplement `options` with the document from the first element
+    if (options && !options.document) {
+        options.document = elements[0].ownerDocument;
+    }
     var opts = ResizeImages.processOptions(options);
 
     for(var i=0; i < elements.length; i++) {
@@ -330,6 +393,7 @@ ResizeImages.defaults = {
       sourceAttribute: "x-src",
       targetAttribute: (capturing ? "x-src" : "src"),
       webp: ResizeImages.supportsWebp(),
+      resize: true,
       onerror: 'ResizeImages.restoreOriginalSrc(event);'
 };
 
