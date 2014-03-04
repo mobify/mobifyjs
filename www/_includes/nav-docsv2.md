@@ -5,7 +5,7 @@
     - [`Capture.init()`]({{ site.baseurl }}/v2/docs/capturing/#captureinitcallback-document-prefixx-)
     - [`getCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#getcaptureddoc)
     - [`capturing` variable]({{ site.baseurl }}/v2/docs/capturing/#capturing-variable)
-    - [`escapedHTMLString()`]({{ site.baseurl }}/v2/docs/capturing/#escapedhtmlstring)
+    - [`enabledHTMLString()`]({{ site.baseurl }}/v2/docs/capturing/#enabledhtmlstring)
     - [`render(htmlString)`]({{ site.baseurl }}/v2/docs/capturing/#renderhtmlstring)
     - [`renderCapturedDoc()`]({{ site.baseurl }}/v2/docs/capturing/#rendercaptureddoc)
     - [`restore()`]({{ site.baseurl }}/v2/docs/capturing/#restore)

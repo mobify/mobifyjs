@@ -4,12 +4,9 @@
         <script src="/tests/utils/proxyassert.js"></script>
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
-        <script>
-            Mobify.Tag.previewUrl = "/tests/fixtures/tag/preview.js";
-        </script>
 
         <script>Mobify.Tag.init({
-            getMode: function() { return 'mobile' },
+            mode: function() { return 'mobile' },
             mobile: {
                 capture: true,
                 url: "/tests/fixtures/tag/mobile.js"

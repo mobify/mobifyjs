@@ -136,7 +136,7 @@
 \n\
 \n\
 \n</body></html>";
-                    var html = capture.escapedHTMLString(capturedDoc);
+                    var html = capture.enabledHTMLString(capturedDoc);
                     equal(html, expectedHtml, "Passed!");
                     start();
                 }, doc);

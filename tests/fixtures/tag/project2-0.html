@@ -6,11 +6,11 @@
         <script src="/tag/v7.js"></script>
         <script>
         Mobify.Tag.init({
-            getMode: function() { return 'mobile' },
+            mode: function() { return 'mobile' },
             mobile: {
                 capture: true,
                 url: "/build/mobify.js",
-                postload: function() {
+                post: function() {
                     var capturing = window.Mobify && window.Mobify.capturing || false;
                     if (capturing) {
                         // Grab reference to a newly created document

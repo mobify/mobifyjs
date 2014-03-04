@@ -1,67 +1,152 @@
-window.Mobify = window.Mobify || {};
-window.Mobify.Tag = window.Mobify.Tag || {};
+/**
+    Mobify Tag Version 7.0  
+    
+    Notes on Compiling:
+        - We rely on Google's Closure Compiler to make the tag small.
+        - We have to annotate our code carefully, and further, write
+        it in a way that gives us the most gains from the Closure compiler.
+            - All properties that will be public must be assigned
+            using [] dictionary/bracket syntax.
+            - Everything should have correct JSDoc annotations.
+            - See https://developers.google.com/closure/compiler/docs/js-for-compiler
+        - Functions that need to be unit tested, but not public in final
+        code, are assigned to `Private`, but when `EXPOSED` is defined to
+        `false`, these end up being dead-code and are removed.
 
-(function(window, document, Mobify, Tag) {
+    To Compile For Unit Tests:
+        java -jar <path to compiler.jar> \
+        --accept_const_keyword \
+        --compilation_level ADVANCED_OPTIMIZATIONS \
+        --js tag/v7.js \
+        --use_types_for_optimization > tag/v7.exposed.min.js
 
-// Tag.debug is a wrapper for console.log
-// Ideally, this will be compiled out during a build step.
-Tag.debug = function(line) {
-    if (window.console && window.console.log) {
-        console.log(line);
-    }
-};
 
-// Mobify.points records timing information. We record
-// time-to-first byte in the tag.
-//
-// This property is required by Mobify.js
-Mobify.points = [+(new Date())];
+    To Compile For Production:
+        java -jar <path to compiler.jar> \
+        --accept_const_keyword \
+        --compilation_level ADVANCED_OPTIMIZATIONS \
+        --define EXPOSE=false \
+        --js tag/v7.js \
+        --use_types_for_optimization > tag/v7.min.js
 
-// Tag.tagVersion is the current tag version.
-// This property is required by Mobify.js
-Mobify.tagVersion = [7, 0];
+*/
 
-// Tag.userAgent is the current user agent.
-// We store it here so it can easily be override for testing purporses.
-Tag.userAgent = window.navigator.userAgent;
+/** @define {boolean} */
+var EXPOSE = true;
 
-// previewUrl is preview API endpoint.
-Tag.previewUrl = "https://preview.mobify.com/v7/";
+(function(window, document) {
 
-// Tag.loadScript loads a script with attributes in `options`
-// asynchronously. The script is inserted in the DOM before the Mobify
-// tag.
-Tag.loadScript = function(options) {
+/** 
+    Mobify Global Object
+
+    @namespace
+    @expose
+*/
+
+var Mobify = window['Mobify'] = {};
+
+/** 
+    Mobify.Tag Global Object
+    
+    @namespace
+    @expose
+*/
+var Tag = Mobify['Tag'] = {};
+
+var Private = {};
+EXPOSE && (Tag['Private'] = Private);
+
+/** 
+    Mobify.points records timing information. We record
+    time-to-first byte in the tag.
+    This property is required by Mobify.js
+
+    @expose
+    @type {Array.<number>}
+*/
+Mobify['points'] = [+(new Date())];
+
+/** 
+    Tag.tagVersion is the current tag version.
+    This property is required by Mobify.js
+
+    @expose
+    @type {Array.<number>}
+*/
+Mobify['tagVersion'] = [7, 0];
+
+/** 
+    Tag.ua is the current user agent.
+    We store it here so it can easily be override for testing purporses.
+
+    @expose
+    @type {string}
+*/
+Tag['ua'] = window.navigator.userAgent;
+
+/** 
+    previewUrl is preview API endpoint.
+    
+    @const
+    @private
+    @type {string}
+*/
+var previewUrl = "https://preview.mobify.com/v7/";
+Private['previewUrl'] = previewUrl;
+
+/** loadScript loads a script with attributes in `options`
+    asynchronously. The script is inserted in the DOM before the Mobify
+    tag.
+
+    @private
+    @param {!Object} options Properties to assign to script
+    @param {string=} klass Class attribute to assign to element
+    @type {null}
+*/
+var loadScript = function(options, klass) {
     var mobifyTagScript = document.getElementsByTagName('script')[0];
 
     var script = document.createElement('script');
-    for (prop in options) {
-        if (/onerror|onload|src|id/.test(prop)) {
-            script[prop] = options[prop];
-        } else {
-            script.setAttribute(prop, options[prop]);
-        }
+    for (var prop in options) {
+        script[prop] = options[prop];
+    }
+        
+    if (klass) {
+        script.setAttribute("class", klass);
     }
     mobifyTagScript.parentNode.insertBefore(script, mobifyTagScript);
 };
+Private['loadScript'] = loadScript;
 
-// Tag.startCapture begins the capturing process, and at the end
-// calls the callback.
-Tag.startCapture = function(callback) {
-    var self = this;
+/**
+    startCapture begins the capturing process, and at the end
+    calls the callback.
 
+    @private
+    @param {function()} callback Callback to call after capturing has begun
+    @type {null}
+*/
+var startCapture = function(callback) {
     document.write('<plaintext style="display:none">');
 
     setTimeout(function() {
-        Mobify.capturing = true;
+        /** @expose */
+        Mobify['capturing'] = true;
 
-        callback.call(self);
+        callback();
     }, 0);
 };
+Private['startCapture'] = startCapture;
 
-// Tag.getCookie fetches the values of a cookie by the given `name`
-// Returns `undefined` if no cookie matches.
-Tag.getCookie = function(name) {
+/**
+    getCookie fetches the values of a cookie by the given `name`
+    Returns `undefined` if no cookie matches.
+
+    @private
+    @param {string} name Name of cookie to fetch.
+    @type {string|null}
+*/
+var getCookie = function(name) {
     // Internet Explorer treats empty cookies differently, it does
     // not include the '=', so our regex has to be extra complicated.
     var re = new RegExp("(^|; )" + name + "((=([^;]*))|(; |$))");
@@ -70,28 +155,53 @@ Tag.getCookie = function(name) {
         return match[4] || '';
     }
 };
+Private['getCookie'] = getCookie;
 
-// Tag.isDisabled checks if we are *completely* disabled.
-// If so, we don't capture nor load any scripts.
-Tag.isDisabled = function() {
-    return this.getCookie('mobify-path') === '';
+/** 
+    isDisabled checks if we are *completely* disabled.
+    If so, we don't capture nor load any scripts.
+
+    @private
+    @type {boolean}
+*/
+var isDisabled = function() {
+    // We have to check for strict equals, because if it returns
+    // undefined it means there was no cookie.
+    return getCookie('mobify-path') === '';
 };
+Private['isDisabled'] = isDisabled;
 
-// Tag.isPreview checks to see if we need to load the preview API.
-Tag.isPreview = function() {
-    return !!((this.getCookie("mobify-path") === 'true') || 
+/**
+    isPreview checks to see if we need to load the preview API.
+    @private
+    @type {boolean}
+*/
+var isPreview = function() {
+    return (getCookie("mobify-path") == 'true' || 
             /mobify-path=true/.test(window.location.hash));
 };
+Private['isPreview'] = isPreview;
 
-// Tag.loadPreview loads the preview API.
-Tag.loadPreview = function() {
-    this.loadScript({
-        src: this.previewUrl
+/**
+    loadPreview loads the preview API.
+
+    @private
+    @type {null}
+*/
+var loadPreview = function() {
+    loadScript({
+        src: previewUrl
     });
 };
 
-// Tag.disable temporarily disables the tag for 5 minutes.
-Tag.disable = function() {
+Private['loadPreview'] = loadPreview;
+/**
+    disableTag temporarily disables the tag for 5 minutes.
+
+    @private
+    @type {null}
+*/
+var disableTag = function() {
     var now = new Date();
     // Set now to 5 minutes ahead
     now.setTime(now.getTime() + 5*60*1000);
@@ -103,137 +213,123 @@ Tag.disable = function() {
     // Reload the page (location.reload has problems in FF)
     window.location = window.location.href;
 };
+Private['disableTag'] = disableTag;
 
-// Tag.collectTiming collects DOMContentLoaded time,
-// and Load time.
-Tag.collectTiming = function() {
+/** 
+    collectTiming collects DOMContentLoaded time,
+    and Load time.
+
+    @private
+    @type {null}
+*/
+var collectTiming = function() {
+    /** @param {string} */
+    var bindEvent = function(name) {
+        window.addEventListener(name, function() {
+            Tag[name] = +(new Date());
+        }, false);
+    };
+
     if (window.addEventListener) {
-        window.addEventListener('DOMContentLoaded', function() {
-            Tag.DOMContentLoadedTime = Date.now();
-        }, false);
-        window.addEventListener('load', function() {
-            Tag.LoadTime = Date.now();
-        }, false);
+        bindEvent('DOMContentLoaded');
+        bindEvent('load');
     }
 };
+Private['collectTiming'] = collectTiming;
 
-// Tag.supportedBrowser will return whether or not we are on a device
-Tag.supportedBrowser = function(ua) {
-    var self = this;
+/**
+    Tag.getOptions returns the current options, accounting for the current
+    mode if necessary.
 
-    // We're enabled for:
-    // - WebKit based browsers
-    // - IE 10+
-    // - FireFox 4+
-    // - Opera 11+
-    match = /webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)/i.exec(ua);
-    if (!match) {
-        return false;
-    }
-    // match[1] == Firefox
-    if (match[1] && +match[2] < 4) {
-        return false;
-    }
-    // match[3] == Opera
-    if (match[3] && +match[4] < 11) {
-        return false;
-    }
-    // match[5] == IE
-    if (match[5] && +match[6] < 6) {
-        return false;
-    }
-
-    return true;
-};
-
-// Tag.getOptions returns the current options, accounting for the current
-// mode if necessary.
-Tag.getOptions = function(){
-    var self = this;
-    var options = self.options;
-    if (!options) {
-        return;
-    }
-
-    if ('getMode' in options) {
+    @type {!Object}
+*/
+var getOptions = function(options){
+    if (options['mode']) {
         // If the "options" objects has a mode, grab the mode and
         // return the options set for that mode
-        var mode = self.getCookie("mobify-mode") || options.getMode(Mobify);
+        var mode = getCookie("mobify-mode");
+
+        if (!mode || !options[mode]) {
+            mode = options['mode'](Tag['ua']);
+        }
+        
         return options[mode];
-    } else if (self.supportedBrowser(self.userAgent)) {
-        // If there is no mode set, return the options object if the browser is
-        // supported.
-        return options
     }
 
-    return;
-}
+    return options;
+};
+Tag['getOptions'] = getOptions;
 
-// Mobify.Tag.init initializes the tag with the `options`.
-//
-// Format of `options` object:
-// Mobify.Tag.init({
-//     // Whether we should allow load through preview.
-//     skipPreview: true 
+/*
+    Mobify.Tag.init initializes the tag with the `options`.
 
-//     getMode: function(Mobify) {
-//         // Return mode based on device or other settings.
-//         // `mode` is a key in to the options object
-//         // that selects our device-specific options.
-//         return 'desktop'
-//     },
+    Format of `options` object:
+    Mobify.Tag.init({
+        // Whether we should allow load through preview.
+        skipPreview: true 
 
-//     desktop: {
-//         // Url to load
-//         url: "http://cdn.mobify.com/foo/mobify.js",
+        mode: function(Mobify) {
+            // Return mode based on device or other settings.
+            // `mode` is a key in to the options object
+            // that selects our device-specific options.
+            return 'desktop'
+        },
 
-//         // Whether to capture
-//         capture: true,
+        desktop: {
+            // Url to load
+            url: "http://cdn.mobify.com/foo/mobify.js",
 
-//         // Prelab Callback (optional)
-//         // Called immediately before we insert the script.
-//         preload: function() {};
+            // Whether to capture
+            capture: true,
 
-//         // Postload Callback (optional)
-//         // Called after the script's onload handler fires.
-//         postload: function() {};
-//     }
-// });
-Tag.init = function(options) {
-    var self = this;
-    self.options = options;
+            // Prelab Callback (optional)
+            // Called immediately before we insert the script.
+            pre: function() {};
 
-    self.debug("Init Called");
+            // Postload Callback (optional)
+            // Called after the script's onload handler fires.
+            postload: function() {};
+        }
+    });
+*/
 
-    if (self.isDisabled()) {
-        self.debug("Tag is disabled.");
+
+
+/** Mobify.Tag.init
+
+    @expose
+    @param {!Object} options Options to load with
+    @type {null}
+*/
+Tag['init'] = function(options) {
+    Tag['options'] = options;
+
+    if (isDisabled()) {
         return;
     }
 
-    self.collectTiming();
+    collectTiming();
 
-    if (!options.skipPreview && self.isPreview()) {
-        self.startCapture(function(){self.loadPreview()});
+    if (!options['skipPreview'] && isPreview()) {
+        startCapture(loadPreview);
         return;
     }
 
-    var opts = self.getOptions();
+    var opts = getOptions(options);
 
-    if (typeof opts === "undefined") {
-        self.debug("No mode options found, acting disabled.");
+    if (!opts) {
         return;
     }
 
     var preloadCallback = function() {
-        if (opts.preload) {
-            opts.preload(self);
+        if (opts['pre']) {
+            opts['pre']();
         }
     };
 
     var postloadCallback = function() {
-        if (opts.postload) {
-            self.debug("Post Load Callback Firing");
-            opts.postload(self);
+        if (opts['post']) {
+            opts['post']();
         }
     };
 
@@ -242,21 +338,21 @@ Tag.init = function(options) {
 
         var options = {
             id: "mobify-js",
-            src: opts.url,
-            'class': "mobify",
-            onerror: function() {self.disable()},
+            src: opts['url'],
+            onerror: disableTag,
             onload: postloadCallback
         }
 
-        self.loadScript(options);
+        loadScript(options, "mobify");
     };
 
     // Default capture to true
-    if (opts.capture === false) {
+    // Testing must be strict, since `undefined` is assumed to be true.
+    if (opts['capture'] === false) {
         load();
     } else {
-        self.startCapture(load);
+        startCapture(load);
     }
 };
 
-})(window, document, window.Mobify, window.Mobify.Tag);
+})(window, document);

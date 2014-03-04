@@ -5,7 +5,7 @@
         <!-- Mobify Tag External -->
         <script src="/tag/v7.js"></script>
         <script>Mobify.Tag.init({
-            getMode: function() { return 'failed' },
+            mode: function() { return 'failed' },
             failed: {
                 capture: true,
                 url: "/tests/fixtures/tag/should-not-exist.js"

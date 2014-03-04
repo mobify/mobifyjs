@@ -1,4 +1,14 @@
-define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['mobifyjs/utils', 'mobifyjs/capture'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('../utils.js'), require('../capture.js'));
+    }
+}(this, function (Utils, Capture) {
 
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
@@ -139,4 +149,4 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
 
 return;
 
-});
+}));

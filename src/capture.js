@@ -1,4 +1,17 @@
-define(["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['mobifyjs/utils', 'mobifyjs/patchAnchorLinks'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('../bower_components/mobify-utils/utils.js'), require('./patchAnchorLinks.js'));
+    } else {
+        // Browser globals (root is window)
+        root.Capture = factory(root.Utils, root.patchAnchorLinks);
+    }
+}(this, function (Utils, patchAnchorLinks) {
 
 // ##
 // # Static Variables/Functions
@@ -396,9 +409,10 @@ Capture.prototype.createDocumentFragments = function() {
 };
 
 /**
- * Returns an escaped HTML representation of the captured DOM
+ * Returns an HTML representation of the captured DOM with resources enabled.
+ * (escapedHTMLString remains for backwards compatibility)
  */
-Capture.prototype.escapedHTMLString = function() {
+Capture.prototype.enabledHTMLString = Capture.prototype.escapedHTMLString = function() {
     var doc = this.capturedDoc;
     var html = Capture.enable(Utils.outerHTML(doc.documentElement), this.prefix);
     var htmlWithDoctype = this.doctype + html;
@@ -409,11 +423,11 @@ Capture.prototype.escapedHTMLString = function() {
  * Rewrite the document with a new html string
  */
 Capture.prototype.render = function(htmlString) {
-    var escapedHTMLString;
+    var enabledHTMLString;
     if (!htmlString) {
-        escapedHTMLString = this.escapedHTMLString();
+        enabledHTMLString = this.enabledHTMLString();
     } else {
-        escapedHTMLString = Capture.enable(htmlString, this.prefix);
+        enabledHTMLString = Capture.enable(htmlString, this.prefix);
     }
 
     var doc = this.sourceDoc;
@@ -424,7 +438,7 @@ Capture.prototype.render = function(htmlString) {
     // Asynchronously render the new document
     setTimeout(function(){
         doc.open("text/html", "replace");
-        doc.write(escapedHTMLString);
+        doc.write(enabledHTMLString);
         doc.close();
     });
 };
@@ -456,9 +470,10 @@ Capture.getMobifyLibrary = function(doc) {
 Capture.getPostload = function(doc) {
     var doc = doc || document;
     var postloadScript = undefined;
+
     // mainExecutable is used for backwards compatibility purposes
-    var tagOptions = window.Mobify.Tag && window.Mobify.Tag.getOptions && window.Mobify.Tag.getOptions() || {};
-    var postload = (tagOptions.postload && tagOptions.postload.toString()) || window.Mobify.mainExecutable;
+    var tagOptions = window.Mobify.Tag && window.Mobify.Tag.options && window.Mobify.Tag.getOptions(Mobify.Tag.options) || {};
+    var postload = (tagOptions.post && tagOptions.post.toString()) || window.Mobify.mainExecutable;
     if (postload) {
         // Checks for main executable string on Mobify object and creates a script
         // out of it
@@ -538,4 +553,4 @@ Capture.patchAnchorLinks = patchAnchorLinks;
 
 return Capture;
 
-});
+}));

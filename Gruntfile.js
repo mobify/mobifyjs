@@ -30,9 +30,12 @@ module.exports = function(grunt) {
                   'http://localhost:3000/tests/capture.html',
                   'http://localhost:3000/tests/unblockify.html',
                   'http://localhost:3000/tests/cssOptimize.html',
-                  'http://localhost:3000/tests/tag.html',
                   'http://localhost:3000/tests/anchor-test.html',
-                  'http://localhost:3000/tests/tag-old-browser.html'
+                  'http://localhost:3000/tests/supported-browser.html',
+                  'http://localhost:3000/tests/tag.html',
+                  'http://localhost:3000/tests/tag-integration-tests.html',
+                  'http://localhost:3000/tests/tag-old-browser.html',
+                  'http://localhost:3000/tests/utils.html'
                 ]
               }
             }
@@ -48,8 +51,17 @@ module.exports = function(grunt) {
                 }
             }
         },
+        browserify: {
+            full: {
+                src: ['src/mobify-library.js'],
+                dest: 'build/mobify.js'
+            },
+            custom: {
+                src: ['mobify-custom.js'],
+                dest: 'build/custom/mobify.js'
+            }
+        },
         requirejs: {
-            // Building full Mobify.js library
             full: {
                 options: {
                     almond: true,
@@ -60,7 +72,6 @@ module.exports = function(grunt) {
                     out: "./build/mobify.js"
                 }
             },
-            // Building custom Mobify.js library (must copy mobify-custom.js.example -> mobify-custom.js)
             custom: {
                 options: {
                     almond: true,
@@ -102,8 +113,11 @@ module.exports = function(grunt) {
                         'http://localhost:3000/tests/jazzcat.html',
                         'http://localhost:3000/tests/unblockify.html',
                         'http://localhost:3000/tests/cssOptimize.html',
+                        'http://localhost:3000/tests/anchor-test.html',
+                        'http://localhost:3000/tests/supported-browser.html',
                         'http://localhost:3000/tests/tag.html',
-                        'http://localhost:3000/tests/anchor-test.html'
+                        'http://localhost:3000/tests/tag-integration-tests.html',
+                        'http://localhost:3000/tests/utils.html'
                     ],
                     concurrency: 16,
                     tunneled: true,
@@ -207,6 +221,7 @@ module.exports = function(grunt) {
                     key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                     urls: [
                         'http://localhost:3000/tests/tag-old-browser.html',
+                        'http://localhost:3000/tests/supported-browser.html'
                     ],
                     concurrency: 16,
                     tunneled: true,
@@ -388,7 +403,7 @@ module.exports = function(grunt) {
             },
         }
     });
-
+    
     grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-qunit');
@@ -398,15 +413,16 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-jekyll');
     grunt.loadNpmTasks('grunt-express');
     grunt.loadNpmTasks('grunt-release');
+    grunt.loadNpmTasks('grunt-browserify');
 
     grunt.registerTask('test', ['express', 'qunit']);
     // Builds librarys, and custom library if mobify-custom.js is present
     grunt.registerTask('build', function() {
         // Then build mobify.js library
-        grunt.task.run("requirejs:full", "uglify:full");
+        grunt.task.run("browserify:full", "uglify:full");
         // Build custom library if it exists
         if (grunt.file.exists("mobify-custom.js")) {
-            grunt.task.run("requirejs:custom", "uglify:custom");
+            grunt.task.run("browserify:custom", "uglify:custom");
         }
     });
     grunt.registerTask('default', 'build');

@@ -93,7 +93,7 @@ Mobify.js is run again in a non-capturing context (at this time
     }
 
 
-## `escapedHTMLString()`
+## `enabledHTMLString()`
 
 Returns a string representation of the `captured document`, but with
 all resources enabled (prefix removed). Can be considered an
@@ -102,7 +102,7 @@ alternative to `capturedDoc.outerHTML`.
 **Usage/Example:**
 
     Mobify.Capture.init(function(capture){
-        var htmlString = capture.escapedHTMLString();
+        var htmlString = capture.enabledHTMLString();
     });
 
 ## `render(htmlString)`
