@@ -1,37 +1,19 @@
-require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify", "mobifyjs/firefox"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, Firefox) {
-    var Mobify = window.Mobify = window.Mobify || {};
+var Mobify = require('./src/mobify-library');
 
-    // DECLARE LIBRARIES ATTACHED TO MOBIFY OBJECT HERE
-    Mobify.Utils = Utils;
-    Mobify.Capture = Capture;
-    Mobify.ResizeImages = ResizeImages;
-    Mobify.Jazzcat = Jazzcat;
-    Mobify.Unblockify = Unblockify;
-    Mobify.api = "2.0"; // v6 tag backwards compatibility change
-    
-    Mobify.Capture = Capture;
-    Mobify.ResizeImages = ResizeImages;
+var capturing = window.Mobify && window.Mobify.capturing || false;
+if (capturing) {
+    // Grab reference to a newly created document
+    Mobify.Capture.initCapture(function(capture){
+        // optimize scripts
+        var capturedDoc = capture.capturedDoc;
+        //var scripts = capturedDoc.querySelectorAll('script');
+        //Mobify.Jazzcat.optimizeScripts(scripts);
+        // optimize images
+        var images = capturedDoc.querySelectorAll('img, picture');
+        Mobify.ResizeImages.resize(images);
 
-    // OPTIONAL: Also add main executable logic to compile library + main
-    //           instead of having seperate main.js file
-    
-    var capturing = window.Mobify && window.Mobify.capturing || false;
-    if (capturing) {
-        // Grab reference to a newly created document
-        Mobify.Capture.initCapture(function(capture){
-            // optimize scripts
-            var capturedDoc = capture.capturedDoc;
-            //var scripts = capturedDoc.querySelectorAll('script');
-            //Mobify.Jazzcat.optimizeScripts(scripts);
-            // optimize images
-            var images = capturedDoc.querySelectorAll('img, picture');
-            Mobify.ResizeImages.resize(images);
+        capture.renderCapturedDoc();
+    });
+} else {
 
-            capture.renderCapturedDoc();
-        });
-    } else {
-
-    }
-
-}, undefined, true);
-// relPath, forceSync
+}

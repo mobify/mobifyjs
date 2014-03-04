@@ -1,4 +1,17 @@
-define(["mobifyjs/utils"], function(Utils) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['mobifyjs/utils'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('./utils.js'));
+    } else {
+        // Browser globals (root is window)
+        root.ResizeImages = factory(root.Utils);
+    }
+}(this, function (Utils) {
 
 var ResizeImages = window.ResizeImages = {};
 
@@ -386,4 +399,4 @@ ResizeImages.defaults = {
 
 return ResizeImages;
 
-});
+}));

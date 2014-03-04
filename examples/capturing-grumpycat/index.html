@@ -7,7 +7,7 @@ h(a);if(b){var e=function(){b.post&&b.post()};a=function(){b.pre&&b.pre();k({id:
 var supportedBrowser=function(e){var t=/webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)/i.exec(e);if(!t){return false}if(t[1]&&+t[2]<4){return false}if(t[3]&&+t[4]<11){return false}if(t[5]&&+t[6]<6){return false}return true};
 if (supportedBrowser) {
     Mobify.Tag.init({
-        url: "/mobifyjs/build/mobify.js",
+        url: "/mobifyjs/build/mobify.min.js",
         post: function() {
             var capturing = window.Mobify && window.Mobify.capturing || false;
             if (capturing) {
