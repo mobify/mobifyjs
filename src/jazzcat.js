@@ -21,7 +21,21 @@
  * into the cache using a bootloader request to Jazzcat. Scripts are then
  * executed directly from the cache.
  */
-define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(["mobifyjs/utils"], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        var Utils = require('./utils.js');
+        module.exports = factory(Utils);
+    } else {
+        // Browser globals (root is window)
+        root.Jazzcat = factory(root.Utils);
+    }
+}(this, function (Utils) {
     /**
      * An HTTP 1.1 compliant localStorage backed cache.
      */
@@ -597,4 +611,4 @@ define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
     };
 
     return Jazzcat;
-});
+}));

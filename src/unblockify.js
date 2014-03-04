@@ -1,4 +1,19 @@
-define(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['mobifyjs/utils', 'mobifyjs/capture'], factory);
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        var Utils = require('./utils.js');
+        var Capture = require('./capture.js');
+        module.exports = factory(Utils, Capture);
+    } else {
+        // Browser globals (root is window)
+        root.Unblockify = factory(root.Utils, root.Capture);
+    }
+}(this, function (Utils, Capture) {
 
 var Unblockify = {}
 
@@ -30,4 +45,4 @@ Unblockify.unblock = function(scripts) {
 
 return Unblockify;
 
-});
+}));
