@@ -1,4 +1,4 @@
-require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify", "mobifyjs/firefox"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify, Firefox) {
+require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/unblockify"], function(Utils, Capture, ResizeImages, Jazzcat, Unblockify) {
     var Mobify = window.Mobify = window.Mobify || {};
 
     // DECLARE LIBRARIES ATTACHED TO MOBIFY OBJECT HERE
