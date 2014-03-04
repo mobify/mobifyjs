@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+    <head>
+        <script src="/tests/utils/proxyassert.js"></script>
+        <!-- Mobify Tag External -->
+        <script src="/tag/v7.js"></script>
+        <script>
+            Mobify.Tag.previewUrl = "/tests/fixtures/tag/preview.js";
+        </script>
+
+        <script>Mobify.Tag.init({
+            skipPreview: true,
+            mode: function() { return 'mobile' },
+            mobile: {
+                capture: true,
+                url: "/tests/fixtures/tag/mobile.js"
+            }
+        });</script>
+    <body>
+        <h1>Mobify tag Tests</h1>
+
+        <div id="content">Content</div>
+
+        <script>
+            Assert.ok(false, "Capturing failed.");
+        </script>
+    </body>
+</html>

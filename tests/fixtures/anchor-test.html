@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];e.src?a.src=e.src:e.innerHTML&&(a.innerHTML=e.innerHTML),a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h=function(){var c=new Date;c.setTime(c.getTime()+18e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e){var a=b.createElement("script");if(a.onerror=h,"string"==typeof e)g(a,"main-executable","mobify",{src:e});else{var c="var main = "+e.toString()+"; main();";g(a,"main-executable","mobify",{innerHTML:c})}}},f.onerror=h,g(f,"mobify-js","mobify",{src:d})})}(window,document,function(){a=/webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return!a||a[1]&&4>+a[2]||a[3]&&11>+a[4]||a[5]&&6>+a[6]?!1:!0},
+
+// path to mobify.js
+"/mobifyjs/build/mobify.js",
+
+// calls to APIs go here (or path to a main.js)
+function() {
+    var capturing = window.Mobify && window.Mobify.capturing || false;
+    if (capturing) {
+        // Grab reference to a newly created document
+        Mobify.Capture.init(function(capture){
+            var capturedDoc = capture.capturedDoc;
+            // Render source DOM to document
+            capture.renderCapturedDoc();
+        });
+    } else {
+        Mobify.Capture.patchAnchorLinks();
+        window.hadHashOnLoad = (window.location.hash !== "");
+    }
+});</script>
+<!-- END MOBIFY TAG -->
+
+
+<style>
+    #bottom {
+        position: absolute;
+        top: 500px;
+        left: 0;
+        right: 0;
+        height: 5000px;
+        background: #DDD;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+</style>
+
+</head>
+<body>
+    <div>
+        <a href="#bottom" id="test1">Test 1 - Regular Anchor Tag to Element</a><br>
+        <a href="#" id="test2">Test 2 - Regular Anchor Tag to Top of Page</a><br>
+        <a href="#bottom" id="test3">Test 3 - Anchor Tag with Handler (no Prevent Default)</a><br>
+        <a href="#bottom" id="test4">Test 4 - Anchor Tag with Handler (Prevent Default)</a><br>
+        <a href="#bottom" id="test5" onclick="cbtest5()">Test 5 - Anchor Tag with onclick (no Prevent Default)</a><br>
+        <a href="#bottom" id="test6" onclick="return cbtest6()">Test 6 - Anchor Tag with Handler (return void)</a><br>
+        <a href="#bottom" id="test7" onclick="cbtest7(event)">Test 7 - Anchor Tag with Handler (calls Prevent Default)</a><br>
+
+    </div>
+
+    <div id="bottom">
+        Bottom!
+    </div>
+
+    <script>
+    // Test 3
+    window.testFired3 = false;
+    document.getElementById('test3').addEventListener('click', function() {
+        window.testFired3 = true;
+    }, false);
+
+    // Test 4
+    window.testFired4 = false;
+    document.getElementById('test4').addEventListener('click', function(e) {
+        window.testFired4 = true;
+        e.preventDefault();
+    }, false);
+
+    // Test 5
+    window.testFired5 = false;
+    window.cbtest5 = function() {
+        window.testFired5 = true;
+    };
+
+    // Test 6
+    window.testFired6 = false;
+    window.cbtest6 = function() {
+        window.testFired6 = true;
+
+        return false;
+    };
+
+    // Test 7
+    window.testFired7 = false;
+    window.cbtest7 = function(e) {
+        window.testFired7 = true;
+        e.preventDefault();
+
+        return false;
+    }
+
+    // Tell parent we are ready
+    parent.postMessage("finished", "*");
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html class="foo">
+<head>
+  <meta charset="utf-8">
+  <title>Mobify.js Tag Tests for Old Browsers</title>
+  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
+
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+</head>
+<body>
+
+<div id="qunit"></div>
+
+<div id="qunit-fixture">
+</div>
+
+
+<script src="/tag/v7.exposed.min.js"></script>
+
+<script>
+    var Assert = window.Assert = {}
+    Assert._waitingCb = null;
+    Assert.ok = ok;
+    Assert.ready = function() {
+        Assert._waitingCb();
+    }
+
+    asyncTest("Ensures tag at least loads", function() {
+        Assert._waitingCb = function() {
+            equal(window.mobifyjsFileName, "/tests/fixtures/tag/desktop.js", "Correct file loaded.");
+
+            start();
+        };
+
+        ok(Mobify.Tag.init, "Mobify.Tag.init should exist.");
+
+        Mobify.Tag.init({
+            mode: function() {return 'desktop'},
+            desktop: {
+                capture: false,
+                url: "/tests/fixtures/tag/desktop.js"
+            }
+        });
+    });
+
+    asyncTest("Ensures single-mode does not blow up", function() {
+        expect(1);
+
+        Assert._waitingCb = function() {
+            start();
+        };
+
+        // This should always load
+        Mobify.Tag.init({
+            capture: false,
+            url: "/tests/fixtures/tag/desktop.js"
+        });
+    });
+</script>
+
+</body>
+</html>

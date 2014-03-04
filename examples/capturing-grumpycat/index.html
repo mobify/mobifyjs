@@ -1,38 +1,40 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<script>!function(a,b,c,d,e){function g(a,c,d,e){var f=b.getElementsByTagName("script")[0];a.src=e,a.id=c,a.setAttribute("class",d),f.parentNode.insertBefore(a,f)}a.Mobify={points:[+new Date]};var f=/((; )|#|&|^)mobify=(\d)/.exec(location.hash+"; "+b.cookie);if(f&&f[3]){if(!+f[3])return}else if(!c())return;b.write('<plaintext style="display:none">'),setTimeout(function(){var c=a.Mobify=a.Mobify||{};c.capturing=!0;var f=b.createElement("script"),h="mobify",i=function(){var c=new Date;c.setTime(c.getTime()+3e5),b.cookie="mobify=0; expires="+c.toGMTString()+"; path=/",a.location=a.location.href};f.onload=function(){if(e)if("string"==typeof e){var c=b.createElement("script");c.onerror=i,g(c,"main-executable",h,mainUrl)}else a.Mobify.mainExecutable=e.toString(),e()},f.onerror=i,g(f,"mobify-js",h,d)})}(window,document,function(){a=/webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)|3ds/i.exec(navigator.userAgent);return!a||a[1]&&4>+a[2]||a[3]&&11>+a[4]||a[5]&&6>+a[6]?!1:!0},
+<script>(function(c,f){function h(a){if(a.mode){var b=g("mobify-mode");b&&a[b]||(b=a.mode(d.ua));return a[b]}return a}function m(){function a(a){c.addEventListener(a,function(){d[a]=+new Date},!1)}c.addEventListener&&(a("DOMContentLoaded"),a("load"))}function n(){var a=new Date;a.setTime(a.getTime()+3E5);f.cookie="mobify-path=; expires="+a.toGMTString()+"; path=/";c.location=c.location.href}function p(){k({src:"https://preview.mobify.com/v7/"})}function g(a){if(a=f.cookie.match(RegExp("(^|; )"+a+"((=([^;]*))|(; |$))")))return a[4]||
+""}function l(a){f.write('<plaintext style="display:none">');setTimeout(function(){e.capturing=!0;a()},0)}function k(a,b){var c=f.getElementsByTagName("script")[0],d=f.createElement("script"),e;for(e in a)d[e]=a[e];b&&d.setAttribute("class",b);c.parentNode.insertBefore(d,c)}var e=c.Mobify={},d=e.Tag={};e.points=[+new Date];e.tagVersion=[7,0];d.ua=c.navigator.userAgent;d.getOptions=h;d.init=function(a){d.options=a;if(""!==g("mobify-path"))if(m(),a.skipPreview||"true"!=g("mobify-path")&&!/mobify-path=true/.test(c.location.hash)){var b=
+h(a);if(b){var e=function(){b.post&&b.post()};a=function(){b.pre&&b.pre();k({id:"mobify-js",src:b.url,onerror:n,onload:e},"mobify")};!1===b.capture?a():l(a)}}else l(p)}})(window,document);
+var supportedBrowser=function(e){var t=/webkit|(firefox)[\/\s](\d+)|(opera)[\s\S]*version[\/\s](\d+)|(trident)[\/\s](\d+)/i.exec(e);if(!t){return false}if(t[1]&&+t[2]<4){return false}if(t[3]&&+t[4]<11){return false}if(t[5]&&+t[6]<6){return false}return true};
+if (supportedBrowser) {
+    Mobify.Tag.init({
+        url: "/mobifyjs/build/mobify.js",
+        post: function() {
+            var capturing = window.Mobify && window.Mobify.capturing || false;
+            if (capturing) {
+                // Grab reference to a newly created document
+                Mobify.Capture.init(function(capture){
+                    // Grab reference to the captured document in progres
+                    var capturedDoc = capture.capturedDoc;
+                    var grumpyUrl = "/mobifyjs/examples/assets/images/grumpycat.jpg"
 
-// path to mobify.js
-"/mobifyjs/build/mobify.js",
+                    var imgs = capturedDoc.getElementsByTagName("img");
+                    for(var i = 0; i < imgs.length; i++) {
+                        var img = imgs[i];
+                        var ogImage = img.getAttribute("x-src");
+                        img.setAttribute("x-src", grumpyUrl);
+                        img.setAttribute("old-src", ogImage);
+                    }
 
-// calls to APIs go here (or path to a main.js)
-function() {
-    var capturing = window.Mobify && window.Mobify.capturing || false;
-    if (capturing) {
-        // Grab reference to a newly created document
-        Mobify.Capture.init(function(capture){
-            // Grab reference to the captured document in progres
-            var capturedDoc = capture.capturedDoc;
-            var grumpyUrl = "/mobifyjs/examples/assets/images/grumpycat.jpg"
-
-            var imgs = capturedDoc.getElementsByTagName("img");
-            for(var i = 0; i < imgs.length; i++) {
-                var img = imgs[i];
-                var ogImage = img.getAttribute("x-src");
-                img.setAttribute("x-src", grumpyUrl);
-                img.setAttribute("old-src", ogImage);
+                    // Render source DOM to document
+                    capture.renderCapturedDoc();
+                });
             }
-
-            // Render source DOM to document
-            capture.renderCapturedDoc();
-        });
-    }
-    else {
-        console.log('Executing post-capture!');
-    }
-});</script>
-<!-- END MOBIFY TAG -->
+            else {
+                console.log('Executing post-capture!');
+            }
+        }
+    });
+}</script>
 <link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
 <title>Grumpy cat example</title>
 </head>

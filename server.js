@@ -10,6 +10,34 @@ var hbs = require('hbs');
 
 http.globalAgent.maxSockets = 100;
 
+
+/**
+ * Inlines the V7 Tag on test fixtures.
+ */
+var inlineTag = function(req, res, next) {
+    try {
+        var page = fs.readFileSync(__dirname + req.path, 'utf8');
+    } catch (e) {
+        return next();
+    }
+
+    var tagSource = '/tag/v7.exposed.min.js';
+    
+    if (req.query['tag'] == "min") {
+        tagSource = '/tag/v7.min.js';
+    }
+
+    var tag = fs.readFileSync(__dirname + tagSource, 'utf8');
+
+    tag = tag.replace("https://preview.mobify.com/v7/", "/tests/fixtures/tag/preview.js");
+
+    page = page.replace("<script src=\"/tag/v7.js\"></script>", "<script>" + tag + "</script>");
+
+    res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8', 'Cache-Control': 'no-cache'});
+    res.end(page);
+};
+
+
 /**
  * Used for test "capture captures the complete document" in `tests/capture.html`.
  */
@@ -227,6 +255,7 @@ app.use(function(req, res, next) {
 
 app.get('/build/mobify(.min)?.js', cachedResponse);
 app.get('/tests/fixtures/split*', slowResponse);
+app.get('/tests/fixtures/tag/*', inlineTag);
 app.get('/performance/jazzcat/', jazzcatPerformanceIndex);
 app.get('/performance/jazzcat/runner/:numScripts', jazzcatPerformanceRunner);
 

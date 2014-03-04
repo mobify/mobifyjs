@@ -64,12 +64,16 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
   format, except non-animated gifs, which are converted to png.
 - `quality`: An integer from 1-100 used as a quality parameter when encoding 
   jpg and webp images, can only be set along with the `format` parameter.
-- `maxWidth`: Maximum width of the image(s) being resized (in CSS pixes). 
+- `maxWidth`: Maximum width of the image(s) being resized (in CSS pixels). 
   Defaults to automatically determine width of device.
 - `maxHeight`: Maximum height of the image(s) being resized (in CSS pixels). 
   Only usable when maxWidth is specified.
 - `devicePixelRatio`: Override the default devicePixelRatio. Defaults to 
   `window.devicePixelRatio.`
+- `resize`: A boolean that controls whether to scale the image(s). When
+  false, the image(s) are served through the image resizer backend but are not
+  resized. A value of null auto detects whether to resize images from the
+  document's viewport meta tag. The default is true.
 
 **Example**
 
@@ -136,19 +140,19 @@ The same as `ResizeImages.resize` options.
     Mobify.ResizeImages.getImageURL('http://www.foo.com/bar.png');
 
     // Get an optimized image URL from a URL string with options overridden
-    var options = Utils.extend(ResizeImages.getDefaultOptions(), {
+    var options = Utils.extend(ResizeImages.processOptions(), {
         cacheHours: '8', 
     });
     Mobify.ResizeImages.getImageURL('http://www.foo.com/bar.png', options);
 
 
-## `ResizeImages.getDefaultOptions()`
+## `ResizeImages.processOptions()`
 
 This method returns all of the default options.
 
 **Usage/Examples:**
 
-    Mobify.ResizeImages.getDefaultOptions()
+    Mobify.ResizeImages.processOptions()
 
     // returns (for iPhone 5):
     // {

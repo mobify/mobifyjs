@@ -153,6 +153,44 @@ __Note: This method is async__
         }
     });
 
+## `patchAnchorLinks()`
+
+On Firefox, links to anchors eg (`<a href="#foo">`) cause the browser 
+to navigate when using Capturing, because Firefox considers the re-written
+document to be a different location.
+
+If you have click handlers on such `a` tags, which do not call
+`e.preventDefault()`, you'll probably experience issues as the page
+will reload before you callback completes. The ideal fix is that
+all events call `e.preventDefault()`.
+
+However, we do provide a patch for this, which behaves as expected,
+but it does not actually update `window.location.hash` to reflect
+the hash in the anchor. This can cause problems with users who
+want to copy-and-paste URLs with `anchor` tags, or sites that trigger
+logic based on `onhashchange` or based on the `hash` at load time.
+
+It should also be noted, that `history.pushState()` is broken on Firefox,
+when used with capturing and no fix exists currently.
+
+This patch is not executed by default - if you want to use it, follow the
+example below:
+
+**Usage/Example:**
+
+    var capturing = window.Mobify && window.Mobify.capturing || false;
+    if (capturing) {
+        // Grab reference to a newly created document
+        Mobify.Capture.init(function(capture){
+            var capturedDoc = capture.capturedDoc;
+            // Render source DOM to document
+            capture.renderCapturedDoc();
+        });
+    } else {
+        // This should be called in the post-capturing phase.
+        Mobify.Capture.patchAnchorLinks();
+    }
+
 ## Browser Support
 
 

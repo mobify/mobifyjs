@@ -1,6 +1,5 @@
-(function () {
-/**
- * almond 0.2.6 Copyright (c) 2011-2012, The Dojo Foundation All Rights Reserved.
+(function () {/**
+ * @license almond 0.2.9 Copyright (c) 2011-2014, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/almond for details
  */
@@ -17,7 +16,8 @@ var requirejs, require, define;
         config = {},
         defining = {},
         hasOwn = Object.prototype.hasOwnProperty,
-        aps = [].slice;
+        aps = [].slice,
+        jsSuffixRegExp = /\.js$/;
 
     function hasProp(obj, prop) {
         return hasOwn.call(obj, prop);
@@ -32,7 +32,7 @@ var requirejs, require, define;
      * @returns {String} normalized name
      */
     function normalize(name, baseName) {
-        var nameParts, nameSegment, mapValue, foundMap,
+        var nameParts, nameSegment, mapValue, foundMap, lastIndex,
             foundI, foundStarMap, starI, i, j, part,
             baseParts = baseName && baseName.split("/"),
             map = config.map,
@@ -50,8 +50,15 @@ var requirejs, require, define;
                 //"one/two/three.js", but we want the directory, "one/two" for
                 //this normalization.
                 baseParts = baseParts.slice(0, baseParts.length - 1);
+                name = name.split('/');
+                lastIndex = name.length - 1;
 
-                name = baseParts.concat(name.split("/"));
+                // Node .js allowance:
+                if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
+                    name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
+                }
+
+                name = baseParts.concat(name);
 
                 //start trimDots
                 for (i = 0; i < name.length; i += 1) {
@@ -260,14 +267,14 @@ var requirejs, require, define;
     main = function (name, deps, callback, relName) {
         var cjsModule, depName, ret, map, i,
             args = [],
+            callbackType = typeof callback,
             usingExports;
 
         //Use name if no relName
         relName = relName || name;
 
         //Call the callback to define the module, if necessary.
-        if (typeof callback === 'function') {
-
+        if (callbackType === 'undefined' || callbackType === 'function') {
             //Pull out the defined dependencies and pass the ordered
             //values to the callback.
             //Default to [require, exports, module] if no deps
@@ -298,7 +305,7 @@ var requirejs, require, define;
                 }
             }
 
-            ret = callback.apply(defined[name], args);
+            ret = callback ? callback.apply(defined[name], args) : undefined;
 
             if (name) {
                 //If setting exports via "module" is in play,
@@ -333,6 +340,13 @@ var requirejs, require, define;
         } else if (!deps.splice) {
             //deps is a config object, not an array.
             config = deps;
+            if (config.deps) {
+                req(config.deps, config.callback);
+            }
+            if (!callback) {
+                return;
+            }
+
             if (callback.splice) {
                 //callback is an array, which means it is a dependency list.
                 //Adjust args if there are dependencies
@@ -377,11 +391,7 @@ var requirejs, require, define;
      * the config return value is used.
      */
     req.config = function (cfg) {
-        config = cfg;
-        if (config.deps) {
-            req(config.deps, config.callback);
-        }
-        return req;
+        return req(cfg);
     };
 
     /**
@@ -510,6 +520,44 @@ Utils.getDoctype = function(doc) {
         + '>';
 };
 
+/**
+ * Returns an object that represents the parsed content attribute of the
+ * viewport meta tag. Returns false if no viewport meta tag is present.
+ */
+Utils.getMetaViewportProperties = function(doc) {
+    // Regex to split comma-delimited viewport meta tag properties
+    var SPLIT_PROPERTIES_REGEX = /,\s?/;
+
+    doc = doc || document;
+    var parsedProperties = {}
+
+    // Get the viewport meta tag
+    var viewport = doc.querySelectorAll('meta[name="viewport"]');
+    if (viewport.length == 0) {
+        return false;
+    }
+
+    // Split its properties
+    var content = viewport[0].getAttribute('content');
+    if (content == null) {
+        return false;
+    }
+    var properties = content.split(SPLIT_PROPERTIES_REGEX);
+
+    // Parse the properties into an object
+    for (var i = 0; i < properties.length; i++) {
+        var property = properties[i].split('=')
+
+        if (property.length >= 2) {
+            var key = property[0];
+            var value = property[1];
+            parsedProperties[key] = value;
+        }
+    }
+
+    return parsedProperties;
+}
+
 Utils.removeBySelector = function(selector, doc) {
     doc = doc || document;
 
@@ -594,7 +642,7 @@ Utils.matchMedia = function(doc) {
 Utils.domIsReady = function(doc) {
     var doc = doc || document;
     return doc.attachEvent ? doc.readyState === "complete" : doc.readyState !== "loading";
-}
+};
 
 Utils.getPhysicalScreenSize = function(devicePixelRatio) {
 
@@ -634,12 +682,156 @@ Utils.getPhysicalScreenSize = function(devicePixelRatio) {
     }
 
     return multiplyByPixelRatio(sizes);
-}
+};
+
+Utils.waitForReady = function(doc, callback) {
+    // Waits for `doc` to be ready, and then fires callback, passing
+    // `doc`.
+
+    // We may be in "loading" state by the time we get here, meaning we are
+    // not ready to capture. Next step after "loading" is "interactive",
+    // which is a valid state to start capturing on (except IE), and thus when ready
+    // state changes once, we know we are good to start capturing.
+    // Cannot rely on using DOMContentLoaded because this event prematurely fires
+    // for some IE10s.
+    var ready = false;
+    
+    var onReady = function() {
+        if (!ready) {
+            ready = true;
+            iid && clearInterval(iid);
+            callback(doc);
+        }
+    }
+
+    // Backup with polling incase readystatechange doesn't fire
+    // (happens with some Android 2.3 browsers)
+    var iid = setInterval(function(){
+        if (Utils.domIsReady(doc)) {
+            onReady();
+        }
+    }, 100);
+
+    doc.addEventListener("readystatechange", onReady, false);
+};
 
 return Utils;
 
 });
-define('mobifyjs/capture',["mobifyjs/utils"], function(Utils) {
+// Fixes anchor links (on FF)
+
+define('mobifyjs/patchAnchorLinks',["mobifyjs/utils"], function(Utils){
+    var exports = {};
+
+    var isFirefox = function(ua) {
+        ua = window.navigator.userAgent;
+
+        return /firefox|fennec/i.test(ua)
+    };
+
+    var _patchAnchorLinks = function(doc) {
+        // Anchor links in FF, after we do `document.open` cause a page
+        // navigation (a refresh) instead of just scrolling the
+        // element in to view.
+        //
+        // So, we prevent the default action on the element, and
+        // then manually scroll it in to view (unless some else already
+        // called prevent default).
+
+        var body = doc.body;
+
+        if (!(body && body.addEventListener)) {
+            // Body is not there or we can't bind as expected.
+            return;
+        }
+
+        var _handler = function(e) {
+            // Handler for all clicks on the page, but only triggers
+            // on proper anchor links.
+
+            var target = e.target;
+
+            var matches = function(el) {
+                return (el.nodeName == "A") && (/^#/.test(el.getAttribute('href')));
+            }
+
+            if (!matches(target)) {
+                return;
+            }
+            
+            // Newer browsers support `e.defaultPrevented`. FF 4.0 supports `e.getPreventDefault()`
+            var defaultPrevented = (typeof e.defaultPrevented !== "undefined") ?
+                e.defaultPrevented :
+                e.getPreventDefault && e.getPreventDefault();
+
+            if (!defaultPrevented) {
+                // Prevent the default action, which would cause a
+                // page refresh.
+                e.preventDefault();
+
+                // But pretend that we didn't call it.
+                e.defaultPrevented = false;
+
+                // We have to wait and see if anyone else calls
+                // `preventDefault`. If they do, we don't scroll.
+                var scroll = true;
+
+                // Override the `preventDefault` to stop  us from scrolling.
+                e.preventDefault = function() {
+                    e.defaultPrevented = true;
+                    scroll = false;
+                }
+
+                // If no other events call `preventDefault` we manually
+                // scroll to the element in question.
+                setTimeout(function() {
+                    if (scroll) {
+                        _scrollToAnchor(target.getAttribute('href'));
+                    }
+                }, 50);
+            }   
+        };
+
+
+        var _scrollToAnchor = function(anchor) {
+            // Scrolls to the element, if any, that matches
+            // the given anchor link (eg, "#foo").
+
+            var anchorRe = /^#([^\s]*)/;
+            var match = anchor.match(anchorRe);
+            var target;
+            
+            // Find the target, if any
+            if (match && match[1] === "") {
+                target = doc.body;
+            } else if (match && match[1]) {
+                var target = doc.getElementById(match[1]);
+            }
+
+            // Scroll to it, if it exists
+            if (target) {
+                target.scrollIntoView && target.scrollIntoView();
+            }
+        };
+
+        // We have to get the event through bubbling, otherwise
+        // events cancelled by the return value of an onclick
+        // handler are not correctly handled.
+        body.addEventListener('click', _handler, false);
+    };
+
+    var patchAnchorLinks = function() {
+        if (!isFirefox()) {
+            return
+        }
+
+        Utils.waitForReady(document, _patchAnchorLinks);
+    }
+
+    return patchAnchorLinks;
+});
+
+define('mobifyjs/capture',["mobifyjs/utils", "mobifyjs/patchAnchorLinks"], function(Utils, patchAnchorLinks) {
 
 // ##
 // # Static Variables/Functions
@@ -714,7 +906,6 @@ function escapeQuote(s) {
  */
 function extractHTMLStringFromElement(container) {
     if (!container) return '';
-
     return [].map.call(container.childNodes, function(el) {
         var tagName = nodeName(el);
         if (tagName == '#comment') return '<!--' + el.textContent + '-->';
@@ -748,7 +939,7 @@ Capture.init = Capture.initCapture = function(callback, doc, prefix) {
 
     var createCapture = function(callback, doc, prefix) {
         var capture = new Capture(doc, prefix);
-        var capturedStringFragments = capture.createDocumentFragmentsStrings();
+        var capturedStringFragments = Capture.createDocumentFragmentsStrings(capture.sourceDoc);
         Utils.extend(capture, capturedStringFragments);
         var capturedDOMFragments = capture.createDocumentFragments();
         Utils.extend(capture, capturedDOMFragments);
@@ -879,11 +1070,17 @@ Capture.openTag = function(element) {
 };
 
 /**
+ * Set the content of an element with html from a string
+ */
+Capture.setElementContentFromString = function(el, htmlString) {
+    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
+};
+
+/**
  * Returns an object containing the state of the original page. Caches the object
  * in `extractedHTML` for later use.
  */
- Capture.prototype.createDocumentFragmentsStrings = function() {
-    var doc = this.sourceDoc;
+ Capture.createDocumentFragmentsStrings = function(doc) {
     var headEl = doc.getElementsByTagName('head')[0] || doc.createElement('head');
     var bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body');
     var htmlEl = doc.getElementsByTagName('html')[0];
@@ -924,16 +1121,27 @@ Capture.openTag = function(element) {
         // <!-- comment --> . Skip it.
         if (!match[1]) continue;
 
+        // Grab the contents of head
+        captured.headContent = rawHTML.slice(0, match.index);
+        // Parse the head content
+        // (using a "new RegExp" here because in Android 2.3 when you use a global
+        // match using a RegExp literal, the state is incorrectly cached).
+        var parsedHeadTag = (new RegExp('^\\s*(<head(?:[^>\'"]*|\'[^\']*?\'|"[^"]*?")*>)([\\s\\S]*)$')).exec(captured.headContent);
+        if (parsedHeadTag) {
+            // if headContent contains an open head, then we know the tag was placed
+            // outside of the body
+            captured.headOpenTag = parsedHeadTag[1];
+            captured.headContent = parsedHeadTag[2];
+        }
+
+        // If there is a closing head tag
         if (match[1][1] == '/') {
             // Hit </head. Gather <head> innerHTML. Also, take trailing content,
             // just in case <body ... > is missing or malformed
-            captured.headContent = rawHTML.slice(0, match.index);
             captured.bodyContent = rawHTML.slice(match.index + match[1].length);
         } else {
             // Hit <body. Gather <body> innerHTML.
-
             // If we were missing a </head> before, now we can pick up everything before <body
-            captured.headContent = captured.head || rawHTML.slice(0, match.index);
             captured.bodyContent = match[0];
 
             // Find the end of <body ... >
@@ -977,13 +1185,6 @@ Capture.prototype.restore = function() {
 };
 
 /**
- * Set the content of an element with html from a string
- */
-Capture.prototype.setElementContentFromString = function(el, htmlString) {
-    for (cachedDiv.innerHTML = htmlString; cachedDiv.firstChild; el.appendChild(cachedDiv.firstChild));
-};
-
-/**
  * Grab fragment strings and construct DOM fragments
  * returns htmlEl, headEl, bodyEl, doc
  */
@@ -1001,21 +1202,28 @@ Capture.prototype.createDocumentFragments = function() {
 
     // Set innerHTML of new source DOM body
     bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
-    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
 
-    // On FF4, and potentially other browsers, you cannot modify <head>
+    // In Safari 4/5 and iOS 4.3, there are certain scenarios where elements
+    // in the body (ex "meta" in "noscripts" tags) get moved into the head,
+    // which can cause issues with certain websites (for example, if you have
+    // a meta refresh tag inside of a noscript tag)
+    var heads = doc.querySelectorAll('head');
+    if (heads.length > 1) {
+        while (heads[1].hasChildNodes()) {
+            heads[1].removeChild(heads[1].lastChild);
+        }
+    }
+
+    var disabledHeadContent = Capture.disable(this.headContent, this.prefix);
+    // On FF4, iOS 4.3, and potentially other browsers, you cannot modify <head>
     // using innerHTML. In that case, do a manual copy of each element
     try {
         headEl.innerHTML = disabledHeadContent;
     } catch (e) {
         var title = headEl.getElementsByTagName('title')[0];
         title && headEl.removeChild(title);
-        this.setElementContentFromString(headEl, disabledHeadContent);
+        Capture.setElementContentFromString(headEl, disabledHeadContent);
     }
-
-    // Append head and body to the html element
-    htmlEl.appendChild(headEl);
-    htmlEl.appendChild(bodyEl);
 
     return docFrags;
 };
@@ -1039,7 +1247,7 @@ Capture.prototype.render = function(htmlString) {
     if (!htmlString) {
         enabledHTMLString = this.enabledHTMLString();
     } else {
-        enabledHTMLString = Capture.enable(htmlString);
+        enabledHTMLString = Capture.enable(htmlString, this.prefix);
     }
 
     var doc = this.sourceDoc;
@@ -1077,23 +1285,27 @@ Capture.getMobifyLibrary = function(doc) {
 };
 
 /**
- * Grabs the main function/src/script if it exists
+ * Grabs the postload function/src/script if it exists
  */
-Capture.getMain = function(doc) {
+Capture.getPostload = function(doc) {
     var doc = doc || document;
-    var mainScript = undefined;
-    if (window.Mobify && window.Mobify.mainExecutable) {
+    var postloadScript = undefined;
+
+    // mainExecutable is used for backwards compatibility purposes
+    var tagOptions = window.Mobify.Tag && window.Mobify.Tag.options && window.Mobify.Tag.getOptions(Mobify.Tag.options) || {};
+    var postload = (tagOptions.post && tagOptions.post.toString()) || window.Mobify.mainExecutable;
+    if (postload) {
         // Checks for main executable string on Mobify object and creates a script
         // out of it
-        mainScript = document.createElement('script');
-        mainScript.innerHTML = "var main = " + window.Mobify.mainExecutable.toString() + "; main();";
-        mainScript.id = 'main-executable';
-        mainScript.setAttribute("class", "mobify");
+        postloadScript = document.createElement('script');
+        postloadScript.innerHTML = "var postload = " + postload + "; postload();";
+        postloadScript.id = 'postload';
+        postloadScript.setAttribute("class", "mobify");
     } else {
         // Older tags used to insert the main executable by themselves. 
-        mainScript = doc.getElementById("main-executable");
+        postloadScript = doc.getElementById("main-executable");
     }
-    return mainScript;
+    return postloadScript;
 }
 
 /**
@@ -1106,9 +1318,13 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
     // must re-inject the script.
     var mobifyjsScript = Capture.getMobifyLibrary(sourceDoc);
 
-    var head = destDoc.head;
+    var head = destDoc.head || destDoc.getElementsByTagName('head')[0];
+    if (!head) {
+        return;
+    }
+
     // If main script exists, re-inject it.
-    var mainScript = Capture.getMain(sourceDoc);
+    var mainScript = Capture.getPostload(sourceDoc);
     if (mainScript) {
         // Since you can't move nodes from one document to another,
         // we must clone it first using importNode:
@@ -1117,7 +1333,7 @@ Capture.insertMobifyScripts = function(sourceDoc, destDoc) {
         if (!mainScript.src) {
             mainClone.innerHTML = mainScript.innerHTML;
         }
-        head.insertBefore(mainClone, head.firstChild)
+        head.insertBefore(mainClone, head.firstChild);
     }
     // reinject mobify.js file
     var mobifyjsClone = destDoc.importNode(mobifyjsScript, false);
@@ -1144,6 +1360,16 @@ Capture.prototype.renderCapturedDoc = function(options) {
 
     this.render();
 };
+
+/**
+ * patchAnchorLinks
+ *
+ * Anchor Links `<a href="#foo">Link</a>` are broken on Firefox.
+ * We provide a function that patches, but it does break
+ * actually changing the URL to show "#foo".
+ * 
+ */
+Capture.patchAnchorLinks = patchAnchorLinks;
 
 return Capture;
 
@@ -1269,6 +1495,8 @@ ResizeImages.getImageURL = function(url, options) {
 
     if (opts.format) {
         bits.push(opts.format + (opts.quality || ''));
+    } else if (opts.quality) {
+        bits.push('q' + opts.quality);
     }
 
     if (opts.maxWidth) {
@@ -1382,41 +1610,95 @@ ResizeImages._getBinnedDimension = function(dim) {
 };
 
 /**
+ * Returns a boolean that indicates whether images should be resized.
+ * Looks for the viewport meta tag and parses it to determine whether the
+ * website is responsive (the viewport is set to the device's width). This
+ * ensures that images that are part of a larger viewport are not scaled.
+ */
+ResizeImages._shouldResize = function(document) {
+    var metaViewport = Utils.getMetaViewportProperties(document);
+    if (!metaViewport) {
+        return false;
+    }
+
+    // It's complicated, but what we want to know is whether the viewport
+    // matches the 'ideal viewport'. If either `initial-scale` is 1 or `width`
+    // is device-width or both, then the viewport will match the 'ideal
+    // viewport'. There are a few other special circumstances under which the
+    // viewport could be ideal, but we can't test for them.
+    //
+    // See: http://www.quirksmode.org/mobile/metaviewport/
+
+    // Ideal viewport when width=device-width
+    if (!metaViewport['initial-scale'] && metaViewport['width']) {
+        return metaViewport['width'] == 'device-width';
+    }
+
+    // Ideal viewport when initial-scale=1
+    if (!metaViewport['width'] && metaViewport['initial-scale']) {
+        return metaViewport['initial-scale'] == '1';
+    }
+
+    // Ideal viewport when width=device-width and the intial-scale is 1 or more
+    // (in that case it's just zoomed)
+    if (metaViewport['width'] && metaViewport['initial-scale']) {
+        initialScale = parseInt(metaViewport['initial-scale']);
+        return initialScale >= 1 && metaViewport['width'] == 'device-width';
+    }
+
+    return false
+};
+
+/**
  * Processes options passed to `resize()`. Takes an options object that 
  * potentially has height and width set in css pixels, returns an object where 
  * they are expressed in device pixels, and other default options are set.
  */
-ResizeImages.processOptions = function(options) {
+ResizeImages.processOptions = function(options) {    
     var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
     }
 
-    var dpr = opts.devicePixelRatio || window.devicePixelRatio;
-
-    var screenSize = Utils.getPhysicalScreenSize(dpr);
-
-    // If maxHeight/maxWidth are not specified, use screen dimensions
-    // in device pixels
-    var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
-    var height = opts.maxHeight || undefined;
-
-    // Otherwise, compute device pixels
-    if (dpr && opts.maxWidth) {
-        width = width * dpr;
-        if (opts.maxHeight) {
-            height = height * dpr;
-        }
-    }
-
-    // round up in case of non-integer device pixel ratios
-    opts.maxWidth = Math.ceil(width);
-    if (opts.maxHeight && height) {
-        opts.maxHeight = Math.ceil(height);
+    // A null value for `resize` triggers the auto detect functionality. This
+    // uses the document to determine whether images should be resized and sets
+    // it as the new default.
+    if (opts.resize == null && options.document) {
+        var resize = ResizeImages._shouldResize(options.document);
+        ResizeImages.defaults.resize = opts.resize = resize;
     }
 
     if (!opts.format && opts.webp) {
         opts.format = "webp";
+    }
+
+    // Without `resize` images are served through IR without changing their dimensions
+    if (!opts.resize) {
+        opts.maxWidth = opts.maxHeight = opts.devicePixelRatio = null;
+    }
+    else {
+        var dpr = opts.devicePixelRatio || window.devicePixelRatio;
+
+        var screenSize = Utils.getPhysicalScreenSize(dpr);
+
+        // If maxHeight/maxWidth are not specified, use screen dimensions
+        // in device pixels
+        var width = opts.maxWidth || ResizeImages._getBinnedDimension(screenSize.width);
+        var height = opts.maxHeight || undefined;
+
+        // Otherwise, compute device pixels
+        if (dpr && opts.maxWidth) {
+            width = width * dpr;
+            if (opts.maxHeight) {
+                height = height * dpr;
+            }
+        }
+
+        // round up in case of non-integer device pixel ratios
+        opts.maxWidth = Math.ceil(width);
+        if (opts.maxHeight && height) {
+            opts.maxHeight = Math.ceil(height);
+        }
     }
 
     return opts;
@@ -1428,6 +1710,15 @@ ResizeImages.processOptions = function(options) {
  * resized.
  */
 ResizeImages.resize = function(elements, options) {
+    // Return early if elements is empty
+    if (!elements.length) {
+        return;
+    }
+
+    // Supplement `options` with the document from the first element
+    if (options && !options.document) {
+        options.document = elements[0].ownerDocument;
+    }
     var opts = ResizeImages.processOptions(options);
 
     for(var i=0; i < elements.length; i++) {
@@ -1466,6 +1757,7 @@ ResizeImages.defaults = {
       sourceAttribute: "x-src",
       targetAttribute: (capturing ? "x-src" : "src"),
       webp: ResizeImages.supportsWebp(),
+      resize: true,
       onerror: 'ResizeImages.restoreOriginalSrc(event);'
 };
 
@@ -2356,4 +2648,5 @@ require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/resizeImages", "mobifyj
 // relPath, forceSync
 ;
 define("mobify-library", function(){});
+
 }());

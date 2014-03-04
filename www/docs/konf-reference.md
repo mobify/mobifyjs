@@ -289,7 +289,7 @@ your site
 kept
 
 `mobileViewport`
-: Contents of the meta viewport tag to be sent
+: Contents of the viewport meta tag to be sent
 
 `siteConfig`
 : An object containing analytics configuration information

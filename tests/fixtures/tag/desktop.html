@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+    <head>
+        <script src="/tests/utils/proxyassert.js"></script>
+        <!-- Mobify Tag External -->
+        <script src="/tag/v7.js"></script>
+        <script>Mobify.Tag.init({
+            mode: function() { return 'desktop' },
+            mobile: {
+                capture: true,
+                url: "/tests/fixtures/tag/mobile.js"
+            },
+            desktop: {
+                capture: false,
+                url: "/tests/fixtures/tag/desktop.js"
+            }
+        });</script>
+    </head>
+    <body>
+        <h1>Mobify tag Tests</h1>
+
+        <div id="content">Content</div>
+    </body>
+</html>

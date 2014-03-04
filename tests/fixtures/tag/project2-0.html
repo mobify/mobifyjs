@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+    <head>
+        <script src="/tests/utils/proxyassert.js"></script>
+        <!-- Mobify Tag External -->
+        <script src="/tag/v7.js"></script>
+        <script>
+        Mobify.Tag.init({
+            mode: function() { return 'mobile' },
+            mobile: {
+                capture: true,
+                url: "/build/mobify.js",
+                post: function() {
+                    var capturing = window.Mobify && window.Mobify.capturing || false;
+                    if (capturing) {
+                        // Grab reference to a newly created document
+                        Mobify.Capture.initCapture(function(capture){
+                            var capturedDoc = capture.capturedDoc;
+
+                            var script = capturedDoc.querySelector('.assert');
+
+                            // Replace test failures with successess!
+                            script.innerHTML = script.innerHTML.replace("false", "true");
+
+                            capture.renderCapturedDoc();
+                        });
+                    } else {
+                        window.elseClauseHit = true;
+                    }
+                }
+            }
+        });</script>
+
+        <title>Title of Page</title>
+    </head>
+    <body>
+        <h1>Mobify tag Tests</h1>
+
+        <div id="content">Content</div>
+
+        <script class="assert">Assert.ok(false, "This assertion should be changed to true."); Assert.ready();</script>
+    </body>
+</html>

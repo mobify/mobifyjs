@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+    <head>
+        <script src="/tests/utils/proxyassert.js"></script>
+        <!-- Mobify Tag External -->
+        <script src="/tag/v7.js"></script>
+        <script>Mobify.Tag.init({
+            mode: function() { return 'failed' },
+            failed: {
+                capture: true,
+                url: "/tests/fixtures/tag/should-not-exist.js"
+            }
+        });</script>
+    </head>
+    <body>
+        <h1>Mobify tag Tests</h1>
+
+        <div id="content">Content</div>
+
+        <script>
+            Assert.ok(true, "Should Fail to load and get here.");
+            Assert.ready();
+        </script>
+    </body>
+</html>
