@@ -4,6 +4,7 @@
   "description": "The Mobify.js client side adaptation library.",
   "author": "Mobify <dev@mobify.com>",
   "devDependencies": {
+    "express": "3.3.1",
     "grunt": "~0.4.0",
     "grunt-requirejs": "~0.4.0",
     "grunt-contrib-watch": "~0.2.x",
