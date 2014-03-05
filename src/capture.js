@@ -6,7 +6,7 @@
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        module.exports = factory(require('../bower_components/mobify-utils/utils.js'), require('./patchAnchorLinks.js'));
+        module.exports = factory(require('../bower_components/mobifyjs-utils/utils.js'), require('./patchAnchorLinks.js'));
     } else {
         // Browser globals (root is window)
         root.Capture = factory(root.Utils, root.patchAnchorLinks);

@@ -7,7 +7,7 @@
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        var Utils = require('../bower_components/mobify-utils/utils.js');
+        var Utils = require('../bower_components/mobifyjs-utils/utils.js');
         module.exports = factory(Utils);
     } else {
         // Browser globals (root is window)

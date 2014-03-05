@@ -6,7 +6,8 @@
         // Node. Does not work with strict CommonJS, but
         // only CommonJS-like environments that support module.exports,
         // like Node.
-        module.exports = factory(require('../utils.js'), require('../capture.js'));
+        module.exports = factory(require('../../bower_components/mobifyjs-utils/utils.js'),
+                                 require('../capture.js'));
     }
 }(this, function (Utils, Capture) {
 
