@@ -31,8 +31,10 @@ module.exports = function(grunt) {
                 options: {
                     wrap: true,
                     baseUrl: ".",
-                    paths: {   
-                        mobifyjs: "bower_components/mobifyjs/src",
+                    paths: {
+                        "mobifyjs/utils": "bower_components/mobifyjs-utils/utils",
+                        "mobifyjs/jazzcat": "bower_components/jazzcat-client/jazzcat",
+                        "mobifyjs/resizeImages": "bower_components/imageresize-client/resizeImages"
                     },
                     optimize: "none",
                     name: "main",

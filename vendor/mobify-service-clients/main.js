@@ -1,11 +1,6 @@
-require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyjs/cssOptimize"], function(Utils, ResizeImages, Jazzcat, CssOptimize) {
+require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat"],
+         function(Utils, ResizeImages, Jazzcat) {
     var Mobify = window.Mobify = window.Mobify || {};
-
-    // Expose APIs we want to use from Mobify.js
-    Mobify.Utils = Utils;
-    Mobify.ResizeImages = ResizeImages;
-    Mobify.Jazzcat = Jazzcat;
-    Mobify.CssOptimize = CssOptimize;
 
     // Backwards compatible fixes
     var $ = Mobify && Mobify.$;
@@ -14,25 +9,35 @@ require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyj
     }
 
     // Jazzcat:
+    Mobify.combo = {}
+    Mobify.combo.httpCache = Jazzcat.httpCache;
+    Mobify.combo.load = Jazzcat.load;
+    Mobify.combo.exec = Jazzcat.load;
     Mobify.combo = Jazzcat;
-    $.fn.combineScripts = function(opts) {
-        return Mobify.Jazzcat.optimizeScripts.call(window, this, opts)
+    
+    $.fn.combineScripts = function($els, opts) {
+        return Mobify.Jazzcat.optimizeScripts.call(window, this, opts);
     };
-    Mobify.Jazzcat.defaults.projectName = (Mobify && Mobify.config && Mobify.config.projectName) || ''
+    
+    Jazzcat.defaults.projectName = (
+        (Mobify && Mobify.config && Mobify.config.projectName) ||
+        ''
+    );
 
     // expose defaults for testing
     $.fn.combineScripts.defaults = Mobify.Jazzcat.defaults;
 
     Mobify.cssURL = function(obj) {
         return '//jazzcat.mobify.com/css/' + encodeURIComponent(JSON.stringify(obj));
-    }
+    };
 
     // ResizeImages
     $.fn.resizeImages = function(opts) {
         var imgs = this.find('img').toArray();
-        return Mobify.ResizeImages.resize.call(window, imgs, opts)
+        return Mobify.ResizeImages.resize.call(window, imgs, opts);
     };
-    Mobify.ResizeImages.defaults.projectName = Mobify.config.projectName || ''
+    
+    ResizeImages.defaults.projectName = Mobify.config.projectName || '';
     $.fn.resizeImages.defaults = Mobify.ResizeImages.defaults;
 
     Mobify.getImageURL = function(url, options) {
@@ -43,7 +48,6 @@ require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat", "mobifyj
             Utils.extend(opts, options);
         }
         return Mobify.ResizeImages.getImageURL(url, opts);
-    }
+    };
 
 });
-// relPath, forceSync

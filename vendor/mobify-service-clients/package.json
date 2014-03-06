@@ -1,5 +1,5 @@
 {
-  "name": "mobifyjs-2.0-service-apis",
+  "name": "mobifyjs-service-clients",
   "version": "1.0.0",
   "description": "Custom Mobify.js 2.0 build which contains all APIs for the Mobify services for use with the 1.1 framework",
   "author": "Mobify <dev@mobify.com>",
