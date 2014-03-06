@@ -36,12 +36,16 @@ module.exports = function(grunt) {
                         "mobifyjs/jazzcat": "bower_components/jazzcat-client/jazzcat",
                         "mobifyjs/resizeImages": "bower_components/imageresize-client/resizeImages"
                     },
+                    almond: true,
                     optimize: "none",
                     name: "main",
                     out: "../../api/mobify-services.js",
-                    onBuildWrite: function(name, path, contents) {
-                        return amdclean.clean(contents);
-                    }
+                    /*onBuildWrite: function(name, path, contents) {
+                        return amdclean.clean({
+                            code: contents,
+                            globalObject: true
+                        });
+                    },*/
                 }
             },
         },
