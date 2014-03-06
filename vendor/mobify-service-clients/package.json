@@ -1,7 +1,7 @@
 {
   "name": "mobifyjs-service-clients",
   "version": "1.0.0",
-  "description": "Custom Mobify.js 2.0 build which contains all APIs for the Mobify services for use with the 1.1 framework",
+  "description": "Image Resizer and Jazzcat clients for MobifyJS 1.1",
   "author": "Mobify <dev@mobify.com>",
   "devDependencies": {
     "connect": "2.3.4",
