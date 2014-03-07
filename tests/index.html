@@ -200,7 +200,7 @@
             Mobify.$.fn.combineScripts.defaults.projectName = "foo";
             var url = Mobify.combo.getURL(["https://www.example.com/baz/qux.js",
                 "http://www.example.com/qux/baz.js"])
-              , expected = "//jazzcat.mobify.com/project-foo/jsonp/Jazzcat.load/%5B%22http%3A%2F%2Fwww.example.com%2Fqux%2Fbaz.js%22%2C%22https%3A%2F%2Fwww.example.com%2Fbaz%2Fqux.js%22%5D"; 
+              , expected = "//jazzcat.mobify.com/project-foo/jsonp/Mobify.combo.load/%5B%22http%3A%2F%2Fwww.example.com%2Fqux%2Fbaz.js%22%2C%22https%3A%2F%2Fwww.example.com%2Fbaz%2Fqux.js%22%5D"; 
 
             
             equal(url, expected);
@@ -237,7 +237,6 @@
                 html += $('#fixtures').reduce(function(memo, el) {
                         return memo + el.outerHTML + '\n';
                     }, '');
-                html += '<script>Jazzcat.httpCache.load();<' + '/script>';
                 html += $result.reduce(function(memo, el) {
                         return memo + el.outerHTML + '\n';
                 }, '');
@@ -265,6 +264,9 @@
                     start();
                 }
                 $(iframeEl).on('load', load);
+                $(iframeEl).on('error', function() {
+                    debugger;
+                })
 
                 iframe.document.close();
             });

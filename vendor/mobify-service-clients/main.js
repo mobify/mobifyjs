@@ -8,21 +8,30 @@ require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat"],
         return;
     }
 
-    // Jazzcat:
+    // Expose API Surface
     Mobify.combo = {};
     Mobify.combo.httpCache = Jazzcat.httpCache;
     Mobify.combo.load = Jazzcat.load;
-    Mobify.combo.exec = Jazzcat.load;
-    Mobify.combo = Jazzcat;
+    Mobify.combo.exec = Jazzcat.exec;
+    Mobify.combo.getURL = Jazzcat.getURL;
     
-    $.fn.combineScripts = function($els, opts) {
-        return Mobify.Jazzcat.optimizeScripts.call(window, this, opts);
+    $.fn.combineScripts = function(opts) {
+        if (!this) {
+            return $([]);
+        }
+        opts = opts || {};
+        this.remove();
+        opts.inlineLoader = false;
+        return $(Jazzcat.optimizeScripts.call(window, this, opts));
     };
     
     Jazzcat.defaults.projectName = (
         (Mobify && Mobify.config && Mobify.config.projectName) ||
         ''
     );
+    Jazzcat.defaults.execCallback = 'Mobify.combo.exec';
+    Jazzcat.defaults.loadCallback = 'Mobify.combo.load';
+    Jazzcat.defaults.cacheLoadCallback = 'Mobify.combo.httpCache.load';
 
     // expose defaults for testing
     $.fn.combineScripts.defaults = Jazzcat.defaults;
