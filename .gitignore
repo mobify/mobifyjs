@@ -4,4 +4,5 @@ _site
 node_modules
 *.bak
 node_modules
+bower_components
 *.zip
