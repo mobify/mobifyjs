@@ -1481,9 +1481,9 @@ return ResizeImages;
 
         // A Boolean to control whether the loader is inlined into the document, 
         // or only added to the returned scripts array
-        var inlineLoader = false;
-        if (options && options.inlineLoader) {
-            inlineLoader = true;
+        var inlineLoader = true;
+        if (options && options.inlineLoader !== undefined) {
+            inlineLoader = options.inlineLoader;
         }
 
         scripts = Array.prototype.slice.call(scripts);
@@ -1593,7 +1593,7 @@ return ResizeImages;
                 // else: queue for concatenation
                 if (!httpCache.get(url)) {
                     if (!concat) {
-                        if (!inlineLoader) {
+                        if (inlineLoader) {
                             insertLoaderInContainingElement(script, [url]);
                         } else {
                             appendLoaderAndScriptToArray(resultScripts, script, [url]);
@@ -1657,12 +1657,17 @@ return ResizeImages;
             for (var i=0, len=scripts.length; i<len; i++) {
                 var script = scripts[i];
                 // Only remove scripts if they are external
-                if (script.getAttribute(options.attribute && inlineLoader)) {
+                if (script.getAttribute(options.attribute) && inlineLoader) {
                     script.parentNode.removeChild(script);
                 }
             }
         }
 
+        // If the loader was inlined, return the original set of scripts
+        if(inlineLoader) {
+            return scripts;
+        }
+        // Otherwise return the generated list
         return resultScripts;
     };
 
