@@ -59,4 +59,5 @@ require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat"],
         return ResizeImages.getImageURL(url, opts);
     };
 
-});
+}, undefined, true);
+// relPath, forceSync
