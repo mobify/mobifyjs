@@ -1,7 +1,7 @@
 {
   "name": "mobifyjs",
   "version": "2.0.8",
-  "description": "The Mobify.js client side adaptation library.",
+  "description": "Mobify.js is an open source library for improving responsive sites by providing responsive images, JS/CSS optimization, Adaptive Templating and more.",
   "author": "Mobify <dev@mobify.com>",
   "devDependencies": {
     "grunt": "~0.4.0",
@@ -23,6 +23,5 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:mobify/mobifyjs.git"
-  },
-  "private": true
+  }
 }
