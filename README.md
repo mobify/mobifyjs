@@ -77,11 +77,9 @@ To run all of the tests in an automated fashion using Phantomjs
 
 It's also important when developing not to run into any regressions on all of the
 supported browsers. The Gruntfile is setup to be able to run qunit tests
-on many browsers we support (in order to do this yourself, you will need a
-Saucelabs Connect username and key).
+on many browsers we support (in order to do this yourself, you will need to set
+SAUCE_USERNAME and SAUCE_KEY in your environment variables).
 
-    cp localConfig.js.example localConfig.js
-    # Add your Saucelabs username and key to localConfig.js
     grunt saucelabs
 
 ## Browser support
