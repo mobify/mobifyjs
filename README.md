@@ -78,9 +78,17 @@ To run all of the tests in an automated fashion using Phantomjs
 It's also important when developing not to run into any regressions on all of the
 supported browsers. The Gruntfile is setup to be able to run qunit tests
 on many browsers we support (in order to do this yourself, you will need to set
-SAUCE_USERNAME and SAUCE_KEY in your environment variables).
+`SAUCE_USERNAME` and `SAUCE_KEY` in your environment variables).
 
     grunt saucelabs
+
+## Deploying
+
+By default, the deploy command is set to deploy Mobify.js to cdn.mobify.com. To deploy
+here, ensure `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are set in your
+environment variables.
+
+    grunt deploy
 
 ## Browser support
 
@@ -107,3 +115,4 @@ The static site is built with [Jekyll](http://jekyllrb.com/). Run the following 
     grunt jekyll
 
 Then navigate to http://localhost:4000/mobifyjs/docs/.
+
