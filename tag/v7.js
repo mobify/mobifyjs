@@ -211,7 +211,7 @@ var disableTag = function() {
             '; path=/';
 
     // Reload the page (location.reload has problems in FF)
-    window.location = window.location.href;
+    window.location.reload();
 };
 Private['disableTag'] = disableTag;
 
