@@ -1,0 +1,11 @@
+*.swp
+.DS_STORE
+_site
+node_modules
+*.bak
+node_modules
+*.zip
+*.gz
+build/mobify-experimental*
+report.xml
+localConfig.json
