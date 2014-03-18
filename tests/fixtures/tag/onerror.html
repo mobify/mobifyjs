@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+    <head>
+        <script src="/tests/utils/proxyassert.js"></script>
+        <!-- Mobify Tag External -->
+        <script src="/tag/v7.js"></script>
+        <script>Mobify.Tag.init({
+            url: "/path/to/fake/mobify.js"
+        });</script>
+    </head>
+    <body>
+        <h1>Mobify tag Tests</h1>
+
+        <div id="content">Content</div>
+
+        <script>Assert.ready()</script>
+    </body>
+</html>
