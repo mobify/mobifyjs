@@ -403,6 +403,13 @@ module.exports = function(grunt) {
                 src: './www',
                 dest: './www/_site',
             },
+        },
+        release: {
+            options: {
+                github: {
+                    repo: 'mobify/mobifyjs'
+                }
+            }
         }
     });
     
