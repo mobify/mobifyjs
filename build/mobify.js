@@ -308,7 +308,6 @@ Capture.setElementContentFromString = function(el, htmlString) {
         // (using a "new RegExp" here because in Android 2.3 when you use a global
         // match using a RegExp literal, the state is incorrectly cached).
         var parsedHeadTag = (new RegExp('^[\\s\\S]*(<head(?:[^>\'"]*|\'[^\']*?\'|"[^"]*?")*>)([\\s\\S]*)$')).exec(captured.headContent);
-        //var parsedHeadTag = (new RegExp('^\\s*(<head(?:[^>\'"]*|\'[^\']*?\'|"[^"]*?")*>)([\\s\\S]*)$')).exec(captured.headContent);
         if (parsedHeadTag) {
             // if headContent contains an open head, then we know the tag was placed
             // outside of the body
