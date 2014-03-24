@@ -173,6 +173,7 @@ Private['isDisabled'] = isDisabled;
 
 /**
     isPreview checks to see if we need to load the preview API.
+
     @private
     @type {boolean}
 */
@@ -181,6 +182,20 @@ var isPreview = function() {
             /mobify-path=true/.test(window.location.hash));
 };
 Private['isPreview'] = isPreview;
+
+
+/**
+    isPreviewWithoutCapturing checks to see if we are going to
+    use capturing with preview.
+
+    @private
+    @type {boolean}
+*/
+var isPreviewWithoutCapturing = function() {
+    return (getCookie("mobify-capture") == 'false' || 
+            /mobify-capture=false/.test(window.location.hash));
+};
+Private['isPreviewWithoutCapturing'] = isPreviewWithoutCapturing;
 
 /**
     loadPreview loads the preview API.
@@ -311,7 +326,11 @@ Tag['init'] = function(options) {
     collectTiming();
 
     if (!options['skipPreview'] && isPreview()) {
-        startCapture(loadPreview);
+        if (isPreviewWithoutCapturing()) {
+            loadPreview();
+        } else {
+            startCapture(loadPreview);
+        }
         return;
     }
 
