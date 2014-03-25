@@ -126,6 +126,10 @@ ResizeImages.getImageURL = function(url, options) {
         bits.push(projectId);
     }
 
+    if (opts.cacheBreaker) {
+        bits.push('cb' + opts.cacheBreaker);
+    }
+
     if (opts.cacheHours) {
         bits.push('c' + opts.cacheHours);
     }
@@ -742,10 +746,13 @@ return ResizeImages;
     // into the document
     Jazzcat.cacheLoaderInserted = false;
     Jazzcat.optimizeScripts = function(scripts, options) {
+        options = options || {};
+        
         if (options && options.cacheOverrideTime !== undefined) {
             Utils.extend(httpCache.options,
               {overrideTime: options.cacheOverrideTime});
         }
+
         scripts = Array.prototype.slice.call(scripts);
 
         // Fastfail if there are no scripts or if required features are missing.
@@ -754,30 +761,44 @@ return ResizeImages;
         }
 
         options = Utils.extend({}, Jazzcat.defaults, options || {});
-        var jsonp = (options.responseType === 'jsonp');
         var concat = options.concat;
+        // A Boolean to control whether the loader is inlined into the document, 
+        // or only added to the returned scripts array
+        var inlineLoader = ((options.inlineLoader !== undefined) ?
+          options.inlineLoader: true);
 
         // helper method for inserting the loader script
         // before the first uncached script in the "uncached" array
-        var insertLoader = function(script, urls) {
+        var insertLoaderInContainingElement = function(script, urls) {
             if (script) {
                 var loader = Jazzcat.getLoaderScript(urls, options);
                 // insert the loader directly before the script
                 script.parentNode.insertBefore(loader, script);
             }
         };
+        // helper for appending loader script into an array before the 
+        // referenced script
+        var appendLoaderForScriptsToArray = function(array, urls) {
+            var loader = Jazzcat.getLoaderScript(urls, options);
+            array.push(loader);
+        };
 
         var url;
         var toConcat = {
             'head': {
                 firstScript: undefined,
-                urls: []
+                urls: [],
+                scripts: []
             },
             'body': {
                 firstScript: undefined,
-                urls: []
+                urls: [],
+                scripts: []
             }
         };
+
+        // an array to accumulate resulting scripts in and later return
+        var resultScripts = [];
 
         for (var i=0, len=scripts.length; i<len; i++) {
             var script = scripts[i];
@@ -789,10 +810,15 @@ return ResizeImages;
                 continue;
             }
 
-            // skip if the script is inline
+            // skip if modifying inline, append to results otherwise
             url = script.getAttribute(options.attribute);
             if (!url) {
-                continue;
+                if (inlineLoader) {
+                    continue;
+                } else {
+                    resultScripts.push(script);
+                    continue;
+                }
             }
             url = Utils.absolutify(url);
             if (!Utils.httpUrl(url)) {
@@ -801,90 +827,102 @@ return ResizeImages;
 
             // TODO: Check for async/defer
 
-            // Load what we have in http cache, and insert loader into document
-            if (jsonp && !Jazzcat.cacheLoaderInserted) {
+            // Load what we have in http cache, and insert loader into document 
+            // or result array
+            if (!Jazzcat.cacheLoaderInserted) {
                 httpCache.load(httpCache.options);
-                var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript();
-                script.parentNode.insertBefore(httpLoaderScript, script);
+                var httpLoaderScript = Jazzcat.getHttpCacheLoaderScript(options);
+                if (inlineLoader) {
+                    script.parentNode.insertBefore(httpLoaderScript, script);
+                } else {
+                    resultScripts.push(httpLoaderScript);
+                }
                 // ensure this doesn't happen again for this page load
                 Jazzcat.cacheLoaderInserted = true;
             }
 
-            var parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
-
-            if (jsonp) {
-                // if: the script is not in the cache (or not jsonp), add a loader
-                // else: queue for concatenation
-                if (!httpCache.get(url)) {
-                    if (!concat) {
-                        insertLoader(script, [url]);
-                    }
-                    else {
-                        if (toConcat[parent].firstScript === undefined) {
-                            toConcat[parent].firstScript = script;
-                        }
-                        toConcat[parent].urls.push(url);
-                    }
-                }
-                script.type = 'text/mobify-script';
-                // Rewriting script to grab contents from our in-memory cache
-                // ex. <script>Jazzcat.exec("http://code.jquery.com/jquery.js")</script>
-                if (script.hasAttribute('onload')){
-                    var onload = script.getAttribute('onload');
-                    script.innerHTML =  options.execCallback + "('" + url + "', '" + onload.replace(/'/g, '\\\'') + "');";
-                    script.removeAttribute('onload');
-                } else {
-                    script.innerHTML =  options.execCallback + "('" + url + "');";
-                }
-
-                // Remove the src attribute
-                script.removeAttribute(options.attribute);
+            var parent;
+            if (inlineLoader) {
+                parent = (script.parentNode.nodeName === "HEAD" ? "head" : "body");
+            } else {
+                // If we're not going to use the inline loader, we'll do 
+                // something terrible and put everything into the head bucket
+                parent = 'head';
             }
-            else {
+
+            // if: the script is not in the cache, add a loader
+            // else: queue for concatenation
+            if (!httpCache.get(url)) {
                 if (!concat) {
-                    var jazzcatUrl = Jazzcat.getURL([url], options);
-                    script.setAttribute(options.attribute, jazzcatUrl);
-                }
-                else {
+                    if (inlineLoader) {
+                        insertLoaderInContainingElement(script, [url]);
+                    } else {
+                        appendLoaderForScriptsToArray(resultScripts, [url]);
+                    }
+                } else {
+                    toConcat[parent].urls.push(url);
+                    // Remember details of first uncached script
                     if (toConcat[parent].firstScript === undefined) {
                         toConcat[parent].firstScript = script;
+                        var firstUncachedScriptIndex = resultScripts.length;
                     }
-                    toConcat[parent].urls.push(url);
                 }
+            }
+            script.type = 'text/mobify-script';
+            // Rewriting script to grab contents from our in-memory cache
+            // ex. <script>Jazzcat.exec("http://code.jquery.com/jquery.js")</script>
+            if (script.hasAttribute('onload')){
+                var onload = script.getAttribute('onload');
+                script.innerHTML =  options.execCallback + "('" + url + "', '" + onload.replace(/'/g, '\\\'') + "');";
+                script.removeAttribute('onload');
+            } else {
+                script.innerHTML =  options.execCallback + "('" + url + "');";
+            }
+
+            // Remove the src attribute
+            script.removeAttribute(options.attribute);
+            
+            // Enqueue the script to be returned
+            if (!inlineLoader) {
+                resultScripts.push(script);
             }
 
         }
         // insert the loaders for uncached head and body scripts if
         // using concatenation
         if (concat) {
-            insertLoader(toConcat['head'].firstScript, toConcat['head'].urls);
-            insertLoader(toConcat['body'].firstScript, toConcat['body'].urls);
-        }
-
-        // if responseType is js and we are concatenating, remove original scripts
-        if (!jsonp && concat) {
-            for (var i=0, len=scripts.length; i<len; i++) {
-                var script = scripts[i];
-                // Only remove scripts if they are external
-                if (script.getAttribute(options.attribute)) {
-                    script.parentNode.removeChild(script);
+            if (inlineLoader) {
+                insertLoaderInContainingElement(toConcat['head'].firstScript,
+                                                toConcat['head'].urls);
+                insertLoaderInContainingElement(toConcat['body'].firstScript,
+                                                toConcat['body'].urls);
+            } else {
+                // splice in loader for uncached scripts if there are any
+                if (firstUncachedScriptIndex) {
+                    var loader = Jazzcat.getLoaderScript(toConcat['head'].urls, options);
+                    resultScripts.splice(firstUncachedScriptIndex, 0, loader);
                 }
             }
         }
 
-        return scripts;
+        // If the loader was inlined, return the original set of scripts
+        if (inlineLoader) {
+            return scripts;
+        }
+        // Otherwise return the generated list
+        return resultScripts;
     };
 
     /**
      * Private helper that returns a script node that when run, loads the 
      * httpCache from localStorage.
      */
-    Jazzcat.getHttpCacheLoaderScript = function() {
+    Jazzcat.getHttpCacheLoaderScript = function(options) {
         var loadFromCacheScript = document.createElement('script');
         loadFromCacheScript.type = 'text/mobify-script';
         loadFromCacheScript.innerHTML = (httpCache.options.overrideTime ?
-          "Jazzcat.httpCache.load(" + JSON.stringify(httpCache.options) + ");" :
-          "Jazzcat.httpCache.load();" );
+          options.cacheLoadCallback + "(" + JSON.stringify(httpCache.options) + ");" :
+          options.cacheLoadCallback + "();" );
 
         return loadFromCacheScript;
     };
@@ -917,9 +955,10 @@ return ResizeImages;
         var options = Utils.extend({}, Jazzcat.defaults, options || {});
         return options.base +
                (options.projectName ? '/project-' + options.projectName : '') +
+               (options.cacheBreaker ? '/cb' + options.cacheBreaker : '') +
                '/' + options.responseType +
                (options.responseType === 'jsonp' ? '/' + options.loadCallback : '') +
-               '/' + encodeURIComponent(JSON.stringify(urls.slice().sort())); // TODO only sort for jsonp
+               '/' + encodeURIComponent(JSON.stringify(urls.slice().sort()));
     };
 
     var scriptSplitRe = /(<\/scr)(ipt\s*>)/ig;
@@ -1011,12 +1050,15 @@ return ResizeImages;
         responseType: 'jsonp',
         execCallback: 'Jazzcat.exec',
         loadCallback: 'Jazzcat.load',
+        cacheLoadCallback: 'Jazzcat.httpCache.load',
+        inlineLoader: 'true',
         concat: false,
         projectName: '',
     };
 
     return Jazzcat;
 }));
+
 },{"../mobifyjs-utils/utils.js":3}],3:[function(require,module,exports){
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -1637,7 +1679,7 @@ Capture.setElementContentFromString = function(el, htmlString) {
         // Parse the head content
         // (using a "new RegExp" here because in Android 2.3 when you use a global
         // match using a RegExp literal, the state is incorrectly cached).
-        var parsedHeadTag = (new RegExp('^\\s*(<head(?:[^>\'"]*|\'[^\']*?\'|"[^"]*?")*>)([\\s\\S]*)$')).exec(captured.headContent);
+        var parsedHeadTag = (new RegExp('^[\\s\\S]*(<head(?:[^>\'"]*|\'[^\']*?\'|"[^"]*?")*>)([\\s\\S]*)$')).exec(captured.headContent);
         if (parsedHeadTag) {
             // if headContent contains an open head, then we know the tag was placed
             // outside of the body

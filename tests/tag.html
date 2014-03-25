@@ -101,9 +101,25 @@
 
         $("#qunit-fixture").append($iframe);
     };
-    
+
     module("Disable");
-    
+
+    asyncTest("Set to disabled when build cannot be loaded", function() {
+        testSetup("/tests/fixtures/tag/onerror.html", function(win, doc, event) {
+            equal(win.Mobify.Tag.Private.isDisabled(), true, "onerror refreshs and opts out.");
+
+            start();
+        });
+    });
+
+    asyncTest("Set to disabled when build cannot be loaded, with hash", function() {
+        testSetup("/tests/fixtures/tag/onerror.html#withhash", function(win, doc, event) {
+            equal(win.Mobify.Tag.Private.isDisabled(), true, "onerror refreshs and opts out.");
+
+            start();
+        });
+    });
+
     asyncTest("isDisabled detects `mobify-path=` in cookie.", function() {
         testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
             equal(win.Mobify.Tag.Private.isDisabled(), true, "Disabled condition detected.");

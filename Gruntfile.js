@@ -12,13 +12,6 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        localConfig: (function(){
-                        try {
-                            return grunt.file.readJSON('localConfig.json');
-                        } catch(e) {
-                            return {};
-                        }
-                    })(),
         lint: {
             files: ['grunt.js', 'src/**/*.js', 'tests/**/*.js']
         },
@@ -104,8 +97,6 @@ module.exports = function(grunt) {
         'saucelabs-qunit': {
             all: {
                 options: {
-                    username: '<%= localConfig.saucelabs.username %>', // if not provided it'll default to ENV SAUCE_USERNAME (if applicable)
-                    key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                     urls: [
                         'http://localhost:3000/tests/capture.html',
                         'http://localhost:3000/tests/unblockify.html',
@@ -213,8 +204,6 @@ module.exports = function(grunt) {
 
             oldbrowsers: {
                 options: {
-                    username: '<%= localConfig.saucelabs.username %>', // if not provided it'll default to ENV SAUCE_USERNAME (if applicable)
-                    key: '<%= localConfig.saucelabs.key %>', // if not provided it'll default to ENV SAUCE_ACCESS_KEY (if applicable)
                     urls: [
                         'http://localhost:3000/tests/tag-old-browser.html',
                         'http://localhost:3000/tests/supported-browser.html'
@@ -266,8 +255,6 @@ module.exports = function(grunt) {
         },
         s3: {
             options: {
-                key: '<%= localConfig.aws.key %>',
-                secret: '<%= localConfig.aws.secret %>',
                 access: "public-read",
                 headers: { "Cache-Control": SHORT_CACHE_CONTROL },
                 maxOperations: 6
@@ -397,6 +384,13 @@ module.exports = function(grunt) {
                 src: './www',
                 dest: './www/_site',
             },
+        },
+        release: {
+            options: {
+                github: {
+                    repo: 'mobify/mobifyjs'
+                }
+            }
         }
     });
     

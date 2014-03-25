@@ -130,6 +130,7 @@
 \n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\
 \n\
 \n</head><body bar=\"baz\">\
+\n    <!-- comment with <head> -->\
 \n    <p>Plaintext example page!</p>\
 \n    <script src=\"/path/to/script.js\"><\/script>\
 \n\
@@ -151,7 +152,7 @@
             headOpenTag: "<head foo=\"bar\">",
             bodyOpenTag: "<body bar=\"baz\">",
             headContent: "\n    \n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\n</head>\n",
-            bodyContent: "\n    <p>Plaintext example page!</p>\n    <script src=\"/path/to/script.js\"><\/script>\n</body>\n</html>\n\n"
+            bodyContent: "\n    <!-- comment with <head> -->\n    <p>Plaintext example page!</p>\n    <script src=\"/path/to/script.js\"><\/script>\n</body>\n</html>\n\n"
         }
 
         asyncTest("createDocumentFragmentsStrings - below head tag", function(){
