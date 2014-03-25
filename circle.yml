@@ -1,5 +1,12 @@
-test:
-    pre:
-        - make install
+machine:
+    node:
+        version: 0.10.22
+
+dependencies:
     override:
-        - make test
+        - npm install -g grunt-cli
+        - npm install
+
+test:
+    override:
+        - grunt test
