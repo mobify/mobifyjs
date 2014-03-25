@@ -2,7 +2,7 @@
   "name": "mobify-service-clients",
   "version": "1.0.0",
   "dependencies": {
-    "jazzcat-client": "git@github.com:mobify/jazzcat-client.git#11b96d20bfa77cb1ffcd633400808046cd385b7b",
+    "jazzcat-client": "git@github.com:mobify/jazzcat-client.git#1.0.0",
     "imageresize-client": "git@github.com:mobify/imageresize-client.git#1.0.0"
   }
 }
