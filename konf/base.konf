@@ -20,10 +20,6 @@
     {>"/base/vendor/slide.js"/}
 {/lib}{/lib_export}
 
-{#lib_export name="combo"}
-    {>"/base/api/combo.js"/}
-{/lib_export}
-
 {#lib_export name="util"}
     {>"/base/api/util.js"/}
 {/lib_export}
@@ -52,7 +48,10 @@
 {/enhance}{/lib_export}
 
 {>"/base/api/main.js"/}
-{>"/base/api/resizeImages.js"/}
+
+{#lib_export name="mobify-services"}
+    {>"/base/api/mobify-services.js"/}
+{/lib_export}
 
 {! Mobify Studio Compatible Url Matching !}
 {>"/base/api/urlmatch.js"/}
