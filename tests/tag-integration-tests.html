@@ -246,6 +246,15 @@
         });
     });
 
+    asyncTest("Loads preview without capturing correctly", function() {
+        testSetup("/tests/fixtures/tag/preview-wo-capturing.html?tag=min#mobify-path=true&mobify-capture=false", function(win, doc, event) {
+            assertNotCapturing();
+            assertLoaded("/tests/fixtures/tag/preview.js");
+
+            start();
+        });
+    });
+
     asyncTest("Skips preview if skipPreview is set.", function() {
         // Test on Open Source
         testSetup("/tests/fixtures/tag/skip-preview.html?tag=min#mobify-path=true", function(win, doc, event) {

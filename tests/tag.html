@@ -78,6 +78,10 @@
             '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
             '; path=/';
 
+        document.cookie = 'mobify-capture=' +
+            '; expires=' + (new Date(Date.now() - 1000)).toGMTString() +
+            '; path=/';
+
         window.addEventListener("message", function onMessage(event) {
             if (event.source != el.contentWindow || event.data !== "ready") return;
             window.removeEventListener("message", onMessage, false);
@@ -146,6 +150,24 @@
             start();
         }, function (el) {
             document.cookie = "mobify-path=true; path=/";
+        });
+    });
+
+    asyncTest("isPreviewWithoutCapturing detects `mobify-capture=false` in hash.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html#mobify-capture=false", function(win, doc, event) {
+            equal(win.Mobify.Tag.Private.isPreviewWithoutCapturing(), true, "Preview condition detected.");
+
+            start();
+        });
+    });
+
+    asyncTest("isPreviewWithoutCapturing detects `mobify-capture=false` in cookie.", function() {
+        testSetup("/tests/fixtures/tag/no-run.html", function(win, doc, event) {
+            equal(win.Mobify.Tag.Private.isPreviewWithoutCapturing(), true, "Preview condition detected.");
+
+            start();
+        }, function (el) {
+            document.cookie = "mobify-capture=false; path=/";
         });
     });
 
