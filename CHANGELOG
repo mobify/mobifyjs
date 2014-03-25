@@ -1,3 +1,5 @@
+2.0.10 - Brings in utils, jazzcat, and imageresize as dependancies using Bower
+2.0.9 - Fix for putting Mobify tag above head tag
 2.0.8 - Change AMD definitions to UMD in all libs
 2.0.7 - Allow specifying quality parameter without it defaulting the format
         to JPG.

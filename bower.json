@@ -1,7 +1,15 @@
 {
   "name": "mobifyjs",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "main": "build/mobify.min.js",
+  "dependencies": {
+    "mobifyjs-utils": "git@github.com:mobify/mobifyjs-utils.git#1.0.0",
+    "jazzcat-client": "git@github.com:mobify/jazzcat-client.git#1.0.0",
+    "imageresize-client": "git@github.com:mobify/imageresize-client.git#1.0.0"
+  },
+  "devDependencies": {
+
+  },
   "ignore": [
     "node_modules",
     "tests",

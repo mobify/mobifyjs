@@ -1,9 +1,10 @@
 {
   "name": "mobifyjs",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "description": "Mobify.js is an open source library for improving responsive sites by providing responsive images, JS/CSS optimization, Adaptive Templating and more.",
   "author": "Mobify <dev@mobify.com>",
   "devDependencies": {
+    "express": "3.3.1",
     "grunt": "~0.4.0",
     "grunt-requirejs": "~0.4.0",
     "grunt-contrib-watch": "~0.2.x",

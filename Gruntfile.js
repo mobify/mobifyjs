@@ -21,8 +21,6 @@ module.exports = function(grunt) {
                 timeout: 20000,
                 urls: [
                   'http://localhost:3000/tests/capture.html',
-                  'http://localhost:3000/tests/jazzcat.html',
-                  'http://localhost:3000/tests/resizeImages.html',
                   'http://localhost:3000/tests/unblockify.html',
                   'http://localhost:3000/tests/cssOptimize.html',
                   'http://localhost:3000/tests/anchor-test.html',
@@ -30,7 +28,6 @@ module.exports = function(grunt) {
                   'http://localhost:3000/tests/tag.html',
                   'http://localhost:3000/tests/tag-integration-tests.html',
                   'http://localhost:3000/tests/tag-old-browser.html',
-                  'http://localhost:3000/tests/utils.html'
                 ]
               }
             }
@@ -102,15 +99,12 @@ module.exports = function(grunt) {
                 options: {
                     urls: [
                         'http://localhost:3000/tests/capture.html',
-                        'http://localhost:3000/tests/resizeImages.html',
-                        'http://localhost:3000/tests/jazzcat.html',
                         'http://localhost:3000/tests/unblockify.html',
                         'http://localhost:3000/tests/cssOptimize.html',
                         'http://localhost:3000/tests/anchor-test.html',
                         'http://localhost:3000/tests/supported-browser.html',
                         'http://localhost:3000/tests/tag.html',
                         'http://localhost:3000/tests/tag-integration-tests.html',
-                        'http://localhost:3000/tests/utils.html'
                     ],
                     concurrency: 16,
                     tunneled: true,

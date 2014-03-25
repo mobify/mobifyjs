@@ -1,9 +1,9 @@
 *.swp
 .DS_STORE
 _site
-node_modules
+node_modules/
+bower_components/
 *.bak
-node_modules
 *.zip
 *.gz
 build/mobify-experimental*
