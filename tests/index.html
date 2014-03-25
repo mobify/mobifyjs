@@ -29,6 +29,13 @@
         </script>
         <script src="../vendor/zepto/src/zepto.js"></script>
         <script src="../vendor/zepto/src/event.js"></script>
+        <script src="../vendor/zepto/src/ajax.js"></script>
+        <script src="../vendor/zepto/src/form.js"></script>
+        <script src="../vendor/zepto/src/ie.js"></script>
+        <script src="../vendor/zepto/src/detect.js"></script>
+        <script src="../vendor/zepto/src/fx.js"></script>
+        <script src="../vendor/zepto/src/selector.js"></script>
+        <script src="../vendor/zepto/src/stack.js"></script>
 
         <script src="../api/noconflict.js"></script>
 
@@ -234,12 +241,21 @@
                     return;
                 }
 
-                html += $('#fixtures').reduce(function(memo, el) {
-                        return memo + el.outerHTML + '\n';
-                    }, '');
-                html += $result.reduce(function(memo, el) {
-                        return memo + el.outerHTML + '\n';
-                }, '');
+                var i
+                  , len
+                  , $fixtures;
+
+                $fixtures = $('#fixtures')
+
+                $fixtures.each(function(index, el) {
+                    html += el.outerHTML + '\n';
+                });
+
+
+                $result.each(function(index, el) {
+                         html += el.outerHTML + '\n';
+                });
+                
                 html = '<html><body>' + html + '</body></html>';
 
                 // Poor mans `Capture.enable`
@@ -270,6 +286,50 @@
 
                 iframe.document.close();
             });
+        });
+
+
+        asyncTest('combo - Cold cache', 1, function() {
+            var $scripts = $($('#combineScripts-1').text()).filter('script')
+              , $result = $scripts.combineScripts()
+              , html = ''
+              , $fixtures = $('#fixtures');
+
+            $fixtures.each(function(index, el) {
+                html += el.outerHTML + '\n';
+            });
+
+            $result.each(function(index, el) {
+                html += el.outerHTML + 'n';
+            });
+
+            html = '<html><body>' + html + '</body></html>'
+
+            var iframeEl = document.createElement('iframe');
+
+            $('body').append(iframeEl);
+
+            var iframe = (iframeEl.contentWindow)
+                        ? iframeEl.contentWindow
+                        : (iframeEl.contentDocument.document)
+                            ? iframeEl.contentDocument.document
+                            : iframeEl.contentDocument;
+
+            iframe.document.open();
+            iframe.document.write(html);
+            iframe.document.close();
+
+            function load() {
+                ok(iframe.window.a, 'jQuery was loaded');
+
+                start();
+            }
+
+            if (iframe.document.readyState == 'complete') {
+                load();
+            } else {
+                $(iframeEl).on('load', load);
+            }
         });
 
         asyncTest('Mobify.combo.load - Encoded Urls are cached', 1, function() {
@@ -613,9 +673,10 @@
 
         test('Mobify.html.openTag', function() {
             var got = Mobify.html.openTag($("<div id=\"<>\" class='<>'></div>"))
-              , vow = "<div id=\"<>\" class=\"<>\">"
+              , vows = ["<div id=\"<>\" class=\"<>\">", 
+                        "<div class=\"<>\" id=\"<>\">"]
 
-            equal(got, vow);
+            ok(got === vows[0] || got === vows[1], got);
         });
 
         test('Mobify.html.closeTag', function() {
@@ -639,11 +700,18 @@
             urlify = document.createElement("a");
             return function(url) {
                 urlify.href = url;
+                var addLeadingSlash = false;
+                // pave over IE's stripping of leading slahes in an anchor's 
+                // pathname property, this does not happen for real 
+                // window.location, so we should be covered 
+                if(urlify.pathname[0] !== '/') {
+                    addLeadingSlash = true;
+                }
                 return {
                     host: urlify.host,
                     hostname: urlify.hostname,
                     href: urlify.href,
-                    pathname: urlify.pathname,
+                    pathname: (addLeadingSlash ? '/' : '' ) + urlify.pathname,
                     port: urlify.port,
                     protocol: urlify.protocol,
                     toString: function() {

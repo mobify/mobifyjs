@@ -83,8 +83,12 @@ var console = Mobify.console
   , anchor = function($root) {
         var rootedQuery = function(selector, context, rootQuery) {
                 $root = $root || (Mobify.conf.data && Mobify.conf.data.$html);
-
-                return ($.fn.init || $.zepto.init).call(this, selector, context || anchored.context(), rootQuery);
+                // jquery-style constructor based $
+                if ($.fn.init) {
+                    return new $.fn.init(selector, context || anchored.context(), rootQuery);
+                }
+                // zepto's constructor-less init call
+                return $.zepto.init.call(this, selector, context || anchored.context(), rootQuery);
             }
 
           , anchored = $.sub(rootedQuery); 

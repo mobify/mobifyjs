@@ -66,7 +66,9 @@
         }
     };
 
-    timing.addPoint('Finished Document', Mobify.points[1]);
+    timing.addPoint('Finished Document', 
+                    (Mobify && Mobify.points && Mobify.points[1]) || 
+                    Date.now());
     timing.addPoint('Loaded Mobify.js');
 
 })(Mobify.$, Mobify);
