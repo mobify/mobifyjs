@@ -18,6 +18,14 @@ Running the tests requires [PhantomJS](http://phantomjs.org/):
 
     make test
 
+## Updating Mobify Service APIs
+
+Mobify.js includes javascript client APIs for Mobify;s image and javascript 
+optimization web services. To get the latest versions of these APIs, go to the
+`vendor/mobify-service-clients` directory, and adjust `bower.json` to install the 
+versions of the client libraries you want. You can then run `grunt build` to 
+build a new version of the shim.
+
 ##  Docs
 
 The compiled documentation for Mobify.js can be found online at [mobifyjs.com](https://www.mobifyjs.com/).
