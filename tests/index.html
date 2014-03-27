@@ -82,6 +82,10 @@
         <img x-src="http://www.mobify.com/i/phone-tablet.png" />
     </div>
 
+    <div id="resizeImages2">
+        <img x-src="http://www.mobify.com/i/phone-tablet.png" />
+    </div>
+
     <div id="resizeImages-non-http">
         <img x-src="gopher://archie.ftp.mailto/somanyprotocols" />
     </div>
@@ -527,7 +531,9 @@
 
         test('$.fn.resizeImages', function() {
             var $got = $('#resizeImages').resizeImages();
-            equal($got.length, 1);
+            equal($got.length, 1, "resizes image children");
+            $got = $('#resizeImages2 img').resizeImages()
+            equal($got.length, 1, "resizes images directly");
         });
 
         // Non-HTTP URLs should be unchanged.

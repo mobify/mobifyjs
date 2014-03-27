@@ -42,8 +42,8 @@ require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat"],
 
     // ResizeImages
     $.fn.resizeImages = function(opts) {
-        var imgs = this.find('img').toArray();
-        return ResizeImages.resize.call(window, imgs, opts);
+        var imgs = this.filter('img').add(this.find('img')).toArray();
+        return $(ResizeImages.resize.call(window, imgs, opts));
     };
     
     ResizeImages.defaults.projectName = Mobify.config.projectName || '';
