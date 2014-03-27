@@ -74,6 +74,10 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
   false, the image(s) are served through the image resizer backend but are not
   resized. A value of null auto detects whether to resize images from the
   document's viewport meta tag. The default is true.
+- `cacheBreaker`: A string used to break the cache. By default, the Image
+  Resizer service caches images to avoid reprocessing the same image more than
+  once. Use this option if you change an image and need to break Image Resizer's
+  cache.
 
 **Example**
 
