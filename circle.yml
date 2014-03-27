@@ -4,6 +4,7 @@ machine:
 
 dependencies:
     override:
+        - git submodule update --init --recursive
         - npm install -g grunt-cli
         - npm install
 
