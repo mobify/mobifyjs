@@ -3,7 +3,6 @@
 <head>
     <link rel="stylesheet" href="qunit/qunit.css">
     <script src="qunit/qunit.js"></script>
-    <script src="junit.js"></script>
 </head>
 <body>
     <!--
@@ -39,7 +38,6 @@
 
         <script src="../api/noconflict.js"></script>
 
-        <script src="../api/combo.js"></script>
         <script src="../api/util.js"></script>
         <script src="../api/persistHash.js"></script>
         <script src="../api/logging.js"></script>
@@ -60,7 +58,7 @@
         <script src="../api/enhance.js"></script>
 
         <script src="../api/main.js"></script>
-        <script src="../api/resizeImages.js"></script>
+        <script src="../api/mobify-services.js"></script>
 
         <script src="../api/urlmatch.js"></script>
 
@@ -69,10 +67,10 @@
     </div>
 
     <textarea id="combineScripts-1">
-        <script>var a = ['a']</script>
-        <script x-src="http://should.be/cached/push.js#b"></script>
-        <script>a.push('c')</script>
-        <script x-src="http://should.be/cached/push.js#d"></script>
+    <script>var a = window.a = ['a']</script>
+    <script x-src="http://should.be/cached/push-b.js"></script>
+    <script>a.push('c')</script>
+    <script x-src="http://should.be/cached/push-d.js"></script>
     </textarea>
 
     <textarea id="combineScripts-2">
@@ -161,7 +159,6 @@
 
     <script>
         var $ = Mobify.$
-          , httpCache = Mobify.httpCache
             // Time offsets in seconds
           , ONE_WEEK = 7 * 24 * 60 * 60
           , TWO_WEEKS = 2 * ONE_WEEK
@@ -175,7 +172,7 @@
 
             // I don't fit in `localStorage` in Chrome or Safari...
             // But I do seem to fit in FF.
-          , LONG_STRING = Array(5000000).join('1')
+          , LONG_STRING = Array(10000000).join('1')
 
           // One or two will fit in local storage, but not several
           , MEDIUM_STRING = Array(2000000).join('1')
@@ -208,32 +205,37 @@
         test('combo - getURL', function() {
             Mobify.$.fn.combineScripts.defaults.projectName = "foo";
             var url = Mobify.combo.getURL(["https://www.example.com/baz/qux.js",
-                "http://www.example.com/qux/baz.js"], "bar")
-              , expected = "//jazzcat.mobify.com/project-foo/jsonp/bar/%5B%22http%3A%2F%2Fwww.example.com%2Fqux%2Fbaz.js%22%2C%22https%3A%2F%2Fwww.example.com%2Fbaz%2Fqux.js%22%5D"; 
+                "http://www.example.com/qux/baz.js"])
+              , expected = "//jazzcat.mobify.com/project-foo/jsonp/Mobify.combo.load/%5B%22http%3A%2F%2Fwww.example.com%2Fqux%2Fbaz.js%22%2C%22https%3A%2F%2Fwww.example.com%2Fbaz%2Fqux.js%22%5D"; 
 
             
             equal(url, expected);
         });
 
         asyncTest('combo - Warm cache', 1, function() {
-            var cache = {
-                    'http://should.be/cached/push.js': {
-                        'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}
-                      , 'status': 'ready'
-                      , 'url': 'http://should.be/cached/push.js'
-                      , 'body': 'var scripts = [].slice.call(document.getElementsByTagName("script"));'
-                             + 'a.push(scripts[scripts.length - 2].innerHTML.split("#")[1][0]);'
-                      , 'text': true
-                    }
+            Jazzcat.httpCache.reset({
+                'http://should.be/cached/push-b.js': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'http://should.be/cached/push-b.js',
+                    'body': 'window.a.push("b")',
+                    'text': true
+                },
+                'http://should.be/cached/push-d.js': {
+                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
+                    'status': 'ready',
+                    'url': 'http://should.be/cached/push-d.js',
+                    'body': 'window.a.push("d")',
+                    'text': true
                 }
-              , $scripts = $($('#combineScripts-1').text())
+            });
+            var $scripts = $($('#combineScripts-1').text()).filter('script')
               , $result
               , html = '';
 
-            httpCache.reset(cache);
             $result = $scripts.combineScripts();
 
-            httpCache.save(function(err) {
+            Jazzcat.httpCache.save(function(err) {
                 if (err) {
                     return;
                 }
@@ -255,6 +257,9 @@
                 
                 html = '<html><body>' + html + '</body></html>';
 
+                // Poor mans `Capture.enable`
+                html = html.replace(/type=\"text\/mobify-script\"/g, '')
+
                 var iframeEl = document.createElement('iframe');
 
                 $('body').append(iframeEl);
@@ -274,13 +279,17 @@
                     start();
                 }
                 $(iframeEl).on('load', load);
+                $(iframeEl).on('error', function() {
+                    debugger;
+                })
 
                 iframe.document.close();
             });
         });
 
+
         asyncTest('combo - Cold cache', 1, function() {
-            var $scripts = $($('#combineScripts-2').text())
+            var $scripts = $($('#combineScripts-1').text()).filter('script')
               , $result = $scripts.combineScripts()
               , html = ''
               , $fixtures = $('#fixtures');
@@ -334,117 +343,57 @@
                 }];
 
 
-            httpCache.reset();
-            httpCache.save(function(err) {
+            Jazzcat.httpCache.reset();
+            Jazzcat.httpCache.save(function(err) {
                 if (err) throw err;
 
                 Mobify.combo.load(resources);
-                ok(httpCache.get(encodeURI(url)) != undefined, "Missing resource.");
+                ok(Jazzcat.httpCache.get(encodeURI(url)) != undefined, "Missing resource.");
                 start();
             });
         });
 
-        test('Mobify.combo.exec', 6, function() {
-            var cache = {
-                'cached': {
-                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
-                    'status': 'ready',
-                    'url': 'cached',
-                    'body': 'cached',
-                    'text': true
-                },
-                'cached-with-scripts': {
-                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
-                    'status': 'ready',
-                    'url': 'cached-with-scripts',
-                    'body': getText("#test-mobify-combo-exec"),
-                    'text': true
-                },
-                'override-document-write': {
-                    'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW},
-                    'status' : 'ready',
-                    'url': 'override-document-write',
-                    'body': getText("#test-mobify-combo-exec-document-write-override"),
-                    'text': true
-                }
-            };
-
-            httpCache.reset(cache);
-
-            var wrote;
-            var origDocWrite = Mobify.combo._docWrite
-            Mobify.combo._docWrite = function(s) {
-                wrote = s
-            }
-
-            try {
-                Mobify.combo.exec('cached');
-                equal(wrote, '<script data-orig-src="cached">cached<\/script>');
-
-                Mobify.combo.exec('uncached');
-                equal(wrote, '<script src="uncached"><\/script>');
-
-                Mobify.combo.exec('cached-with-scripts');
-                equal(wrote, '<script data-orig-src=\"cached-with-scripts\">/*<\/scr\\ipt>*/ \"<\/scr\\ipt>\" \/<\/scr\\ipt>\/<\/script>');
-
-                Mobify.combo.exec('cached');
-                equal(wrote, '<script data-orig-src="cached">cached<\/script>');
-
-                Mobify.combo.exec('cached', true);
-                equal(wrote, '<script data-orig-src="cached" src="data:application/x-javascript,cached"><\/script>');
-
-                // test execing a functiont hat overrides a document.write
-                Mobify.combo.exec('override-document-write');
-                equal(wrote, '<script data-orig-src="override-document-write">document.write = function() {console.log("moo!");};<\/script>');
-                // restore regular old document.write after this exec
-                document.write = Mobify.combo._docWrite;
-
-            } finally {
-                Mobify.combo._docWrite = origDocWrite;
-            }
-        });
-
         asyncTest('httpCache - Eviction on an unused resource', 2, function() {
-            httpCache.reset();
-            httpCache.save();
+            Jazzcat.httpCache.reset();
+            Jazzcat.httpCache.save();
 
-            httpCache.set('unused', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
+            Jazzcat.httpCache.set('unused', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
 
-            httpCache.set('used', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'used'})
-            httpCache.get('used', true); // mark it used
+            Jazzcat.httpCache.set('used', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'used'})
+            Jazzcat.httpCache.get('used', true); // mark it used
 
-            httpCache.save(function(err) {
+            Jazzcat.httpCache.save(function(err) {
                 if (err) return;
 
-                httpCache.reset();
-                httpCache.load();
+                Jazzcat.httpCache.reset();
+                Jazzcat.httpCache.load();
 
-                ok(!httpCache.get('unused'), '`unused` was evicted');
-                ok(!!httpCache.get('used'), '`used` was cached');
+                ok(!Jazzcat.httpCache.get('unused'), '`unused` was evicted');
+                ok(!!Jazzcat.httpCache.get('used'), '`used` was cached');
 
                 start();
             });
         });
 
         asyncTest('httpCache - Least recently used eviction', 2, function() {
-            httpCache.reset();
-            httpCache.save();
+            Jazzcat.httpCache.reset();
+            Jazzcat.httpCache.save();
 
-            httpCache.set('old', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
-            httpCache.get('old', true)
+            Jazzcat.httpCache.set('old', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: LONG_STRING})
+            Jazzcat.httpCache.get('old', true)
 
             setTimeout(function() {
-                httpCache.set('new', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'new'})
-                httpCache.get('new', true)
+                Jazzcat.httpCache.set('new', {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: 'new'})
+                Jazzcat.httpCache.get('new', true)
 
-                httpCache.save(function(err) {
+                Jazzcat.httpCache.save(function(err) {
                     if (err) return;
 
-                    httpCache.reset();
-                    httpCache.load();
+                    Jazzcat.httpCache.reset();
+                    Jazzcat.httpCache.load();
 
-                    ok(!httpCache.get('old'), '`old` was evicted');
-                    ok(!!httpCache.get('new'), '`new` was cached');
+                    ok(!Jazzcat.httpCache.get('old'), '`old` was evicted');
+                    ok(!!Jazzcat.httpCache.get('new'), '`new` was cached');
 
                     start();
                 });
@@ -454,25 +403,25 @@
             // regression test to ensure Jazzcat evicts more than one itme 
             // properly when there is too much to store
             asyncTest('httpCache - Evict until small enough', 2, function() {
-                httpCache.reset();
-                httpCache.save(function(){
+                Jazzcat.httpCache.reset();
+                Jazzcat.httpCache.save(function(){
                     for (var i=0; i < 5; i++) {
-                        httpCache.set('val' + i, {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: MEDIUM_STRING});
+                        Jazzcat.httpCache.set('val' + i, {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: MEDIUM_STRING});
                         if (i !== 0) {
-                            httpCache.get('val' + i, true);
+                            Jazzcat.httpCache.get('val' + i, true);
                         }
                     }
 
-                    httpCache.save(function(err) {
+                    Jazzcat.httpCache.save(function(err) {
 
-                        httpCache.reset();
-                        httpCache.load();
+                        Jazzcat.httpCache.reset();
+                        Jazzcat.httpCache.load();
 
-                        ok(!httpCache.get('val0'), 'val0 was evicted')
-                        ok(!!httpCache.get('val1'), '`val1` was cached');
+                        ok(!Jazzcat.httpCache.get('val0'), 'val0 was evicted')
+                        ok(!!Jazzcat.httpCache.get('val1'), '`val1` was cached');
 
-                        httpCache.reset();
-                        httpCache.save();
+                        Jazzcat.httpCache.reset();
+                        Jazzcat.httpCache.save();
 
                         start();
                     });
@@ -480,7 +429,7 @@
             });
 
         test('httpCache.utils.isStale', 12, function() {
-            var isStale = httpCache.utils.isStale
+            var isStale = Jazzcat.httpCache.utils.isStale
               , resources = {
                     'stale-expires': {
                         'headers': {
@@ -578,7 +527,6 @@
 
         test('$.fn.resizeImages', function() {
             var $got = $('#resizeImages').resizeImages();
-
             equal($got.length, 1);
         });
 
@@ -589,8 +537,7 @@
             var before = $('#resizeImages-non-http').find('img').attr('x-src')
               , $imgs = $('#resizeImages-non-http').resizeImages()
               , after = $('#resizeImages-non-http').find('img').attr('x-src');
-
-            equal($imgs.length, 0);
+            equal($imgs[0].getAttribute('x-src'), 'gopher://archie.ftp.mailto/somanyprotocols');
             equal(before, after, "Non-http url unchanged");
         });
 
@@ -603,24 +550,22 @@
         });
 
         test('Mobify.getImageURL', function() {
-            expect(2);
-
-            var got = Mobify.getImageURL('http://test/image.jpg')
-              , vow = '//ir0.mobify.com/http://test/image.jpg';
-
-            equal(got, vow);
-
-            got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
-            vow = '//ir0.mobify.com/320/http://test/image.jpg';
+            var got = Mobify.getImageURL('http://test/image.jpg', {
+                projectName: 'test1',
+                maxWidth: 320,
+                maxHeight: 480,
+                format: 'png'
+            })
+              , vow = '//ir0.mobify.com/project-test1/png/320/480/http://test/image.jpg';
 
             equal(got, vow);
         });
 
         test('Mobify.getImageURL cached string', 2, function() {
             var url = 'http://test/image.jpg';
-            var result1 = Mobify.getImageURL(url, {maxWidth: '320', cacheHours: '8'});
-            var result2 = Mobify.getImageURL(url, {maxWidth: 320, cacheHours: 8});
-            var expected = '//ir0.mobify.com/c8/320/' + url;
+            var result1 = Mobify.getImageURL(url, {projectName: 'test1', format: 'png', maxWidth: '320', cacheHours: '8'});
+            var result2 = Mobify.getImageURL(url, {projectName: 'test1', format: 'png', maxWidth: 320, cacheHours: 8});
+            var expected = '//ir0.mobify.com/project-test1/c8/png/320/' + url;
             equal(result1, expected);
             equal(result2, expected);
         });
@@ -631,8 +576,8 @@
             try {
                 Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
 
-                got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320});
-                vow = "//ir0.mobify.com/project-testing/320/http://test/image.jpg";
+                got = Mobify.getImageURL('http://test/image.jpg', {maxWidth: 320, format: 'png'});
+                vow = "//ir0.mobify.com/project-testing/png/320/http://test/image.jpg";
 
                 equal(got, vow);
             } finally {
@@ -647,8 +592,8 @@
                 Mobify.$.fn.resizeImages.defaults.projectName = 'testing';
 
                 got = Mobify.getImageURL('http://test/image.jpg',
-                    {maxWidth: 320, cacheHours:8});
-                vow = "//ir0.mobify.com/project-testing/c8/320/http://test/image.jpg";
+                    {maxWidth: 320, cacheHours:8, format: 'png'});
+                vow = "//ir0.mobify.com/project-testing/c8/png/320/http://test/image.jpg";
 
                 equal(got, vow);
             } finally {

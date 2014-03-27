@@ -1,0 +1,18 @@
+{
+  "name": "mobifyjs-service-clients",
+  "version": "1.0.0",
+  "description": "Image Resizer and Jazzcat clients for MobifyJS 1.1",
+  "author": "Mobify <dev@mobify.com>",
+  "devDependencies": {
+    "connect": "2.3.4",
+    "grunt": "~0.4.0",
+    "grunt-requirejs": "0.4.0",
+    "grunt-contrib-requirejs": "0.4.1",
+    "grunt-contrib-watch": "~0.2.x",
+    "grunt-contrib-connect": "~0.1.0",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-saucelabs": "4.0.4",
+    "amdclean": "1.1.0"
+  },
+  "engine": ">= 0.10.1"
+}
