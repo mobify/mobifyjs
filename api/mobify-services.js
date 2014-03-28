@@ -1812,10 +1812,12 @@ require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat"],
         if (!this) {
             return $([]);
         }
+        var $scripts = this.filter('script').add(this.find('script'));
         opts = opts || {};
-        this.remove();
         opts.inlineLoader = false;
-        return $(Jazzcat.optimizeScripts.call(window, this, opts));
+        $scripts.remove();
+        var scripts = $scripts.toArray()
+        return $(Jazzcat.optimizeScripts.call(window, scripts, opts));
     };
     
     Jazzcat.defaults.projectName = (
