@@ -19,10 +19,12 @@ require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat"],
         if (!this) {
             return $([]);
         }
+        var $scripts = this.filter('script').add(this.find('script'));
         opts = opts || {};
-        this.remove();
         opts.inlineLoader = false;
-        return $(Jazzcat.optimizeScripts.call(window, this, opts));
+        $scripts.remove();
+        var scripts = $scripts.toArray()
+        return $(Jazzcat.optimizeScripts.call(window, scripts, opts));
     };
     
     Jazzcat.defaults.projectName = (
@@ -42,8 +44,8 @@ require(["mobifyjs/utils", "mobifyjs/resizeImages", "mobifyjs/jazzcat"],
 
     // ResizeImages
     $.fn.resizeImages = function(opts) {
-        var imgs = this.find('img').toArray();
-        return ResizeImages.resize.call(window, imgs, opts);
+        var imgs = this.filter('img').add(this.find('img')).toArray();
+        return $(ResizeImages.resize.call(window, imgs, opts));
     };
     
     ResizeImages.defaults.projectName = Mobify.config.projectName || '';

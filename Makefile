@@ -3,10 +3,7 @@ install:
 	npm install
 
 test:
-	./tests/runner.sh
-
-jenkins:
-	./tests/runner.sh
+	grunt test
 
 all:
 	install
