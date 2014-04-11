@@ -340,28 +340,14 @@ Capture.setElementContentFromString = function(el, htmlString) {
 };
 
 /**
- * Gather escaped content from the DOM, unescaped it, and then use
- * `document.write` to revert to the original page.
+ * Grab the captured document and render it
  */
 Capture.prototype.restore = function() {
     var self = this;
-    var doc = self.sourceDoc;
 
-    var restore = function() {
-        doc.removeEventListener('readystatechange', restore, false);
-
-        setTimeout(function() {
-            doc.open();
-            doc.write(self.all());
-            doc.close();
-        }, 15);
-    };
-
-    if (Utils.domIsReady(doc)) {
-        restore();
-    } else {
-        doc.addEventListener('readystatechange', restore, false);
-    }
+    Utils.waitForReady(document, function() {
+        self.render();
+    });
 };
 
 /**
