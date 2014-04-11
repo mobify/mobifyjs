@@ -351,9 +351,7 @@ Capture.prototype.restore = function() {
         doc.removeEventListener('readystatechange', restore, false);
 
         setTimeout(function() {
-            doc.open();
-            doc.write(self.all());
-            doc.close();
+            this.render();
         }, 15);
     };
 
