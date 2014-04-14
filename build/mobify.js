@@ -1653,8 +1653,8 @@ Capture.setElementContentFromString = function(el, htmlString) {
      * Therefore, bodyContent will have these tags, and they do not need to be added to .all()
      */
     captured.all = function(inject) {
-        return this.doctype + this.htmlOpenTag + this.headOpenTag + (inject || '') + this.headContent + this.bodyContent;
-    }
+        return this.doctype + this.htmlOpenTag + this.headOpenTag + (inject || '') + this.headContent + this.bodyOpenTag + this.bodyContent;
+    };
 
     // During capturing, we will usually end up hiding our </head>/<body ... > boundary
     // within <plaintext> capturing element. To construct source DOM, we need to rejoin
@@ -1715,11 +1715,11 @@ Capture.setElementContentFromString = function(el, htmlString) {
 /**
  * Grab the captured document and render it
  */
-Capture.prototype.restore = function() {
+Capture.prototype.restore = function(inject) {
     var self = this;
 
     Utils.waitForReady(document, function() {
-        self.render();
+        self.render(self.all(inject));
     });
 };
 

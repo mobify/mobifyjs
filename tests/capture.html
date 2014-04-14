@@ -405,12 +405,47 @@
             window.addEventListener("message", function onMessage(event) {
                 if (event.source != el.contentWindow) return;
                 window.removeEventListener("message", onMessage, false);
-
                 // Make sure that there are no meta tags in the document at all
                 equal(el.contentDocument.getElementsByTagName('meta').length, 0, "Meta tags moved into the head are removed");
                 start();
             }, false);
 
+            $("#qunit-fixture").append($iframe);
+        });
+
+        asyncTest("Capture.restore", function(){
+            var $iframe = $("<iframe>", {id: "plaintext-example"});
+            $iframe.attr("src", "/tests/fixtures/plaintext-example.html");
+            var el = $iframe[0];  
+
+            var expectedHTML = "<!DOCTYPE HTML><html class=\"testclass\"><head foo=\"bar\"><script>parent.postMessage(\"done!\", \"*\");<\/script>\
+\n    \
+\n    <link rel=\"stylesheet\" href=\"/path/to/stylesheet.css\">\
+\n</head>\
+\n<body bar=\"baz\">\
+\n    <!-- comment with <head> -->\
+\n    <p>Plaintext example page!</p>\
+\n    <script src=\"/path/to/script.js\"><\/script></body></html>";
+
+            window.addEventListener("message", function onMessage(event) {
+                if (event.source != el.contentWindow) return;
+                window.removeEventListener("message", onMessage, false);
+                var doc = el.contentDocument;
+                // Make sure that there are no meta tags in the document at all
+                equal(Utils.getDoctype(doc) + Utils.outerHTML(doc.documentElement), expectedHTML, "HTML Restored to original state + injected script");
+                start();
+            }, false);
+
+            $iframe.load(function(){
+                var doc = this.contentDocument;
+
+                // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+                var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
+                Capture.init(function(capture) {
+                    capture.restore('<script>parent.postMessage("done!", "*");<\/script>');
+                }, doc);
+            });
             $("#qunit-fixture").append($iframe);
         });
 
