@@ -72,7 +72,9 @@
 
         var i18nlookup = function(key) {
             for(var i = 0; i < list.length; i++) {
-                var value = data[list[i]][key];
+                // Make sure list[i] is actually in data before we use it
+                //  to lookup a key
+                var value = (data[list[i]] ? data[list[i]][key] : undefined);
                 if (value) return value;
            }
         }
