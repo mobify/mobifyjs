@@ -21,7 +21,7 @@ Mobify.i18n = function(list, data) {
 
     var i18nlookup = function(key) {
         for(var i = 0; i < list.length; i++) {
-            var value = data[list[i]][key];
+            var value = (data[list[i]] ? data[list[i]][key] : undefined);
             if (value) return value;
        }
     }
