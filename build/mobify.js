@@ -2232,10 +2232,18 @@ return;
 }(this, function (Utils) {
     var exports = {};
 
-    var isFirefox = function(ua) {
+    var isOldFirefox = function(ua) {
         ua = window.navigator.userAgent;
+        var match = /(firefox|fennec)[\/\s](\d+)/i.exec(ua);
+        if (match) {
+            var version = +match[2];
+            if (version >= 29) {
+                return false;
+            }
+            return true;
+        }
 
-        return /firefox|fennec/i.test(ua)
+        return false;
     };
 
     var _patchAnchorLinks = function(doc) {
@@ -2330,7 +2338,7 @@ return;
     };
 
     var patchAnchorLinks = function() {
-        if (!isFirefox()) {
+        if (!isOldFirefox()) {
             return
         }
 
