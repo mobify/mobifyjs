@@ -59,9 +59,11 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
 - `targetAttribute`: The attribute to set witht he resized url. Defaults to 
   "x-src" when capturing, and "src" without capturing.
 - `cacheHours`: Sets the length of time for the image(s) to be cached on the CDN. 
-  The default is 2 months.
-- `format`: Output format of the image(s) being resized. Defaults to original
-  format, except non-animated gifs, which are converted to png.
+  The default is 8 hours.
+- `format`: Output format of the image(s) being resized, one of 'jpg', 'png, 
+'webp' or the special format specifier 'q', which will return an image in its
+original format, but allows quality to be specified on its own. Defaults to 
+original format, except non-animated gifs, which are converted to png.
 - `quality`: An integer from 1-100 used as a quality parameter when encoding 
   jpg and webp images, can only be set along with the `format` parameter.
 - `maxWidth`: Maximum width of the image(s) being resized (in CSS pixels). 
@@ -78,6 +80,20 @@ ir0.mobify.com will serve a 302 redirect back to the original image location.**
   Resizer service caches images to avoid reprocessing the same image more than
   once. Use this option if you change an image and need to break Image Resizer's
   cache.
+
+**Profiles**
+Some options presets are provided on `ResizeImages.profiles`
+
+- `SHORT_CACHE` sets a 2 hour cache lifetime on the resulting asset, for images
+that might change without changing URL.
+- `LONG_CACHE` sets a one week cache lifetime for assets that will remain valid
+for longer periods.
+
+You can combine these profiles with your own options objects like so:
+
+    var options = Utils.extend({
+        < your options >
+        }, ResizeImages.profiles.SHORT_CACHE);
 
 **Example**
 
