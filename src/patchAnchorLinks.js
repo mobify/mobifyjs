@@ -18,7 +18,7 @@
 
     var isOldFirefox = function(ua) {
         ua = ua || window.navigator.userAgent;
-        var match = /(firefox|fennec)[\/](\d+)/i.exec(ua);
+        var match = /(firefox|fennec)[\/\s](\d+)/i.exec(ua);
         if (match) {
             var version = +match[2];
             if (version >= 29) {
