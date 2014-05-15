@@ -11,15 +11,23 @@
         module.exports = factory(Utils);
     } else {
         // Browser globals (root is window)
-        root.Jazzcat = factory(root.Utils);
+        root.Utils = factory(root.Utils);
     }
 }(this, function (Utils) {
     var exports = {};
 
-    var isFirefox = function(ua) {
-        ua = window.navigator.userAgent;
+    var isOldFirefox = function(ua) {
+        ua = ua || window.navigator.userAgent;
+        var match = /(firefox|fennec)[\/\s](\d+)/i.exec(ua);
+        if (match) {
+            var version = +match[2];
+            if (version >= 29) {
+                return false;
+            }
+            return true;
+        }
 
-        return /firefox|fennec/i.test(ua)
+        return false;
     };
 
     var _patchAnchorLinks = function(doc) {
@@ -46,7 +54,7 @@
 
             var matches = function(el) {
                 return (el.nodeName == "A") && (/^#/.test(el.getAttribute('href')));
-            }
+            };
 
             if (!matches(target)) {
                 return;
@@ -73,7 +81,7 @@
                 e.preventDefault = function() {
                     e.defaultPrevented = true;
                     scroll = false;
-                }
+                };
 
                 // If no other events call `preventDefault` we manually
                 // scroll to the element in question.
@@ -82,7 +90,7 @@
                         _scrollToAnchor(target.getAttribute('href'));
                     }
                 }, 50);
-            }   
+            }
         };
 
 
@@ -98,7 +106,7 @@
             if (match && match[1] === "") {
                 target = doc.body;
             } else if (match && match[1]) {
-                var target = doc.getElementById(match[1]);
+                target = doc.getElementById(match[1]);
             }
 
             // Scroll to it, if it exists
@@ -114,12 +122,15 @@
     };
 
     var patchAnchorLinks = function() {
-        if (!isFirefox()) {
-            return
+        if (!isOldFirefox()) {
+            return;
         }
 
         Utils.waitForReady(document, _patchAnchorLinks);
-    }
+    };
+
+    patchAnchorLinks._isOldFirefox = isOldFirefox;
+
 
     return patchAnchorLinks;
 }));
