@@ -1,18 +1,35 @@
-2.0.12 - `Capture.prototype.restore` uses self.all() instead of capturedDoc 
-2.0.11 - Updates `Capture.prototype.restore` to restore the captured doc
-2.0.10 - Brings in utils, jazzcat, and imageresize as dependancies using Bower
-2.0.9 - Fix for putting Mobify tag above head tag
-2.0.8 - Change AMD definitions to UMD in all libs
-2.0.7 - Allow specifying quality parameter without it defaulting the format
-        to JPG.
-        Added a flag that allows you to turn resizing to auto/on/off.
-2.0.6 - Fixed issue where we were not passing in the prefix when 
-        using `render` with an HTML string, causing assets to not get enabled.
-2.0.5 - Add API for fixing Anchor Tags on Firefox when using Capturing.
-2.0.4 - Fixes iOS 4.3 / Safari 4 issue with placing Mobify tag above <head>.
-2.0.3 - Adds a fix to ensure that meta tags do not get created and inserted
-        into the <head> for older Safari browsers.
-2.0.2 - Fixes iOS 4.3 / Safari 4 issue with document.head being undefined.
-2.0.1 - Changes getImageURL to grab default options if options object is not
-        passed to it.
-2.0.0 - First stable release of 2.0 API!
+2.0.13
+    - Update image resizer to 1.0.2, which contains changes to default
+      cache time (from 2 months down to 8 hours).
+    - Don't patch anchor links on Firefox 29 and above.
+2.0.12
+    - `Capture.prototype.restore` uses self.all() instead of capturedDoc.
+2.0.11 
+    - Updates `Capture.prototype.restore` to restore the captured doc.
+2.0.10
+    - Brings in utils, jazzcat, and imageresize as dependancies using Bower.
+2.0.9
+    - Fix for putting Mobify tag above head tag.
+2.0.8
+    - Change AMD definitions to UMD in all libs.
+2.0.7
+    - Allow specifying quality parameter without it defaulting the format
+      to JPG.
+    - Added a flag that allows you to turn resizing to auto/on/off.
+2.0.6
+    - Fixed issue where we were not passing in the prefix when 
+      using `render` with an HTML string, causing assets to not get enabled.
+2.0.5
+    - Add API for fixing Anchor Tags on Firefox when using Capturing.
+2.0.4
+    - Fixes iOS 4.3 / Safari 4 issue with placing Mobify tag above <head>.
+2.0.3
+    - Adds a fix to ensure that meta tags do not get created and inserted
+      into the <head> for older Safari browsers.
+2.0.2
+    - Fixes iOS 4.3 / Safari 4 issue with document.head being undefined.
+2.0.1
+    - Changes getImageURL to grab default options if options object is not
+      passed to it.
+2.0.0
+    - First stable release of 2.0 API!
