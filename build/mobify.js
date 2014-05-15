@@ -1647,7 +1647,7 @@ Capture.setElementContentFromString = function(el, htmlString) {
     var bodyEl = doc.getElementsByTagName('body')[0] || doc.createElement('body');
     var htmlEl = doc.getElementsByTagName('html')[0];
 
-    captured = {
+    var captured = {
         doctype: Utils.getDoctype(doc),
         htmlOpenTag: Capture.openTag(htmlEl),
         headOpenTag: Capture.openTag(headEl),
