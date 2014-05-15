@@ -70,7 +70,7 @@ ResizeImages.dataUriWebpDetect = function(callback) {
     // through the Mobify Image resizer: 
     // http://ir0.mobify.com/webp/http://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png
     image.src = 'data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQABgBwlpAADcAD+/gbQAA==';
-}
+};
 
 /**
  * Detect WEBP support sync and async. Do our best to determine support
@@ -283,11 +283,11 @@ ResizeImages._shouldResize = function(document) {
     // Ideal viewport when width=device-width and the intial-scale is 1 or more
     // (in that case it's just zoomed)
     if (metaViewport['width'] && metaViewport['initial-scale']) {
-        initialScale = parseInt(metaViewport['initial-scale']);
+        initialScale = parseInt(metaViewport['initial-scale'], 10);
         return initialScale >= 1 && metaViewport['width'] == 'device-width';
     }
 
-    return false
+    return false;
 };
 
 /**
@@ -295,7 +295,7 @@ ResizeImages._shouldResize = function(document) {
  * potentially has height and width set in css pixels, returns an object where 
  * they are expressed in device pixels, and other default options are set.
  */
-ResizeImages.processOptions = function(options) {    
+ResizeImages.processOptions = function(options) {
     var opts = Utils.clone(ResizeImages.defaults);
     if (options) {
         Utils.extend(opts, options);
@@ -304,7 +304,7 @@ ResizeImages.processOptions = function(options) {
     // A null value for `resize` triggers the auto detect functionality. This
     // uses the document to determine whether images should be resized and sets
     // it as the new default.
-    if (opts.resize == null && options.document) {
+    if (opts.resize === null && options.document) {
         var resize = ResizeImages._shouldResize(options.document);
         ResizeImages.defaults.resize = opts.resize = resize;
     }
@@ -383,7 +383,7 @@ ResizeImages.resize = function(elements, options) {
 ResizeImages.restoreOriginalSrc = function(event) {
     var origSrc;
     event.target.removeAttribute('onerror'); // remove ourselves
-    origSrc = event.target.getAttribute('data-orig-src')
+    origSrc = event.target.getAttribute('data-orig-src');
     if (origSrc) {
         event.target.setAttribute('src', origSrc);
     }
@@ -392,18 +392,27 @@ ResizeImages.restoreOriginalSrc = function(event) {
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
 ResizeImages.defaults = {
-      proto: '//',
-      host: 'ir0.mobify.com',
-      projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
-      sourceAttribute: "x-src",
-      targetAttribute: (capturing ? "x-src" : "src"),
-      webp: ResizeImages.supportsWebp(),
-      resize: true,
-      onerror: 'ResizeImages.restoreOriginalSrc(event);'
+    cacheHours: 8,
+    proto: '//',
+    host: 'ir0.mobify.com',
+    projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
+    sourceAttribute: "x-src",
+    targetAttribute: (capturing ? "x-src" : "src"),
+    webp: ResizeImages.supportsWebp(),
+    resize: true,
+    onerror: 'ResizeImages.restoreOriginalSrc(event);'
+};
+
+ResizeImages.profiles = {
+    SHORT_CACHE: {
+        cacheHours: 2
+    },
+    LONG_CACHE: {
+        cacheHours: 168
+    }
 };
 
 return ResizeImages;
-
 }));
 
 },{"../mobifyjs-utils/utils.js":3}],2:[function(require,module,exports){
