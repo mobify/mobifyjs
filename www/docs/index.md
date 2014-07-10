@@ -28,7 +28,7 @@ Insert the Mobify.js tag **immediately** after the opening _<head>_ tag on the
 website you want to adapt:
 
 <div class="alert alert-block">
-    <p>If you are a Mobify Enterprise customer, please head over to
+    <p>If you have purchased a Mobify platform subscription, please head over to
     <a href="https://cloud.mobify.com">https://cloud.mobify.com</a>
     to get your tag instead.</p>
 </div>
