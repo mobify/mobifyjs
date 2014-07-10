@@ -27,6 +27,8 @@ Mobify.js is a JavaScript framework for adapting websites for tablet and mobile.
 Insert the Mobify.js tag **immediately** after the opening _<head>_ tag on the
 website you want to adapt:
 
+{% include paid_warning.html %}
+
     <script>
     (function(window, document, mjs) {
 
