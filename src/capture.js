@@ -339,6 +339,47 @@ Capture.setElementContentFromString = function(el, htmlString) {
     return captured;
 };
 
+Capture.ios8_0ScrollFix = function(htmlString) {
+    var IOS8_REGEX = /ip(hone|od|ad).*OS 8_0/i;
+    var BODY_REGEX = /<body(?:[^>'"]*|'[^']*?'|"[^"]*?")*>/i;
+
+    // This fix only applies to iOS 8.0
+    if (!IOS8_REGEX.test(window.navigator.userAgent)) {
+        return htmlString;
+    }
+
+    var openingBodyTag = BODY_REGEX.exec(htmlString);
+    // Do nothing if we can't find an opening `body` tag.
+    if (!openingBodyTag) {
+        return htmlString;
+    }
+    openingBodyTag = openingBodyTag[0];
+
+    // Use DOM methods to manipulate the attributes on the `body` tag. This
+    // lets us rely on the browser to set the `display: none` style.
+    var divEl = document.createElement('div');
+    
+    var openingBodyTagAsDiv = openingBodyTag.replace(/^<body/, '<div');
+    divEl.innerHTML = openingBodyTagAsDiv;
+
+    divEl.firstChild.style.display = 'none';
+
+    openingBodyTagAsDiv = divEl.innerHTML.replace(/<\/div>$/, '');
+    openingBodyTag = openingBodyTagAsDiv.replace(/^<div/, '<body');
+
+    var script =
+        "<script>" +
+        "  window.requestAnimationFrame(function() {" +
+        "    window.requestAnimationFrame(function() {" +
+        "      document.body.style.display = null;" +
+        "    });" +
+        "  });" +
+        "</script>";
+
+    htmlString = htmlString.replace(BODY_REGEX, openingBodyTag + script);
+    return htmlString;
+}
+
 /**
  * Grab the captured document and render it
  */
@@ -415,6 +456,8 @@ Capture.prototype.render = function(htmlString) {
     } else {
         enabledHTMLString = Capture.enable(htmlString, this.prefix);
     }
+
+    enabledHTMLString = Capture.ios8_0ScrollFix(enabledHTMLString);
 
     var doc = this.sourceDoc;
 
