@@ -311,61 +311,65 @@
                 '`x-test` body class tag is still present');
         });
 
-        asyncTest("iOS 8.0 scroll fix is applied when rendering", function() {
-            var opts = {
-                id: "ios-8_0-render-scroll-fix",
-                src: "/tests/fixtures/plaintext-display-none-body.html"
-            };
-            var $iframe = $("<iframe>", opts);
-            var el = $iframe[0];
+        // Ensure these tests done fail on browsers that don't have `requestAnimationFrame`,
+        // such as PhantomJS and Firefox 4.
+        if (window.requestAnimationFrame) {
+            asyncTest("iOS 8.0 scroll fix is applied when rendering", function() {
+                var opts = {
+                    id: "ios-8_0-render-scroll-fix",
+                    src: "/tests/fixtures/plaintext-display-none-body.html"
+                };
+                var $iframe = $("<iframe>", opts);
+                var el = $iframe[0];
 
-            $iframe.one('load', function onLoad() {
-                var self = this;
+                $iframe.one('load', function onLoad() {
+                    var self = this;
 
-                Capture.init(function(capture) {
-                    capture.render(null, {forceIOS8_0ScrollFix: true});
+                    Capture.init(function(capture) {
+                        capture.render(null, {forceIOS8_0ScrollFix: true});
 
-                    var iid = setInterval(function() {
-                        if (self.contentDocument.querySelectorAll('plaintext').length == 0 &&
-                                self.contentDocument.body.style.display == '') {
-                            ok(true, 'document was shown');
-                            clearInterval(iid);
-                            start();
-                        }
-                    }, 100);
-                }, this.contentDocument);
+                        var iid = setInterval(function() {
+                            if (self.contentDocument.querySelectorAll('plaintext').length == 0 &&
+                                    self.contentDocument.body.style.display == '') {
+                                ok(true, 'document was shown');
+                                clearInterval(iid);
+                                start();
+                            }
+                        }, 100);
+                    }, this.contentDocument);
+                });
+
+                $("#qunit-fixture").append($iframe);
             });
 
-            $("#qunit-fixture").append($iframe);
-        });
+           asyncTest("iOS 8.0 scroll fix is applied on restore", function(){
+                var opts = {
+                    id: "ios-8_0-restore-scroll-fix",
+                    src: "/tests/fixtures/plaintext-display-none-body.html"
+                };
+                var $iframe = $("<iframe>", opts);
+                var el = $iframe[0];
 
-       asyncTest("iOS 8.0 scroll fix is applied on restore", function(){
-            var opts = {
-                id: "ios-8_0-restore-scroll-fix",
-                src: "/tests/fixtures/plaintext-display-none-body.html"
-            };
-            var $iframe = $("<iframe>", opts);
-            var el = $iframe[0];
+                $iframe.one('load', function onLoad() {
+                    var self = this;
 
-            $iframe.one('load', function onLoad() {
-                var self = this;
+                    Capture.init(function(capture) {
+                        capture.restore(null, {forceIOS8_0ScrollFix: true});
 
-                Capture.init(function(capture) {
-                    capture.restore(null, {forceIOS8_0ScrollFix: true});
+                        var iid = setInterval(function() {
+                            if (self.contentDocument.querySelectorAll('plaintext').length == 0 &&
+                                    self.contentDocument.body.style.display == '') {
+                                ok(true, 'document was shown');
+                                clearInterval(iid);
+                                start();
+                            }
+                        }, 100);
+                    }, this.contentDocument);
+                });
 
-                    var iid = setInterval(function() {
-                        if (self.contentDocument.querySelectorAll('plaintext').length == 0 &&
-                                self.contentDocument.body.style.display == '') {
-                            ok(true, 'document was shown');
-                            clearInterval(iid);
-                            start();
-                        }
-                    }, 100);
-                }, this.contentDocument);
+                $("#qunit-fixture").append($iframe);
             });
-
-            $("#qunit-fixture").append($iframe);
-        });
+        }
 
         test("cloneAttributes", function(){
             var el = document.createElement("div");
