@@ -348,6 +348,10 @@ Capture.setElementContentFromString = function(el, htmlString) {
  * This patches HTML to hide the body until the first paint (and hopefully after
  * the initial viewport is calculated). By the time we show the body the new
  * viewport should have already taken effect.
+ *
+ * JIRA: https://mobify.atlassian.net/browse/GOLD-883
+ * Open Radar: http://www.openradar.me/radar?id=5516452639539200
+ * WebKit Bugzilla: https://bugs.webkit.org/show_bug.cgi?id=136904
  */
 Capture.ios8_0ScrollFix = function(htmlString) {
     var IOS8_REGEX = /ip(hone|od|ad).*OS 8_0/i;
