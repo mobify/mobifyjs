@@ -339,6 +339,12 @@ Capture.setElementContentFromString = function(el, htmlString) {
     return captured;
 };
 
+Capture.isIOS8_0 = function() {
+    var IOS8_REGEX = /ip(hone|od|ad).*OS 8_0/i;
+
+    return IOS8_REGEX.test(window.navigator.userAgent);
+};
+
 /**
  * iOS 8.0 has a bug where dynamically switching the viewport (by swapping the
  * viewport meta tag) causes the viewport to automatically scroll. When
@@ -354,13 +360,7 @@ Capture.setElementContentFromString = function(el, htmlString) {
  * WebKit Bugzilla: https://bugs.webkit.org/show_bug.cgi?id=136904
  */
 Capture.ios8_0ScrollFix = function(htmlString) {
-    var IOS8_REGEX = /ip(hone|od|ad).*OS 8_0/i;
     var BODY_REGEX = /<body(?:[^>'"]*|'[^']*?'|"[^"]*?")*>/i;
-
-    // This fix only applies to iOS 8.0
-    if (!IOS8_REGEX.test(window.navigator.userAgent)) {
-        return htmlString;
-    }
 
     var openingBodyTag = BODY_REGEX.exec(htmlString);
     // Do nothing if we can't find an opening `body` tag.
@@ -399,16 +399,24 @@ Capture.ios8_0ScrollFix = function(htmlString) {
         "<\/script>";
 
     return htmlString.replace(BODY_REGEX, openingBodyTag + script);
-}
+};
 
 /**
  * Grab the captured document and render it
  */
-Capture.prototype.restore = function(inject) {
+Capture.prototype.restore = function(inject, options) {
+    options = options || {};
     var self = this;
 
     Utils.waitForReady(document, function() {
-        self.render(self.all(inject));
+        var htmlString = self.all(inject);
+
+        // This fix only applies to iOS 8.0
+        if (options.forceIOS8_0ScrollFix || Capture.isIOS8_0()) {
+            htmlString = Capture.ios8_0ScrollFix(htmlString);
+        }
+
+        self.render(htmlString);
     });
 };
 
@@ -470,7 +478,9 @@ Capture.prototype.enabledHTMLString = Capture.prototype.escapedHTMLString = func
 /**
  * Rewrite the document with a new html string
  */
-Capture.prototype.render = function(htmlString) {
+Capture.prototype.render = function(htmlString, options) {
+    options = options || {};
+
     var enabledHTMLString;
     if (!htmlString) {
         enabledHTMLString = this.enabledHTMLString();
@@ -478,7 +488,10 @@ Capture.prototype.render = function(htmlString) {
         enabledHTMLString = Capture.enable(htmlString, this.prefix);
     }
 
-    enabledHTMLString = Capture.ios8_0ScrollFix(enabledHTMLString);
+    // This fix only applies to iOS 8.0
+    if (options.forceIOS8_0ScrollFix || Capture.isIOS8_0()) {
+        enabledHTMLString = Capture.ios8_0ScrollFix(enabledHTMLString);
+    }
 
     var doc = this.sourceDoc;
 

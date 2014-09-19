@@ -286,6 +286,87 @@
             $("#qunit-fixture").append($iframe);
         });
 
+        test("ios8_0ScrollFix", function() {
+            var html =
+                "<html>" +
+                "<head>" +
+                "  <title>Scroll Fix Test</title>" +
+                "</head>" +
+                "<body style='font-size: 13px' class='x-test'>" +
+                "  <ul>" +
+                "    <li>Woohoo</li>" +
+                "  </ul>" +
+                "</body>" +
+                "</html>";
+
+            html = Capture.ios8_0ScrollFix(html);
+            
+            ok(html.indexOf('font-size: 13px') !== -1,
+                '`font-size: 13px` on the body tag is still present');
+            ok(html.indexOf('display: none') !== -1,
+                '`display: none` was set on the body tag');
+            ok(html.indexOf('document.body.style.display = null;') !== -1,
+                'script that shows body was added');
+            ok(html.indexOf('x-test') !== -1,
+                '`x-test` body class tag is still present');
+        });
+
+        asyncTest("iOS 8.0 scroll fix is applied when rendering", function() {
+            var opts = {
+                id: "ios-8_0-render-scroll-fix",
+                src: "/tests/fixtures/plaintext-display-none-body.html"
+            };
+            var $iframe = $("<iframe>", opts);
+            var el = $iframe[0];
+
+            $iframe.one('load', function onLoad() {
+                var self = this;
+
+                Capture.init(function(capture) {
+                    capture.render(null, {forceIOS8_0ScrollFix: true});
+
+                    var iid = setInterval(function() {
+                        if (self.contentDocument.querySelectorAll('plaintext').length == 0 &&
+                                self.contentDocument.body.style.display == '') {
+                            ok(true, 'document was shown');
+                            clearInterval(iid);
+                            start();
+                        }
+                    }, 100);
+                }, this.contentDocument);
+            });
+
+            $("#qunit-fixture").append($iframe);
+        });
+
+       asyncTest("iOS 8.0 scroll fix is applied on restore", function(){
+            var opts = {
+                id: "ios-8_0-restore-scroll-fix",
+                src: "/tests/fixtures/plaintext-display-none-body.html"
+            };
+            var $iframe = $("<iframe>", opts);
+            var el = $iframe[0];
+
+            $iframe.one('load', function onLoad() {
+                var self = this;
+
+                Capture.init(function(capture) {
+                    capture.restore(null, {forceIOS8_0ScrollFix: true});
+
+                    var iid = setInterval(function() {
+                        if (self.contentDocument.querySelectorAll('plaintext').length == 0 &&
+                                self.contentDocument.body.style.display == '') {
+                            ok(true, 'document was shown');
+                            clearInterval(iid);
+                            start();
+                        }
+                    }, 100);
+                }, this.contentDocument);
+            });
+
+            $("#qunit-fixture").append($iframe);
+        });
+
         test("cloneAttributes", function(){
             var el = document.createElement("div");
             Capture.cloneAttributes("<div class=\"test1 test2\"></div>", el);
