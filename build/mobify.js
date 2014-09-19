@@ -1775,7 +1775,7 @@ Capture.ios8_0ScrollFix = function(htmlString) {
         "<script>" +
         "  window.requestAnimationFrame(function() {" +
         "    window.requestAnimationFrame(function() {" +
-        "      document.body.style.display = null;" +
+        "      document.body.style.display = '';" +
         "    });" +
         "  });" +
         "<\/script>";
