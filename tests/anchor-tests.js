@@ -1,27 +1,5 @@
-<!DOCTYPE html>
-<html class="foo">
-<head>
-  <meta charset="utf-8">
-  <title>Mobify.js Anchor Link Tests</title>
-  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
-  <script src="/tests/resources/qunit-1.10.0.js"></script>
-  <script src="/tests/resources/require.js"></script>
-  <script src="/tests/resources/jquery-1.7.1.js"></script>
-
-  <meta name="viewport" content="width=device-width, user-scalable=no">
-</head>
-<body>
-
-<div id="qunit"></div>
-
-<div id="qunit-fixture">
-</div>
-
-<script>
-    // http://api.qunitjs.com/QUnit.config/
-    QUnit.config.autostart = false;
-    QUnit.config.testTimeout = 30 * 1000;
-
+require(['mobifyjs/patchAnchorLinks'], function(patchAnchorLinks) {
+    module("Anchor");
     var skip = function() {
         // Test harness does not work on Android 4.0.x and less because
         // of an iframe scrolling bug. However, the functionality works
@@ -85,7 +63,7 @@
 
     var getScrollTop = function(win) {
         return typeof win.scrollY !== "undefined" ? win.scrollY : win.document.documentElement.scrollTop;
-    }
+    };
 
     asyncTest("Regular Anchor Tag to Element", function() {
         testSetup('test1', function(win, doc) {
@@ -168,31 +146,14 @@
             start();
         });
     });
-
-    /* unit tests run with async required module */
-    require.config({
-        baseUrl: "../",
-        paths: {
-            "jquery": "tests/resources/jquery-1.7.1.js",
-            "mobifyjs/utils": "../bower_components/mobifyjs-utils/utils"
-        }
+    test("Old Firefox UA detection", function() {
+        firefoxUAs = {
+            "3.6.9": "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.9) Gecko/20100915 Gentoo Firefox/3.6.9",
+            "25.0": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0",
+            "29.0": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:29.0) Gecko/20100101 Firefox/29.0"
+        };
+        ok(patchAnchorLinks._isOldFirefox(firefoxUAs["3.6.9"]), "firefox 3.6.9 is old");
+        ok(patchAnchorLinks._isOldFirefox(firefoxUAs["25.0"]), "firefox 25 is also old");
+        ok(!patchAnchorLinks._isOldFirefox(firefoxUAs["29.0"]), "firefox 29 is not old!");
     })
-    require(['src/patchAnchorLinks'], function(patchAnchorLinks) {
-        test("Old Firefox UA detection", function() {
-            firefoxUAs = {
-                "3.6.9": "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.9) Gecko/20100915 Gentoo Firefox/3.6.9",
-                "25.0": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0",
-                "29.0": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:29.0) Gecko/20100101 Firefox/29.0"
-            };
-            ok(patchAnchorLinks._isOldFirefox(firefoxUAs["3.6.9"]), "firefox 3.6.9 is old");
-            ok(patchAnchorLinks._isOldFirefox(firefoxUAs["25.0"]), "firefox 25 is also old");
-            ok(!patchAnchorLinks._isOldFirefox(firefoxUAs["29.0"]), "firefox 29 is not old!");
-        })
-
-        QUnit.start();
-    });
-
-
-</script>
-</body>
-</html>
+});

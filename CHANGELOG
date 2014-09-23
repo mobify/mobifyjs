@@ -1,3 +1,8 @@
+2.0.14
+    - Added patch to fix scrolling jank on iOS 8.0.
+    - Bumped the version of grunt-saucelabs and fixed tests to support the new
+      version.
+    - Fixed tests on Android 2.3.
 2.0.13
     - Update image resizer to 1.0.2, which contains changes to default
       cache time (from 2 months down to 8 hours).

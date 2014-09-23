@@ -1,28 +1,4 @@
-<!DOCTYPE html>
-<html class="foo">
-<head>
-  <meta charset="utf-8">
-  <title>Mobify.js Tag Tests</title>
-  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
-  <script src="/tests/resources/qunit-1.10.0.js"></script>
-  <script src="/tests/resources/jquery-1.7.1.js"></script>
-
-  <meta name="viewport" content="width=device-width, user-scalable=no">
-</head>
-<body>
-
-<div id="qunit"></div>
-
-<div id="qunit-fixture">
-</div>
-
-<script>
-    // http://api.qunitjs.com/QUnit.config/
-    QUnit.config.autostart = false;
-    QUnit.config.testTimeout = 30 * 1000;
-
-    QUnit.start();
-
+(function(){
     var skip = function() {
         return false;
     };
@@ -103,7 +79,7 @@
     };
 
 
-    module("Mobify Properties");
+    module("Tag: Mobify Properties");
 
     asyncTest("Mobify.points exists", function() {
         testSetup("/tests/fixtures/tag/no-run.html?tag=min", function(win, doc, event) {
@@ -138,7 +114,7 @@
         });
     });
 
-    module("Capturing");
+    module("Tag: Capturing");
 
     asyncTest("Always-Run: Capturing Fires", function() {
         testSetup("/tests/fixtures/tag/always-run.html?tag=min", function(win, doc, event) {
@@ -205,6 +181,7 @@
 
     asyncTest("Fires preload callback", function() {
         testSetup("/tests/fixtures/tag/preload.html?tag=min", function(win, doc, event) {
+            debugger;
             // All assertions are fired in the iframe.
             expect(2);
 
@@ -223,7 +200,7 @@
     });
 
     
-    module("Disable");
+    module("Tag: Disable");
 
     asyncTest("Capturing does not fire if disabled.", function() {
         testSetup("/tests/fixtures/tag/disabled.html?tag=min", function(win, doc, event) {
@@ -235,7 +212,7 @@
         });
     });
 
-    module("Preview");
+    module("Tag: Preview");
 
     asyncTest("Loads preview correctly", function() {
         testSetup("/tests/fixtures/tag/preview.html?tag=min#mobify-path=true", function(win, doc, event) {
@@ -256,7 +233,7 @@
         });
     });
 
-    module("Time Tracking");
+    module("Tag: Time Tracking");
     asyncTest("Time tracking happens when capturing.", function() {
         testSetup("/tests/fixtures/tag/always-run.html?tag=min", function(win, doc, event) {
             ok(win.Mobify.Tag.DOMContentLoaded > 0, "DOMContentLoaded Time is recorded.");
@@ -275,7 +252,7 @@
         });
     });
 
-    module("Compatiblity");
+    module("Tag: Compatiblity");
     asyncTest("Projects 1.0", function() {
         // This test only runs on supported browsers, but not Opera or IE for 1.0.
         if (/trident|opera|firefox/i.test(window.navigator.userAgent)) {
@@ -325,8 +302,4 @@
             start();
         });
     });
-
-
-</script>
-</body>
-</html>
+})();
