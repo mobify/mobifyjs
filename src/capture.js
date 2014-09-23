@@ -290,7 +290,9 @@ Capture.setElementContentFromString = function(el, htmlString) {
 
     // Consume comments without grouping to avoid catching
     // <body> inside a comment, common with IE conditional comments.
-    var bodySnatcher = /<!--(?:[\s\S]*?)-->|(<\/head\s*>|<body[\s\S]*$)/gi;
+    // (using a "new RegExp" here because in Android 2.3 when you use a global
+    // match using a RegExp literal, the state is incorrectly cached).
+    var bodySnatcher = new RegExp('<!--(?:[\\s\\S]*?)-->|(<\\/head\\s*>|<body[\\s\\S]*$)', 'gi');
 
     //Fallback for absence of </head> and <body>
     var rawHTML = captured.bodyContent = captured.headContent + captured.bodyContent;
@@ -304,8 +306,6 @@ Capture.setElementContentFromString = function(el, htmlString) {
         // Grab the contents of head
         captured.headContent = rawHTML.slice(0, match.index);
         // Parse the head content
-        // (using a "new RegExp" here because in Android 2.3 when you use a global
-        // match using a RegExp literal, the state is incorrectly cached).
         var parsedHeadTag = (new RegExp('^[\\s\\S]*(<head(?:[^>\'"]*|\'[^\']*?\'|"[^"]*?")*>)([\\s\\S]*)$')).exec(captured.headContent);
         if (parsedHeadTag) {
             // if headContent contains an open head, then we know the tag was placed
