@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html class="foo">
+<head>
+  <meta charset="utf-8">
+  <title>mobify.js tests</title>
+  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
+  <script src="/tests/resources/qunit-1.10.0.js"></script>
+  <script src="/tests/resources/require.js"></script>
+  <script src="/tests/resources/jquery-1.7.1.js"></script>
+  <script src="/tests/utils/compare-html.js"></script>
+
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+</head>
+<body>
+
+  <div id="qunit"></div>
+  <div id="qunit-fixture">
+
+    <textarea id="disable-test-fixture">
+        <html>
+        <head>
+            <link href="/path/to/stylesheet.css">
+            <style media="query"></style>
+        </head>
+        <body>
+            <img src="/path/to/image.png"></img>
+            <iframe src="/path/to/page.html"></iframe>
+        </body>
+        </html>
+    </textarea>
+
+    <textarea id="enable-test-fixture">
+        <html>
+        <head>
+            <link x-href="/path/to/stylesheet.css">
+            <style x-media="query"></style>
+        </head>
+        <body>
+            <img x-src="/path/to/image.png"></img>
+            <iframe x-src="/path/to/page.html"></iframe>
+        </body>
+        </html>
+    </textarea>
+
+    <div id="foo-element" foo="bar"></div>
+
+    <div id="foo-element" foo="bar"></div>
+
+    <div id="disabled-stylesheet-link">
+        <link rel="stylesheet" x-href="/foo.css">
+    </div>
+  </div>
+
+<script>
+    // http://api.qunitjs.com/QUnit.config/
+    QUnit.config.autostart = false;
+    QUnit.config.testTimeout = 30 * 1000;
+
+    var removeNewlines = function(str) {
+        return str.replace(/(\r\n|\n|\r)/gm,'');
+    };
+
+    var log = [];
+    var testName;
+
+    QUnit.done(function (test_results) {
+      var tests = [];
+      for(var i = 0, len = log.length; i < len; i++) {
+        var details = log[i];
+        tests.push({
+          name: details.name,
+          result: details.result,
+          expected: details.expected,
+          actual: details.actual,
+          source: details.source
+        });
+      }
+      test_results.tests = tests;
+
+      window.global_test_results = test_results;
+    });
+    QUnit.testStart(function(testDetails){
+      QUnit.log(function(details){
+        if (!details.result) {
+          details.name = testDetails.name;
+          log.push(details);
+        }
+      });
+    });
+
+    require.config({
+        "baseUrl": "../src",
+        "paths": {
+            "mobifyjs": "../src",
+            "mobifyjs/utils": "../bower_components/mobifyjs-utils/utils"
+        }
+    });
+    
+</script>
+  <script src="capture-tests.js"></script>
+  <script src="unblockify-tests.js"></script>
+  <script src="cssOptimize-tests.js"></script>
+  <script src="anchor-tests.js"></script>
+
+  <script src="/tag/supportedBrowser.js"></script>
+  <script src="supportedBrowser-tests.js"></script>
+  <script src="tag-tests.js"></script>
+</body>
+</html>

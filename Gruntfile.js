@@ -1,6 +1,7 @@
 // http://stackoverflow.com/questions/13567312/working-project-structure-that-uses-grunt-js-to-combine-javascript-files-using-r
 var fs = require("fs");
 var path = require('path');
+var request = require('request');
 
 var LONG_CACHE_CONTROL = "public,max-age=31536000, s-maxage=900"; // one year
 var SHORT_CACHE_CONTROL = "public,max-age=300"; // five minutes
@@ -20,13 +21,7 @@ module.exports = function(grunt) {
               options: {
                 timeout: 20000,
                 urls: [
-                  'http://localhost:3000/tests/capture.html',
-                  'http://localhost:3000/tests/unblockify.html',
-                  'http://localhost:3000/tests/cssOptimize.html',
-                  'http://localhost:3000/tests/anchor-test.html',
-                  'http://localhost:3000/tests/supported-browser.html',
-                  'http://localhost:3000/tests/tag.html',
-                  'http://localhost:3000/tests/tag-integration-tests.html',
+                  'http://localhost:3000/tests/index.html',
                   'http://localhost:3000/tests/tag-old-browser.html',
                 ]
               }
@@ -97,16 +92,11 @@ module.exports = function(grunt) {
         'saucelabs-qunit': {
             all: {
                 options: {
+                    // SJ: The following have been commented out
                     urls: [
-                        'http://localhost:3000/tests/capture.html',
-                        'http://localhost:3000/tests/unblockify.html',
-                        'http://localhost:3000/tests/cssOptimize.html',
-                        'http://localhost:3000/tests/anchor-test.html',
-                        'http://localhost:3000/tests/supported-browser.html',
-                        'http://localhost:3000/tests/tag.html',
-                        'http://localhost:3000/tests/tag-integration-tests.html',
+                        'http://localhost:3000/tests/index.html',
                     ],
-                    concurrency: 16,
+                    throttled: 16,
                     tunneled: true,
                     detailedError: true,
                     browsers: [ //https://saucelabs.com/docs/platforms
@@ -187,17 +177,35 @@ module.exports = function(grunt) {
                             version: '4'
                         }
                     ], // https://saucelabs.com/docs/browsers
-                    onTestComplete: function(){
-                        // Called after a qunit unit is done, per page, per browser
-                        // Return true or false, passes or fails the test
-                        // Returning undefined does not alter the test result
+                    onTestComplete: function(result, callback){
+                        // Called after a unit test is done, per page, per browser
+                        // 'result' param is the object returned by the test framework's reporter
+                        // 'callback' is a Node.js style callback function. You must invoke it after you
+                        // finish your work.
+                        // Pass a non-null value as the callback's first parameter if you want to throw an
+                        // exception. If your function is synchronous you can also throw exceptions
+                        // directly.
+                        // Passing true or false as the callback's second parameter passes or fails the
+                        // test. Passing undefined does not alter the test result. Please note that this
+                        // only affects the grunt task's result. You have to explicitly update the Sauce
+                        // Labs job's status via its REST API, if you want so.
 
-                        // For async return, call
-                        var done = this.async();
-                        setTimeout(function(){
-                            // Return to this test after 1000 milliseconds
-                            done(/*true or false changes the test result, undefined does not alter the result*/);
-                        }, 1000);
+                        // The example below negates the result, and also updates the Sauce Labs job's status
+                        var user = process.env.SAUCE_USERNAME;
+                        var pass = process.env.SAUCE_ACCESS_KEY;
+                        request.put({
+                            url: ['https://saucelabs.com/rest/v1', user, 'jobs', result.job_id].join('/'),
+                            auth: { user: user, pass: pass },
+                            json: { passed: !result.passed }
+                        }, function (error, response, body) {
+                          if (error) {
+                            callback(error);
+                          } else if (response.statusCode !== 200) {
+                            callback(new Error('Unexpected response status'));
+                          } else {
+                            callback(null, !result.passed);
+                          }
+                        });
                     }
                 }
             },
@@ -419,7 +427,7 @@ module.exports = function(grunt) {
     grunt.registerTask('deploy', ['build', 's3:devBuild', 's3:prodBuild', 's3:examples']);
     grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging', 's3:wwwstagingstatic']);
     grunt.registerTask('wwwproddeploy', ['jekyll:build', 's3:wwwprod', 's3:wwwprodstatic']);
-    grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit']);
+    grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit:all']);
     grunt.registerTask('serve', ['build', 'express', 'watch']);
     grunt.registerTask('preview', 'serve'); // alias to serve
 };

@@ -1,62 +1,7 @@
-<!DOCTYPE html>
-<html class="foo">
-<head>
-  <meta charset="utf-8">
-  <title>capture.js tests</title>
-  <link rel="stylesheet" href="/tests/resources/qunit-1.10.0.css">
-  <script src="/tests/resources/qunit-1.10.0.js"></script>
-  <script src="/tests/resources/require.js"></script>
-  <script src="/tests/resources/jquery-1.7.1.js"></script>
-  <script src="/tests/utils/compare-html.js"></script>
-</head>
-<body>
-    <div id="qunit"></div>
-    <div id="qunit-fixture">
-
-        <textarea id="disable-test-fixture">
-            <html>
-            <head>
-                <link href="/path/to/stylesheet.css">
-                <style media="query"></style>
-            </head>
-            <body>
-                <img src="/path/to/image.png"></img>
-                <iframe src="/path/to/page.html"></iframe>
-            </body>
-            </html>
-        </textarea>
-
-        <textarea id="enable-test-fixture">
-            <html>
-            <head>
-                <link x-href="/path/to/stylesheet.css">
-                <style x-media="query"></style>
-            </head>
-            <body>
-                <img x-src="/path/to/image.png"></img>
-                <iframe x-src="/path/to/page.html"></iframe>
-            </body>
-            </html>
-        </textarea>
-
-        <div id="foo-element" foo="bar"></div>
-    </div>
-
-    <script>
-// http://api.qunitjs.com/QUnit.config/
-QUnit.config.autostart = false;
-QUnit.config.testTimeout = 30 * 1000;
-
-require.config({
-    "baseUrl": "../src",
-    "paths": {
-        "mobifyjs": "../src",
-        "mobifyjs/utils": "../bower_components/mobifyjs-utils/utils"
-    }
-});
-
 require(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
     QUnit.start();
+
+    module('Capturing');
 
     // Test disabling attributes that cause resource loading
     test("disable", function() {
@@ -523,6 +468,3 @@ require(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         $("#qunit-fixture").append($iframe);
     });
 });
-    </script>
-</body>
-</html>
