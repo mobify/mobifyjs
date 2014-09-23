@@ -168,7 +168,7 @@
 
             // I don't fit in `localStorage` in Chrome or Safari...
             // But I do seem to fit in FF.
-          , LONG_STRING = Array(5000000).join('1')
+          , LONG_STRING = Array(8000000).join('1')
 
           // One or two will fit in local storage, but not several
           , MEDIUM_STRING = Array(2000000).join('1')
@@ -432,33 +432,33 @@
             }, 0);
         });
 
-            // regression test to ensure Jazzcat evicts more than one itme 
-            // properly when there is too much to store
-            asyncTest('httpCache - Evict until small enough', 2, function() {
-                httpCache.reset();
-                httpCache.save(function(){
-                    for (var i=0; i < 5; i++) {
-                        httpCache.set('val' + i, {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: MEDIUM_STRING});
-                        if (i !== 0) {
-                            httpCache.get('val' + i, true);
-                        }
+        // regression test to ensure Jazzcat evicts more than one itme 
+        // properly when there is too much to store
+        asyncTest('httpCache - Evict until small enough', 2, function() {
+            httpCache.reset();
+            httpCache.save(function(){
+                for (var i=0; i < 5; i++) {
+                    httpCache.set('val' + i, {'headers': {'expires': UTC_TWO_WEEKS_FROM_NOW}, body: MEDIUM_STRING});
+                    if (i !== 0) {
+                        httpCache.get('val' + i, true);
                     }
+                }
 
-                    httpCache.save(function(err) {
+                httpCache.save(function(err) {
 
-                        httpCache.reset();
-                        httpCache.load();
+                    httpCache.reset();
+                    httpCache.load();
 
-                        ok(!httpCache.get('val0'), 'val0 was evicted')
-                        ok(!!httpCache.get('val1'), '`val1` was cached');
+                    ok(!httpCache.get('val0'), 'val0 was evicted')
+                    ok(!!httpCache.get('val1'), '`val1` was cached');
 
-                        httpCache.reset();
-                        httpCache.save();
+                    httpCache.reset();
+                    httpCache.save();
 
-                        start();
-                    });
+                    start();
                 });
             });
+        });
 
         test('httpCache.utils.isStale', 12, function() {
             var isStale = httpCache.utils.isStale
@@ -554,6 +554,32 @@
 
         });
 
+        module('util');
+
+        test("Mobify.ios8_0ScrollFix", function() {
+            var html =
+                "<html>" +
+                "<head>" +
+                "  <title>Scroll Fix Test</title>" +
+                "</head>" +
+                "<body style='font-size: 13px' class='x-test'>" +
+                "  <ul>" +
+                "    <li>Woohoo</li>" +
+                "  </ul>" +
+                "</body>" +
+                "</html>";
+
+            html = Mobify.ios8_0ScrollFix(html);
+            
+            ok(html.indexOf('font-size: 13px') !== -1,
+                '`font-size: 13px` on the body tag is still present');
+            ok(html.indexOf('display: none') !== -1,
+                '`display: none` was set on the body tag');
+            ok(html.indexOf("document.body.style.display = '';") !== -1,
+                'there is a script to show the body');
+            ok(html.indexOf('x-test') !== -1,
+                '`x-test` body class tag is still present');
+        });
 
         module('resizeImages');
 
@@ -637,14 +663,12 @@
             }
         });
 
-
         module('enhance');
 
         test('Mobify.enhance', function() {
             Mobify.enhance();
             ok(1);
         });
-
 
         module('externals')
 
@@ -819,7 +843,7 @@
               "passing the empty object to urlmatch makes it return false");
             equal(urlmatch("/a/b/c")(5), false,
               "passing a number to urlmatch makes it return false");
-        }); //test
+        });
 
         // test('Mobify.html.extractHTML', function() {
         //     var doc = createDocument()
