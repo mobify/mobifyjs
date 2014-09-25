@@ -210,7 +210,9 @@ var disableTag = function() {
             '; expires=' + now.toGMTString() +
             '; path=/';
 
-    // Reload the page (location.reload has problems in FF)
+    // Reload the page to get out of broken state due to
+    // plaintext tag. Note: this works in Firefox because
+    // we haven't ran capturing / done a document.open yet.
     window.location.reload();
 };
 Private['disableTag'] = disableTag;
