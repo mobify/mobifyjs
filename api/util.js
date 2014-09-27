@@ -40,18 +40,15 @@ Mobify.isIOS8_0 = function() {
  * capturing, the initial document never has an active meta viewport tag.
  * Then, the rendered document injects one causing the aforementioned scroll.
  *
- * This patches HTML to hide the body until the first paint (and hopefully after
- * the initial viewport is calculated). By the time we show the body the new
- * viewport should have already taken effect.
+ * Create a meta viewport tag that we inject into the page to force the
+ * page to scroll before anything is rendered in the page
+ * (this code should be called before document.open!)
  *
  * JIRA: https://mobify.atlassian.net/browse/GOLD-883
  * Open Radar: http://www.openradar.me/radar?id=5516452639539200
  * WebKit Bugzilla: https://bugs.webkit.org/show_bug.cgi?id=136904
  */
 Mobify.ios8_0ScrollFix = function(doc) {
-    // Create a meta viewport tag that we inject into the page to force the
-    // page to scroll before anything is rendered in the page
-    // (this code should be called before document.open!)
     var meta = document.createElement('meta');
     meta.setAttribute('name', 'viewport');
     meta.setAttribute('content', 'width=device-width');
