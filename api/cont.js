@@ -231,11 +231,6 @@
 
                 if (args.length == 1) data = cont.all();
                 dust.render(template, base.push(data), function(err, out) {
-                    // Apply scroll fix to iOS 8.0
-                    if (out && Mobify.isIOS8_0()) {
-                        out = Mobify.ios8_0ScrollFix(out);
-                    }
-
                     if (err) {
                         async.finish(out);
                         Mobify.console.die(err);

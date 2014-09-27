@@ -48,46 +48,17 @@ Mobify.isIOS8_0 = function() {
  * Open Radar: http://www.openradar.me/radar?id=5516452639539200
  * WebKit Bugzilla: https://bugs.webkit.org/show_bug.cgi?id=136904
  */
-Mobify.ios8_0ScrollFix = function(htmlString) {
-    var BODY_REGEX = /<body(?:[^>'"]*|'[^']*?'|"[^"]*?")*>/i;
-
-    var openingBodyTag = BODY_REGEX.exec(htmlString);
-    // Do nothing if we can't find an opening `body` tag.
-    if (!openingBodyTag) {
-        return htmlString;
-    }
-    openingBodyTag = openingBodyTag[0];
-
-    // Use DOM methods to manipulate the attributes on the `body` tag. This
-    // lets us rely on the browser to set body's style to `display: none`.
-    // We create a containing element to be able to set an inner HTML string.
-    var divEl = document.createElement('div');
-    
-    // The `div`'s inner string can't be a `body` tag, so we temporarily change
-    // it to a `div`..
-    var openingBodyTagAsDiv = openingBodyTag.replace(/^<body/, '<div');
-    divEl.innerHTML = openingBodyTagAsDiv;
-
-    // ..so that we can set it to be hidden..
-    divEl.firstChild.style.display = 'none';
-
-    // ..and change it back to a `body` string!
-    openingBodyTagAsDiv = divEl.innerHTML.replace(/<\/div>$/, '');
-    openingBodyTag = openingBodyTagAsDiv.replace(/^<div/, '<body');
-
-    // Append the script to show the body after two paints. This needs to be
-    // inside the body to ensure that `document.body` is available when it
-    // executes.
-    var script =
-        "<script>" +
-        "  window.requestAnimationFrame(function() {" +
-        "    window.requestAnimationFrame(function() {" +
-        "      document.body.style.display = '';" +
-        "    });" +
-        "  });" +
-        "<\/script>";
-
-    return htmlString.replace(BODY_REGEX, openingBodyTag + script);
+Mobify.ios8_0ScrollFix = function(doc) {
+    // Create a meta viewport tag that we inject into the page to force the
+    // page to scroll before anything is rendered in the page
+    // (this code should be called before document.open!)
+    var meta = document.createElement('meta');
+    meta.setAttribute('name', 'viewport');
+    meta.setAttribute('content', 'width=device-width');
+    // Using `getElementsByTagName` here because grabbing head using
+    // document.head will throw exceptions in some older browsers
+    // (iOS 4.3).
+    doc.getElementsByTagName('head')[0].appendChild(meta);
 };
 
 })(Mobify.$, Mobify);
