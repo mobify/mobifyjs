@@ -48,7 +48,7 @@ Mobify.isIOS8_0 = function() {
  * Open Radar: http://www.openradar.me/radar?id=5516452639539200
  * WebKit Bugzilla: https://bugs.webkit.org/show_bug.cgi?id=136904
  */
-Mobify.ios8_0ScrollFix = function(doc) {
+Mobify.ios8_0ScrollFix = function(doc, callback) {
     var meta = document.createElement('meta');
     meta.setAttribute('name', 'viewport');
     meta.setAttribute('content', 'width=device-width');
@@ -56,6 +56,13 @@ Mobify.ios8_0ScrollFix = function(doc) {
     // document.head will throw exceptions in some older browsers
     // (iOS 4.3).
     doc.getElementsByTagName('head')[0].appendChild(meta);
+
+    if (callback) {
+        // Wait two paints for the meta tag to take effect.
+        window.requestAnimationFrame(function() {
+            window.requestAnimationFrame(callback);
+        });
+    }
 };
 
 })(Mobify.$, Mobify);

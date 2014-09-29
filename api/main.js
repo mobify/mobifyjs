@@ -107,13 +107,8 @@ $.extend(Mobify.transform, {
         };
 
         if (Mobify.isIOS8_0()){
-            // See `utils.js` for more information about this fix.
-            Mobify.ios8_0ScrollFix(document);
-            window.requestAnimationFrame(function(){
-                window.requestAnimationFrame(function(){
-                    write();
-                })
-            })
+            // See `util.js` for more information about this fix.
+            Mobify.ios8_0ScrollFix(document, write);
         } else {
             write();
         }
