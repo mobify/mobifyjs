@@ -191,25 +191,35 @@ the browser behave as if the templated HTML was the regular source.
             return Mobify.unmobify();
         }
 
-        // `document.open` clears events bound to `document`.
-        document.open();
+        var write = function(markup) {
+            // `document.open` clears events bound to `document`.
+            document.open();
 
-        // On `DOMContentLoaded` of the new `document`, fire the ready event on our
-        // jQuery. (the `DOMContentLoaded` it binds to fires early)
-        document.addEventListener('DOMContentLoaded', function DOMContentLoaded() {
-            document.removeEventListener('DOMContentLoaded', DOMContentLoaded, false);            
-            $.holdReady(false);
-        }, false);
+            // On `DOMContentLoaded` of the new `document`, fire the ready event on our
+            // jQuery. (the `DOMContentLoaded` it binds to fires early)
+            document.addEventListener('DOMContentLoaded', function DOMContentLoaded() {
+                document.removeEventListener('DOMContentLoaded', DOMContentLoaded, false);            
+                $.holdReady(false);
+            }, false);
 
-        // In Webkit, `document.write` immediately executes inline scripts 
-        // not preceded by an external resource.
-        document.write(markup);
-        timing.addPoint('Wrote Document');
+            // In Webkit, `document.write` immediately executes inline scripts 
+            // not preceded by an external resource.
+            document.write(markup);
+            timing.addPoint('Wrote Document');
 
-        Mobify.postDocWrite();
+            Mobify.postDocWrite();
 
-        // Positioning this after the last `document.write`.
-        document.close();
+            // Positioning this after the last `document.write`.
+            document.close();
+        };
+
+        if (Mobify.isIOS8_0()){
+            // See `util.js` for more information about this fix.
+            Mobify.ios8_0ScrollFix(document, write);
+        } else {
+            write();
+        }
+
         if (Mobify.studioJS) {
             Mobify.studioJS.get('renderHTML', function(markup) {
                 oldEmitMarkup(markup);
