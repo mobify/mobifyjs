@@ -566,9 +566,9 @@
 
                 ok(true,
                     'meta tag is appended');
-                ok(meta.getAttribute('name'), 'viewport',
+                equal(meta.getAttribute('name'), 'viewport',
                     'meta name is viewport');
-                ok(meta.getAttribute('content'), 'width=device-width',
+                equal(meta.getAttribute('content'), 'width=device-width',
                     'content is width=device-width');
 
                 start();
