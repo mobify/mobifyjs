@@ -115,10 +115,17 @@
         head.appendChild(meta);
 
         if (callback) {
-            // Wait two paints for the meta tag to take effect.
-            window.requestAnimationFrame(function() {
-                window.requestAnimationFrame(callback);
-            });
+            // Wait two paints for the meta viewport tag to take effect. This is
+            // required for this fix to work, but guard against it being undefined
+            // anyway just in case.
+            if (window.requestAnimationFrame) {
+                window.requestAnimationFrame(function() {
+                    window.requestAnimationFrame(callback);
+                });
+            }
+            else {
+                callback();
+            }
         }
     };
 

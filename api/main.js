@@ -211,6 +211,15 @@ the browser behave as if the templated HTML was the regular source.
 
             // Positioning this after the last `document.write`.
             document.close();
+
+            if (Mobify.studioJS) {
+                Mobify.studioJS.get('renderHTML', function(markup) {
+                    oldEmitMarkup(markup);
+                });
+            }
+
+            // Bind `orientationchange` listener and add `html` classes.
+            Mobify.enhance();
         };
 
         if (Mobify.isIOS8_0()){
@@ -219,16 +228,6 @@ the browser behave as if the templated HTML was the regular source.
         } else {
             write();
         }
-
-        if (Mobify.studioJS) {
-            Mobify.studioJS.get('renderHTML', function(markup) {
-                oldEmitMarkup(markup);
-            });
-        }
-
-        // Bind `orientationchange` listener and add `html` classes.
-        Mobify.enhance();
-
     };
     var oldEmitMarkup;
     if (Mobify.studioJS) {

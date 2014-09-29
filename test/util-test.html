@@ -251,7 +251,24 @@ test('$.fn.resizeImages speed', function() {
     
 });
 
+test("Mobify.ios8_0ScrollFix", function() {
+    var html = document.createElement('html');
+    var head = document.createElement('head');
+    html.appendChild(head);
 
+    Mobify.ios8_0ScrollFix(html, function() {
+        var meta = html.getElementsByTagName('meta')[0]
+
+        ok(true,
+            'meta tag is appended');
+        equal(meta.getAttribute('name'), 'viewport',
+            'meta name is viewport');
+        equal(meta.getAttribute('content'), 'width=device-width',
+            'content is width=device-width');
+
+        start();
+    });
+});
 
     </script>
 <body>
