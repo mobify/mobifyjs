@@ -311,7 +311,7 @@ var tagVersion = parseInt(Mobify.tagVersion && Mobify.tagVersion[0] || Mobify.co
             // If used as part of the API, content will be ready, otherwise find it.
           , headMarkup = Mobify.headMarkup
           , bodyMarkup = Mobify.bodyMarkup
-          , bodyOpenTag = openTag(bodyEl)
+          , bodyOpenTag = Mobify.bodyOpenTagMarkup || openTag(bodyEl)
           , rawMarkup;
 
         if (!Mobify.headMarkup && !Mobify.bodyMarkup) {
