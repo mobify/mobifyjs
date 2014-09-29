@@ -42,54 +42,42 @@ Mobify.isIOS8_0 = function() {
  * capturing, the initial document never has an active meta viewport tag.
  * Then, the rendered document injects one causing the aforementioned scroll.
  *
- * This patches HTML to hide the body until the first paint (and hopefully after
- * the initial viewport is calculated). By the time we show the body the new
- * viewport should have already taken effect.
+ * Create a meta viewport tag that we inject into the page to force the page to
+ * scroll before anything is rendered in the page (this code should be called
+ * before document.open!)
  *
  * JIRA: https://mobify.atlassian.net/browse/GOLD-883
  * Open Radar: http://www.openradar.me/radar?id=5516452639539200
  * WebKit Bugzilla: https://bugs.webkit.org/show_bug.cgi?id=136904
  */
-Mobify.ios8_0ScrollFix = function(htmlString) {
-    var BODY_REGEX = /<body(?:[^>'"]*|'[^']*?'|"[^"]*?")*>/i;
-
-    var openingBodyTag = BODY_REGEX.exec(htmlString);
-    // Do nothing if we can't find an opening `body` tag.
-    if (!openingBodyTag) {
-        return htmlString;
+Mobify.ios8_0ScrollFix = function(doc, callback) {
+    // Using `getElementsByTagName` here because grabbing head using
+    // `document.head` will throw exceptions in some older browsers (iOS 4.3).
+    var head = doc.getElementsByTagName('head');
+    // Be extra safe and guard against `head` not existing.
+    if (!head.length) {
+        return;
     }
-    openingBodyTag = openingBodyTag[0];
+    var head = head[0];
 
-    // Use DOM methods to manipulate the attributes on the `body` tag. This
-    // lets us rely on the browser to set body's style to `display: none`.
-    // We create a containing element to be able to set an inner HTML string.
-    var divEl = document.createElement('div');
-    
-    // The `div`'s inner string can't be a `body` tag, so we temporarily change
-    // it to a `div`..
-    var openingBodyTagAsDiv = openingBodyTag.replace(/^<body/, '<div');
-    divEl.innerHTML = openingBodyTagAsDiv;
+    var meta = document.createElement('meta');
+    meta.setAttribute('name', 'viewport');
+    meta.setAttribute('content', 'width=device-width');
+    head.appendChild(meta);
 
-    // ..so that we can set it to be hidden..
-    divEl.firstChild.style.display = 'none';
-
-    // ..and change it back to a `body` string!
-    openingBodyTagAsDiv = divEl.innerHTML.replace(/<\/div>$/, '');
-    openingBodyTag = openingBodyTagAsDiv.replace(/^<div/, '<body');
-
-    // Append the script to show the body after two paints. This needs to be
-    // inside the body to ensure that `document.body` is available when it
-    // executes.
-    var script =
-        "<script>" +
-        "  window.requestAnimationFrame(function() {" +
-        "    window.requestAnimationFrame(function() {" +
-        "      document.body.style.display = '';" +
-        "    });" +
-        "  });" +
-        "<\/script>";
-
-    return htmlString.replace(BODY_REGEX, openingBodyTag + script);
+    if (callback) {
+        // Wait two paints for the meta viewport tag to take effect. This is
+        // required for this fix to work, but guard against it being undefined
+        // anyway just in case.
+        if (window.requestAnimationFrame) {
+            window.requestAnimationFrame(function() {
+                window.requestAnimationFrame(callback);
+            });
+        }
+        else {
+            callback();
+        }
+    }
 };
 
 })(Mobify.$, Mobify);
