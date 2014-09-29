@@ -1,3 +1,7 @@
+2.0.15
+    - The previous iOS 8.0 scroll fix was causing some incompatibilities with
+      certain websites. Introduces a new fix that should work in all
+      circumstances.
 2.0.14
     - Added patch to fix scrolling jank on iOS 8.0.
     - Bumped the version of grunt-saucelabs and fixed tests to support the new
