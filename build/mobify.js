@@ -1728,6 +1728,27 @@ Capture.isIOS8_0 = function() {
 };
 
 /**
+ * This is a feature detection function to determine if you
+ * can construct body using innerHTML. In iOS8, setting
+ * innerHTML on body seems to break if you have forms.
+ * If you have forms in the page which are siblings,
+ * the second sibling ends up becoming a child element
+ * of the first sibling.
+ */
+Capture.isSetBodyInnerHTMLBroken = function(){
+    var doc = document.implementation.createHTMLDocument("");
+    var bodyEl = doc.documentElement.lastChild;
+    if (!bodyEl) {
+        return false;
+    }
+    bodyEl.innerHTML = '<form></form><form></form>';
+    if (bodyEl.childNodes && bodyEl.childNodes.length === 1) {
+        return true;
+    }
+    return false;
+};
+
+/**
  * iOS 8.0 has a bug where dynamically switching the viewport (by swapping the
  * viewport meta tag) causes the viewport to automatically scroll. When
  * capturing, the initial document never has an active meta viewport tag.
@@ -1788,7 +1809,7 @@ Capture.prototype.restore = function(inject) {
  */
 Capture.prototype.createDocumentFragments = function() {
     var docFrags = {};
-    var doc = docFrags.capturedDoc = document.implementation.createHTMLDocument("")
+    var doc = docFrags.capturedDoc = document.implementation.createHTMLDocument("");
     var htmlEl = docFrags.htmlEl = doc.documentElement;
     var headEl = docFrags.headEl = htmlEl.firstChild;
     var bodyEl = docFrags.bodyEl = htmlEl.lastChild;
@@ -1798,8 +1819,15 @@ Capture.prototype.createDocumentFragments = function() {
     Capture.cloneAttributes(this.headOpenTag, headEl);
     Capture.cloneAttributes(this.bodyOpenTag, bodyEl);
 
-    // Set innerHTML of new source DOM body
-    bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
+    var disabledBodyContent = Capture.disable(this.bodyContent, this.prefix);
+    // Set innerHTML on body (if the browser is capable of doing so).
+    // If not, set innerHTML on a div and copy children elements into body.
+    if (!Capture.isSetBodyInnerHTMLBroken()) {
+        // Set innerHTML of new source DOM body
+        bodyEl.innerHTML = disabledBodyContent;
+    } else {
+        Capture.setElementContentFromString(bodyEl, disabledBodyContent);
+    }
 
     // In Safari 4/5 and iOS 4.3, there are certain scenarios where elements
     // in the body (ex "meta" in "noscripts" tags) get moved into the head,
