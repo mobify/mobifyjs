@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/test/qunit/qunit.css">
+    <script src="/test/qunit/qunit.js"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="/lib/underscore.js"></script>
+    <script>
+        // externals.js dependencies:
+        //   - jquery
+        //   - underscore
+        //   - Mobify.(config.tagVersion|_|$|timing.addPoint)
+        //   - jquery.mapattributes.js
+        //   - unmobify
+
+        // Fake out the tag.
+        Mobify = {
+            config: {tagVersion: '7.0.0'},
+            _: _,
+            $: $,
+            timing: {addPoint: function(){}}
+        }
+    </script>
+    <script src="/lib/jquery/jquery.mapattributes.js"></script>
+    <script src="/api/externals.js"></script>
+    <script src="/unmobify.js"></script>
+    <script src="/api/data2.js"></script>
+    <script src="/api/stack.js"></script>
+    <script src="/api/cont.js"></script>
+</head>
+<body>
+    <!-- 
+    Usage:
+    # Run test-server for checkout folder.
+    $ node test/test-server.js
+    # Navigate to this page:
+    $ http://127.0.0.1:8001/test/context-test.html
+    -->
+    <h1 id="qunit-header">QUnit Test Suite</h1>
+    <h2 id="qunit-banner"></h2>
+    <div id="qunit-testrunner-toolbar"></div>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+
+    <script>
+        // There is a bug on iOS 8.0 where:
+        //     `body`.innerHTML = '<form></form><form></form>';
+        // produces the following elements:
+        //     `<form><form></form></form>`
+        //
+        // This test ensures that capturing works as expected.
+        //
+        asyncTest('Mobify.html.extractDOM correctly extracts document with two sibbling forms', function() {
+            var $iframe = $('<iframe src="/test/fixtures-externals/plaintext-sibbling-forms.html">');
+
+            $iframe.one('load', function() {
+                var doc = $iframe.get(0).contentDocument;
+                var content = Mobify.externals.grabContent(doc);
+                var children = content.$body.children();
+
+                equal(children.length, 2, 'extracted body has two children');
+                equal(children[0].nodeName, 'FORM', 'first child element is a form');
+                equal(children[1].nodeName, 'FORM', 'second child element is a form');
+
+                start();
+            });
+            $('body').append($iframe);
+        });
+    </script>
+<body>
+</html>
