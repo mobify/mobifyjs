@@ -403,4 +403,29 @@ require(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         });
         $("#qunit-fixture").append($iframe);
     });
+
+    /**
+     * Regressions test for iOS8 where sibling forms got written out
+     * as children of eachother.
+     */
+    asyncTest("createDocumentSiblingForms", function(){
+        var iframe = $("<iframe>", {id: "plaintext-sibling-forms"});
+        iframe.attr("src", "/tests/fixtures/plaintext-sibling-forms.html")
+        iframe.one('load', function(){
+            var doc = this.contentDocument;
+
+            // We remove the webdriver attribute set when running tests on selenium (typically done through SauceLabs)
+            var htmlEl = doc.getElementsByTagName("html")[0].removeAttribute("webdriver")
+
+            Capture.init(function(capture) {
+                var capturedDoc = capture.capturedDoc;
+
+                var bodyChildren = capturedDoc.body.children;
+                equal(bodyChildren.length, 2);
+                start();
+            }, doc);
+        });
+        $("#qunit-fixture").append(iframe);
+    });
+
 });
