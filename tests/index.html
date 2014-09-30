@@ -744,6 +744,30 @@
             ok(got, "makeElement fails to get attributes of badly formed 'bodyclass' element");
         });
 
+        // There is a bug on iOS 8.0 where:
+        //     `body`.innerHTML = '<form></form><form></form>';
+        // produces the following elements:
+        //     `<form><form></form></form>`
+        //
+        // This test ensures that capturing works as expected.
+        //
+        asyncTest('Mobify.html.extractDOM correctly extracts document with two sibbling forms', function() {
+            var $iframe = $('<iframe src="/tests/fixtures/plaintext-sibbling-forms.html">');
+
+            $iframe.one('load', function() {
+                var doc = $iframe.get(0).contentDocument;
+                var result = Mobify.html.extractDOM(doc);
+                var children = result.$body.children();
+
+                equal(children.length, 2, 'extracted body has two children');
+                equal(children[0].nodeName, 'FORM', 'first child element is a form');
+                equal(children[1].nodeName, 'FORM', 'second child element is a form');
+
+                start();
+            });
+            $('body').append($iframe);
+        });
+
         module('Mobify.urlmatch');
         // First, some utility functions and variables
         var locationify, urlmatch, testUrlMatch;

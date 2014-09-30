@@ -73,9 +73,9 @@ $.extend(html, {
     // 1. Get the original markup from the document.
     // 2. Disable the markup.
     // 3. Construct the source pseudoDOM.
-    extractDOM: function() {
+    extractDOM: function(doc) {
         // Extract escaped markup out of the DOM
-        var captured = guillotine(html.extractHTML());
+        var captured = guillotine(html.extractHTML(doc));
 
         Mobify.timing.addPoint('Recovered Markup');
 
