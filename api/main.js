@@ -191,7 +191,7 @@ the browser behave as if the templated HTML was the regular source.
             return Mobify.unmobify();
         }
 
-        var write = function(markup) {
+        var write = function() {
             // `document.open` clears events bound to `document`.
             document.open();
 
