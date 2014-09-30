@@ -29,7 +29,7 @@ Mobify.i18n = function(list, data) {
 };
 
 Mobify.isIOS8_0 = function() {
-    var IOS8_REGEX = /ip(hone|od|ad).*OS 8_0/i;
+    var IOS8_REGEX = /ip(hone|od|ad).*Version\/8.0/i;
 
     return IOS8_REGEX.test(window.navigator.userAgent);
 };

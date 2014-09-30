@@ -92,10 +92,10 @@ $.extend(Mobify.transform, {
             timing.logPoints();
         }
 
-        var write = function(){
+        var write = function() {
             // We'll write markup a tick later, as Firefox logging is async
             // and gets interrupted if followed by synchronous document.open
-            window.setTimeout(function(){
+            window.setTimeout(function() {
                 // `document.open` clears events bound to `document`.
                 document.open();
 
@@ -106,7 +106,7 @@ $.extend(Mobify.transform, {
             });
         };
 
-        if (Mobify.isIOS8_0()){
+        if (Mobify.isIOS8_0()) {
             // See `util.js` for more information about this fix.
             Mobify.ios8_0ScrollFix(document, write);
         } else {
