@@ -232,31 +232,6 @@ test('Mobify.getImageURL', function() {
     equal(Mobify.getImageURL('http://test/1.jpg', {maxWidth: 320}), '//ir3.mobify.com/320/http://test/1.jpg')
 });
 
-test("Mobify.ios8_0ScrollFix", function() {
-    var html =
-        "<html>" +
-        "<head>" +
-        "  <title>Scroll Fix Test</title>" +
-        "</head>" +
-        "<body style='font-size: 13px' class='x-test'>" +
-        "  <ul>" +
-        "    <li>Woohoo</li>" +
-        "  </ul>" +
-        "</body>" +
-        "</html>";
-
-    html = Mobify.ios8_0ScrollFix(html);
-    
-    ok(html.indexOf('font-size: 13px') !== -1,
-        '`font-size: 13px` on the body tag is still present');
-    ok(html.indexOf('display: none') !== -1,
-        '`display: none` was set on the body tag');
-    ok(html.indexOf("document.body.style.display = '';") !== -1,
-        'there is a script to show the body');
-    ok(html.indexOf('x-test') !== -1,
-        '`x-test` body class tag is still present');
-});
-
 test('$.fn.resizeImages', function() {
     var $resized = Mobify.$('#test-resizeImages').resizeImages()
     equal($resized.length, 3)
@@ -276,7 +251,24 @@ test('$.fn.resizeImages speed', function() {
     
 });
 
+asyncTest("Mobify.ios8_0ScrollFix", function() {
+    var html = document.createElement('html');
+    var head = document.createElement('head');
+    html.appendChild(head);
 
+    Mobify.ios8_0ScrollFix(html, function() {
+        var meta = html.getElementsByTagName('meta')[0]
+
+        ok(true,
+            'meta tag is appended');
+        equal(meta.getAttribute('name'), 'viewport',
+            'meta name is viewport');
+        equal(meta.getAttribute('content'), 'width=device-width',
+            'content is width=device-width');
+
+        start();
+    });
+});
 
     </script>
 <body>
