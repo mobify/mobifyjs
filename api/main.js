@@ -92,17 +92,26 @@ $.extend(Mobify.transform, {
             timing.logPoints();
         }
 
-        // We'll write markup a tick later, as Firefox logging is async
-        // and gets interrupted if followed by synchronous document.open
-        window.setTimeout(function(){
-            // `document.open` clears events bound to `document`.
-            document.open();
+        var write = function() {
+            // We'll write markup a tick later, as Firefox logging is async
+            // and gets interrupted if followed by synchronous document.open
+            window.setTimeout(function() {
+                // `document.open` clears events bound to `document`.
+                document.open();
 
-            // In Webkit, `document.write` immediately executes inline scripts 
-            // not preceded by an external resource.
-            document.write(markup);
-            document.close();
-        });
+                // In Webkit, `document.write` immediately executes inline scripts 
+                // not preceded by an external resource.
+                document.write(markup);
+                document.close();
+            });
+        };
+
+        if (Mobify.isIOS8_0()) {
+            // See `util.js` for more information about this fix.
+            Mobify.ios8_0ScrollFix(document, write);
+        } else {
+            write();
+        }
     },
 
     // Kickstart processing. Guard against beginning before the document is ready.
