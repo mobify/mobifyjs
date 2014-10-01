@@ -1,3 +1,10 @@
+2.0.15
+    - The previous iOS 8.0 scroll fix was causing some incompatibilities with
+      certain websites. Introduces a new scroll fix that should work in all
+      circumstances.
+    - Also fixes an iOS 8.0 issue where if there are two sibling forms in the
+      original document, one of the forms ends up as a child form in the
+      captured document.
 2.0.14
     - Added patch to fix scrolling jank on iOS 8.0.
     - Bumped the version of grunt-saucelabs and fixed tests to support the new

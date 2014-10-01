@@ -340,9 +340,30 @@ Capture.setElementContentFromString = function(el, htmlString) {
 };
 
 Capture.isIOS8_0 = function() {
-    var IOS8_REGEX = /ip(hone|od|ad).*OS 8_0/i;
+    var IOS8_REGEX = /ip(hone|od|ad).*Version\/8.0/i;
 
     return IOS8_REGEX.test(window.navigator.userAgent);
+};
+
+/**
+ * This is a feature detection function to determine if you
+ * can construct body using innerHTML. In iOS8, setting
+ * innerHTML on body seems to break if you have forms.
+ * If you have forms in the page which are siblings,
+ * the second sibling ends up becoming a child element
+ * of the first sibling.
+ */
+Capture.isSetBodyInnerHTMLBroken = function(){
+    var doc = document.implementation.createHTMLDocument("");
+    var bodyEl = doc.documentElement.lastChild;
+    if (!bodyEl) {
+        return false;
+    }
+    bodyEl.innerHTML = '<form></form><form></form>';
+    if (bodyEl.childNodes && bodyEl.childNodes.length === 1) {
+        return true;
+    }
+    return false;
 };
 
 /**
@@ -351,72 +372,52 @@ Capture.isIOS8_0 = function() {
  * capturing, the initial document never has an active meta viewport tag.
  * Then, the rendered document injects one causing the aforementioned scroll.
  *
- * This patches HTML to hide the body until the first paint (and hopefully after
- * the initial viewport is calculated). By the time we show the body the new
- * viewport should have already taken effect.
+ * Create a meta viewport tag that we inject into the page to force the page to
+ * scroll before anything is rendered in the page (this code should be called
+ * before document.open!)
  *
  * JIRA: https://mobify.atlassian.net/browse/GOLD-883
  * Open Radar: http://www.openradar.me/radar?id=5516452639539200
  * WebKit Bugzilla: https://bugs.webkit.org/show_bug.cgi?id=136904
  */
-Capture.ios8_0ScrollFix = function(htmlString) {
-    var BODY_REGEX = /<body(?:[^>'"]*|'[^']*?'|"[^"]*?")*>/i;
-
-    var openingBodyTag = BODY_REGEX.exec(htmlString);
-    // Do nothing if we can't find an opening `body` tag.
-    if (!openingBodyTag) {
-        return htmlString;
+Capture.ios8_0ScrollFix = function(doc, callback) {
+    // Using `getElementsByTagName` here because grabbing head using
+    // `document.head` will throw exceptions in some older browsers (iOS 4.3).
+    var head = doc.getElementsByTagName('head');
+    // Be extra safe and guard against `head` not existing.
+    if (!head.length) {
+        return;
     }
-    openingBodyTag = openingBodyTag[0];
+    var head = head[0];
 
-    // Use DOM methods to manipulate the attributes on the `body` tag. This
-    // lets us rely on the browser to set body's style to `display: none`.
-    // We create a containing element to be able to set an inner HTML string.
-    var divEl = document.createElement('div');
-    
-    // The `div`'s inner string can't be a `body` tag, so we temporarily change
-    // it to a `div`..
-    var openingBodyTagAsDiv = openingBodyTag.replace(/^<body/, '<div');
-    divEl.innerHTML = openingBodyTagAsDiv;
+    var meta = document.createElement('meta');
+    meta.setAttribute('name', 'viewport');
+    meta.setAttribute('content', 'width=device-width');
+    head.appendChild(meta);
 
-    // ..so that we can set it to be hidden..
-    divEl.firstChild.style.display = 'none';
-
-    // ..and change it back to a `body` string!
-    openingBodyTagAsDiv = divEl.innerHTML.replace(/<\/div>$/, '');
-    openingBodyTag = openingBodyTagAsDiv.replace(/^<div/, '<body');
-
-    // Append the script to show the body after two paints. This needs to be
-    // inside the body to ensure that `document.body` is available when it
-    // executes.
-    var script =
-        "<script>" +
-        "  window.requestAnimationFrame(function() {" +
-        "    window.requestAnimationFrame(function() {" +
-        "      document.body.style.display = '';" +
-        "    });" +
-        "  });" +
-        "<\/script>";
-
-    return htmlString.replace(BODY_REGEX, openingBodyTag + script);
+    if (callback) {
+        // Wait two paints for the meta viewport tag to take effect. This is
+        // required for this fix to work, but guard against it being undefined
+        // anyway just in case.
+        if (window.requestAnimationFrame) {
+            window.requestAnimationFrame(function() {
+                window.requestAnimationFrame(callback);
+            });
+        }
+        else {
+            callback();
+        }
+    }
 };
 
 /**
  * Grab the captured document and render it
  */
-Capture.prototype.restore = function(inject, options) {
-    options = options || {};
+Capture.prototype.restore = function(inject) {
     var self = this;
 
     Utils.waitForReady(document, function() {
-        var htmlString = self.all(inject);
-
-        // This fix only applies to iOS 8.0
-        if (options.forceIOS8_0ScrollFix || Capture.isIOS8_0()) {
-            htmlString = Capture.ios8_0ScrollFix(htmlString);
-        }
-
-        self.render(htmlString);
+        self.render(self.all(inject));
     });
 };
 
@@ -426,7 +427,7 @@ Capture.prototype.restore = function(inject, options) {
  */
 Capture.prototype.createDocumentFragments = function() {
     var docFrags = {};
-    var doc = docFrags.capturedDoc = document.implementation.createHTMLDocument("")
+    var doc = docFrags.capturedDoc = document.implementation.createHTMLDocument("");
     var htmlEl = docFrags.htmlEl = doc.documentElement;
     var headEl = docFrags.headEl = htmlEl.firstChild;
     var bodyEl = docFrags.bodyEl = htmlEl.lastChild;
@@ -436,8 +437,15 @@ Capture.prototype.createDocumentFragments = function() {
     Capture.cloneAttributes(this.headOpenTag, headEl);
     Capture.cloneAttributes(this.bodyOpenTag, bodyEl);
 
-    // Set innerHTML of new source DOM body
-    bodyEl.innerHTML = Capture.disable(this.bodyContent, this.prefix);
+    var disabledBodyContent = Capture.disable(this.bodyContent, this.prefix);
+    // Set innerHTML on body (if the browser is capable of doing so).
+    // If not, set innerHTML on a div and copy children elements into body.
+    if (!Capture.isSetBodyInnerHTMLBroken()) {
+        // Set innerHTML of new source DOM body
+        bodyEl.innerHTML = disabledBodyContent;
+    } else {
+        Capture.setElementContentFromString(bodyEl, disabledBodyContent);
+    }
 
     // In Safari 4/5 and iOS 4.3, there are certain scenarios where elements
     // in the body (ex "meta" in "noscripts" tags) get moved into the head,
@@ -478,9 +486,7 @@ Capture.prototype.enabledHTMLString = Capture.prototype.escapedHTMLString = func
 /**
  * Rewrite the document with a new html string
  */
-Capture.prototype.render = function(htmlString, options) {
-    options = options || {};
-
+Capture.prototype.render = function(htmlString) {
     var enabledHTMLString;
     if (!htmlString) {
         enabledHTMLString = this.enabledHTMLString();
@@ -488,22 +494,25 @@ Capture.prototype.render = function(htmlString, options) {
         enabledHTMLString = Capture.enable(htmlString, this.prefix);
     }
 
-    // This fix only applies to iOS 8.0
-    if (options.forceIOS8_0ScrollFix || Capture.isIOS8_0()) {
-        enabledHTMLString = Capture.ios8_0ScrollFix(enabledHTMLString);
-    }
-
     var doc = this.sourceDoc;
 
     // Set capturing state to false so that the user main code knows how to execute
     if (window.Mobify) window.Mobify.capturing = false;
 
-    // Asynchronously render the new document
-    setTimeout(function(){
-        doc.open("text/html", "replace");
-        doc.write(enabledHTMLString);
-        doc.close();
-    });
+    var write = function() {
+        // Asynchronously render the new document
+        setTimeout(function(){
+            doc.open("text/html", "replace");
+            doc.write(enabledHTMLString);
+            doc.close();
+        });
+    };
+    
+    if (Capture.isIOS8_0()) {
+        Capture.ios8_0ScrollFix(document, write);
+    } else {
+        write();
+    }
 };
 
 /**

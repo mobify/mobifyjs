@@ -216,88 +216,24 @@ require(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         $("#qunit-fixture").append($iframe);
     });
 
-    test("ios8_0ScrollFix", function() {
-        var html =
-            "<html>" +
-            "<head>" +
-            "  <title>Scroll Fix Test</title>" +
-            "</head>" +
-            "<body style='font-size: 13px' class='x-test'>" +
-            "  <ul>" +
-            "    <li>Woohoo</li>" +
-            "  </ul>" +
-            "</body>" +
-            "</html>";
+    asyncTest("ios8_0ScrollFix", function() {
+        var html = document.createElement('html');
+        var head = document.createElement('head');
+        html.appendChild(head);
 
-        html = Capture.ios8_0ScrollFix(html);
-        
-        ok(html.indexOf('font-size: 13px') !== -1,
-            '`font-size: 13px` on the body tag is still present');
-        ok(html.indexOf('display: none') !== -1,
-            '`display: none` was set on the body tag');
-        ok(html.indexOf("document.body.style.display = '';") !== -1,
-            'there is a script to show the body');
-        ok(html.indexOf('x-test') !== -1,
-            '`x-test` body class tag is still present');
+        Capture.ios8_0ScrollFix(html, function() {
+            var meta = html.getElementsByTagName('meta')[0]
+
+            ok(true,
+                'meta tag is appended');
+            equal(meta.getAttribute('name'), 'viewport',
+                'meta name is viewport');
+            equal(meta.getAttribute('content'), 'width=device-width',
+                'content is width=device-width');
+
+            start();
+        });
     });
-
-    if (window.requestAnimationFrame) {
-        asyncTest("iOS 8.0 scroll fix is applied when rendering", function() {
-            var opts = {
-                id: "ios-8_0-render-scroll-fix",
-                src: "/tests/fixtures/plaintext-display-none-body.html"
-            };
-            var $iframe = $("<iframe>", opts);
-            var el = $iframe[0];
-
-            $iframe.one('load', function onLoad() {
-                var self = this;
-
-                Capture.init(function(capture) {
-                    capture.render(null, {forceIOS8_0ScrollFix: true});
-
-                    var iid = setInterval(function() {
-                        if (self.contentDocument.querySelectorAll('plaintext').length == 0 &&
-                                self.contentDocument.body.style.display == '') {
-                            ok(true, 'document was shown');
-                            clearInterval(iid);
-                            start();
-                        }
-                    }, 100);
-                }, this.contentDocument);
-            });
-
-            $("#qunit-fixture").append($iframe);
-        });
-
-        asyncTest("iOS 8.0 scroll fix is applied on restore", function(){
-            var opts = {
-                id: "ios-8_0-restore-scroll-fix",
-                src: "/tests/fixtures/plaintext-display-none-body.html"
-            };
-            var $iframe = $("<iframe>", opts);
-            var el = $iframe[0];
-
-            $iframe.one('load', function onLoad() {
-                var self = this;
-
-                Capture.init(function(capture) {
-                    capture.restore(null, {forceIOS8_0ScrollFix: true});
-
-                    var iid = setInterval(function() {
-                        if (self.contentDocument.querySelectorAll('plaintext').length == 0 &&
-                                self.contentDocument.body.style.display == '') {
-                            ok(true, 'document was shown');
-                            clearInterval(iid);
-                            start();
-                        }
-                    }, 100);
-                }, this.contentDocument);
-            });
-
-            $("#qunit-fixture").append($iframe);
-        });
-    }
 
     test("cloneAttributes", function(){
         var el = document.createElement("div");
@@ -467,4 +403,30 @@ require(["mobifyjs/utils", "mobifyjs/capture"], function(Utils, Capture) {
         });
         $("#qunit-fixture").append($iframe);
     });
+
+    /**
+     * Regressions test for iOS8 where sibling forms got written out
+     * as children of eachother.
+     */
+    asyncTest("createDocumentSiblingForms", function(){
+        var iframe = $("<iframe>", {
+            id: "plaintext-sibling-forms",
+            src: "/tests/fixtures/plaintext-sibling-forms.html"
+        });
+        iframe.one('load', function(){
+            var doc = this.contentDocument;
+
+            Capture.init(function(capture) {
+                var capturedDoc = capture.capturedDoc;
+
+                var bodyChildren = capturedDoc.body.children;
+                equal(bodyChildren.length, 2);
+                equal(bodyChildren[0].nodeName, 'FORM', 'first child element is a form');
+                equal(bodyChildren[1].nodeName, 'FORM', 'second child element is a form');
+                start();
+            }, doc);
+        });
+        $("#qunit-fixture").append(iframe);
+    });
+
 });

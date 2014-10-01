@@ -4,7 +4,9 @@ require(['mobifyjs/patchAnchorLinks'], function(patchAnchorLinks) {
         // Test harness does not work on Android 4.0.x and less because
         // of an iframe scrolling bug. However, the functionality works
         // but needs to be manually tested.
-        return /android.*(4\.0\.|(2|3)\.\d)/i.test(window.navigator.userAgent);
+        // Also we don't run these tests in iOS8 because you can't seem
+        // to query for the scroll position in iframes.
+        return /(android.*(4\.0\.|(2|3)\.\d)|ip(hone|od|ad).*Version\/8.0)|/i.test(window.navigator.userAgent);
     };
 
     var testSetup = function(id, ready) {
