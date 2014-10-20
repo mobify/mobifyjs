@@ -158,20 +158,27 @@ ResizeImages.getImageURL = function(url, options) {
  */
 
 ResizeImages._rewriteSrcAttribute = function(element, opts, srcVal){
-    srcVal = element.getAttribute(opts.sourceAttribute) || srcVal;
+    srcVal = element.getAttribute(opts.sourceAttribute) ||
+             element.getAttribute(opts.sourceSetAttribute) ||
+             srcVal;
     if (srcVal) {
         var url = Utils.absolutify(srcVal);
         if (Utils.httpUrl(url)) {
             if (opts.onerror) {
                 element.setAttribute('onerror', opts.onerror);
             }
-            element.setAttribute(opts.targetAttribute, ResizeImages.getImageURL(url, opts));
+            // if the element is a source element, then we always want to set srcset rather then src
+            var targetAttribute = (element.nodeName === 'SOURCE') ? opts.targetSrcSetAttribute : opts.targetSrcAttribute;
+
+            element.setAttribute(targetAttribute, ResizeImages.getImageURL(url, opts));
             element.setAttribute('data-orig-src', srcVal);
             // if using resize when not capturing, remove the sourceAttribute
-            // as long as it's not "src", which is the target attribute used
-            // when not capturing.
-            if (!capturing && opts.sourceAttribute != opts.targetAttribute) {
+            // or sourceSetAttribute as long as it's not "src", which is the target
+            // attribute used when not capturing.
+            if (!capturing && opts.sourceAttribute != opts.targetSrcAttribute) {
                 element.removeAttribute(opts.sourceAttribute);
+            } else if (!capturing && opts.sourceSetAttribute != opts.targetSrcSetAttribute) {
+                element.removeAttribute(opts.sourceSetAttribute);
             }
         }
     }
@@ -362,11 +369,14 @@ ResizeImages.resize = function(elements, options) {
     }
     var opts = ResizeImages.processOptions(options);
 
-    for(var i=0; i < elements.length; i++) {
+    for (var i=0; i < elements.length; i++) {
         var element = elements[i];
-
         // For an `img`, simply modify the src attribute
         if (element.nodeName === 'IMG' && !element.hasAttribute('mobify-optimized')) {
+            // Skip this image if it's parent is a picture element
+            if (element.parentNode && element.parentNode.nodeName === 'PICTURE') {
+                continue;
+            }
             element.setAttribute('mobify-optimized', '');
             ResizeImages._rewriteSrcAttribute(element, opts);
         }
@@ -397,7 +407,9 @@ ResizeImages.defaults = {
     host: 'ir0.mobify.com',
     projectName: "oss-" + location.hostname.replace(/[^\w]/g, '-'),
     sourceAttribute: "x-src",
-    targetAttribute: (capturing ? "x-src" : "src"),
+    sourceSetAttribute: "x-srcset",
+    targetSrcAttribute: (capturing ? "x-src" : "src"),
+    targetSrcSetAttribute: (capturing ? "x-srcset" : "srcset"),
     webp: ResizeImages.supportsWebp(),
     resize: true,
     onerror: 'ResizeImages.restoreOriginalSrc(event);'
@@ -1419,8 +1431,8 @@ var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 
 // Map of all attributes we should disable (to prevent resources from downloading)
 var disablingMap = {
-    img:    ['src'],
-    source: ['src'],
+    img:    ['src', 'srcset'],
+    source: ['src', 'srcset'],
     iframe: ['src'],
     script: ['src', 'type'],
     link:   ['href'],
@@ -2127,7 +2139,6 @@ return CssOptimize;
                                  require('../capture.js'));
     }
 }(this, function (Utils, Capture) {
-
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
 if (capturing) {
@@ -2208,7 +2219,7 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
 
             if( matches.length ){
                 // Grab the most appropriate (last) match.
-                var match = matches.pop(),
+                var match = matches[0],
                     srcset = match.getAttribute( "srcset" );
 
                 if( !picImg ){
@@ -2226,7 +2237,11 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
                         for( var res = sources.length, r = res - 1; r >= 0; r-- ) { // Loop through each source/resolution in `srcset`.
                             var source = sources[ r ].replace(/^\s*/, '').replace(/\s*$/, '').split(" "), // Remove any leading whitespace, then split on spaces.
                                 resMatch = parseFloat( source[1], 10 ); // Parse out the resolution for each source in `srcset`.
-
+                            if (isNaN(resMatch)) {
+                                // this srcset doesn't have a resolution specified, so just set the src.
+                                picImg.src = match.getAttribute( "srcset" );
+                                break;
+                            }
                             if( screenRes >= resMatch ) {
                                 if( picImg.getAttribute( "src" ) !== source[0] ) {
                                     var newImg = document.createElement("img");

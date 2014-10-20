@@ -37,8 +37,8 @@ var tagEnablingRe = new RegExp(Utils.values(tagDisablers).join('|'), 'g');
 
 // Map of all attributes we should disable (to prevent resources from downloading)
 var disablingMap = {
-    img:    ['src'],
-    source: ['src'],
+    img:    ['src', 'srcset'],
+    source: ['src', 'srcset'],
     iframe: ['src'],
     script: ['src', 'type'],
     link:   ['href'],
