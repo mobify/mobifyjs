@@ -2218,7 +2218,7 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
             picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 
             if( matches.length ){
-                // Grab the most appropriate (last) match.
+                // Grab the most appropriate (first) match.
                 var match = matches[0],
                     srcset = match.getAttribute( "srcset" );
 
