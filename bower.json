@@ -1,6 +1,6 @@
 {
   "name": "mobifyjs",
-  "version": "2.0.12",
+  "version": "2.0.15",
   "main": "build/mobify.min.js",
   "dependencies": {
     "mobifyjs-utils": "git@github.com:mobify/mobifyjs-utils.git#1.0.0",
