@@ -1,6 +1,6 @@
 2.0.16
-    - Updates resource disabling to disable `srcset` attributes on `<img>` and 
-      `<source>` elements.
+    - Updates resource disabling in capturing to disable `srcset` attributes on
+      `<img>` and `<source>` elements.
     - Updates dependency on imageresize-client to better support modern 
       `<picture>` element markup.
 2.0.15
