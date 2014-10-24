@@ -10,7 +10,6 @@
                                  require('../capture.js'));
     }
 }(this, function (Utils, Capture) {
-
 var capturing = window.Mobify && window.Mobify.capturing || false;
 
 if (capturing) {
@@ -90,8 +89,8 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
             picImg = ps[ i ].getElementsByTagName( "img" )[ 0 ];
 
             if( matches.length ){
-                // Grab the most appropriate (last) match.
-                var match = matches.pop(),
+                // Grab the most appropriate (first) match.
+                var match = matches[0],
                     srcset = match.getAttribute( "srcset" );
 
                 if( !picImg ){
@@ -109,7 +108,11 @@ window.matchMedia = window.matchMedia || Utils.matchMedia(document);
                         for( var res = sources.length, r = res - 1; r >= 0; r-- ) { // Loop through each source/resolution in `srcset`.
                             var source = sources[ r ].replace(/^\s*/, '').replace(/\s*$/, '').split(" "), // Remove any leading whitespace, then split on spaces.
                                 resMatch = parseFloat( source[1], 10 ); // Parse out the resolution for each source in `srcset`.
-
+                            if (isNaN(resMatch)) {
+                                // this srcset doesn't have a resolution specified, so just set the src.
+                                picImg.src = match.getAttribute( "srcset" );
+                                break;
+                            }
                             if( screenRes >= resMatch ) {
                                 if( picImg.getAttribute( "src" ) !== source[0] ) {
                                     var newImg = document.createElement("img");

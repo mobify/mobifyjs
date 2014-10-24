@@ -4,36 +4,62 @@
 <title>Mobify.js Image Resizer Without Capturing</title>
 
 <link rel="stylesheet" href="/mobifyjs/examples/assets/css/stylesheet.css" type="text/css">
-<style>
-.images {
-    width: 1024px;
-}
-.images img {
-    width: 49%;
-}
-</style>
 <script async src="/mobifyjs/build/mobify.min.js"></script>
 <script>
     var intervalId = setInterval(function(){
         if (window.Mobify) {
-            var images = document.querySelectorAll('img[x-src]');
+            var images = document.querySelectorAll('img, picture');
             if (images.length > 0) {
-                Mobify.ResizeImages.resize( images, {
-                    maxWidth: 320   
-                });
+                Mobify.ResizeImages.resize( images );
             }
             // When the document has finished loading, stop checking for new images
             if (Mobify.Utils.domIsReady()) {
                 clearInterval(intervalId)
             }
         }
-    }, 30);
+    }, 100);
 </script>
+<style>
+img {
+    max-width: 100%;
+}
+picture {
+    display: block;
+    padding: 1em;
+}
+.example-photo {
+    max-width: 100%;
+}
+@media (min-width: 512px) {
+    .example-photo {
+        float: left;
+        max-width: 50%;
+    }
+}
+</style>
 </head>
 <body class="foo">
-<div class="images">
-    <img x-src="/mobifyjs/examples/assets/images/forest.jpg">
-    <img x-src="/mobifyjs/examples/assets/images/mountains.jpg">
-</div>
+    <p>Picture element is used here in a much simpler way. Equivalent images at different breakpoints do not need to be automatically generated, they only need to set width attributes for each `source` element.</p>
+    <p>View the source to have a look, and view the inspector to see what the `resize` method does to the picture element's markup.</p>
+    <!-- http://upload.wikimedia.org/wikipedia/commons/6/68/President_Barack_Obama_Tours_Storm_Damage_in_New_Jersey_2.jpg -->
+    <picture class="example-photo" data-src="/mobifyjs/examples/assets/images/responsive-obama.jpg">
+        <source media="(min-width: 2048px)" data-width="1024">
+        <source media="(min-width: 1024px)" data-width="512">
+        <source media="(min-width: 512px)">
+        <source srcset="/mobifyjs/examples/assets/images/responsive-obama-mobile.png">
+        <img x-src="/mobifyjs/examples/assets/images/responsive-obama.jpg">
+    </picture>
+
+    <h1>Excitingus Headlineus</h1>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam viverra vestibulum mi, vitae euismod libero vehicula non. Morbi sollicitudin nulla in metus tincidunt lobortis. Cras volutpat eros sapien, vitae tempor arcu faucibus at. Sed a accumsan purus. Nulla eget sem lectus. Nullam pharetra lobortis eleifend. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed vel ligula velit. Integer eget sodales lacus, rutrum blandit dui.</p>
+
+    <p>Quisque pharetra augue id vehicula vulputate. Quisque volutpat dui nec vehicula hendrerit. Vivamus semper quam enim, vitae molestie enim luctus non. Fusce ornare nisi non arcu volutpat vestibulum. Aliquam quis neque quis metus pretium auctor. Cras vitae felis et odio auctor ornare sed a augue. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut accumsan tincidunt sapien. Donec volutpat erat at diam facilisis, eget tempus quam pharetra.</p>
+
+    <p>Mauris vulputate diam ac ante scelerisque, sed sodales turpis mattis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed purus justo, facilisis sed mauris et, tempus auctor mi. Sed ac interdum magna. Pellentesque id odio a lectus dapibus pharetra nec vitae urna. Suspendisse rutrum, odio a bibendum semper, velit augue fringilla augue, a rutrum ligula tellus non lorem. Donec quis felis nec nisi venenatis scelerisque.</p>
+
+    <p>Sed at aliquam mauris. Vestibulum aliquet, risus in bibendum mollis, nibh lectus gravida nunc, at condimentum metus arcu vel mi. Morbi id egestas erat. Sed vitae nisl molestie, dictum ante a, ultrices magna. Ut euismod accumsan sagittis. Vivamus porta nibh quis erat suscipit, vel consectetur tellus ultricies. Donec aliquam ornare congue. Cras lobortis purus nec nisl laoreet sodales. Proin sit amet mi vel urna vehicula ultrices non et mauris. Mauris ante dui, consectetur et tincidunt sed, bibendum in elit. Pellentesque volutpat hendrerit nisi a lacinia. Cras cursus in dui id porta.</p>
+
+    <p>Aliquam erat volutpat. Duis odio felis, consectetur sit amet libero et, rhoncus lacinia lacus. Vestibulum et magna sit amet tortor hendrerit lacinia posuere sit amet nunc. Proin hendrerit gravida molestie. Vivamus sit amet velit a ligula pellentesque pretium. Suspendisse viverra malesuada purus aliquam venenatis. Nunc tempor varius lectus, eget eleifend orci condimentum quis. Suspendisse pharetra, odio id rhoncus pharetra, mauris eros consequat enim, ac feugiat tellus augue a urna. Proin hendrerit dapibus felis iaculis tincidunt.</p>
 </body>
 </html>

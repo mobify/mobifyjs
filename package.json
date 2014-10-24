@@ -1,6 +1,6 @@
 {
   "name": "mobifyjs",
-  "version": "2.0.15",
+  "version": "2.0.16",
   "description": "Mobify.js is an open source library for improving responsive sites by providing responsive images, JS/CSS optimization, Adaptive Templating and more.",
   "author": "Mobify <dev@mobify.com>",
   "devDependencies": {
