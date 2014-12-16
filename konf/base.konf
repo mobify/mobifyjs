@@ -28,7 +28,6 @@
     {>"/base/api/util.js"/}
 {/lib_export}
 
-{>"/base/api/persistHash.js"/}
 {>"/base/api/logging.js"/}
 {>"/base/api/timing.js"/}
 {>"/base/api/externals.js"/}
