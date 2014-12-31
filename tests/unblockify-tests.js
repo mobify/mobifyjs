@@ -1,5 +1,6 @@
 require(["mobifyjs/utils", "mobifyjs/capture", "mobifyjs/unblockify"], function(Utils, Capture, Unblockify) {
     window.Unblockify = Unblockify;
+    QUnit.start();
 
     module("Unblockify");
     asyncTest("moveScripts", function(){
