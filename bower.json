@@ -1,6 +1,6 @@
 {
   "name": "mobifyjs",
-  "version": "2.0.16",
+  "version": "2.0.17",
   "main": "build/mobify.min.js",
   "dependencies": {
     "capturejs": "1.0.1",
