@@ -3,9 +3,11 @@
   "version": "2.0.16",
   "main": "build/mobify.min.js",
   "dependencies": {
-    "mobifyjs-utils": "git@github.com:mobify/mobifyjs-utils.git#1.0.0",
-    "jazzcat-client": "git@github.com:mobify/jazzcat-client.git#1.0.0",
-    "imageresize-client": "git@github.com:mobify/imageresize-client.git#1.0.3"
+    "capturejs": "1.0.1",
+    "mobifyjs-utils": "1.0.0",
+    "jazzcat-client": "1.0.0",
+    "imageresize-client": "1.0.4",
+    "css-optimize": "1.0.0"
   },
   "devDependencies": {
 
