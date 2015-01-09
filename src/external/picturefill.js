@@ -7,7 +7,7 @@
         // only CommonJS-like environments that support module.exports,
         // like Node.
         module.exports = factory(require('../../bower_components/mobifyjs-utils/utils.js'),
-                                 require('../capture.js'));
+                                 require('../../bower_components/capturejs/src/capture.js'));
     }
 }(this, function (Utils, Capture) {
 var capturing = window.Mobify && window.Mobify.capturing || false;

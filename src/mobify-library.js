@@ -13,10 +13,10 @@
         // only CommonJS-like environments that support module.exports,
         // like Node.
         var Utils = require('../bower_components/mobifyjs-utils/utils');
-        var Capture = require('./capture');
+        var Capture = require('../bower_components/capturejs/src/capture');
         var ResizeImages = require('../bower_components/imageresize-client/resizeImages');
         var Jazzcat = require('../bower_components/jazzcat-client/jazzcat');
-        var CssOptimize = require('./cssOptimize');
+        var CssOptimize = require('../bower_components/css-optimize/src/cssOptimize');
         var Unblockify = require('./unblockify');
         require('./external/picturefill');
 
