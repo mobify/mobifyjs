@@ -8,7 +8,7 @@
 var guillotine = function(captured) {
         // Consume comments without grouping to avoid catching
         // <body> inside a comment, common with IE conditional comments.
-        var bodySnatcher = /<!--(?:[\s\S]*?)-->|(<\/head\s*>|<body[\s\S]*$)/gi;
+        var bodySnatcher = new RegExp('<!--(?:[\\s\\S]*?)-->|<script(?:[^>\'"]*|\'[^\']*?\'|"[^"]*?")*>(?:[\\s\\S]*?)</script>|(<\\/head\\s*>|<body[\\s\\S]*$)', 'gi');
 
         captured = $.extend({}, captured);
         //Fallback for absence of </head> and <body>
