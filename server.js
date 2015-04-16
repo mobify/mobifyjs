@@ -3,6 +3,7 @@
  */
 var http = require('http');
 var express = require('express');
+var modRewrite = require('connect-modrewrite');
 var fs = require('fs');
 var path = require('path');
 var Url = require('url');
@@ -174,7 +175,7 @@ var jazzcatJs = function(req, res) {
 };
 
 // Load scripts for the mock mock Jazzcat API.
-var resourcesUrl = '/mobifyjs/performance/resources/samplescripts/';
+var resourcesUrl = '/performance/resources/samplescripts/';
 var files = fs.readdirSync(__dirname + resourcesUrl).filter(function(folder) {
     return folder[0] !== '.';
 });
@@ -244,6 +245,12 @@ var fakeJPEG = function(req, res) {
 
 var app = express();
 
+app.use(modRewrite([
+    '^/mobifyjs/(.*) /$1 [L]'
+]));
+
+
+
 app.set('views', __dirname + '/performance');
 app.set('view engine', 'html');
 app.engine('html', require('hbs').__express);
@@ -252,6 +259,8 @@ app.use(function(req, res, next) {
     res.header('Cache-Control' , 'max-age=0, no-cache, no-store');
     next();
 });
+
+
 
 app.get('/build/mobify(.min)?.js', cachedResponse);
 app.get('/tests/fixtures/split*', slowResponse);
