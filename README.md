@@ -21,7 +21,7 @@ Mobify.js uses Bower, Grunt.js and Require.js to build the library, and manage a
 
 And then download the latest code from git and install the dependancies:
 
-    git checkout https://github.com/mobify/mobifyjs.git
+    git clone git@github.com:mobify/mobifyjs.git
     cd mobifyjs
     npm install
     bower install
