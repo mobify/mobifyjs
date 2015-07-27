@@ -202,6 +202,21 @@ Private['loadPreview'] = loadPreview;
     @type {null}
 */
 var disableTag = function() {
+    // This workaround addresses an iOS fallthrough issue, where iOS 8's
+    // "preload top hits" option will load a Mobified page in the
+    // background when typing in an address into the URL bar. Safari
+    // seems to cancel the mobify.js download, resulting in us dropping
+    // a failure cookie.
+    //
+    // We get around this by ignoring mobify.js failures in a background
+    // tab.
+    //
+    // Related ticket: https://mobify.atlassian.net/browse/RTM-280
+    //
+    if (doc.visibilityState && doc.hidden) {
+        return;
+    }
+
     var now = new Date();
     // Set now to 5 minutes ahead
     now.setTime(now.getTime() + 5*60*1000);
