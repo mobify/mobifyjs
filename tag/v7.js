@@ -213,7 +213,7 @@ var disableTag = function() {
     //
     // Related ticket: https://mobify.atlassian.net/browse/RTM-280
     //
-    if (doc.visibilityState && doc.hidden) {
+    if (document.visibilityState && document.hidden) {
         return;
     }
 
