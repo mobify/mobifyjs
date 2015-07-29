@@ -202,17 +202,16 @@ Private['loadPreview'] = loadPreview;
     @type {null}
 */
 var disableTag = function() {
-    // This workaround addresses an iOS fallthrough issue, where iOS 8's
-    // "preload top hits" option will load a Mobified page in the
-    // background when typing in an address into the URL bar. Safari
-    // seems to cancel the mobify.js download, resulting in us dropping
-    // a failure cookie.
+    // This workaround addresses an iOS fallthrough issue, where
+    // iOS 8's "preload top hits" option will load a Mobified page
+    // in the background when typing in an address into the URL bar.
+    // Safari seems to cancel the mobify.js download, resulting in
+    // us dropping a failure cookie.
     //
-    // We get around this by ignoring mobify.js failures in a background
-    // tab.
+    // We get around this by ignoring adaptive script failures in a
+    // background tab.
     //
     // Related ticket: https://mobify.atlassian.net/browse/RTM-280
-    //
     if (document.visibilityState && document.hidden) {
         return;
     }
@@ -358,7 +357,7 @@ Tag['init'] = function(options) {
             src: opts['url'],
             onerror: disableTag,
             onload: postloadCallback
-        }
+        };
 
         loadScript(options, "mobify");
     };
