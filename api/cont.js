@@ -116,8 +116,10 @@
                     .evalReference();
             };
 
-            if (typeof source.length === 'number') {
-                $.each(source, eachCallback);
+            if (typeof sourceLength === 'number') {
+                for (i = 0; i < sourceLength; i++) {
+                    eachCallback(i, source[key]);
+                }
             }
             else {
                 for (key in source) {
