@@ -103,8 +103,8 @@
             var source = this.source(),
                 sourceLength = source.length,
                 continuation = this;
- 
-            $.each(source, function(idx, sourceFragment) {
+
+            var eachCallback = function(idx, sourceFragment) {
                 if (sourceFragment && (sourceFragment.jquery || sourceFragment.nodeType)
                     && (typeof idx == "string") && idx.indexOf('$')) {
                     var root = continuation.root;
@@ -114,7 +114,19 @@
                 continuation
                     .extend({source: sourceFragment}, idx, sourceLength, value)
                     .evalReference();
-            });
+            };
+
+            if (typeof sourceLength === 'number') {
+                for (i = 0; i < sourceLength; i++) {
+                    eachCallback(i, source[key]);
+                }
+            }
+            else {
+                for (key in source) {
+                    eachCallback(key, source[key]);
+                }
+            }
+ 
             return value;
         }
 
