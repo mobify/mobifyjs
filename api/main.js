@@ -106,9 +106,9 @@ $.extend(Mobify.transform, {
             });
         };
 
-        if (Mobify.isIOS8_0()) {
+        if (Mobify.isIOS8OrGreater(window.navigator.userAgent)) {
             // See `util.js` for more information about this fix.
-            Mobify.ios8_0ScrollFix(document, write);
+            Mobify.ios8AndGreaterScrollFix(document, write);
         } else {
             write();
         }

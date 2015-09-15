@@ -528,12 +528,12 @@
 
         module('util');
 
-        asyncTest("Mobify.ios8_0ScrollFix", function() {
+        asyncTest("Mobify.ios8AndGreaterScrollFix", function() {
             var html = document.createElement('html');
             var head = document.createElement('head');
             html.appendChild(head);
 
-            Mobify.ios8_0ScrollFix(html, function() {
+            Mobify.ios8AndGreaterScrollFix(html, function() {
                 var meta = html.getElementsByTagName('meta')[0]
 
                 ok(true,
