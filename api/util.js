@@ -28,14 +28,19 @@ Mobify.i18n = function(list, data) {
     return i18nlookup;
 };
 
-Mobify.isIOS8_0 = function() {
-    var IOS8_REGEX = /ip(hone|od|ad).*Version\/8.0/i;
+var IOS_REGEX = /ip(?:hone|od|ad).*Version\/(\d{1,2})\.\d/i;
+Mobify.isIOS8OrGreater = function(ua) {
+    if (typeof ua !== 'string') {
+        return;
+    }
 
-    return IOS8_REGEX.test(window.navigator.userAgent);
+    var match = ua.match(IOS_REGEX);
+
+    return match ? match[1] >= 8 : false;
 };
 
 /**
- * iOS 8.0 has a bug where dynamically switching the viewport (by swapping the
+ * iOS 8.0+ has a bug where dynamically switching the viewport (by swapping the
  * viewport meta tag) causes the viewport to automatically scroll. When
  * capturing, the initial document never has an active meta viewport tag.
  * Then, the rendered document injects one causing the aforementioned scroll.
@@ -48,7 +53,7 @@ Mobify.isIOS8_0 = function() {
  * Open Radar: http://www.openradar.me/radar?id=5516452639539200
  * WebKit Bugzilla: https://bugs.webkit.org/show_bug.cgi?id=136904
  */
-Mobify.ios8_0ScrollFix = function(doc, callback) {
+Mobify.ios8AndGreaterScrollFix = function(doc, callback) {
     // Using `getElementsByTagName` here because grabbing head using
     // `document.head` will throw exceptions in some older browsers (iOS 4.3).
     var head = doc.getElementsByTagName('head');
