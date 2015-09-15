@@ -36,7 +36,7 @@ Mobify.isIOS8_0 = function() {
     return IOS8_REGEX.test(window.navigator.userAgent);
 };
 
-Mobify.isIOS8OrGreater = function() {
+Mobify.isIOS8OrGreater = function(ua) {
     var IOS_REGEX = /ip(?:hone|od|ad).*Version\/(\d{1,2})\.\d/i;
 
     if (typeof ua !== 'string') {
