@@ -282,11 +282,11 @@ module.exports = function(grunt) {
                     bucket: 'www-staging.mobify.com',
                     CacheControl: SHORT_CACHE_CONTROL,
                 },
-                upload: [
+                files: [
                     {
-                       src: "**/*",
-                       dest: "mobifyjs",
-                       cwd: "www/_site"
+                        src: ["www/_site/**/*"],
+                        dest: "mobifyjs",
+                        expand: true,
                     },
                 ]
             },
@@ -295,11 +295,11 @@ module.exports = function(grunt) {
                     bucket: 'www-staging.mobify.com',
                     CacheControl: LONG_CACHE_CONTROL,
                 },
-                upload: [
+                files: [
                     {
-                        src: "static/**/*",
+                        src: ["www/_site/static/**/*"],
                         dest: "mobifyjs",
-                        cwd: "www/_site",
+                        expand: true,
                     }
                 ]
             },
@@ -308,11 +308,11 @@ module.exports = function(grunt) {
                     bucket: 'www.mobify.com',
                     CacheControl: LONG_CACHE_CONTROL,
                 },
-                upload: [
+                files: [
                     {
-                       src: "**/*",
-                       dest: "mobifyjs",
-                       cwd: "www/_site"
+                        src: ["www/_site/**/*"],
+                        dest: "mobifyjs",
+                        expand: true,
                     },
                 ]
             },
@@ -321,11 +321,11 @@ module.exports = function(grunt) {
                     bucket: 'www.mobify.com',
                     CacheControl: LONG_CACHE_CONTROL,
                 },
-                upload: [
+                files: [
                     {
-                        src: "static/**/*",
+                        src: ["www/_site/static/**/*"],
                         dest: "mobifyjs",
-                        cwd: "www/_site",
+                        expand: true,
                     }
                 ]
             },
