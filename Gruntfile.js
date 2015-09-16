@@ -218,121 +218,114 @@ module.exports = function(grunt) {
                 }
             }
         },
-        s3: {
-            options: {
-                access: "public-read",
-                headers: { "Cache-Control": SHORT_CACHE_CONTROL },
-                maxOperations: 6
-            },
+        aws_s3: {
             devBuild: {
                 options: {
                     bucket: 'mobify',
-                    gzip: true
+                    CacheControl: SHORT_CACHE_CONTROL,
                 },
-                upload: [
+                files: [
                     { // unminified dev build
-                        src: "build/mobify.js",
+                        src: ["build/mobify.js"],
                         dest: "mobifyjs/build/mobify-<%= pkg.version %>.js",
-                        rel: "build",
                     },
                     { // unminified dev build to latest
-                        src: "build/mobify.js",
+                        src: ["build/mobify.js"],
                         dest: "mobifyjs/build/mobify.js",
-                        rel: "build",
                     }
                 ]
             },
             prodBuild: {
                 options: {
                     bucket: 'mobify',
-                    gzip: true
+                    CacheControl: SHORT_CACHE_CONTROL,
                 },
-                upload: [
+                files: [
                     { // minified production build
-                        src: "build/mobify.min.js",
+                        src: ["build/mobify.min.js"],
                         dest: "mobifyjs/build/mobify-<%= pkg.version %>.min.js",
-                        rel: "build",
                     },
                     { // minified production build to latest
-                        src: "build/mobify.min.js",
+                        src: ["build/mobify.min.js"],
                         dest: "mobifyjs/build/mobify.min.js",
-                        rel: "build",
                     }
                 ]
             },
             examples: {
                 options: {
                     bucket: 'mobify',
-                    gzip: true
+                    CacheControl: SHORT_CACHE_CONTROL,
                 },
-                upload: [
+                files: [
                     { // examples
-                        src: "examples/**/*",
+                        src: ["examples/**/*"],
                         dest: "mobifyjs/examples/",
-                        rel: "examples",
+                        expand: true,
                     }
                 ]
             },
             performance: {
                 options: {
                     bucket: 'mobify',
-                    headers: { "Cache-Control": NO_CACHE},
+                    CacheControl: SHORT_CACHE_CONTROL,
                 },
-                upload: [
+                files: [
                     { // examples
-                        src: "performance/**/*",
+                        src: ["performance/**/*"],
                         dest: "mobifyjs/performance/",
-                        rel: "performance",
+                        expand: true,
                     }
                 ]
             },
             wwwstaging: {
                 options: {
                     bucket: 'www-staging.mobify.com',
+                    CacheControl: SHORT_CACHE_CONTROL,
                 },
                 upload: [
                     {
-                       src: "www/_site/**/*",
+                       src: "**/*",
                        dest: "mobifyjs",
-                       rel: "www/_site"
+                       cwd: "www/_site"
                     },
                 ]
             },
             wwwstagingstatic: {
                 options: {
                     bucket: 'www-staging.mobify.com',
-                    headers: { "Cache-Control": LONG_CACHE_CONTROL }
+                    CacheControl: LONG_CACHE_CONTROL,
                 },
                 upload: [
                     {
-                        src: "www/_site/static/**/*",
+                        src: "static/**/*",
                         dest: "mobifyjs",
-                        rel: "www/_site",
+                        cwd: "www/_site",
                     }
                 ]
             },
             wwwprod: {
                 options: {
                     bucket: 'www.mobify.com',
+                    CacheControl: LONG_CACHE_CONTROL,
                 },
                 upload: [
                     {
-                       src: "www/_site/**/*",
+                       src: "**/*",
                        dest: "mobifyjs",
-                       rel: "www/_site"
+                       cwd: "www/_site"
                     },
                 ]
             },
             wwwprodstatic: {
                 options: {
                     bucket: 'www.mobify.com',
-                    headers: { "Cache-Control": LONG_CACHE_CONTROL }
+                    CacheControl: LONG_CACHE_CONTROL,
                 },
                 upload: [
                     {
-                        src: "www/_site/static/**/*",
+                        src: "static/**/*",
                         dest: "mobifyjs",
-                        rel: "www/_site",
+                        cwd: "www/_site",
                     }
                 ]
             },
@@ -359,11 +352,11 @@ module.exports = function(grunt) {
         }
     });
     
+    grunt.loadNpmTasks('grunt-aws-s3');
     grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-saucelabs');
-    grunt.loadNpmTasks('grunt-s3');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-jekyll');
     grunt.loadNpmTasks('grunt-express');
@@ -381,9 +374,9 @@ module.exports = function(grunt) {
         }
     });
     grunt.registerTask('default', 'build');
-    grunt.registerTask('deploy', ['build', 's3:devBuild', 's3:prodBuild', 's3:examples']);
-    grunt.registerTask('wwwstagingdeploy', ['jekyll:build', 's3:wwwstaging', 's3:wwwstagingstatic']);
-    grunt.registerTask('wwwproddeploy', ['jekyll:build', 's3:wwwprod', 's3:wwwprodstatic']);
+    grunt.registerTask('deploy', ['build', 'aws_s3:devBuild', 'aws_s3:prodBuild', 'aws_s3:examples']);
+    grunt.registerTask('deploy_docs_staging', ['jekyll:build', 'aws_s3:wwwstaging', 'aws_s3:wwwstagingstatic']);
+    grunt.registerTask('deploy_docs', ['jekyll:build', 'aws_s3:wwwprod', 'aws_s3:wwwprodstatic']);
     grunt.registerTask('saucelabs', ['test', 'saucelabs-qunit:all']);
     grunt.registerTask('serve', ['build', 'express', 'watch']);
     grunt.registerTask('preview', 'serve'); // alias to serve

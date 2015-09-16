@@ -3,7 +3,7 @@
   "version": "2.0.16",
   "main": "build/mobify.min.js",
   "dependencies": {
-    "capturejs": "1.0.1",
+    "capturejs": "1.0.4",
     "mobifyjs-utils": "1.0.0",
     "jazzcat-client": "1.0.0",
     "imageresize-client": "1.0.4",
