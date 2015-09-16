@@ -3,6 +3,8 @@
       `<img>` and `<source>` elements.
     - Updates dependency on imageresize-client to better support modern 
       `<picture>` element markup.
+    - Update to latest capturing fix that targets scroll jank bug fix on
+      iOS8 and greater.
 2.0.15
     - The previous iOS 8.0 scroll fix was causing some incompatibilities with
       certain websites. Introduces a new scroll fix that should work in all
