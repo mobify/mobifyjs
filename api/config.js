@@ -16,7 +16,7 @@
     // in the v6 tag, ajs is always defined, but that is not the case for v7 tags,
     // and thus we will make it defined here.
     if (Mobify && Mobify.config && Mobify.config.projectName) {
-        Mobify.ajs = Mobify.ajs || '//a.mobify.com/' + Mobify.config.projectName + 'a.js';
+        Mobify.ajs = Mobify.ajs || '//a.mobify.com/' + Mobify.config.projectName + '/a.js';
     }
     config.ajs = Mobify.ajs;
 })();
