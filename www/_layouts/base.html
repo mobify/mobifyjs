@@ -57,35 +57,14 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body class="{{ page.bodyclass }}">
     <div class="viewport">
+        <div class="navbar">
+            <a class="brand" href="/mobifyjs/"></a>
+        </div>
         {{ content }}
     </div>
-    <div class="footer">
-        <div class="row-fluid">
-            <div class="span6">
-                <p>Copyright &copy; 2013 <a href="//www.mobify.com/">Mobify</a>.</p>
-            </div>
-
-            <div class="span6">
-                <ul class="nav pull-right">
-                    <li>
-                        <a href="//twitter.com/mobify" title="Mobify on Twitter">
-                            <i class="icon-twitter"></i>@Mobify
-                        </a>
-                    </li>
-                    <li>
-                        <a href="//github.com/mobify" title="Mobify on Github">
-                            <i class="icon-github"></i>Github
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ site.baseurl }}/license/">License</a>
-                    </li>
-                </ul>
-            </div>
-        </div><!-- .row-fluid -->
- </div><!-- .footer -->
 
 <!-- JavaScript -->
 <script src="{{ site.baseurl }}/static/js/highlight/highlight.pack.js"></script>
