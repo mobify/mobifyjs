@@ -269,9 +269,7 @@ table td code {
 
 /* Base Layout */
 .viewport {
-	border: solid 13px rgba(255,255,255,0.1);
-	border-width: 13px 13px 0 13px;
-	padding-bottom: 4em;
+    margin: 50px;
 }
 	.home .viewport {
 		padding-bottom: 0;
@@ -347,14 +345,12 @@ table td code {
 	padding: 3em 0;
 }
 .navbar .brand {
-	font-size: 0;
-	text-indent: -999px;
-	overflow: hidden;
-	width: 200px;
-	height: 51px;
-	padding: 0;
-	margin: 0;
-	background: url(../img/sprites.min.png) 0 0;
+    width: 300px;
+    height: 120px;
+    padding: 0;
+    margin-left: 15px;
+    background: url(../img/logo.png) 0 0;
+    background-repeat: no-repeat;
 }
 .navbar ul.nav {
 	float: right;
@@ -636,6 +632,7 @@ table td code {
 }
 .intro {
 	position: relative;
+	padding: 100px;
 }
   .intro p {
     margin: 0.5em 0 0 0;

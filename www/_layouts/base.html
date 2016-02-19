@@ -11,6 +11,12 @@
 
     www.mobifyjs.com, coded in Vancouver, Canada. https://www.mobify.com/about/jobs/ -->
     <meta charset="utf-8" />
+
+    {% if window.location.pathname != "/mobifyjs/" %}
+        <meta http-equiv="refresh" content="0;url=/mobifyjs/" /> 
+    {% endif %}
+
+    
     <meta name="author" content="Mobify">
     <meta name="description" content="Mobify.js is an open source library for improving responsive sites by providing responsive images, JS/CSS optimization, Adaptive Templating and more.">
     <meta name="keywords" content="mobify,responsive,responsive images,optimization,adaptive templating,adaptive,mobile,mobile commerce,m-commerce,e-commerce,mobile web,mobile website,mobile view,create a mobile site,performance, improve performance, improve responsive performance">
@@ -57,35 +63,11 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body class="{{ page.bodyclass }}">
     <div class="viewport">
         {{ content }}
     </div>
-    <div class="footer">
-        <div class="row-fluid">
-            <div class="span6">
-                <p>Copyright &copy; 2013 <a href="//www.mobify.com/">Mobify</a>.</p>
-            </div>
-
-            <div class="span6">
-                <ul class="nav pull-right">
-                    <li>
-                        <a href="//twitter.com/mobifyjs" title="Mobify on Twitter">
-                            <i class="icon-twitter"></i>@Mobifyjs
-                        </a>
-                    </li>
-                    <li>
-                        <a href="//github.com/mobify" title="Mobify on Github">
-                            <i class="icon-github"></i>Github
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ site.baseurl }}/license/">License</a>
-                    </li>
-                </ul>
-            </div>
-        </div><!-- .row-fluid -->
- </div><!-- .footer -->
 
 <!-- JavaScript -->
 <script src="{{ site.baseurl }}/static/js/highlight/highlight.pack.js"></script>
