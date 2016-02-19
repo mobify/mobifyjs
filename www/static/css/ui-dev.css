@@ -348,7 +348,7 @@ table td code {
     width: 300px;
     height: 120px;
     padding: 0;
-    margin: 0;
+    margin-left: 15px;
     background: url(../img/logo.png) 0 0;
     background-repeat: no-repeat;
 }
@@ -632,6 +632,7 @@ table td code {
 }
 .intro {
 	position: relative;
+	padding: 100px;
 }
   .intro p {
     margin: 0.5em 0 0 0;

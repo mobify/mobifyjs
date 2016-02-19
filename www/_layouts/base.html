@@ -11,6 +11,12 @@
 
     www.mobifyjs.com, coded in Vancouver, Canada. https://www.mobify.com/about/jobs/ -->
     <meta charset="utf-8" />
+
+    {% if window.location.pathname != "/mobifyjs/" %}
+        <meta http-equiv="refresh" content="0;url=/mobifyjs/" /> 
+    {% endif %}
+
+    
     <meta name="author" content="Mobify">
     <meta name="description" content="Mobify.js is an open source library for improving responsive sites by providing responsive images, JS/CSS optimization, Adaptive Templating and more.">
     <meta name="keywords" content="mobify,responsive,responsive images,optimization,adaptive templating,adaptive,mobile,mobile commerce,m-commerce,e-commerce,mobile web,mobile website,mobile view,create a mobile site,performance, improve performance, improve responsive performance">
