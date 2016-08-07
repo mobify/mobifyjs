@@ -53,7 +53,7 @@ var supportsOrientation = $.support.orientation
   , evName = supportsOrientation ? "orientationchange" : "resize"
   , handler = supportsOrientation ? dispatchListeners : ersatzOrientation
   , ensureOrientationHandler = function() {
-        $(window).unbind(evName, handler).bind(evName, handler);
+        $(window).off(evName, handler).on(evName, handler);
     }
 
 Mobify.orientation = function(fn) {

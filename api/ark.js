@@ -70,4 +70,4 @@ var contraband = {}
         }
     };
 
-})(Mobify);
+})(window.Mobify || (window.Mobify = {}));
