@@ -36,6 +36,15 @@ $.extend(Mobify.transform, {
     // Read the conf, extract the Source DOM and begin the evaluation.
     prepareConf : function(rawConf) {
         var capturedState = Mobify.html.extractDOM();
+
+        // We need to remove the plaintext element after state is captured
+        // b/c googlebot will think it's the real content
+        // and use it as the SEO content for search result page
+        var plaintextEl = document.querySelector('plaintext')
+        if (plaintextEl) {
+            plaintextEl.parentNode.removeChild(plaintextEl)
+        }
+
         capturedState.config = Mobify.config;
         
         // If conf is using data2 evaluation in a {+conf} or {+konf}, this call would provide
