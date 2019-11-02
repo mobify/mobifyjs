@@ -19,7 +19,7 @@
     "grunt-s3": "0.2.0-alpha.2",
     "grunt-saucelabs": "8.3.2",
     "hbs": "~2.3.0",
-    "request": "~2.44.0"
+    "request": "~2.88.0"
   },
   "engine": ">= 0.10.1",
   "repository": {
